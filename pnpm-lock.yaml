@@ -62,6 +62,9 @@ importers:
 
   apps/docs:
     dependencies:
+      '@consent-management/core':
+        specifier: workspace:*
+        version: link:../../packages/core
       '@consent-management/react':
         specifier: workspace:*
         version: link:../../packages/react

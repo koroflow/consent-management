@@ -12,6 +12,7 @@
 	},
 	"dependencies": {
 		"@consent-management/react": "workspace:*",
+		"@consent-management/core": "workspace:*",
 		"@consent-management/shadcn": "workspace:*",
 		"@radix-ui/react-scroll-area": "^1.2.3",
 		"@radix-ui/react-select": "^2.1.6",

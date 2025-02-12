@@ -51,76 +51,36 @@ store.getState().setConsent('analytics', true);
 
 You can manage user consents using various methods provided by the store:
 
-- **Set Consent**: Update consent for a specific type.
+<Tabs groupId="Method" items={["Set Consent", "Save Consents", "Reset Consents"]}>
+<Tab value="Set Consent">
+Update consent for a specific type.
   ```typescript
+  import { createConsentManagerStore } from '@consent-management/core';
+ 
+  const store = createConsentManagerStore();
+ 
   store.getState().setConsent('marketing', true);
   ```
-
-- **Save Consents**: Save user preferences.
+</Tab>
+<Tab value="Save Consents">
+Save user preferences.
   ```typescript
+  import { createConsentManagerStore } from '@consent-management/core';
+ 
+  const store = createConsentManagerStore();
+ 
   store.getState().saveConsents('all');
   ```
-
-- **Reset Consents**: Reset all consents to default values.
+</Tab>
+<Tab value="Reset Consents">
+ Reset all consents to default values.
   ```typescript
+
+  import { createConsentManagerStore } from '@consent-management/core';
+ 
+  const store = createConsentManagerStore();
+ 
   store.getState().resetConsents();
   ```
-
-## API Reference
-
-### createConsentManagerStore
-
-Creates a new consent manager store instance.
-
-**Parameters:**
-- `namespace` (optional): A string to namespace the store instance.
-
-**Returns:** A Zustand store instance with consent management functionality.
-
-### PrivacyConsentState
-
-Defines the core state and methods for the consent management store.
-
-**Properties:**
-- `consents`: Current consent states.
-- `consentInfo`: Information about when and how consent was given.
-- `showPopup`: Whether to show the consent popup.
-- `gdprTypes`: Active GDPR consent types.
-- `isPrivacyDialogOpen`: Whether the privacy dialog is open.
-- `complianceSettings`: Region-specific compliance settings.
-- `callbacks`: Event callbacks for consent actions.
-- `detectedCountry`: User's detected country code.
-- `privacySettings`: Privacy-related settings.
-- `includeNonDisplayedConsents`: Whether to include non-displayed consents.
-
-**Methods:**
-- `setConsent(name: AllConsentNames, value: boolean)`: Updates the consent state.
-- `setShowPopup(show: boolean)`: Controls the visibility of the consent popup.
-- `setIsPrivacyDialogOpen(isOpen: boolean)`: Controls the privacy dialog visibility.
-- `saveConsents(type: 'all' | 'custom' | 'necessary')`: Saves user consent preferences.
-- `resetConsents()`: Resets all consent preferences.
-- `setGdprTypes(types: AllConsentNames[])`: Updates active GDPR consent types.
-- `setComplianceSetting(region: ComplianceRegion, settings: Partial<ComplianceSettings>)`: Updates compliance settings.
-- `resetComplianceSettings()`: Resets compliance settings.
-- `setCallback(name: keyof Callbacks, callback: CallbackFunction | undefined)`: Sets a callback for a consent event.
-- `setDetectedCountry(country: string)`: Updates the user's detected country.
-- `getDisplayedConsents()`: Retrieves the list of consent types to display.
-- `hasConsented()`: Checks if any consent has been given.
-- `clearAllData()`: Clears all consent data.
-- `updateConsentMode()`: Updates the consent mode in external systems.
-- `setPrivacySettings(settings: Partial<PrivacySettings>)`: Updates privacy settings.
-- `getEffectiveConsents()`: Gets effective consent states.
-- `hasConsentFor(consentType: AllConsentNames)`: Checks if consent is given for a type.
-- `setIncludeNonDisplayedConsents(include: boolean)`: Controls inclusion of non-displayed consents.
-
-## License
-
-This package is licensed under the [GNU General Public License v3.0](https://github.com/koroflow/consent-management/blob/main/LICENSE).
-
-## Contributing
-
-Contributions are welcome! Please read the [contributing guidelines](https://github.com/koroflow/consent-management/blob/main/CONTRIBUTING.md) before submitting a pull request.
-
-## Support
-
-For support, please join our [Discord community](https://discord.gg/koroflow) or open an issue on [GitHub](https://github.com/koroflow/consent-management/issues).
+</Tab>
+</Tabs> 
