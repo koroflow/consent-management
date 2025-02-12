@@ -3,6 +3,10 @@ title: Getting Started
 description: Build privacy-first applications with zero legal overhead. Our plug-and-play components handle compliance so you can focus on your product.
 ---
 import CookieBannerExample from '../../../examples/cookie-banner';
+import { HomeIcon, LanguagesIcon, CookieIcon, LayersIcon, ToggleRightIcon } from 'lucide-react';
+
+<CookieBannerExample/>
+
 
 ## Why @consent-management/react?
 
@@ -14,38 +18,22 @@ Building privacy-compliant interfaces isn't just about showing a cookie banner -
 - **Manage consent automatically** - Smart state management that remembers user preferences
 - **Stay up to date** - Automatic updates when regulations change
 
-<CookieBannerExample/>
-
 ## Getting Started
 
-1. Install the package:
+<Steps>
+<Step>
 
-<Tabs groupId="manual-install" items={["npm", "pnpm", "yarn", "bun"]}>
-  <Tab value="npm">
-  ```bash 
-  npm install @consent-management/react
-  ```
-  </Tab>
-  <Tab value="pnpm">
-  ```bash 
-  pnpm install @consent-management/react
-  ```
-  </Tab>
-  <Tab value="yarn">
-  ```bash
-  yarn add @consent-management/react
-  ```
-  </Tab>
-  <Tab value="bun">
-  ```bash
-  bun add @consent-management/react 
-  ```
-  </Tab>
-</Tabs>
+### Install the package:
 
-2. Add the privacy banner to your app:
+```package-install
+@consent-management/react
+```
+</Step>
+<Step>
 
-```tsx
+### Add the privacy banner to your app:
+
+```tsx title="app.tsx"
 import {
 	ConsentManagerDialog,
 	ConsentManagerProvider,
@@ -62,75 +50,49 @@ function App() {
   )
 }
 ```
+</Step>
+<Step>
 
-That's it! You now have a fully compliant privacy system. The banner will automatically:
-- Display on first visit
-- Remember user preferences
-- Handle consent management
-- Maintain compliance records
+### That's it! You now have a fully compliant privacy system.
+
+</Step>
+</Steps>
 
 ## Core Components
 
-@consent-management/react includes three main components that work together to create a complete privacy management system:
+<Cards>
+  <Card 
+    icon={<CookieIcon />}
+    title="Cookie Banner"
+    description="The friendly first-touch privacy notice that greets users. Customizable, accessible, and designed to get out of the way."
+    href="/docs/framework/react/cookie-banner"
+  />
+  <Card 
+   icon={<LayersIcon />}
+    title="Consent Manager Dialog"
+    description="A detailed privacy preferences interface that lets users fine-tune their choices. Built with accessibility and usability in mind."
+    href="/docs/framework/react/consent-manager-dialog"
+  />
+  <Card 
+    icon={<ToggleRightIcon />}
+    title="Consent Manager Widget"
+    description="The engine that powers granular consent management. Easily embed detailed privacy controls anywhere in your app."
+    href="/docs/framework/react/consent-manager-widget"
+  />
+</Cards>
 
-### Cookie Banner
-The friendly first-touch privacy notice that greets users. Customizable, accessible, and designed to get out of the way.
-
-```tsx
-<CookieBanner 
-  title="We respect your privacy"
-  description="We use cookies to improve your experience"
-/>
-```
-
-[Learn more about Cookie Banner →](/docs/framework/react/cookie-banner)
-
-### Consent Manager Dialog
-A detailed privacy preferences interface that lets users fine-tune their choices. Built with accessibility and usability in mind.
-
-```tsx
-<ConsentManagerDialog theme={yourTheme} />
-```
-
-[Learn more about Consent Manager Dialog →](/docs/framework/react/consent-manager-dialog)
-
-### Consent Manager Widget
-The engine that powers granular consent management. Easily embed detailed privacy controls anywhere in your app.
-
-```tsx
-<ConsentManagerWidget/>
-```
-
-[Learn more about Consent Manager Widget →](/docs/framework/react/consent-manager-widget)
-
-## Customization
-
-Every component can be styled to match your brand:
-
-```tsx
-<CookieBanner 
-  theme={{
-    "cookie-banner.root": "your-custom-class",
-    "cookie-banner.title": "text-xl font-bold",
-    "cookie-banner.description": "text-gray-600"
-  }}
-/>
-```
-
-We support:
-- Custom CSS classes
-- Tailwind CSS
-- CSS-in-JS solutions
-- Custom component injection
-- Theme providers
-
-[Learn more about customization →](/docs/framework/react/customization)
-
-## Browser Support
-
-@consent-management/react works in all modern browsers:
-- Chrome/Edge (last 2 versions)
-- Firefox (last 2 versions)
-- Safari (last 2 versions)
-- Mobile Safari (last 2 versions)
-- Android Chrome (last 2 versions)
+## Guides
+<Cards>
+  <Card 
+    icon={<HomeIcon />}
+    title="Customization" 
+    description="Customize the c15t components to match your brand"
+    href="/docs/framework/react/customization" 
+  />
+  <Card 
+    icon={<LanguagesIcon />}
+    title="Internationalization" 
+    description="Translate the c15t components into any language"
+    href="/docs/framework/react/guides/translation" 
+  />
+</Cards>

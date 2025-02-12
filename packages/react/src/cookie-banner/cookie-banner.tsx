@@ -38,42 +38,50 @@ export interface CookieBannerProps {
 	/**
 	 * Custom styles to apply to the banner and its child components
 	 * @remarks Allows for deep customization of the banner's appearance while maintaining accessibility
+	 * @type {Partial<CookieBannerTheme>}
+	 * @default undefined
 	 */
 	theme?: Partial<CookieBannerTheme>;
 
 	/**
 	 * When true, removes all default styling from the component
 	 * @remarks Useful for implementing completely custom designs
+	 * @default false
 	 */
 	noStyle?: boolean;
 
 	/**
 	 * Content to display as the banner's title
 	 * @remarks Supports string or ReactNode for rich content
+	 * @default undefined
 	 */
 	title?: ReactNode;
 
 	/**
 	 * Content to display as the banner's description
 	 * @remarks Supports string or ReactNode for rich content
+	 * @default undefined
 	 */
 	description?: ReactNode;
 
 	/**
 	 * Content to display on the reject button
 	 * @remarks Required by GDPR for explicit consent rejection
+	 * @default undefined
 	 */
 	rejectButtonText?: ReactNode;
 
 	/**
 	 * Content to display on the customize button
 	 * @remarks Opens detailed consent preferences
+	 * @default undefined
 	 */
 	customizeButtonText?: ReactNode;
 
 	/**
 	 * Content to display on the accept button
 	 * @remarks Primary action for accepting cookie preferences
+	 * @default undefined
 	 */
 	acceptButtonText?: ReactNode;
 }

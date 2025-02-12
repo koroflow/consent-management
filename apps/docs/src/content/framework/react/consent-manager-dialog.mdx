@@ -2,6 +2,7 @@
 title: Consent Manager Dialog
 description: An accessible, animated modal interface that wraps the Consent Manager Widget for a focused privacy customization experience.
 ---
+import { LayersIcon, ToggleRightIcon } from 'lucide-react';
 
 The Consent Manager Dialog provides a clean, focused way for users to customize their privacy preferences. Think of it as a spotlight that dims the rest of your application while users make important privacy decisions. When users click "Customize" on your cookie banner, this dialog smoothly appears with detailed privacy controls.
 
@@ -22,29 +23,9 @@ Let's explore how to implement this in your application.
 
 First, install the package if you haven't already:
 
-<Tabs groupId="manual-install" items={["npm", "pnpm", "yarn", "bun"]}>
-  <Tab value="npm">
-  ```bash 
-  npm install @consent-management/react
-  ```
-  </Tab>
-  <Tab value="pnpm">
-  ```bash 
-  pnpm install @consent-management/react
-  ```
-  </Tab>
-  <Tab value="yarn">
-  ```bash
-  yarn add @consent-management/react
-  ```
-  </Tab>
-  <Tab value="bun">
-  ```bash
-  bun add @consent-management/react 
-  ```
-  </Tab>
-</Tabs>
-
+```package-install
+@consent-management/react
+```
 
 Then add the dialog to your application:
 
@@ -237,5 +218,17 @@ To prevent hydration issues, the dialog only renders on the client side. This is
 
 ## Related Components
 
-- [Cookie Banner](/docs/framework/react/cookie-banner) - Initial privacy notice
-- [Consent Manager Widget](/docs/framework/react/consent-manager-widget) - Detailed controls
+<Cards>
+  <Card 
+    icon={<CookieIcon />}
+    title="Cookie Banner"
+    description="The friendly first-touch privacy notice that greets users. Customizable, accessible, and designed to get out of the way."
+    href="/docs/framework/react/cookie-banner"
+  />
+  <Card 
+    icon={<ToggleRightIcon />}
+    title="Consent Manager Widget"
+    description="The engine that powers granular consent management. Easily embed detailed privacy controls anywhere in your app."
+    href="/docs/framework/react/consent-manager-widget"
+  />
+</Cards>

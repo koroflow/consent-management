@@ -3,6 +3,7 @@ title: Cookie Banner
 description: A customizable cookie consent banner that handles privacy compliance with zero configuration required.
 ---
 import CookieBannerExample from '../../../examples/cookie-banner';
+import { LayersIcon, ToggleRightIcon } from 'lucide-react';
 
 The Cookie Banner component provides an elegant way to obtain and manage cookie consent from your users. It handles all the complexity of privacy regulations while providing a smooth user experience that integrates naturally with your application.
 
@@ -24,28 +25,9 @@ Our Cookie Banner component handles all of these requirements automatically, whi
 
 Let's add a basic cookie banner to your application. First, install the package:
 
-<Tabs groupId="manual-install" items={["npm", "pnpm", "yarn", "bun"]}>
-  <Tab value="npm">
-  ```bash 
-  npm install @consent-management/react
-  ```
-  </Tab>
-  <Tab value="pnpm">
-  ```bash 
-  pnpm install @consent-management/react
-  ```
-  </Tab>
-  <Tab value="yarn">
-  ```bash
-  yarn add @consent-management/react
-  ```
-  </Tab>
-  <Tab value="bun">
-  ```bash
-  bun add @consent-management/react 
-  ```
-  </Tab>
-</Tabs>
+```package-install
+@consent-management/react
+```
 
 Then add the banner to your root component:
 
@@ -125,6 +107,11 @@ const Banner = () => {
 The Cookie Banner is designed to adapt to your application's visual style. Here are the main ways to customize its appearance:
 
 ### Using Themes
+
+Here are the available theme variables:
+
+<AutoTypeTable path="node_modules/@consent-management/react/src/cookie-banner/index.tsx" name="CookieBannerTheme" />
+
 
 The theme prop provides a straightforward way to customize the banner's appearance:
 
@@ -212,24 +199,20 @@ These features work automatically, ensuring all users can interact with your pri
 
 The main component accepts these props:
 
-| Prop        | Type              | Description            | Default                 |
-| ----------- | ----------------- | ---------------------- | ----------------------- |
-| title       | ReactNode         | Banner title           | "We value your privacy" |
-| description | ReactNode         | Banner description     | "We use cookies..."     |
-| theme       | CookieBannerTheme | Theme configuration    | {}                      |
-| noStyle     | boolean           | Disable default styles | false                   |
+<AutoTypeTable path="node_modules/@consent-management/react/src/cookie-banner/cookie-banner.tsx" name="CookieBannerProps" />
 
 ### Compound Components
 
 Each compound component is designed for specific functionality:
-
-- `CookieBanner.Root`: The container component
-- `CookieBanner.Card`: Wrapper for banner content
-- `CookieBanner.Header`: Groups title and description
-- `CookieBanner.Footer`: Contains action buttons
-- `CookieBanner.AcceptButton`: Accepts all cookies
-- `CookieBanner.RejectButton`: Rejects optional cookies
-- `CookieBanner.CustomizeButton`: Opens preference dialog
+| Component | Description |
+| --- | --- |
+| `CookieBanner.Root` | The container component |
+| `CookieBanner.Card` | Wrapper for banner content |
+| `CookieBanner.Header` | Groups title and description |
+| `CookieBanner.Footer` | Contains action buttons |
+| `CookieBanner.AcceptButton` | Accepts all cookies |
+| `CookieBanner.RejectButton` | Rejects optional cookies |
+| `CookieBanner.CustomizeButton` | Opens preference dialog |
 
 ## Best Practices
 
@@ -244,24 +227,26 @@ Follow these guidelines for optimal implementation:
 ## Common Pitfalls
 
 Watch out for these common issues:
+1. Blocking essential functionality before consent
+2. Overwhelming users with too much information
+3. Poor mobile responsiveness
+4. Insufficient color contrast
+5. Missing keyboard navigation
 
-- Blocking essential functionality before consent
-- Overwhelming users with too much information
-- Poor mobile responsiveness
-- Insufficient color contrast
-- Missing keyboard navigation
 
-## Browser Support
-
-The Cookie Banner works in all modern browsers:
-
-- Chrome/Edge (last 2 versions)
-- Firefox (last 2 versions)
-- Safari (last 2 versions)
-- Mobile Safari (last 2 versions)
-- Android Chrome (last 2 versions)
 
 ## Related Components
-
-- [Consent Manager Dialog](/docs/framework/react/consent-manager-dialog)
-- [Consent Manager Widget](/docs/framework/react/consent-manager-widget)
+<Cards>
+  <Card 
+   icon={<LayersIcon />}
+    title="Consent Manager Dialog"
+    description="A detailed privacy preferences interface that lets users fine-tune their choices. Built with accessibility and usability in mind."
+    href="/docs/framework/react/consent-manager-dialog"
+  />
+  <Card 
+    icon={<ToggleRightIcon />}
+    title="Consent Manager Widget"
+    description="The engine that powers granular consent management. Easily embed detailed privacy controls anywhere in your app."
+    href="/docs/framework/react/consent-manager-widget"
+  />
+</Cards>

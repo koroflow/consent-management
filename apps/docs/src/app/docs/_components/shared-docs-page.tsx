@@ -1,5 +1,7 @@
 import { cn } from '@consent-management/shadcn/libs';
 
+import { createTypeTable } from 'fumadocs-typescript/ui';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
 import defaultMdxComponents from 'fumadocs-ui/mdx';
 import {
 	DocsBody,
@@ -10,22 +12,31 @@ import {
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import type { ComponentType } from 'react';
+import { Card } from '~/components/docs/card';
+import { CodeBlock } from '~/components/docs/codeblock';
 import { Installer } from '~/components/docs/installer';
 import { PoweredBy } from '~/components/docs/powered-by';
 import { Preview } from '~/components/docs/preview';
 import { Tab, Tabs } from '~/components/docs/tabs';
 import type { Source } from '~/lib/source';
 
+const { AutoTypeTable } = createTypeTable();
+
 /**
  * Custom MDX components used for rendering documentation content
  */
 const components = {
 	...defaultMdxComponents,
+	AutoTypeTable,
 	Tabs,
 	Tab,
 	Installer,
 	Preview,
 	PoweredBy,
+	Steps,
+	Step,
+	Card,
+	CodeBlock,
 };
 
 /**

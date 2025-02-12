@@ -19,12 +19,14 @@ export type CardProps = HTMLAttributes<HTMLElement> & {
 	description?: ReactNode;
 	href?: string;
 	external?: boolean;
+	showBackgroundIcon?: boolean;
 };
 
 export function Card({
 	icon,
 	title,
 	description,
+	showBackgroundIcon = true,
 	...props
 }: CardProps): ReactElement {
 	const E = props.href ? Link : 'div';
@@ -67,7 +69,7 @@ export function Card({
 			<div className="absolute inset-0 z-1 bg-gradient-to-t from-transparent to-fd-primary/[0.4] opacity-0 transition-opacity group-hover:opacity-100" />
 
 			{/* Background icon */}
-			{icon && (
+			{showBackgroundIcon && icon && (
 				<div className="-right-6 -translate-y-1/2 group-hover:-right-4 absolute top-1/2 z-2 opacity-[0.02] transition-all duration-300 group-hover:opacity-[0.04]">
 					<div className="rotate-12 text-fd-card-foreground [&_svg]:size-32">
 						{icon}

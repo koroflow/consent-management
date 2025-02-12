@@ -2,6 +2,7 @@
 title: Consent Manager Widget
 description: A flexible, composable widget for building custom privacy consent interfaces. The widget provides granular control over privacy preferences while handling all the compliance requirements for you.
 ---
+import { LayersIcon, CookieIcon } from 'lucide-react';
 
 The Consent Manager Widget serves as the core interface for detailed privacy consent management in your application. While the Cookie Banner handles initial consent, this widget enables users to fine-tune their privacy preferences through an intuitive accordion interface.
 
@@ -23,29 +24,9 @@ The widget automatically handles the complex task of tracking and storing these 
 
 First, install the package:
 
-<Tabs groupId="manual-install" items={["npm", "pnpm", "yarn", "bun"]}>
-  <Tab value="npm">
-  ```bash 
-  npm install @consent-management/react
-  ```
-  </Tab>
-  <Tab value="pnpm">
-  ```bash 
-  pnpm install @consent-management/react
-  ```
-  </Tab>
-  <Tab value="yarn">
-  ```bash
-  yarn add @consent-management/react
-  ```
-  </Tab>
-  <Tab value="bun">
-  ```bash
-  bun add @consent-management/react 
-  ```
-  </Tab>
-</Tabs>
-
+```package-install
+@consent-management/react
+```
 
 Then add the widget to your application:
 
@@ -259,13 +240,24 @@ function PrivacyCenter() {
 
 ## Best Practices
 
-- Place the widget in a dedicated privacy preferences page or dialog
-- Use clear, concise labels for consent options
-- Maintain consistent styling with your application
-- Test the widget across different screen sizes
-- Ensure all interactive elements are keyboard accessible
+1. Place the widget in a dedicated privacy preferences page or dialog
+2. Use clear, concise labels for consent options
+3. Maintain consistent styling with your application
+4. Test the widget across different screen sizes
+5. Ensure all interactive elements are keyboard accessible
 
 ## Related Components
-
-- [Cookie Banner](/docs/framework/react/cookie-banner)
-- [Consent Manager Dialog](/docs/framework/react/consent-manager-dialog)
+<Cards>
+  <Card 
+    icon={<CookieIcon />}
+    title="Cookie Banner"
+    description="The friendly first-touch privacy notice that greets users. Customizable, accessible, and designed to get out of the way."
+    href="/docs/framework/react/cookie-banner"
+  />
+  <Card 
+   icon={<LayersIcon />}
+    title="Consent Manager Dialog"
+    description="A detailed privacy preferences interface that lets users fine-tune their choices. Built with accessibility and usability in mind."
+    href="/docs/framework/react/consent-manager-dialog"
+  />
+</Cards>
