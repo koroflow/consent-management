@@ -100,7 +100,6 @@
 	background-color: var(--c15t-cookie-banner-bg);
 	box-shadow: var(--c15t-cookie-banner-shadow);
 	overflow: hidden;
-	max-width: 440px;
 	/* Animation states */
 	&[data-state="open"] {
 		animation: c15t-cookie-banner-enter var(--c15t-cookie-banner-duration)
