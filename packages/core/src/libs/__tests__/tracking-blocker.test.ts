@@ -248,4 +248,24 @@ describe('TrackingBlocker', () => {
 			xhr.open('GET', 'https://www.google-analytics.com/analytics.js');
 		}).not.toThrow();
 	});
+
+	test('handles multiple concurrent requests correctly', async () => {
+		createTrackingBlocker({}, BLOCKED_CONSENT);
+
+		// Create multiple concurrent requests
+		const requests = Promise.all([
+			expect(
+				fetch('https://www.google-analytics.com/analytics.js')
+			).rejects.toThrow(),
+			expect(
+				fetch('https://www.google-analytics.com/collect')
+			).rejects.toThrow(),
+			fetch('https://api.example.com/data'), // Should succeed
+		]);
+		await requests;
+
+		// Verify correct number of blocked events
+		// 6 blocked events for the 3 requests due to retries
+		expect(document.dispatchEvent).toHaveBeenCalledTimes(6);
+	});
 });
