@@ -31,8 +31,8 @@ const BUTTON_ICON_NAME = 'ButtonIcon';
  */
 export const buttonVariants = tv({
 	slots: {
-		root: ['kf-button'],
-		icon: ['kf-button-icon'],
+		root: ['c15t-button'],
+		icon: ['c15t-button-icon'],
 	},
 	variants: {
 		variant: {
@@ -46,10 +46,10 @@ export const buttonVariants = tv({
 			ghost: {},
 		},
 		size: {
-			medium: { root: 'kf-button-medium' },
-			small: { root: 'kf-button-small' },
-			xsmall: { root: 'kf-button-xsmall' },
-			xxsmall: { root: 'kf-button-xxsmall' },
+			medium: { root: 'c15t-button-medium' },
+			small: { root: 'c15t-button-small' },
+			xsmall: { root: 'c15t-button-xsmall' },
+			xxsmall: { root: 'c15t-button-xxsmall' },
 		},
 	},
 	compoundVariants: [
@@ -57,44 +57,44 @@ export const buttonVariants = tv({
 		{
 			variant: 'primary',
 			mode: 'filled',
-			class: { root: 'kf-button-primary-filled' },
+			class: { root: 'c15t-button-primary-filled' },
 		},
 		{
 			variant: 'primary',
 			mode: 'stroke',
-			class: { root: 'kf-button-primary-stroke' },
+			class: { root: 'c15t-button-primary-stroke' },
 		},
 		{
 			variant: 'primary',
 			mode: 'lighter',
-			class: { root: 'kf-button-primary-lighter' },
+			class: { root: 'c15t-button-primary-lighter' },
 		},
 		{
 			variant: 'primary',
 			mode: 'ghost',
-			class: { root: 'kf-button-primary-ghost' },
+			class: { root: 'c15t-button-primary-ghost' },
 		},
 
 		// Neutral variants
 		{
 			variant: 'neutral',
 			mode: 'filled',
-			class: { root: 'kf-button-neutral-filled' },
+			class: { root: 'c15t-button-neutral-filled' },
 		},
 		{
 			variant: 'neutral',
 			mode: 'stroke',
-			class: { root: 'kf-button-neutral-stroke' },
+			class: { root: 'c15t-button-neutral-stroke' },
 		},
 		{
 			variant: 'neutral',
 			mode: 'lighter',
-			class: { root: 'kf-button-neutral-lighter' },
+			class: { root: 'c15t-button-neutral-lighter' },
 		},
 		{
 			variant: 'neutral',
 			mode: 'ghost',
-			class: { root: 'kf-button-neutral-ghost' },
+			class: { root: 'c15t-button-neutral-ghost' },
 		},
 	],
 	defaultVariants: {

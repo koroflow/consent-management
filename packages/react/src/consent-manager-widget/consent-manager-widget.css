@@ -1,4 +1,4 @@
-.kf-consent-manager-widget {
+.c15t-consent-manager-widget {
 	isolation: isolate;
 
 	/* css reset */
@@ -9,9 +9,9 @@
 	tab-size: 4; /* 4 */
 
 	/* Colors */
-	--kf-cmw-stroke-soft-200: hsl(0, 0%, 92.16%);
-	--kf-cmw-branding-link-color: #47c2ff;
-	--kf-link-text-color: hsl(0, 0%, 9.02%);
+	--c15t-cmw-stroke-soft-200: hsl(0, 0%, 92.16%);
+	--c15t-cmw-branding-link-color: #47c2ff;
+	--c15t-link-text-color: hsl(0, 0%, 9.02%);
 
 	& > :not([hidden]) ~ :not([hidden]) {
 		--tw-space-y-reverse: 0;
@@ -20,24 +20,24 @@
 	}
 }
 
-.dark .kf-consent-manager-dialog-card {
-	--kf-cmw-stroke-soft-200: hsl(0, 0%, 20%);
-	--kf-link-text-color: hsl(0, 0%, 90%);
+.dark .c15t-consent-manager-dialog-card {
+	--c15t-cmw-stroke-soft-200: hsl(0, 0%, 20%);
+	--c15t-link-text-color: hsl(0, 0%, 90%);
 }
 
-.kf-consent-manager-widget .kf-accordion-trigger {
+.c15t-consent-manager-widget .c15t-accordion-trigger {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
 	position: relative;
-	& .kf-accordion-trigger-sub-group {
+	& .c15t-accordion-trigger-sub-group {
 		display: flex;
 		align-items: center;
 		gap: 1rem;
 	}
 }
 
-.kf-consent-manager-widget-footer {
+.c15t-consent-manager-widget-footer {
 	display: flex;
 	justify-content: space-between;
 	gap: 1rem;
@@ -46,33 +46,33 @@
 	}
 }
 
-.kf-consent-manager-widget-footer-sub-group {
+.c15t-consent-manager-widget-footer-sub-group {
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
 	gap: 1rem /* 16px */;
 }
 @media (max-width: 640px) {
-	.kf-button, {
+	.c15t-button, {
 		width: 100%;
 	}
 }
 
-.kf-consent-manager-widget-branding {
+.c15t-consent-manager-widget-branding {
 	display: flex;
 	justify-content: center;
 	width: 100%;
 	border-top-width: 1px;
-	border-top-color: var(--kf-cmw-stroke-soft-200);
+	border-top-color: var(--c15t-cmw-stroke-soft-200);
 	padding-top: 1rem;
 }
 
-.kf-consent-manager-widget-branding-link {
-	color: var(--kf-link-text-color);
+.c15t-consent-manager-widget-branding-link {
+	color: var(--c15t-link-text-color);
 	text-decoration: none;
 	text-align: center;
 }
 
-.kf-consent-manager-widget-branding-link-span {
-	color: var(--kf-cmw-branding-link-color);
+.c15t-consent-manager-widget-branding-link-span {
+	color: var(--c15t-cmw-branding-link-color);
 }

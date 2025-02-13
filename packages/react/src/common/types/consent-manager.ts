@@ -39,7 +39,6 @@ export interface ConsentManagerProviderProps extends NamespaceProps {
 	 * should behave in different geographical regions.
 	 */
 	initialComplianceSettings?: Record<ComplianceRegion, ComplianceSettings>;
-
 	/**
 	 * @remarks
 	 * Whether to skip injecting default styles

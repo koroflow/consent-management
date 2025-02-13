@@ -18,7 +18,7 @@ export const ConsentManagerWidgetFooter = forwardRef<
 	return (
 		<Box
 			ref={ref as Ref<HTMLDivElement>}
-			baseClassName="kf-consent-manager-widget-footer"
+			baseClassName="c15t-consent-manager-widget-footer"
 			data-testid="consent-manager-widget-footer"
 			{...props}
 			themeKey="consent-manager-widget.footer"
@@ -35,7 +35,7 @@ export const ConsentManagerWidgetFooterSubGroup = forwardRef<
 	return (
 		<Box
 			ref={ref as Ref<HTMLDivElement>}
-			baseClassName="kf-consent-manager-widget-footer-sub-group"
+			baseClassName="c15t-consent-manager-widget-footer-sub-group"
 			data-testid="consent-manager-widget-footer-sub-group"
 			{...props}
 			themeKey="consent-manager-widget.footer.sub-group"

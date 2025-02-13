@@ -112,7 +112,7 @@ interface StoreConfig {
  * @public
  */
 export const createConsentManagerStore = (
-	namespace: string | undefined = 'ConsentManagerStore',
+	namespace: string | undefined = 'c15tStore',
 	config?: StoreConfig
 ) => {
 	// Load initial state from localStorage if available

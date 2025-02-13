@@ -1,5 +1,5 @@
 /* Base switch variables */
-.kf-switch {
+.c15t-switch {
 
   /* css reset */
    font-family: inherit; /* 1 */
@@ -11,118 +11,118 @@
   border: 0;
   background: none;
 	/* Layout variables */
-	--kf-switch-height: 1.25rem;
-	--kf-switch-width: 2rem;
-	--kf-switch-padding: 0.125rem;
-	--kf-switch-duration: 200ms;
-	--kf-switch-ease: cubic-bezier(0.4, 0, 0.2, 1);
+	--c15t-switch-height: 1.25rem;
+	--c15t-switch-width: 2rem;
+	--c15t-switch-padding: 0.125rem;
+	--c15t-switch-duration: 200ms;
+	--c15t-switch-ease: cubic-bezier(0.4, 0, 0.2, 1);
 
 	/* Thumb sizes */
-	--kf-switch-thumb-size: 0.75rem;
-	--kf-switch-thumb-size-disabled: 0.625rem;
-	--kf-switch-thumb-translate: 0.75rem;
+	--c15t-switch-thumb-size: 0.75rem;
+	--c15t-switch-thumb-size-disabled: 0.625rem;
+	--c15t-switch-thumb-translate: 0.75rem;
 
 	/* Default HSL values */
-	--kf-switch-bg-default: hsl(0, 0%, 92%);
-	--kf-switch-bg-hover: hsl(0, 0%, 82%);
-	--kf-switch-bg-checked: hsl(227.94, 100%, 60%);
-	--kf-switch-bg-checked-hover: hsl(228.07, 69.8%, 48.04%);
-	--kf-switch-bg-disabled: hsl(0, 0%, 100%);
-	--kf-switch-thumb-bg: hsl(0, 0%, 100%);
-	--kf-switch-thumb-disabled: hsl(0, 0%, 96.86%);
+	--c15t-switch-bg-default: hsl(0, 0%, 92%);
+	--c15t-switch-bg-hover: hsl(0, 0%, 82%);
+	--c15t-switch-bg-checked: hsl(227.94, 100%, 60%);
+	--c15t-switch-bg-checked-hover: hsl(228.07, 69.8%, 48.04%);
+	--c15t-switch-bg-disabled: hsl(0, 0%, 100%);
+	--c15t-switch-thumb-bg: hsl(0, 0%, 100%);
+	--c15t-switch-thumb-disabled: hsl(0, 0%, 96.86%);
 }
 
-.dark .kf-switch {
+.dark .c15t-switch {
 	/* Colors for dark mode */
-	--kf-switch-bg-default: hsl(0, 0%, 20%);
-	--kf-switch-bg-hover: hsl(0, 0%, 16.08%);
-	--kf-switch-bg-checked: hsl(227.94, 100%, 60%);
-	--kf-switch-bg-checked-hover: hsl(228.07, 69.8%, 48.04%);
-	--kf-switch-bg-disabled: hsl(0, 0%, 9.02%);
-	--kf-switch-thumb-bg: hsl(0, 0%, 100%);
-	--kf-switch-thumb-disabled: hsl(0, 0%, 20%);
+	--c15t-switch-bg-default: hsl(0, 0%, 20%);
+	--c15t-switch-bg-hover: hsl(0, 0%, 16.08%);
+	--c15t-switch-bg-checked: hsl(227.94, 100%, 60%);
+	--c15t-switch-bg-checked-hover: hsl(228.07, 69.8%, 48.04%);
+	--c15t-switch-bg-disabled: hsl(0, 0%, 9.02%);
+	--c15t-switch-thumb-bg: hsl(0, 0%, 100%);
+	--c15t-switch-thumb-disabled: hsl(0, 0%, 20%);
 }
 
 /* Root switch wrapper */
-.kf-switch-root {
+.c15t-switch-root {
 	display: block;
-	height: var(--kf-switch-height);
-	width: var(--kf-switch-width);
+	height: var(--c15t-switch-height);
+	width: var(--c15t-switch-width);
 	flex-shrink: 0;
-	padding: var(--kf-switch-padding);
+	padding: var(--c15t-switch-padding);
 	outline: none;
 }
 
 /* Switch track */
-.kf-switch-track {
+.c15t-switch-track {
 	position: relative;
-	height: calc(var(--kf-switch-height) * var(--kf-switch-padding));
-	width: calc(var(--kf-switch-width) * var(--kf-switch-padding));
+	height: calc(var(--c15t-switch-height) * var(--c15t-switch-padding));
+	width: calc(var(--c15t-switch-width) * var(--c15t-switch-padding));
 	border-radius: 9999px;
-	padding: var(--kf-switch-padding);
-	background-color: var(--kf-switch-bg-default);
+	padding: var(--c15t-switch-padding);
+	background-color: var(--c15t-switch-bg-default);
 	outline: none;
-	transition: all var(--kf-switch-duration) var(--kf-switch-ease);
+	transition: all var(--c15t-switch-duration) var(--c15t-switch-ease);
 }
 
 /* Track states */
-.kf-switch-track:hover {
-	background-color: var(--kf-switch-bg-hover);
+.c15t-switch-track:hover {
+	background-color: var(--c15t-switch-bg-hover);
 }
 
-.kf-switch-track:focus-visible {
-	background-color: var(--kf-switch-bg-hover);
+.c15t-switch-track:focus-visible {
+	background-color: var(--c15t-switch-bg-hover);
 }
 
-.kf-switch-track:active {
-	background-color: var(--kf-switch-bg-default);
+.c15t-switch-track:active {
+	background-color: var(--c15t-switch-bg-default);
 }
 
-.kf-switch-root[data-state="checked"] .kf-switch-track {
-	background-color: var(--kf-switch-bg-checked);
+.c15t-switch-root[data-state="checked"] .c15t-switch-track {
+	background-color: var(--c15t-switch-bg-checked);
 }
 
-.kf-switch-root[data-state="checked"]:hover .kf-switch-track {
-	background-color: var(--kf-switch-bg-checked-hover);
+.c15t-switch-root[data-state="checked"]:hover .c15t-switch-track {
+	background-color: var(--c15t-switch-bg-checked-hover);
 }
 
 /* Disabled states */
-.kf-switch-root[data-disabled] {
+.c15t-switch-root[data-disabled] {
 	cursor: not-allowed;
 }
 
-.kf-switch-root[data-disabled] .kf-switch-track {
-	background-color: var(--kf-switch-bg-disabled);
+.c15t-switch-root[data-disabled] .c15t-switch-track {
+	background-color: var(--c15t-switch-bg-disabled);
 	opacity: 0.4;
 	box-shadow: inset 0 0 0 1px hsl(0, 0%, 92.16%);
 }
 
-.kf-switch-root[data-disabled][data-state="checked"] .kf-switch-track {
-	background-color: var(--kf-switch-bg-checked);
+.c15t-switch-root[data-disabled][data-state="checked"] .c15t-switch-track {
+	background-color: var(--c15t-switch-bg-checked);
 	opacity: 0.4;
 	box-shadow: none;
 }
 
 /* Switch thumb */
-.kf-switch-thumb {
+.c15t-switch-thumb {
 	position: relative;
 	display: block;
 	pointer-events: none;
-	width: var(--kf-switch-thumb-size);
-	height: var(--kf-switch-thumb-size);
-	transition: transform var(--kf-switch-duration) var(--kf-switch-ease);
+	width: var(--c15t-switch-thumb-size);
+	height: var(--c15t-switch-thumb-size);
+	transition: transform var(--c15t-switch-duration) var(--c15t-switch-ease);
 	transform: translateX(0);
 }
 
 /* Thumb states */
-.kf-switch-thumb::before {
+.c15t-switch-thumb::before {
 	content: "";
 	position: absolute;
 	inset-block: 0;
 	left: 0;
 	width: 100%;
 	border-radius: 9999px;
-	background-color: var(--kf-switch-thumb-bg);
+	background-color: var(--c15t-switch-thumb-bg);
 	mask: radial-gradient(
 			circle farthest-side at 50% 50%,
 			#0000 1.95px,
@@ -131,29 +131,29 @@
 		50% 50% / 100% 100% no-repeat;
 }
 
-.kf-switch-thumb::after {
+.c15t-switch-thumb::after {
 	content: "";
 	position: absolute;
 	inset-block: 0;
 	left: 0;
 	width: 100%;
 	border-radius: 9999px;
-	box-shadow: var(--kf-shadow-switch-thumb);
+	box-shadow: var(--c15t-shadow-switch-thumb);
 }
 
-.kf-switch-root[data-state="checked"] .kf-switch-thumb {
-	transform: translateX(var(--kf-switch-thumb-translate));
+.c15t-switch-root[data-state="checked"] .c15t-switch-thumb {
+	transform: translateX(var(--c15t-switch-thumb-translate));
 }
 
-.kf-switch-track:active .kf-switch-thumb {
+.c15t-switch-track:active .c15t-switch-thumb {
 	transform: scale(0.833);
 }
 
 /* Disabled thumb */
-.kf-switch-root[data-disabled] .kf-switch-thumb {
+.c15t-switch-root[data-disabled] .c15t-switch-thumb {
 	box-shadow: none;
 }
 
-.kf-switch-root[data-disabled][data-state="checked"] .kf-switch-thumb {
-	transform: translateX(var(--kf-switch-thumb-translate));
+.c15t-switch-root[data-disabled][data-state="checked"] .c15t-switch-thumb {
+	transform: translateX(var(--c15t-switch-thumb-translate));
 }
