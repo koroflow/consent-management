@@ -85,9 +85,12 @@ export const ConsentButton = forwardRef<
 				case 'custom-consent':
 					saveConsents('custom');
 					break;
-				case 'open-consent-dialog':
+				case 'open-consent-dialog': {
 					setIsPrivacyDialogOpen(true);
 					setShowPopup(false);
+					break;
+				}
+				default:
 					break;
 			}
 			if (closeCookieBanner) {

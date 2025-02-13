@@ -166,13 +166,6 @@ export const createConsentManagerStore = (
 				}
 
 				const newConsents = { ...state.consents, [name]: value };
-				localStorage.setItem(
-					STORAGE_KEY,
-					JSON.stringify({
-						consents: newConsents,
-						consentInfo: state.consentInfo,
-					})
-				);
 
 				// Update tracking blocker with new consents
 				trackingBlocker?.updateConsents(newConsents);

@@ -67,6 +67,8 @@ export const ConsentManagerWidgetRejectButton = forwardRef<
 			{...props}
 			themeKey="consent-manager-widget.footer.reject-button"
 			data-testid="consent-manager-widget-reject-button"
+			closeCookieBanner={true}
+			closeCustomizeDialog={true}
 		>
 			{children}
 		</ConsentButton>
