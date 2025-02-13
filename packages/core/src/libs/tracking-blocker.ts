@@ -1,6 +1,10 @@
 /**
  * @packageDocumentation
  * Implements automatic blocking of tracking scripts and network requests until user consent is granted.
+ *
+ * IMPORTANT: This module overrides global `fetch` and `XMLHttpRequest` APIs to enforce consent requirements.
+ * While this approach is necessary for proper consent management, it may conflict with other libraries that
+ * also modify these APIs. This implementation takes precedence to ensure compliance.
  */
 
 import type { AllConsentNames, ConsentState } from '../types';
@@ -61,7 +65,11 @@ export function createTrackingBlocker(
 	 * Normalize a domain by removing 'www.' prefix and ensuring consistent format
 	 */
 	function normalizeDomain(domain: string): string {
-		return domain.toLowerCase().replace(/^www\./, '');
+		return domain
+			.toLowerCase()
+			.replace(/^www\./, '')
+			.replace(/:\d+$/, '') // Remove port numbers
+			.trim();
 	}
 
 	/**
@@ -105,12 +113,13 @@ export function createTrackingBlocker(
 			);
 
 			if (!requiredConsent) {
-				return true; // Allow if no consent required
+				return true;
 			}
 
-			return consents[requiredConsent] === true;
-		} catch {
-			return true; // Allow malformed URLs
+			const isAllowed = consents[requiredConsent] === true;
+			return isAllowed;
+		} catch (error) {
+			return true;
 		}
 	}
 
@@ -131,7 +140,6 @@ export function createTrackingBlocker(
 		if (window.fetch === originalFetch) {
 			window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
 				const url = input instanceof Request ? input.url : input.toString();
-
 				if (!isRequestAllowed(url)) {
 					dispatchConsentBlockedEvent(url);
 					return Promise.reject(
@@ -168,15 +176,12 @@ export function createTrackingBlocker(
 	 * Safe restoration of fetch and XHR
 	 */
 	function restoreOriginalRequests(): void {
-		// Only restore if the current implementations are our overridden versions
-		const currentFetch = window.fetch.toString();
-		const currentXHR = window.XMLHttpRequest.toString();
-
-		// Check if the current implementations match our overridden versions
-		if (currentFetch.includes('dispatchConsentBlockedEvent')) {
+		// Restore fetch if it has been overridden
+		if (window.fetch !== originalFetch) {
 			window.fetch = originalFetch;
 		}
-		if (currentXHR.includes('dispatchConsentBlockedEvent')) {
+
+		if (window.XMLHttpRequest !== originalXHR) {
 			window.XMLHttpRequest = originalXHR;
 		}
 	}

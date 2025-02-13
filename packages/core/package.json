@@ -10,14 +10,22 @@
 		"check-types": "tsc --noEmit",
 		"dev": "rslib build --watch",
 		"fmt": "pnpm biome format --write .",
-		"lint": "pnpm biome lint ./src"
+		"lint": "pnpm biome lint ./src",
+		"test": "vitest run",
+		"test:watch": "vitest",
+		"test:coverage": "vitest run --coverage"
 	},
-	"browserslist": [">0.2%", "not dead", "not op_mini all"],
+	"browserslist": [
+		">0.2%",
+		"not dead",
+		"not op_mini all"
+	],
 	"dependencies": {
 		"zustand": "^5.0.3"
 	},
 	"devDependencies": {
-		"@consent-management/typescript-config": "workspace:*"
+		"@consent-management/typescript-config": "workspace:*",
+		"happy-dom": "^17.1.0"
 	},
 	"publishConfig": {
 		"access": "public"
