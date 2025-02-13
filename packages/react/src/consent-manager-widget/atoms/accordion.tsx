@@ -79,18 +79,26 @@ const ConsentManagerWidgetAccordionItems = () => {
 			key={consent.name}
 			themeKey={`consent-manager-widget.accordion.item-${consent.name}`}
 		>
-			<ConsentManagerWidgetAccordionTrigger
-				themeKey="consent-manager-widget.accordion.trigger"
-				data-testid={`consent-manager-widget-accordion-trigger-${consent.name}`}
+			<div
+				style={{
+					display: 'flex',
+					alignItems: 'center',
+				}}
 			>
-				<ConsentManagerWidgetAccordionSubGroup
-					data-testid={`consent-manager-widget-accordion-sub-group-${consent.name}`}
+				<ConsentManagerWidgetAccordionTrigger
+					themeKey="consent-manager-widget.accordion.trigger"
+					data-testid={`consent-manager-widget-accordion-trigger-${consent.name}`}
 				>
-					<ConsentManagerWidgetAccordionArrow
-						data-testid={`consent-manager-widget-accordion-arrow-${consent.name}`}
-					/>
-					{consentTypes[consent.name]?.title ?? formatConsentName(consent.name)}
-				</ConsentManagerWidgetAccordionSubGroup>
+					<ConsentManagerWidgetAccordionSubGroup
+						data-testid={`consent-manager-widget-accordion-sub-group-${consent.name}`}
+					>
+						<ConsentManagerWidgetAccordionArrow
+							data-testid={`consent-manager-widget-accordion-arrow-${consent.name}`}
+						/>
+						{consentTypes[consent.name]?.title ??
+							formatConsentName(consent.name)}
+					</ConsentManagerWidgetAccordionSubGroup>
+				</ConsentManagerWidgetAccordionTrigger>
 
 				<ConsentManagerWidgetSwitch
 					checked={consents[consent.name]}
@@ -108,7 +116,7 @@ const ConsentManagerWidgetAccordionItems = () => {
 					}}
 					data-testid={`consent-manager-widget-switch-${consent.name}`}
 				/>
-			</ConsentManagerWidgetAccordionTrigger>
+			</div>
 			<ConsentManagerWidgetAccordionContent
 				theme={{
 					content: { themeKey: 'consent-manager-widget.accordion.content' },
