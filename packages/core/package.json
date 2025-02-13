@@ -15,11 +15,7 @@
 		"test:watch": "vitest",
 		"test:coverage": "vitest run --coverage"
 	},
-	"browserslist": [
-		">0.2%",
-		"not dead",
-		"not op_mini all"
-	],
+	"browserslist": [">0.2%", "not dead", "not op_mini all"],
 	"dependencies": {
 		"zustand": "^5.0.3"
 	},
