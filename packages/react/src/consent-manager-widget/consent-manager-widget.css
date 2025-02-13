@@ -1,16 +1,9 @@
 .kf-consent-manager-widget {
-    isolation: isolate;
+	isolation: isolate;
 
-     /* css reset */
-    font-family:
-		system-ui,
-		'Segoe UI',
-		Roboto,
-		Helvetica,
-		Arial,
-		sans-serif,
-		'Apple Color Emoji',
-		'Segoe UI Emoji'; /* 1 */
+	/* css reset */
+	font-family: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif,
+		"Apple Color Emoji", "Segoe UI Emoji"; /* 1 */
 	line-height: 1.15; /* 2 */
 	-webkit-text-size-adjust: 100%; /* 3 */
 	tab-size: 4; /* 4 */
@@ -18,7 +11,7 @@
 	/* Colors */
 	--kf-cmw-stroke-soft-200: hsl(0, 0%, 92.16%);
 	--kf-cmw-branding-link-color: #47c2ff;
-  --kf-link-text-color: hsl(0, 0%, 9.02%);
+	--kf-link-text-color: hsl(0, 0%, 9.02%);
 
 	& > :not([hidden]) ~ :not([hidden]) {
 		--tw-space-y-reverse: 0;
@@ -27,9 +20,9 @@
 	}
 }
 
-.dark .kf-consent-manager-widget {
-  --kf-cmw-stroke-soft-200: hsl(0, 0%, 20%);
-  --kf-link-text-color: hsl(0, 0%, 90%);
+.dark .kf-consent-manager-dialog-card {
+	--kf-cmw-stroke-soft-200: hsl(0, 0%, 20%);
+	--kf-link-text-color: hsl(0, 0%, 90%);
 }
 
 .kf-consent-manager-widget .kf-accordion-trigger {
@@ -75,7 +68,7 @@
 }
 
 .kf-consent-manager-widget-branding-link {
-  color: var(--kf-link-text-color);
+	color: var(--kf-link-text-color);
 	text-decoration: none;
 	text-align: center;
 }
