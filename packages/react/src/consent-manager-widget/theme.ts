@@ -24,8 +24,8 @@ export type ConsentManagerWidgetTheme = Partial<{
 	'consent-manager-widget.accordion': ThemeValue;
 	/** @remarks Styles for the accordion trigger element */
 	'consent-manager-widget.accordion.trigger': ThemeValue;
-	/** @remarks Styles for the accordion trigger sub-group element */
-	'consent-manager-widget.accordion.trigger-sub-group': ThemeValue;
+	/** @remarks Styles for the accordion trigger inner element */
+	'consent-manager-widget.accordion.trigger-inner': ThemeValue;
 	/** @remarks Styles for the accordion item element */
 	'consent-manager-widget.accordion.item': ThemeValue;
 	/** @remarks Styles for the accordion icon element */

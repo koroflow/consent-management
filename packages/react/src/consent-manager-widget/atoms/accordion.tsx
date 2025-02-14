@@ -12,23 +12,24 @@ import { useTranslations } from '../../common/store/use-translations';
 import { Box, type BoxProps } from '../../primitives/box';
 import * as RadixAccordion from '../../ui/components/accordion';
 import * as RadixSwitch from '../../ui/components/switch';
+
 /**
- * Accordion sub-group component for organizing consent options.
+ * Accordion Trigger Component
  *
  * @remarks
  * - Provides visual grouping for related consent options
  * - Supports theme customization
  * - Maintains accessibility structure
  */
-const ConsentManagerWidgetAccordionSubGroup = forwardRef<
+const ConsentManagerWidgetAccordionTrigger = forwardRef<
 	HTMLDivElement,
-	Omit<BoxProps, 'themeKey'>
->(({ children, ...props }, ref) => {
+	BoxProps
+>(({ children, themeKey, ...props }, ref) => {
 	return (
 		<Box
 			ref={ref as Ref<HTMLDivElement>}
-			baseClassName="c15t-accordion-trigger-sub-group"
-			themeKey={'consent-manager-widget.accordion.trigger-sub-group'}
+			baseClassName="c15t-accordion-trigger"
+			themeKey={themeKey}
 			{...props}
 		>
 			{children}
@@ -36,7 +37,7 @@ const ConsentManagerWidgetAccordionSubGroup = forwardRef<
 	);
 });
 
-const ConsentManagerWidgetAccordionTrigger = RadixAccordion.Trigger;
+const ConsentManagerWidgetAccordionTriggerInner = RadixAccordion.Trigger;
 const ConsentManagerWidgetAccordionContent = RadixAccordion.Content;
 const ConsentManagerWidgetAccordionArrow = RadixAccordion.Arrow;
 const ConsentManagerWidgetAccordion = RadixAccordion.Root;
@@ -79,26 +80,19 @@ const ConsentManagerWidgetAccordionItems = () => {
 			key={consent.name}
 			themeKey={`consent-manager-widget.accordion.item-${consent.name}`}
 		>
-			<div
-				style={{
-					display: 'flex',
-					alignItems: 'center',
-				}}
+			<ConsentManagerWidgetAccordionTrigger
+				themeKey="consent-manager-widget.accordion.trigger"
+				data-testid={`consent-manager-widget-accordion-trigger-${consent.name}`}
 			>
-				<ConsentManagerWidgetAccordionTrigger
-					themeKey="consent-manager-widget.accordion.trigger"
-					data-testid={`consent-manager-widget-accordion-trigger-${consent.name}`}
+				<ConsentManagerWidgetAccordionTriggerInner
+					themeKey="consent-manager-widget.accordion.trigger-inner"
+					data-testid={`consent-manager-widget-accordion-trigger-inner-${consent.name}`}
 				>
-					<ConsentManagerWidgetAccordionSubGroup
-						data-testid={`consent-manager-widget-accordion-sub-group-${consent.name}`}
-					>
-						<ConsentManagerWidgetAccordionArrow
-							data-testid={`consent-manager-widget-accordion-arrow-${consent.name}`}
-						/>
-						{consentTypes[consent.name]?.title ??
-							formatConsentName(consent.name)}
-					</ConsentManagerWidgetAccordionSubGroup>
-				</ConsentManagerWidgetAccordionTrigger>
+					<ConsentManagerWidgetAccordionArrow
+						data-testid={`consent-manager-widget-accordion-arrow-${consent.name}`}
+					/>
+					{consentTypes[consent.name]?.title ?? formatConsentName(consent.name)}
+				</ConsentManagerWidgetAccordionTriggerInner>
 
 				<ConsentManagerWidgetSwitch
 					checked={consents[consent.name]}
@@ -116,7 +110,7 @@ const ConsentManagerWidgetAccordionItems = () => {
 					}}
 					data-testid={`consent-manager-widget-switch-${consent.name}`}
 				/>
-			</div>
+			</ConsentManagerWidgetAccordionTrigger>
 			<ConsentManagerWidgetAccordionContent
 				theme={{
 					content: { themeKey: 'consent-manager-widget.accordion.content' },
@@ -139,7 +133,7 @@ const ConsentManagerWidgetAccordionItem = forwardRef<
 	return <RadixAccordion.Item ref={forwardedRef} {...rest} />;
 });
 
-const AccordionSubGroup = ConsentManagerWidgetAccordionSubGroup;
+const AccordionTriggerInner = ConsentManagerWidgetAccordionTriggerInner;
 const AccordionTrigger = ConsentManagerWidgetAccordionTrigger;
 const AccordionContent = ConsentManagerWidgetAccordionContent;
 const AccordionArrow = ConsentManagerWidgetAccordionArrow;
@@ -149,16 +143,16 @@ const AccordionItems = ConsentManagerWidgetAccordionItems;
 const AccordionItem = ConsentManagerWidgetAccordionItem;
 
 export {
-	ConsentManagerWidgetAccordionSubGroup,
 	ConsentManagerWidgetAccordionTrigger,
+	ConsentManagerWidgetAccordionTriggerInner,
 	ConsentManagerWidgetAccordionContent,
 	ConsentManagerWidgetAccordionArrow,
 	ConsentManagerWidgetAccordion,
 	ConsentManagerWidgetSwitch,
 	ConsentManagerWidgetAccordionItems,
 	ConsentManagerWidgetAccordionItem,
-	AccordionSubGroup,
 	AccordionTrigger,
+	AccordionTriggerInner,
 	AccordionContent,
 	AccordionArrow,
 	Accordion,

@@ -53,7 +53,7 @@
 }
 
 /* Trigger button */
-.c15t-accordion-trigger {
+.c15t-accordion-trigger-inner {
 	display: grid;
 	grid-template-columns: auto 1fr;
 	align-items: center;
@@ -160,4 +160,11 @@
 	line-height: 1.25rem;
 	letter-spacing: -0.006em;
 	color: var(--c15t-accordion-content-color);
+}
+
+.c15t-accordion-trigger {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	position: relative;
 }

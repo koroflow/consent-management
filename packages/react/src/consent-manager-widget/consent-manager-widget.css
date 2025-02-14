@@ -52,6 +52,7 @@
 	justify-content: space-between;
 	gap: 1rem /* 16px */;
 }
+
 @media (max-width: 640px) {
 	.c15t-button, {
 		width: 100%;
@@ -71,8 +72,14 @@
 	color: var(--c15t-link-text-color);
 	text-decoration: none;
 	text-align: center;
+  flex-direction: row;
+  display: flex;
+  flex:1;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
 }
 
-.c15t-consent-manager-widget-branding-link-span {
-	color: var(--c15t-cmw-branding-link-color);
+.c15t-consent-manager-widget-branding-link svg {
+  height: 1.2rem;
 }

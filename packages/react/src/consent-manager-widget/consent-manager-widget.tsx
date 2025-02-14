@@ -12,6 +12,7 @@ import { Box } from '../primitives/box';
 
 import { useState } from 'react';
 import { useTranslations } from '../common/store/use-translations';
+import { ConsentManagementIcon } from '../ui/components/logo';
 import {
 	ConsentManagerWidgetAccordion,
 	ConsentManagerWidgetAccordionItems,
@@ -105,12 +106,9 @@ export const ConsentManagerWidget = ({
 				>
 					<a
 						className="c15t-consent-manager-widget-branding-link"
-						href="https://consent.management"
+						href="https://c15t.com"
 					>
-						Secured by{' '}
-						<span className="c15t-consent-manager-widget-branding-link-span">
-							consent.management
-						</span>
+						Secured by <ConsentManagementIcon className="h-4" />
 					</a>
 				</Box>
 			)}

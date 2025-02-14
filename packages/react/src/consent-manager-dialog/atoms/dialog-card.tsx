@@ -12,6 +12,7 @@ import { useTranslations } from '../../common/store/use-translations';
 import { ConsentManagerWidget } from '../../consent-manager-widget/consent-manager-widget';
 import { Box, type BoxProps } from '../../primitives/box';
 import type { ClassNameStyle } from '../../theme';
+import { ConsentManagementIcon } from '../../ui/components/logo';
 /**
  * Props for the DialogCard and related components
  * @public
@@ -175,13 +176,10 @@ const DialogFooter = forwardRef<HTMLDivElement, Omit<BoxProps, 'themeKey'>>(
 				data-testid="consent-manager-dialog-footer"
 			>
 				<a
-					className="consent-manager-widget-branding-link"
-					href="https://koroflow.com"
+					className="c15t-consent-manager-widget-branding-link"
+					href="https://c15t.com"
 				>
-					Secured by{' '}
-					<span className="consent-manager-widget-branding-link-span">
-						consent.management
-					</span>
+					Secured by <ConsentManagementIcon />
 				</a>
 			</Box>
 		);

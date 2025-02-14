@@ -112,12 +112,15 @@ const AccordionTrigger = forwardRef<
 	) => {
 		const { noStyle: contextNoStyle } = useThemeContext();
 
-		const accordionTriggerStyle = useStyles(themeKey ?? 'accordion.trigger', {
-			baseClassName: [baseClassName, 'c15t-accordion-trigger'],
-			className,
-			noStyle: contextNoStyle || noStyle,
-			style,
-		});
+		const accordionTriggerStyle = useStyles(
+			themeKey ?? 'accordion.trigger-inner',
+			{
+				baseClassName: [baseClassName, 'c15t-accordion-trigger-inner'],
+				className,
+				noStyle: contextNoStyle || noStyle,
+				style,
+			}
+		);
 
 		return (
 			<AccordionPrimitive.Trigger
