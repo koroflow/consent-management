@@ -42,7 +42,7 @@ const DialogCard = forwardRef<HTMLDivElement, DialogCardProps>(
 		return (
 			<Box
 				ref={ref as Ref<HTMLDivElement>}
-				baseClassName="kf-card kf-consent-manager-dialog-card"
+				baseClassName="c15t-card c15t-consent-manager-dialog-card"
 				{...props}
 				themeKey="consent-manager-dialog.root"
 				data-testid="consent-manager-dialog-root"
@@ -67,7 +67,7 @@ const DialogHeader = forwardRef<HTMLDivElement, Omit<BoxProps, 'themeKey'>>(
 		return (
 			<Box
 				ref={ref as Ref<HTMLDivElement>}
-				baseClassName="kf-card-header kf-consent-manager-dialog-card"
+				baseClassName="c15t-card-header c15t-consent-manager-dialog-card"
 				{...props}
 				themeKey="consent-manager-dialog.header"
 				data-testid="consent-manager-dialog-header"
@@ -94,7 +94,7 @@ const DialogHeaderTitle = forwardRef<
 	return (
 		<Box
 			ref={ref as Ref<HTMLDivElement>}
-			baseClassName="kf-card-title"
+			baseClassName="c15t-card-title"
 			themeKey="consent-manager-dialog.title"
 			{...props}
 			data-testid="consent-manager-dialog-title"
@@ -120,7 +120,7 @@ const DialogHeaderDescription = forwardRef<
 	return (
 		<Box
 			ref={ref as Ref<HTMLDivElement>}
-			baseClassName="kf-card-description"
+			baseClassName="c15t-card-description"
 			themeKey="consent-manager-dialog.description"
 			{...props}
 			data-testid="consent-manager-dialog-description"
@@ -144,7 +144,7 @@ const DialogContent = forwardRef<HTMLDivElement, Omit<BoxProps, 'themeKey'>>(
 		return (
 			<Box
 				ref={ref as Ref<HTMLDivElement>}
-				baseClassName="kf-card-content"
+				baseClassName="c15t-card-content"
 				themeKey="consent-manager-dialog.content"
 				data-testid="consent-manager-dialog-content"
 				{...props}
@@ -169,7 +169,7 @@ const DialogFooter = forwardRef<HTMLDivElement, Omit<BoxProps, 'themeKey'>>(
 		return (
 			<Box
 				ref={ref as Ref<HTMLDivElement>}
-				baseClassName="kf-card-footer"
+				baseClassName="c15t-card-footer"
 				themeKey="consent-manager-dialog.footer"
 				{...props}
 				data-testid="consent-manager-dialog-footer"

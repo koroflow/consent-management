@@ -64,7 +64,7 @@ interface ConsentManagerProviderProps extends NamespaceProps {
 }
 
 export const ConsentManagerDevTool: FC<ConsentManagerProviderProps> = ({
-	namespace = 'ConsentManagerStore',
+	namespace = 'c15tStore',
 	position = 'bottom-right',
 }) => {
 	const [state, setState] = useState<PrivacyConsentState | null>(null);

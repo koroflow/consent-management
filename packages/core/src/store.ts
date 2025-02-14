@@ -112,7 +112,7 @@ interface StoreConfig {
  * @public
  */
 export const createConsentManagerStore = (
-	namespace: string | undefined = 'ConsentManagerStore',
+	namespace: string | undefined = 'c15tStore',
 	config?: StoreConfig
 ) => {
 	// Load initial state from localStorage if available
@@ -166,13 +166,6 @@ export const createConsentManagerStore = (
 				}
 
 				const newConsents = { ...state.consents, [name]: value };
-				localStorage.setItem(
-					STORAGE_KEY,
-					JSON.stringify({
-						consents: newConsents,
-						consentInfo: state.consentInfo,
-					})
-				);
 
 				// Update tracking blocker with new consents
 				trackingBlocker?.updateConsents(newConsents);

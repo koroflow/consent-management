@@ -27,7 +27,7 @@ const ConsentManagerWidgetAccordionSubGroup = forwardRef<
 	return (
 		<Box
 			ref={ref as Ref<HTMLDivElement>}
-			baseClassName="kf-accordion-trigger-sub-group"
+			baseClassName="c15t-accordion-trigger-sub-group"
 			themeKey={'consent-manager-widget.accordion.trigger-sub-group'}
 			{...props}
 		>

@@ -199,7 +199,7 @@ export type NamespaceProps = {
 	/**
 	 * Global namespace for the consent manager store.
 	 *
-	 * @defaultValue "ConsentManagerStore"
+	 * @defaultValue "c15tStore"
 	 */
 	namespace?: string;
 };

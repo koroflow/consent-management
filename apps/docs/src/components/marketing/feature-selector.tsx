@@ -4,7 +4,7 @@ import { type HTMLAttributes, type ReactNode, forwardRef } from 'react';
 import { BorderIcon } from './border-icon';
 
 // Types
-interface FeatureProps extends HTMLAttributes<HTMLDivElement> {
+export interface FeatureProps extends HTMLAttributes<HTMLDivElement> {
 	title: string;
 	description: string;
 	icon: ReactNode;

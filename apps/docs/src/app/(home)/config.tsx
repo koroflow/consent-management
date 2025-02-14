@@ -63,7 +63,6 @@ export const siteConfig = {
 			description:
 				'Automatically block fetch and XHR requests until consent is granted.',
 			icon: <NetworkIcon className="h-6 w-6" />,
-			comingSoon: true,
 		},
 		{
 			name: 'Performance First',

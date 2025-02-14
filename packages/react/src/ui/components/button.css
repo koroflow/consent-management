@@ -1,4 +1,4 @@
-.kf-cookie-banner-root, .kf-consent-manager-dialog-root, .kf-consent-manager-widget-root {
+.c15t-cookie-banner-root, .c15t-consent-manager-dialog-root, .c15t-consent-manager-widget-root {
 	/* Base variables */
 	--button-transition-duration: 200ms;
 	--button-transition-ease: cubic-bezier(0.4, 0, 0.2, 1);
@@ -36,9 +36,9 @@
 	--button-stroke-soft: hsl(0, 0%, 92.16%);
 }
 
-.dark .kf-cookie-banner-root, 
-.dark .kf-consent-manager-dialog-root, 
-.dark .kf-consent-manager-widget-root {
+.dark .c15t-cookie-banner-root, 
+.dark .c15t-consent-manager-dialog-root, 
+.dark .c15t-consent-manager-widget-root {
 	--button-bg-light-gray: hsl(0, 0%, 20%);
 	--button-text-disabled: hsl(0, 0%, 30%);
 	--button-text-subtle: hsl(0, 0%, 70%);
@@ -47,15 +47,15 @@
 	--button-bg-surface: hsl(0, 0%, 16.08%);
 }
 
-.kf-button,
-.kf-button[type='button'],
-.kf-button[type='reset'],
-.kf-button[type='submit'] {
+.c15t-button,
+.c15t-button[type='button'],
+.c15t-button[type='reset'],
+.c15t-button[type='submit'] {
 	-webkit-appearance: button;
 }
 
 /* Base button styles */
-.kf-button {
+.c15t-button {
   /* Combine font properties */
   font: inherit 0.875rem/1.25rem 500;
   margin: 0;
@@ -69,19 +69,19 @@
   border: 0;
 }
 
-.kf-button:disabled {
+.c15t-button:disabled {
   pointer-events: none;
   background-color: var(--button-bg-light-gray);
   color: var(--button-text-disabled);
   box-shadow: none;
 }
 
-.kf-button:focus {
+.c15t-button:focus {
   outline: none;
 }
 
 /* Icon styles */
-.kf-button-icon {
+.c15t-button-icon {
   display: flex;
   width: var(--button-icon-size);
   height: var(--button-icon-size);
@@ -92,50 +92,50 @@
 }
 
 /* Size variants */
-.kf-button-medium,
-.kf-button-small,
-.kf-button-xsmall,
-.kf-button-xxsmall {
+.c15t-button-medium,
+.c15t-button-small,
+.c15t-button-xsmall,
+.c15t-button-xxsmall {
   gap: var(--button-gap-large);
   border-radius: 0.5rem;
 }
 
-.kf-button-medium {
+.c15t-button-medium {
   height: var(--button-height-medium);
   padding: 0 0.875rem;
 }
 
-.kf-button-small {
+.c15t-button-small {
   height: var(--button-height-small);
   padding: 0 0.75rem;
 }
 
-.kf-button-xsmall {
+.c15t-button-xsmall {
   height: var(--button-height-xsmall);
   padding: 0 0.625rem;
 }
 
-.kf-button-xxsmall {
+.c15t-button-xxsmall {
   height: var(--button-height-xxsmall);
   padding: 0 0.5rem;
 }
 
 /* Primary variants */
-.kf-button-primary-filled {
+.c15t-button-primary-filled {
   background-color: var(--button-primary-color);
   color: var(--button-static-white);
 }
 
-.kf-button-primary-filled:hover {
+.c15t-button-primary-filled:hover {
   background-color: var(--button-primary-dark);
 }
 
-.kf-button-primary-filled:focus-visible {
+.c15t-button-primary-filled:focus-visible {
   box-shadow: var(--button-shadow-primary-focus);
 }
 
 /* Dark mode adjustments */
-.dark .kf-button-primary-filled {
+.dark .c15t-button-primary-filled {
   --button-bg-white: hsl(0, 0%, 10%);
   --button-bg-light-gray: hsl(0, 0%, 20%);
   --button-text-disabled: hsl(0, 0%, 30%);
@@ -145,7 +145,7 @@
   --button-bg-surface: hsl(0, 0%, 16.08%);
 }
 
-.kf-button-primary-stroke {
+.c15t-button-primary-stroke {
 	background-color: var(--button-bg-white);
 	color: var(--button-primary-color);
 	box-shadow: inset 0 0 0 1px var(--button-primary-color);
@@ -159,7 +159,7 @@
 		box-shadow: var(--button-shadow-primary-focus);
 	}
 }
-.dark .kf-button-primary-stroke{
+.dark .c15t-button-primary-stroke{
   --button-primary-color: hsl(227.94, 100%, 60%);
   --button-primary-dark: hsl(228.07, 69.8%, 48.04%);
   --button-primary-alpha-10: hsl(227.93, 100%, 63.92%, 10%);
@@ -172,7 +172,7 @@
   --button-bg-surface: hsl(0, 0%, 16.08%);
 }
 
-.kf-button-primary-lighter {
+.c15t-button-primary-lighter {
 	background-color: var(--button-primary-alpha-10);
 	color: var(--button-primary-color);
 	box-shadow: inset 0 0 0 1px transparent;
@@ -188,7 +188,7 @@
 			var(--button-primary-color);
 	}
 }
-.dark .kf-button-primary-lighter{
+.dark .c15t-button-primary-lighter{
   --button-primary-color: hsl(227.94, 100%, 60%);
   --button-primary-dark: hsl(228.07, 69.8%, 48.04%);
   --button-primary-alpha-10: hsl(227.93, 100%, 63.92%, 10%);
@@ -201,7 +201,7 @@
   --button-bg-surface: hsl(0, 0%, 16.08%);
 }
 
-.kf-button-primary-ghost {
+.c15t-button-primary-ghost {
 	background-color: transparent;
 	color: var(--button-primary-color);
 	box-shadow: inset 0 0 0 1px transparent;
@@ -216,7 +216,7 @@
 			var(--button-primary-color);
 	}
 }
-.dark .kf-button-primary-ghost{
+.dark .c15t-button-primary-ghost{
   --button-primary-color: hsl(227.94, 100%, 60%);
   --button-primary-dark: hsl(228.07, 69.8%, 48.04%);
   --button-primary-alpha-10: hsl(227.93, 100%, 63.92%, 10%);
@@ -230,7 +230,7 @@
 }
 
 /* Neutral variants */
-.kf-button-neutral-filled {
+.c15t-button-neutral-filled {
 	background-color: var(--button-bg-dark);
 	color: var(--button-static-white);
 
@@ -243,7 +243,7 @@
 	}
 }
 
-.kf-button-neutral-stroke {
+.c15t-button-neutral-stroke {
 	background-color: var(--button-bg-white);
 	color: var(--button-text-subtle);
 	box-shadow: var(--button-shadow-xs), inset 0 0 0 1px
@@ -262,7 +262,7 @@
 	}
 }
 
-.dark .kf-button-neutral-stroke{
+.dark .c15t-button-neutral-stroke{
   --button-text-subtle: hsl(0, 0%, 70%);
   --button-bg-white: hsl(0, 0%, 10%);
   --button-stroke-soft: hsl(0, 0%, 20%);
@@ -273,7 +273,7 @@
   --button-bg-surface: hsl(0, 0%, 16.08%);
 }
 
-.kf-button-neutral-lighter {
+.c15t-button-neutral-lighter {
 	background-color: var(--button-bg-light-gray);
 	color: var(--button-text-subtle);
 	box-shadow: inset 0 0 0 1px transparent;
@@ -292,7 +292,7 @@
 			var(--button-text-strong);
 	}
 }
-.dark .kf-button-neutral-lighter{
+.dark .c15t-button-neutral-lighter{
   --button-bg-light-gray: hsl(0, 0%, 20%);
   --button-text-subtle: hsl(0, 0%, 70%);
   --button-bg-white: hsl(0, 0%, 10%);
@@ -302,7 +302,7 @@
   --button-bg-dark: hsl(0, 0%, 9.02%);
   --button-bg-surface: hsl(0, 0%, 16.08%);
 }
-.kf-button-neutral-ghost {
+.c15t-button-neutral-ghost {
 	background-color: transparent;
 	color: var(--button-text-subtle);
 	box-shadow: inset 0 0 0 1px transparent;
@@ -320,7 +320,7 @@
 	}
 }
 
-.dark .kf-button-neutral-ghost{
+.dark .c15t-button-neutral-ghost{
   --button-bg-light-gray: hsl(0, 0%, 20%);
   --button-text-subtle: hsl(0, 0%, 70%);
   --button-bg-white: hsl(0, 0%, 10%);

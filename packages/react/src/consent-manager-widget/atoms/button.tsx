@@ -24,6 +24,8 @@ const ConsentManagerWidgetAcceptAllButton = forwardRef<
 			{...props}
 			themeKey="consent-manager-widget.footer.accept-button"
 			data-testid="consent-manager-widget-footer-accept-button"
+			closeCookieBanner={true}
+			closeCustomizeDialog={true}
 		>
 			{children}
 		</ConsentButton>

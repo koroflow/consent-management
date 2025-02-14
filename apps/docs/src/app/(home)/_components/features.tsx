@@ -1,10 +1,12 @@
-import Features from '../../../components/marketing/feature-selector';
+import Features, {
+	type FeatureProps,
+} from '../../../components/marketing/feature-selector';
 import { Section } from '../../../components/marketing/section';
 
 import { siteConfig } from '../config';
 
 export function FeaturesSection() {
-	const features = siteConfig.features;
+	const features = siteConfig.features as (FeatureProps & { name: string })[];
 
 	return (
 		<Section id="features" title="Features">

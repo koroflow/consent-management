@@ -41,7 +41,7 @@ const CookieBannerTitle = forwardRef<
 	return (
 		<Box
 			ref={ref as Ref<HTMLDivElement>}
-			baseClassName="kf-cookie-banner-title"
+			baseClassName="c15t-cookie-banner-title"
 			data-testid="cookie-banner-title"
 			themeKey="cookie-banner.header.title"
 			{...props}
@@ -74,7 +74,7 @@ const CookieBannerDescription = forwardRef<
 	return (
 		<Box
 			ref={ref as Ref<HTMLDivElement>}
-			baseClassName="kf-cookie-banner-description"
+			baseClassName="c15t-cookie-banner-description"
 			data-testid="cookie-banner-description"
 			themeKey="cookie-banner.header.description"
 			{...props}
@@ -108,7 +108,7 @@ const CookieBannerFooter = forwardRef<
 	return (
 		<Box
 			ref={ref as Ref<HTMLDivElement>}
-			baseClassName="kf-cookie-banner-footer"
+			baseClassName="c15t-cookie-banner-footer"
 			data-testid="cookie-banner-footer"
 			themeKey="cookie-banner.footer"
 			{...props}
@@ -141,7 +141,7 @@ const CookieBannerCard = forwardRef<HTMLDivElement, Omit<BoxProps, 'themeKey'>>(
 		return (
 			<Box
 				ref={ref as Ref<HTMLDivElement>}
-				baseClassName="kf-cookie-banner-card"
+				baseClassName="c15t-cookie-banner-card"
 				data-testid="cookie-banner-card"
 				themeKey="cookie-banner.card"
 				{...props}
@@ -168,7 +168,7 @@ const CookieBannerHeader = forwardRef<
 	return (
 		<Box
 			ref={ref as Ref<HTMLDivElement>}
-			baseClassName="kf-cookie-banner-header"
+			baseClassName="c15t-cookie-banner-header"
 			data-testid="cookie-banner-header"
 			themeKey="cookie-banner.header.root"
 			{...props}
@@ -194,7 +194,7 @@ const CookieBannerFooterSubGroup = forwardRef<
 	return (
 		<Box
 			ref={ref as Ref<HTMLDivElement>}
-			baseClassName="kf-cookie-banner-footer-sub-group"
+			baseClassName="c15t-cookie-banner-footer-sub-group"
 			data-testid="cookie-banner-footer-sub-group"
 			themeKey="cookie-banner.footer.sub-group"
 			{...props}
