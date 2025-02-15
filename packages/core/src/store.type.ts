@@ -109,12 +109,12 @@ export interface PrivacyConsentState {
 	 * Controls the visibility of the consent popup.
 	 * @param show - Whether to show the popup
 	 */
- /**
-  * Controls the visibility of the consent popup.
-  * @param show - Whether to show the popup
-  * @param force - When true, forcefully updates the popup state regardless of current consent customization
-  */
- setShowPopup: (show: boolean, force?: boolean) => void;
+	/**
+	 * Controls the visibility of the consent popup.
+	 * @param show - Whether to show the popup
+	 * @param force - When true, forcefully updates the popup state regardless of current consent customization
+	 */
+	setShowPopup: (show: boolean, force?: boolean) => void;
 
 	/**
 	 * Controls the visibility of the privacy dialog.
