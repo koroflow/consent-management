@@ -16,6 +16,7 @@ export function createThemeContextValue(
 	const result = Object.assign(fn, {
 		...consentManager,
 		...themeProps,
+		noStyle: themeProps.noStyle ?? consentManager.noStyle,
 	});
 
 	// Type guard to ensure type safety
