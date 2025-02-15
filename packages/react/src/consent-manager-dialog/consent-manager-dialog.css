@@ -1,30 +1,26 @@
-
-.c15t-consent-manager-dialog-root{
-  isolation: isolate;
-  /* css reset */
-  font-family:
-		system-ui,
-		'Segoe UI',
-		Roboto,
-		Helvetica,
-		Arial,
-		sans-serif,
-		'Apple Color Emoji',
-		'Segoe UI Emoji'; /* 1 */
+.c15t-consent-manager-dialog-root {
+	isolation: isolate;
+	/* css reset */
+	font-family: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif,
+		"Apple Color Emoji", "Segoe UI Emoji"; /* 1 */
 	line-height: 1.15; /* 2 */
 	-webkit-text-size-adjust: 100%; /* 3 */
 	tab-size: 4; /* 4 */
 
-  margin: 0;
-  padding: 0;
-  border: 0;
-  background: none;
+	margin: 0;
+	padding: 1rem;
+	border: 0;
+	background: none;
 
-
-  	/* Colors */
+	/* Colors */
 	--c15t-cmw-stroke-soft-200: hsl(0, 0%, 92.16%);
 	--c15t-cmw-branding-link-color: #47c2ff;
-  --c15t-link-text-color: hsl(0, 0%, 9.02%);
+	--c15t-link-text-color: hsl(0, 0%, 9.02%);
+
+	@media (min-width: 640px) {
+		padding: 1.5rem;
+		width: auto;
+	}
 }
 
 .c15t-consent-manager-dialog-card .c15t-consent-manager-widget-branding {
@@ -77,15 +73,13 @@
 	font-size: 14px;
 	padding-top: 1rem;
 	padding-bottom: 1rem;
-  border-top: solid 1px var(--c15t-cmw-stroke-soft-200);
+	border-top: solid 1px var(--c15t-cmw-stroke-soft-200);
 }
 
 .c15t-consent-manager-overlay {
-  color: var(--c15t-link-text-color);
+	color: var(--c15t-link-text-color);
 	position: fixed;
 	inset: 0px;
 	background-color: rgb(0 0 0 / 0.5);
 	z-index: 999999998;
 }
-
-

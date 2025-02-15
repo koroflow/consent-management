@@ -1,19 +1,10 @@
-
 /* Base cookie banner variables */
 .c15t-cookie-banner {
-  isolation: isolate;
+	isolation: isolate;
 
-
- /* css reset */
-  font-family:
-		system-ui,
-		'Segoe UI',
-		Roboto,
-		Helvetica,
-		Arial,
-		sans-serif,
-		'Apple Color Emoji',
-		'Segoe UI Emoji'; /* 1 */
+	/* css reset */
+	font-family: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif,
+		"Apple Color Emoji", "Segoe UI Emoji"; /* 1 */
 	line-height: 1.15; /* 2 */
 	-webkit-text-size-adjust: 100%; /* 3 */
 	tab-size: 4; /* 4 */
@@ -31,33 +22,24 @@
 	/* Shadow */
 	--c15t-cookie-banner-shadow: 0 16px 32px -12px rgba(14, 18, 27, 0.1);
 
-
-  /* Colors */
-  --c15t-cookie-banner-bg: hsl(0 0% 100%);
-  --c15t-cookie-banner-footer-bg: hsl(0 0% 96.86%);
-  --c15t-cookie-banner-text-color: hsl(0 0% 9.02);
-  --c15t-cookie-banner-border-color: hsl(0 0% 92.16%);
-  --c15t-cookie-banner-title-color: hsl(0 0% 9.02);
-  --c15t-cookie-banner-description-color: hsl(0 0% 36.08%);
-  
+	/* Colors */
+	--c15t-cookie-banner-bg: hsl(0 0% 100%);
+	--c15t-cookie-banner-footer-bg: hsl(0 0% 96.86%);
+	--c15t-cookie-banner-text-color: hsl(0 0% 9.02);
+	--c15t-cookie-banner-border-color: hsl(0 0% 92.16%);
+	--c15t-cookie-banner-title-color: hsl(0 0% 9.02);
+	--c15t-cookie-banner-description-color: hsl(0 0% 36.08%);
 }
 
-.dark .c15t-cookie-banner{
-  --c15t-cookie-banner-bg: hsl(0 0% 9.02);
-  --c15t-cookie-banner-border-color: hsl(0 0% 20%);
-  --c15t-cookie-banner-footer-bg: hsl(0 0% 10.98%);
-  --c15t-cookie-banner-title-color: hsl(0 0% 90%);
-  --c15t-cookie-banner-description-color: hsl(0 0% 60%);
+.dark .c15t-cookie-banner {
+	--c15t-cookie-banner-bg: hsl(0 0% 9.02);
+	--c15t-cookie-banner-border-color: hsl(0 0% 20%);
+	--c15t-cookie-banner-footer-bg: hsl(0 0% 10.98%);
+	--c15t-cookie-banner-title-color: hsl(0 0% 90%);
+	--c15t-cookie-banner-description-color: hsl(0 0% 60%);
 }
 
 .c15t-cookie-banner-root {
-	@media (min-width: 640px) {
-		padding: 1.5rem;
-	}
-
-	@media (min-width: 640px) {
-		width: auto;
-	}
 	padding: 1rem;
 	flex-direction: column;
 	width: 100%;
@@ -65,6 +47,7 @@
 	z-index: 999999998;
 	position: fixed;
 	@media (min-width: 640px) {
+		padding: 1.5rem;
 		width: auto;
 	}
 }
@@ -205,14 +188,11 @@
 	flex-direction: row;
 	justify-content: space-between;
 	gap: 1rem /* 16px */;
-
-	@media (max-width: 640px) {
-		gap: 0.25rem /* 4px */;
-	}
 }
-@media (max-width: 640px) {
-	.c15t-cookie-banner-reject-button,
-	.c15t-cookie-banner-customize-button {
+
+.c15t-cookie-banner-footer-sub-group .c15t-button {
+	width: auto;
+	@media (max-width: 640px) {
 		width: 100%;
 	}
 }
@@ -223,7 +203,7 @@
 	letter-spacing: -0.006em;
 	font-weight: 400;
 	/* color: hsl(var(--c15t-text-sub-600));/ */
-  color: var(--c15t-cookie-banner-description-color);
+	color: var(--c15t-cookie-banner-description-color);
 }
 
 .c15t-cookie-banner-title {
@@ -232,11 +212,11 @@
 	letter-spacing: -0.011em;
 	font-weight: 500;
 	/* color: hsl(var(--c15t-text-strong-950)); */
-  color: var(--c15t-cookie-banner-title-color);
+	color: var(--c15t-cookie-banner-title-color);
 }
 
 .c15t-cookie-banner-overlay {
-  --c15t-cookie-banner-overlay-bg: hsl(0 0% 0% / 0.5);
+	--c15t-cookie-banner-overlay-bg: hsl(0 0% 0% / 0.5);
 	position: fixed;
 	inset: 0px;
 	background-color: var(--c15t-cookie-banner-overlay-bg);
