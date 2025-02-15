@@ -77,11 +77,20 @@ export interface PrivacyConsentState {
 	/** Translation configuration */
 	translationConfig: TranslationConfig;
 
+	/** Whether to disable all default styling */
+	noStyle?: boolean;
+
 	/**
 	 * Updates the translation configuration.
 	 * @param config - The new translation configuration
 	 */
 	setTranslationConfig: (config: TranslationConfig) => void;
+
+	/**
+	 * Updates the noStyle setting.
+	 * @param noStyle - Whether to disable default styling
+	 */
+	setNoStyle: (noStyle: boolean) => void;
 
 	/** Whether to include non-displayed consents in operations */
 	includeNonDisplayedConsents: boolean;
