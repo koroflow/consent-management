@@ -87,7 +87,7 @@ export const ConsentButton = forwardRef<
 					break;
 				case 'open-consent-dialog': {
 					setIsPrivacyDialogOpen(true);
-					setShowPopup(false);
+					setShowPopup(false, true);
 					break;
 				}
 				default:
