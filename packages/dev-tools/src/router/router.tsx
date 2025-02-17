@@ -59,26 +59,30 @@ export function Router({ onClose }: RouterProps) {
 	];
 
 	// Compute content items based on active section
-	const contentItems: ContentItem[] =
-		activeSection === 'Consents'
-			? Object.entries(privacyConsent.consents).map(([name, value]) => ({
+	const contentItems: ContentItem[] = (() => {
+		switch (activeSection) {
+			case 'Consents':
+				return Object.entries(privacyConsent.consents).map(([name, value]) => ({
 					title: name,
 					status: value ? 'Enabled' : 'Disabled',
-				}))
-			: activeSection === 'Compliance'
-				? Object.entries(privacyConsent.complianceSettings).map(
-						([region, settings]) => ({
-							title: region,
-							status: settings.enabled ? 'Active' : 'Inactive',
-						})
-					)
-				: activeSection === 'Conditional'
-					? renderingState.map((item) => ({
-							title: item.componentName,
-							status: 'Rendered',
-							details: `Requires: ${item.consentType}`,
-						}))
-					: [];
+				}));
+			case 'Compliance':
+				return Object.entries(privacyConsent.complianceSettings).map(
+					([region, settings]) => ({
+						title: region,
+						status: settings.enabled ? 'Active' : 'Inactive',
+					})
+				);
+			case 'Conditional':
+				return renderingState.map((item) => ({
+					title: item.componentName,
+					status: 'Rendered',
+					details: `Requires: ${item.consentType}`,
+				}));
+			default:
+				return [];
+		}
+	})();
 
 	const handleResetConsent = useCallback(() => {
 		clearAllData();

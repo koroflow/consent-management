@@ -16,6 +16,11 @@
 	text-align: left;
 }
 
+.c15t-devtool-accordion-chevron {
+	transition: transform 200ms cubic-bezier(0.87, 0, 0.13, 1);
+	flex-shrink: 0;
+}
+
 .c15t-devtool-accordion-trigger:hover {
 	background-color: var(--c15t-dev-tools-accent);
 	color: var(--c15t-dev-tools-accent-foreground);
@@ -45,11 +50,6 @@
 .c15t-devtool-accordion-content-inner {
 	padding: 1rem;
 	padding-top: 0;
-}
-
-.c15t-devtool-accordion-chevron {
-	transition: transform 200ms cubic-bezier(0.87, 0, 0.13, 1);
-	flex-shrink: 0;
 }
 
 @keyframes slideDown {
