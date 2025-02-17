@@ -4,6 +4,7 @@
 	"pages": [
 		"--- Introduction ---",
 		"index",
+		"api-reference",
 		"--- Components ---",
 		"cookie-banner",
 		"consent-manager-widget",
