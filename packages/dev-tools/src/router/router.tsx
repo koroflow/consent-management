@@ -1,17 +1,10 @@
 'use client';
 
-import {
-	Cookie,
-	FileText,
-	GanttChartSquare,
-	RefreshCw,
-	ToggleLeft,
-} from 'lucide-react';
+import { GanttChartSquare, ToggleLeft } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useCallback, useState } from 'react';
 
 import type { PrivacyConsentState } from 'c15t';
-import { Button } from '../components/ui/button';
 import { ExpandableTabs } from '../components/ui/expandable-tabs';
 import { ScrollArea } from '../components/ui/scroll-area';
 import { getStore } from '../dev-tool';
@@ -34,9 +27,9 @@ interface RouterProps {
 	onClose: () => void;
 }
 
-export function Router({ onClose }: RouterProps) {
+export function Router({ onClose: _onClose }: RouterProps) {
 	const privacyConsent = getStore() as PrivacyConsentState;
-	const { clearAllData, setIsPrivacyDialogOpen, setShowPopup } = privacyConsent;
+	// const { clearAllData, setIsPrivacyDialogOpen, setShowPopup } = privacyConsent;
 
 	const [activeSection, setActiveSection] = useState<TabSection>('Consents');
 
@@ -84,18 +77,18 @@ export function Router({ onClose }: RouterProps) {
 		}
 	})();
 
-	const handleResetConsent = useCallback(() => {
-		clearAllData();
-		onClose();
-	}, [clearAllData, onClose]);
+	// const handleResetConsent = useCallback(() => {
+	// 	clearAllData();
+	// 	onClose();
+	// }, [clearAllData, onClose]);
 
-	const handleOpenPrivacyModal = useCallback(() => {
-		setIsPrivacyDialogOpen(true);
-	}, [setIsPrivacyDialogOpen]);
+	// const handleOpenPrivacyModal = useCallback(() => {
+	// 	setIsPrivacyDialogOpen(true);
+	// }, [setIsPrivacyDialogOpen]);
 
-	const handleOpenCookiePopup = useCallback(() => {
-		setShowPopup(true);
-	}, [setShowPopup]);
+	// const handleOpenCookiePopup = useCallback(() => {
+	// 	setShowPopup(true);
+	// }, [setShowPopup]);
 
 	return (
 		<>
@@ -146,7 +139,7 @@ export function Router({ onClose }: RouterProps) {
 					))}
 				</motion.div>
 			</ScrollArea>
-			<div className="border-t p-4">
+			{/* <div className="border-t p-4">
 				<div className="flex flex-col gap-2">
 					<Button variant="outline" size="sm" onClick={handleResetConsent}>
 						<RefreshCw className="mr-2 h-4 w-4" />
@@ -161,7 +154,7 @@ export function Router({ onClose }: RouterProps) {
 						Open Cookie Popup
 					</Button>
 				</div>
-			</div>
+			</div> */}
 		</>
 	);
 }
