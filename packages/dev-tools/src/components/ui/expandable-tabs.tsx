@@ -2,10 +2,8 @@
 
 import type { LucideIcon } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
-
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useOnClickOutside } from 'usehooks-ts';
-import { cn } from '../../libs/utils';
+import { memo, useCallback, useEffect, useState } from 'react';
+import './expandable-tabs.css';
 
 interface Tab {
 	title: string;
@@ -50,7 +48,7 @@ const spanVariants = {
 const transition = { delay: 0.1, type: 'spring', bounce: 0, duration: 0.6 };
 
 const Separator = memo(() => (
-	<div className="mx-1 h-[24px] w-[1.2px] bg-border" aria-hidden="true" />
+	<div className="c15t-devtool-tab-separator" aria-hidden="true" />
 ));
 Separator.displayName = 'Separator';
 
@@ -78,12 +76,7 @@ const TabButton = memo(
 				custom={isSelected}
 				onClick={() => onClick(index)}
 				transition={transition}
-				className={cn(
-					'relative flex flex-grow items-center justify-center rounded-xl px-4 py-2 font-medium text-sm transition-colors duration-300',
-					isSelected
-						? cn('bg-muted', activeColor)
-						: 'text-muted-foreground hover:bg-muted hover:text-foreground'
-				)}
+				className={`c15t-devtool-tab-button ${isSelected ? `selected ${activeColor}` : ''}`}
 			>
 				<Icon size={20} />
 				<AnimatePresence initial={false}>
@@ -94,7 +87,7 @@ const TabButton = memo(
 							animate="animate"
 							exit="exit"
 							transition={transition}
-							className="overflow-hidden whitespace-nowrap"
+							className="c15t-devtool-tab-title"
 						>
 							{tab.title}
 						</motion.span>
@@ -109,11 +102,10 @@ TabButton.displayName = 'TabButton';
 export function ExpandableTabs({
 	tabs,
 	className,
-	activeColor = 'text-primary',
+	activeColor = 'primary',
 	onChange,
 }: ExpandableTabsProps) {
 	const [selected, setSelected] = useState<number | null>(0);
-	const outsideClickRef = useRef<HTMLDivElement>(null);
 
 	const handleInitialChange = useCallback(() => {
 		onChange?.(0);
@@ -123,14 +115,6 @@ export function ExpandableTabs({
 		handleInitialChange();
 	}, [handleInitialChange]);
 
-	const handleOutsideClick = useCallback(() => {
-		setSelected(null);
-		onChange?.(null);
-	}, [onChange]);
-
-	//@ts-expect-error
-	useOnClickOutside(outsideClickRef, handleOutsideClick);
-
 	const handleSelect = useCallback(
 		(index: number) => {
 			setSelected(index);
@@ -139,25 +123,11 @@ export function ExpandableTabs({
 		[onChange]
 	);
 
-	const containerClassName = useMemo(
-		() =>
-			cn(
-				'flex flex-wrap items-center gap-2 rounded-2xl border bg-background p-1 shadow-sm',
-				className
-			),
-		[className]
-	);
-
 	return (
-		<div ref={outsideClickRef} className={containerClassName}>
+		<div className={`c15t-devtool-tabs-container ${className || ''}`}>
 			{tabs.map((tab, index) =>
 				tab.type === 'separator' ? (
-					<Separator
-						key={`separator-${
-							// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-							index
-						}`}
-					/>
+					<Separator key={`separator-${index}`} />
 				) : (
 					<TabButton
 						key={`${tab.title}-${index}`}

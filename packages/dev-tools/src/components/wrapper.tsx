@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from 'motion/react';
 
 import { type ReactNode, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { cn } from '../libs/utils';
+import './wrapper.css';
 import { Button } from './ui/button';
 import { Card } from './ui/card';
 
@@ -42,32 +42,26 @@ export function DevToolWrapper({
 		<AnimatePresence>
 			{isOpen && (
 				<motion.div
-					className="fixed inset-0 z-50 flex items-end justify-center sm:items-center"
+					className="dev-tool-overlay"
 					initial={{ opacity: 0 }}
 					animate={{ opacity: 1 }}
 					exit={{ opacity: 0 }}
 				>
 					<motion.div
-						className="fixed inset-0 bg-background/10 backdrop-blur-sm"
+						className="dev-tool-backdrop"
 						initial={{ opacity: 0 }}
 						animate={{ opacity: 1 }}
 						exit={{ opacity: 0 }}
 						onClick={toggleOpen}
 					/>
 					<motion.div
-						className={cn(
-							'fixed z-[9999]',
-							position === 'bottom-right' && 'right-4 bottom-4',
-							position === 'top-right' && 'top-4 right-4',
-							position === 'bottom-left' && 'bottom-4 left-4',
-							position === 'top-left' && 'top-4 left-4'
-						)}
+						className={`dev-tool-content ${position}`}
 						initial={{ opacity: 0, y: 50 }}
 						animate={{ opacity: 1, y: 0 }}
 						exit={{ opacity: 0, y: 50 }}
 						transition={{ type: 'spring', stiffness: 300, damping: 30 }}
 					>
-						<Card className="w-[350px] shadow-lg">{children}</Card>
+						<Card className="dev-tool-card">{children}</Card>
 					</motion.div>
 				</motion.div>
 			)}
@@ -82,15 +76,15 @@ export function DevToolWrapper({
 						initial={{ scale: 0.9, opacity: 0 }}
 						animate={{ scale: 1, opacity: 1 }}
 						exit={{ scale: 0.9, opacity: 0 }}
-						className="fixed right-4 bottom-4 z-[9999]"
+						className="dev-tool-button-container"
 					>
 						<Button
 							variant="outline"
 							size="icon"
-							className="h-10 w-10 rounded-full shadow-lg"
+							className="dev-tool-button"
 							onClick={toggleOpen}
 						>
-							<Shield className="h-4 w-4" />
+							<Shield className="dev-tool-icon" />
 						</Button>
 					</motion.div>
 				)}

@@ -31,7 +31,7 @@ export function ConsentManagerProvider({
 	children,
 	initialGdprTypes,
 	initialComplianceSettings,
-	namespace = 'KoroflowStore',
+	namespace = 'c15tStore',
 	noStyle = false,
 	translationConfig,
 	trackingBlockerConfig,

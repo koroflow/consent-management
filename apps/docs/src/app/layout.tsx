@@ -8,7 +8,6 @@ import { cn } from '@c15t/shadcn/libs';
 import { RootProvider } from 'fumadocs-ui/provider';
 import { Fira_Mono, Inter } from 'next/font/google';
 import type { ReactNode } from 'react';
-
 const inter = Inter({
 	subsets: ['latin'],
 	variable: '--font-inter',

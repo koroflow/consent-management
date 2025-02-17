@@ -1,23 +1,18 @@
 import { type VariantProps, cva } from 'class-variance-authority';
-
 import { type HTMLAttributes, forwardRef } from 'react';
-import { cn } from '../../libs/utils';
+import './alert.css';
 
-const alertVariants = cva(
-	'relative w-full rounded-lg border px-4 py-3 text-sm [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:top-4 [&>svg]:left-4 [&>svg]:text-foreground [&>svg~*]:pl-7',
-	{
-		variants: {
-			variant: {
-				default: 'bg-background text-foreground',
-				destructive:
-					'border-destructive/50 text-destructive dark:border-destructive [&>svg]:text-destructive',
-			},
+const alertVariants = cva('c15t-devtool-alert', {
+	variants: {
+		variant: {
+			default: 'c15t-devtool-alert-default',
+			destructive: 'c15t-devtool-alert-destructive',
 		},
-		defaultVariants: {
-			variant: 'default',
-		},
-	}
-);
+	},
+	defaultVariants: {
+		variant: 'default',
+	},
+});
 
 const Alert = forwardRef<
 	HTMLDivElement,
@@ -26,7 +21,7 @@ const Alert = forwardRef<
 	<div
 		ref={ref}
 		role="alert"
-		className={cn(alertVariants({ variant }), className)}
+		className={`${alertVariants({ variant })} ${className || ''}`}
 		{...props}
 	/>
 ));
@@ -38,7 +33,7 @@ const AlertTitle = forwardRef<
 >(({ className, ...props }, ref) => (
 	<h5
 		ref={ref}
-		className={cn('mb-1 font-medium leading-none tracking-tight', className)}
+		className={`c15t-devtool-alert-title ${className || ''}`}
 		{...props}
 	/>
 ));
@@ -50,7 +45,7 @@ const AlertDescription = forwardRef<
 >(({ className, ...props }, ref) => (
 	<div
 		ref={ref}
-		className={cn('text-sm [&_p]:leading-relaxed', className)}
+		className={`c15t-devtool-alert-description ${className || ''}`}
 		{...props}
 	/>
 ));

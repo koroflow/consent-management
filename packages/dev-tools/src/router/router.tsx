@@ -15,7 +15,7 @@ import { Button } from '../components/ui/button';
 import { ExpandableTabs } from '../components/ui/expandable-tabs';
 import { ScrollArea } from '../components/ui/scroll-area';
 import { getStore } from '../dev-tool';
-import { cn } from '../libs/utils';
+import { Badge } from '~/components/ui/badge';
 
 type TabSection = 'Consents' | 'Compliance' | 'Scripts' | 'Conditional';
 
@@ -126,19 +126,18 @@ export function Router({ onClose }: RouterProps) {
 									</span>
 								)}
 							</div>
-							<span
-								className={cn(
-									'rounded-full px-2 py-1 text-xs',
+							<Badge
+								variant={
 									item.status === 'Enabled' ||
-										item.status === 'Active' ||
-										item.status === 'active' ||
-										item.status === 'Rendered'
-										? 'bg-green-100 text-green-800'
-										: 'bg-red-100 text-red-800'
-								)}
+									item.status === 'Active' ||
+									item.status === 'active' ||
+									item.status === 'Rendered'
+										? 'default'
+										: 'destructive'
+								}
 							>
 								{item.status}
-							</span>
+							</Badge>
 						</motion.div>
 					))}
 				</motion.div>

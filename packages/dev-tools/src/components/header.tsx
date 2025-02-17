@@ -1,28 +1,31 @@
-import { Shield, X } from 'lucide-react';
-
-import { Button } from '../components/ui/button';
+import { X } from 'lucide-react';
+import { Button } from './ui/button';
+import './header.css';
+import { ConsentManagementIcon } from './ui/logo';
 
 interface HeaderProps {
-	onClose: () => void;
+	onClose?: () => void;
 }
 
 export function Header({ onClose }: HeaderProps) {
 	return (
-		<>
-			<div className="flex items-center justify-between border-b p-4">
-				<div className="flex items-center gap-2">
-					<Shield className="h-4 w-4" />
-					<span className="font-medium text-sm">c15t.com Dev Tool</span>
-				</div>
-				<Button
-					variant="ghost"
-					size="icon"
-					className="h-8 w-8"
-					onClick={onClose}
-				>
-					<X className="h-4 w-4" />
-				</Button>
+		<div className="c15t-devtool-header">
+			<div className="c15t-devtool-header-title">
+				<ConsentManagementIcon className="c15t-devtool-header-logo" />
+				{/* <span>Consent Management</span> */}
 			</div>
-		</>
+			<div className="c15t-devtool-header-actions">
+				{onClose && (
+					<Button
+						variant="ghost"
+						size="icon"
+						onClick={onClose}
+						aria-label="Close"
+					>
+						<X className="h-4 w-4" />
+					</Button>
+				)}
+			</div>
+		</div>
 	);
 }

@@ -14,7 +14,7 @@ import { ErrorState } from './components/error-state';
 import { Header } from './components/header';
 import DevToolWrapper from './components/wrapper';
 import { Router } from './router/router';
-
+import './styles/theme.css';
 const PrivacyConsentContext = createContext<{
 	state: PrivacyConsentState | null;
 	store: StoreApi<PrivacyConsentState> | null;
@@ -60,7 +60,7 @@ interface ConsentManagerProviderProps extends NamespaceProps {
 	position?: 'bottom-right' | 'top-right' | 'bottom-left' | 'top-left';
 }
 
-export const ConsentManagerDevTool: FC<ConsentManagerProviderProps> = ({
+export const C15TDevTools: FC<ConsentManagerProviderProps> = ({
 	namespace = 'c15tStore',
 	position = 'bottom-right',
 }) => {

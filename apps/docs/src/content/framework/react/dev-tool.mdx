@@ -28,13 +28,13 @@ First, install the development tools package:
 Then add the development tools to your application:
 
 ```tsx
-import ConsentManagerDevTool from '@c15t/dev-tools'
+import { C15TDevTools } from '@c15t/dev-tools';
 
 function App() {
   return (
     <>
       <YourApp />
-      {process.env.NODE_ENV === 'development' && <ConsentManagerDevTool />}
+      {process.env.NODE_ENV === 'development' && <C15TDevTools />}
     </>
   )
 }
@@ -43,34 +43,13 @@ function App() {
 The dev tools will automatically appear in your application during development. They're designed to be unobtrusive while still providing quick access to important information.
 
 
-
-## Customizing the Dev Tools
-
-Adapt the dev tools to match your development environment:
-
-```tsx
-<ConsentManagerDevTool 
-  theme={{
-    panel: "bg-slate-900 text-white",
-    timeline: "border-t border-slate-700",
-    inspector: "font-mono text-sm"
-  }}
-  position="bottom-right"
-  defaultOpen={true}
-/>
-```
-
 ## API Reference
 
 ### PrivacyDevTools
 
 The main development tools component accepts these props:
 
-| Prop | Type | Description | Default |
-|------|------|-------------|---------|
-| theme | DevToolsTheme | Custom styling options | {} |
-| position | 'top-left' \| 'top-right' \| 'bottom-left' \| 'bottom-right' | Panel position | 'bottom-right' |
-| defaultOpen | boolean | Initial panel state | false |
+<AutoTypeTable path="node_modules/@c15t/dev-tools/src/dev-tool.tsx" name="ConsentManagerProviderProps" />
 
 
 ## Development Best Practices
@@ -95,7 +74,7 @@ To get the most out of the development tools:
 4. Remove dev tools in production
    ```tsx
    // Automatically removed in production builds
-   {process.env.NODE_ENV === 'development' && <ConsentManagerDevTool />}
+   {process.env.NODE_ENV === 'development' && <C15TDevTools />}
    ```
 
 ## Security Considerations

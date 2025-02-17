@@ -35,7 +35,7 @@ export default function App() {
     <ConsentManagerProvider>
       <CookieBanner />
       <ConsentManagerDialog/>
-      <ConsentManagerDevTool />
+      <C15TDevTools />
       {/* Your app content */}
     </ConsentManagerProvider>
   );

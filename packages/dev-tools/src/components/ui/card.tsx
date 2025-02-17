@@ -1,14 +1,11 @@
 import { type HTMLAttributes, forwardRef } from 'react';
-import { cn } from '../../libs/utils';
+import './card.css';
 
 const Card = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
 	({ className, ...props }, ref) => (
 		<div
 			ref={ref}
-			className={cn(
-				'rounded-lg border bg-card text-card-foreground shadow-sm',
-				className
-			)}
+			className={`c15t-devtool-card ${className || ''}`}
 			{...props}
 		/>
 	)
@@ -19,7 +16,7 @@ const CardHeader = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
 	({ className, ...props }, ref) => (
 		<div
 			ref={ref}
-			className={cn('flex flex-col space-y-1.5 p-6', className)}
+			className={`c15t-devtool-card-header ${className || ''}`}
 			{...props}
 		/>
 	)
@@ -32,10 +29,7 @@ const CardTitle = forwardRef<
 >(({ className, ...props }, ref) => (
 	<h3
 		ref={ref}
-		className={cn(
-			'font-semibold text-2xl leading-none tracking-tight',
-			className
-		)}
+		className={`c15t-devtool-card-title ${className || ''}`}
 		{...props}
 	/>
 ));
@@ -47,7 +41,7 @@ const CardDescription = forwardRef<
 >(({ className, ...props }, ref) => (
 	<p
 		ref={ref}
-		className={cn('text-muted-foreground text-sm', className)}
+		className={`c15t-devtool-card-description ${className || ''}`}
 		{...props}
 	/>
 ));
@@ -55,7 +49,11 @@ CardDescription.displayName = 'CardDescription';
 
 const CardContent = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
 	({ className, ...props }, ref) => (
-		<div ref={ref} className={cn('p-6 pt-0', className)} {...props} />
+		<div
+			ref={ref}
+			className={`c15t-devtool-card-content ${className || ''}`}
+			{...props}
+		/>
 	)
 );
 CardContent.displayName = 'CardContent';
@@ -64,7 +62,7 @@ const CardFooter = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
 	({ className, ...props }, ref) => (
 		<div
 			ref={ref}
-			className={cn('flex items-center p-6 pt-0', className)}
+			className={`c15t-devtool-card-footer ${className || ''}`}
 			{...props}
 		/>
 	)
