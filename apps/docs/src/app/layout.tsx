@@ -8,6 +8,8 @@ import { cn } from '@c15t/shadcn/libs';
 import { RootProvider } from 'fumadocs-ui/provider';
 import { Fira_Mono, Inter } from 'next/font/google';
 import type { ReactNode } from 'react';
+import { C15TDevTools } from '@c15t/dev-tools';
+
 const inter = Inter({
 	subsets: ['latin'],
 	variable: '--font-inter',
@@ -31,6 +33,7 @@ export default function Layout({ children }: { children: ReactNode }) {
 					<ConsentManagerProvider initialGdprTypes={['necessary', 'marketing']}>
 						<CookieBanner />
 						<ConsentManagerDialog />
+						{process.env.NODE_ENV === 'development' && <C15TDevTools />}
 						{children}
 					</ConsentManagerProvider>
 				</RootProvider>

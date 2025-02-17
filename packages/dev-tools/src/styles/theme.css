@@ -1,4 +1,4 @@
-:root {
+.c15t-devtool-wrapper-overlay {
 	/* Base colors */
 	--c15t-dev-tools-background: hsl(0, 0%, 100%);
 	--c15t-dev-tools-foreground: hsl(0, 0%, 9.02%);
@@ -40,7 +40,7 @@
 
 /* Dark mode overrides */
 
-.dark :root {
+.dark .c15t-devtool-wrapper-overlay {
 	--c15t-dev-tools-background: hsl(0, 0%, 10%);
 	--c15t-dev-tools-foreground: hsl(0, 0%, 90%);
 

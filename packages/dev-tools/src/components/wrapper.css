@@ -1,4 +1,4 @@
-.dev-tool-overlay {
+.c15t-devtool-wrapper-overlay {
 	position: fixed;
 	inset: 0;
 	z-index: 50;
@@ -8,84 +8,79 @@
 }
 
 @media (min-width: 640px) {
-	.dev-tool-overlay {
+	.c15t-devtool-wrapper-overlay {
 		align-items: center;
 	}
 }
 
-.dev-tool-backdrop {
+.c15t-devtool-wrapper-backdrop {
 	position: fixed;
 	inset: 0;
-	background-color: var(--c15t-dev-tools-overlay);
+	background-color: rgb(0 0 0 / 0.2);
 	padding: 1rem;
-	backdrop-filter: blur(4px);
 }
 
-.dev-tool-content {
+.c15t-devtool-wrapper-content {
 	position: fixed;
-	z-index: 9999;
+	z-index: 51;
+	display: flex;
+	flex-direction: column;
+	height: 600px;
+	width: 400px;
 }
 
-.dev-tool-content.bottom-right {
+.c15t-devtool-wrapper-content.bottom-right {
 	right: 1rem;
 	bottom: 1rem;
 }
 
-.dev-tool-content.top-right {
+.c15t-devtool-wrapper-content.top-right {
 	top: 1rem;
 	right: 1rem;
 }
 
-.dev-tool-content.bottom-left {
+.c15t-devtool-wrapper-content.bottom-left {
 	bottom: 1rem;
 	left: 1rem;
 }
 
-.dev-tool-content.top-left {
+.c15t-devtool-wrapper-content.top-left {
 	top: 1rem;
 	left: 1rem;
 }
 
-.dev-tool-card {
-	width: 350px;
-	box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-}
-
-.dev-tool-button-container {
+.c15t-devtool-wrapper-button-container {
 	position: fixed;
 	right: 1rem;
 	bottom: 1rem;
-	z-index: 9999;
+	z-index: 51;
 }
 
-.dev-tool-button {
-	height: 2.5rem;
-	width: 2.5rem;
+.c15t-devtool-wrapper-button {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 	border-radius: 9999px;
-	box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+	border: 1px solid hsl(0, 0%, 60%);
 }
 
-.dev-tool-icon {
+.dark .c15t-devtool-wrapper-button {
+	border: 1px solid hsl(0, 0%, 36.08%);
+}
+
+.c15t-devtool-wrapper-button-icon {
 	height: 1rem;
 	width: 1rem;
 }
 
-.c15t-devtool-wrapper {
-	position: fixed;
-	right: 1rem;
-	bottom: 1rem;
-	z-index: 50;
-	width: 400px;
+.c15t-devtool-wrapper-card {
+	width: 100%;
+	height: 100%;
 	border-radius: 0.5rem;
 	border: 1px solid var(--border);
 	background-color: var(--background);
-	box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-}
-
-.c15t-devtool-wrapper-content {
-	display: flex;
-	flex-direction: column;
-	height: 600px;
+	box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
 }
 
 .c15t-devtool-wrapper-body {
