@@ -3,7 +3,8 @@
 import { SandboxProvider } from '@c15t/shadcn/components';
 import { useTheme } from 'next-themes';
 import { type ComponentProps, useEffect, useState } from 'react';
-type PreviewProviderProps = Omit<
+
+export type PreviewProviderProps = Omit<
 	ComponentProps<typeof SandboxProvider>,
 	'theme'
 >;
