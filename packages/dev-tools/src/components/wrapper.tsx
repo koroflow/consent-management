@@ -43,6 +43,7 @@ export function DevToolWrapper({
 					initial={{ opacity: 0 }}
 					animate={{ opacity: 1 }}
 					exit={{ opacity: 0 }}
+					transition={{ type: 'spring', stiffness: 400, damping: 40 }}
 				>
 					<motion.div
 						className="c15t-devtool-wrapper-backdrop"
@@ -56,7 +57,6 @@ export function DevToolWrapper({
 						initial={{ opacity: 0, y: 20 }}
 						animate={{ opacity: 1, y: 0 }}
 						exit={{ opacity: 0, y: 20 }}
-						transition={{ type: 'spring', stiffness: 400, damping: 40 }}
 					>
 						<Card className="c15t-devtool-wrapper-card">{children}</Card>
 					</motion.div>
