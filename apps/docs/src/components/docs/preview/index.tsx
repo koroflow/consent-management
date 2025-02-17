@@ -18,14 +18,12 @@ import {
 import { cn } from '@c15t/shadcn/libs';
 import { AppWindowIcon, CodeIcon, TerminalIcon } from 'lucide-react';
 import type { ComponentProps } from 'react';
-import { exampleContent } from '~/examples/cookie-banner/example-page';
 import { PreviewProvider } from './provider';
 import { tsconfig } from './tsconfig';
 import { utils } from './utils';
-
 type PreviewProps = {
 	name: string;
-	code: string;
+	code: string | Record<string, string>;
 	dependencies?: Record<string, string>;
 };
 
@@ -49,10 +47,17 @@ export const Preview = ({
 	const devDependencies: Record<string, string> = {};
 
 	const files: ComponentProps<typeof SandboxProvider>['files'] = {
-		'/App.tsx': code,
 		'/tsconfig.json': tsconfig,
 		'/lib/utils.ts': utils,
-		'/exampleContent.tsx': exampleContent,
+		...(typeof code === 'string'
+			? { '/App.tsx': code }
+			: Object.entries(code).reduce(
+					(acc, [filename, content]) =>
+						Object.assign(acc, {
+							[filename.startsWith('/') ? filename : `/${filename}`]: content,
+						}),
+					{}
+				)),
 	};
 
 	// Scan the demo code for any imports of shadcn/ui components

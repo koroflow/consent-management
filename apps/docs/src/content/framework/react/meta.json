@@ -10,6 +10,7 @@
 		"consent-manager-widget",
 		"consent-manager-dialog",
 		"dev-tool",
+		"use-consent-manager",
 		"--- Guides ---",
 		"guides/customization",
 		"guides/translation"

@@ -9,7 +9,7 @@ export default function App() {
 
     return (
         <ConsentManagerProvider 
-            initialGdprTypes={['necessary', 'marketing']}
+            initialGdprTypes={['necessary', 'marketing', 'analytics']}
         >
             <CookieBanner />
             <ConsentManagerDialog />
@@ -30,6 +30,13 @@ export function ExampleContent() {
 
     return (
         <div className="min-h-screen flex flex-col justify-center items-center gap-4 dark:bg-[#18191c] p-4">
+            <button 
+                onClick={() => setShowPopup(true)} 
+                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition-colors"
+            >
+                Open Cookie Settings
+            </button>
+            
          	  <main className="mx-auto max-w-2xl text-center">
 					    <div className="bg-gradient-to-t light:from-black/40 dark:from-white/40 light:to-black/10 dark:to-white/10 bg-clip-text font-bold text-[60px] text-transparent leading-none tracking-tighter">c15t.com</div>
 			      </main>
