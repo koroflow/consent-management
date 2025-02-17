@@ -56,7 +56,7 @@ export const getStore = () => {
 
 export default PrivacyConsentContext;
 
-interface ConsentManagerProviderProps extends NamespaceProps {
+export interface ConsentManagerProviderProps extends NamespaceProps {
 	position?: 'bottom-right' | 'top-right' | 'bottom-left' | 'top-left';
 }
 
