@@ -17,14 +17,23 @@ export async function GET() {
 	]);
 
 	const scan = files.map(async (file) => {
-		const fileContent = await fs.readFile(file);
-		const { content, data } = matter(fileContent.toString());
+	  try {
+	    const stats = await fs.stat(file);
+	    if (stats.size > 5_000_000) { // 5MB limit
+	      throw new Error(`File ${file} exceeds size limit`);
+	    }
+	    const fileContent = await fs.readFile(file);
+	    const { content, data } = matter(fileContent.toString());
 
-		const processed = await processContent(content);
-		return `file: ${file}
+	    const processed = await processContent(content);
+	    return `file: ${file}
 meta: ${JSON.stringify(data, null, 2)}
         
 ${processed}`;
+	  } catch (error) {
+	    console.error(`Error processing file ${file}:`, error);
+	    return `Error processing file ${file}: ${error.message}`;
+	  }
 	});
 
 	const scanned = await Promise.all(scan);
