@@ -3,6 +3,7 @@ import { docsSource } from '~/lib/source';
 
 import { DocsLayout } from 'fumadocs-ui/layouts/notebook';
 import { HeaderBg } from '~/components/docs/header-bg';
+import { Footer } from '../(home)/_components/footer';
 import { docsOptions } from '../layout.config';
 
 /**
@@ -27,6 +28,7 @@ export default function Layout({ children }: { children: ReactNode }) {
 			>
 				{children}
 			</DocsLayout>
+			<Footer />
 		</div>
 	);
 }
