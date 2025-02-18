@@ -1,7 +1,5 @@
 import * as fs from 'node:fs/promises';
 import fg from 'fast-glob';
-import { remarkInstall } from 'fumadocs-docgen';
-import { remarkInclude } from 'fumadocs-mdx/config';
 import matter from 'gray-matter';
 import { remark } from 'remark';
 import remarkGfm from 'remark-gfm';
@@ -37,13 +35,7 @@ ${processed}`;
 async function processContent(content: string): Promise<string> {
 	const file = await remark()
 		.use(remarkMdx)
-		// https://fumadocs.vercel.app/docs/mdx/include
-		.use(remarkInclude)
-		// gfm styles
 		.use(remarkGfm)
-		// your remark plugins
-		.use(remarkInstall, { persist: { id: 'package-manager' } })
-		// to string
 		.use(remarkStringify)
 		.process(content);
 

@@ -20,7 +20,7 @@
 		"lint": "pnpm biome lint ./src"
 	},
 	"dependencies": {
-		"@codesandbox/sandpack-react": "^2.19.11",
+		"@codesandbox/sandpack-react": "^2.20.0",
 		"@codesandbox/sandpack-themes": "^2.0.21",
 		"@radix-ui/react-slot": "^1.1.2",
 		"@radix-ui/react-tabs": "^1.1.3",
