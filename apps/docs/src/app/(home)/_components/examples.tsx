@@ -55,8 +55,8 @@ const modernTheme = {
   'cookie-banner.footer.reject-button':
     'bg-red-600 text-white hover:bg-red-700 px-2 py-1 rounded-md',
 	'cookie-banner.footer.accept-button': 
-    'bg-blue-600 text-white hover:bg-blue-700 px-2 py-1 rounded-md    ',
-	cookie-banner.footer.customize-button': 
+    'bg-blue-600 text-white hover:bg-blue-700 px-2 py-1 rounded-md',
+	'cookie-banner.footer.customize-button': 
     'bg-gray-100 text-gray-900 hover:bg-gray-200 px-2 py-1 rounded-md',
 }
 

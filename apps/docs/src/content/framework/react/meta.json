@@ -17,6 +17,7 @@
 		"guides/translation",
 		"--- Examples ---",
 		"examples/tailwind",
-		"examples/css"
+		"examples/css",
+		"examples/css-variables"
 	]
 }
