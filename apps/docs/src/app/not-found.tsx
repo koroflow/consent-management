@@ -1,8 +1,10 @@
+import { HomeLayout } from 'fumadocs-ui/layouts/home';
+import { homePageOptions } from './layout.config';
 import NotFoundClient from './not-found.client';
 export default function NotFound() {
 	return (
-		<div className="not-found-layout">
+		<HomeLayout {...homePageOptions}>
 			<NotFoundClient />
-		</div>
+		</HomeLayout>
 	);
 }
