@@ -19,13 +19,13 @@
 	--fd-layout-width: 1400px !important;
 }
 
-
 #nd-subnav {
-  border-bottom: 1px solid color-mix(in oklab, var(--color-fd-foreground) 10%, transparent);
+	border-bottom: 1px solid
+		color-mix(in oklab, var(--color-fd-foreground) 10%, transparent);
 }
 
 #nd-subnav > div:nth-child(2) {
-  border-bottom: 0;
+	border-bottom: 0;
 }
 
 :root .dark {
