@@ -41,8 +41,7 @@ export const linkItems: LinkItemType[] = [
 export const docsOptions: BaseLayoutProps = {
 	nav: {
 		title: <LogoWithBadge />,
-		// transparentMode: 'top',
-		component: undefined,
+		transparentMode: 'top',
 	},
 	links: [...linkItems],
 };
@@ -132,6 +131,7 @@ export const homePageOptions: BaseLayoutProps = {
 				},
 			],
 		},
+
 		// {
 		// 	text: 'Release Notes',
 		// 	url: '/docs/release-notes',

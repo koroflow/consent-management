@@ -1,0 +1,4 @@
+{
+	"root": true,
+	"pages": ["getting-started", "core", "framework/react"]
+}

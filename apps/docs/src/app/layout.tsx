@@ -1,4 +1,5 @@
-import './global.css';
+import './styles/global.css';
+import { C15TDevTools } from '@c15t/dev-tools';
 import {
 	ConsentManagerDialog,
 	ConsentManagerProvider,
@@ -8,7 +9,6 @@ import { cn } from '@c15t/shadcn/libs';
 import { RootProvider } from 'fumadocs-ui/provider';
 import { Fira_Mono, Inter } from 'next/font/google';
 import type { ReactNode } from 'react';
-import { C15TDevTools } from '@c15t/dev-tools';
 
 const inter = Inter({
 	subsets: ['latin'],

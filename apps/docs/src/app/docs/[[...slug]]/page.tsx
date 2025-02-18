@@ -1,5 +1,4 @@
 import { cn } from '@c15t/shadcn/libs';
-
 import { createTypeTable } from 'fumadocs-typescript/ui';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 import defaultMdxComponents from 'fumadocs-ui/mdx';
@@ -18,13 +17,11 @@ import { Installer } from '~/components/docs/installer';
 import { PoweredBy } from '~/components/docs/powered-by';
 import { Preview } from '~/components/docs/preview';
 import { Tab, Tabs } from '~/components/docs/tabs';
+import { docsSource } from '~/lib/source';
 import type { Source } from '~/lib/source';
 
 const { AutoTypeTable } = createTypeTable();
 
-/**
- * Custom MDX components used for rendering documentation content
- */
 const components = {
 	...defaultMdxComponents,
 	AutoTypeTable,
@@ -39,40 +36,13 @@ const components = {
 	CodeBlock,
 };
 
-/**
- * Props for the SharedDocsPage component
- *
- * @interface SharedDocsPageProps
- * @property {Object} params - The route parameters
- * @property {string[]} [params.slug] - Optional array of path segments representing the current page path
- * @property {Source} source - The documentation source containing page data and content
- */
 interface SharedDocsPageProps {
 	params: { slug?: string[] };
 	source: Source;
 	otherComponents?: Record<string, ComponentType>;
 }
 
-/**
- * A shared page component for rendering documentation content with consistent structure
- * and styling across different documentation sections.
- *
- * @component
- * @param {SharedDocsPageProps} props - The component props
- * @param {Object} props.params - The route parameters
- * @param {Source} props.source - The documentation source
- * @returns {JSX.Element} The rendered documentation page
- * @throws {NotFoundError} When the requested page is not found in the source
- *
- * @example
- * ```tsx
- * <SharedDocsPage
- *   params={{ slug: ['getting-started'] }}
- *   source={myDocsSource}
- * />
- * ```
- */
-export function SharedDocsPage({
+function SharedDocsPage({
 	params,
 	source,
 	otherComponents,
@@ -102,24 +72,7 @@ export function SharedDocsPage({
 	);
 }
 
-/**
- * Generates metadata for a documentation page based on its content.
- *
- * @param {Object} params - The route parameters
- * @param {string[]} [params.slug] - Optional array of path segments representing the current page path
- * @param {Source} source - The documentation source containing page data
- * @returns {Metadata} The page metadata including title, description and OpenGraph data
- * @throws {NotFoundError} When the requested page is not found in the source
- *
- * @example
- * ```tsx
- * const metadata = generateSharedMetadata(
- *   { slug: ['getting-started'] },
- *   myDocsSource
- * );
- * ```
- */
-export function generateSharedMetadata(
+function generateSharedMetadata(
 	params: { slug?: string[] },
 	source: Source
 ): Metadata {
@@ -145,4 +98,41 @@ export function generateSharedMetadata(
 			],
 		},
 	};
+}
+
+/**
+ * The main documentation page component that renders content based on the current slug.
+ *
+ * @param props - The component props
+ * @param props.params - A promise containing the route parameters
+ * @param props.params.slug - Optional array of path segments representing the current page path
+ * @returns The rendered documentation page
+ */
+export default async function Page(props: {
+	params: Promise<{ slug?: string[] }>;
+}) {
+	const params = await props.params;
+	return SharedDocsPage({ params, source: docsSource });
+}
+
+/**
+ * Generates the static paths for all documentation pages at build time.
+ *
+ * @returns A promise that resolves to an array of valid route parameters
+ */
+export const generateStaticParams = async () => docsSource.generateParams();
+
+/**
+ * Generates the metadata for the current documentation page.
+ *
+ * @param props - The metadata generation props
+ * @param props.params - A promise containing the route parameters
+ * @param props.params.slug - Optional array of path segments representing the current page path
+ * @returns The page metadata including title, description and OpenGraph data
+ */
+export async function generateMetadata(props: {
+	params: Promise<{ slug?: string[] }>;
+}) {
+	const params = await props.params;
+	return generateSharedMetadata(params, docsSource);
 }

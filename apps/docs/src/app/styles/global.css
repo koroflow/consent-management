@@ -2,8 +2,8 @@
 @import "fumadocs-ui/css/black.css";
 @import "fumadocs-ui/css/preset.css";
 
-@source "../../node_modules/fumadocs-ui/dist/**/*.js";
-@source "../../node_modules/@c15t/shadcn/dist/**/*.js";
+@source "../../../node_modules/fumadocs-ui/dist/**/*.js";
+@source "../../../node_modules/@c15t/shadcn/dist/**/*.js";
 
 #nd-docs-layout,
 #nd-sidebar {
@@ -17,17 +17,15 @@
 :root {
 	--color-fd-primary: hsl(172 72.2% 48%);
 	--fd-layout-width: 1400px !important;
-	--fd-nav-height: 58px !important; /* Default for mobile */
-
-	@media (min-width: 64rem) {
-		--fd-nav-height: 112px !important;
-	}
 }
 
-#nd-toc {
-	@media (min-width: 64rem) {
-		--fd-nav-height: 112px !important;
-	}
+
+#nd-subnav {
+  border-bottom: 1px solid color-mix(in oklab, var(--color-fd-foreground) 10%, transparent);
+}
+
+#nd-subnav > div:nth-child(2) {
+  border-bottom: 0;
 }
 
 :root .dark {
