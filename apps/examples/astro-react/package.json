@@ -1,5 +1,5 @@
 {
-	"name": "@consent-management-examples/astro-react",
+	"name": "@c15t-examples/astro-react",
 	"type": "module",
 	"private": true,
 	"scripts": {
@@ -10,7 +10,7 @@
 	},
 	"dependencies": {
 		"@astrojs/react": "^4.2.0",
-		"@consent-management/react": "workspace:*",
+		"@c15t/react": "workspace:*",
 		"@types/react": "^19.0.8",
 		"@types/react-dom": "^19.0.3",
 		"astro": "^5.2.5",

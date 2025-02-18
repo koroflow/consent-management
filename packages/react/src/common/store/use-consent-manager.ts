@@ -1,8 +1,5 @@
 'use client';
-import type {
-	PrivacyConsentState,
-	createConsentManagerStore,
-} from '@consent-management/core';
+import type { PrivacyConsentState, createConsentManagerStore } from 'c15t';
 import { useContext } from 'react';
 import { ConsentStateContext } from '../context/consent-manager-context';
 

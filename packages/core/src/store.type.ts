@@ -77,11 +77,20 @@ export interface PrivacyConsentState {
 	/** Translation configuration */
 	translationConfig: TranslationConfig;
 
+	/** Whether to disable all default styling */
+	noStyle?: boolean;
+
 	/**
 	 * Updates the translation configuration.
 	 * @param config - The new translation configuration
 	 */
 	setTranslationConfig: (config: TranslationConfig) => void;
+
+	/**
+	 * Updates the noStyle setting.
+	 * @param noStyle - Whether to disable default styling
+	 */
+	setNoStyle: (noStyle: boolean) => void;
 
 	/** Whether to include non-displayed consents in operations */
 	includeNonDisplayedConsents: boolean;
@@ -100,7 +109,12 @@ export interface PrivacyConsentState {
 	 * Controls the visibility of the consent popup.
 	 * @param show - Whether to show the popup
 	 */
-	setShowPopup: (show: boolean) => void;
+	/**
+	 * Controls the visibility of the consent popup.
+	 * @param show - Whether to show the popup
+	 * @param force - When true, forcefully updates the popup state regardless of current consent customization
+	 */
+	setShowPopup: (show: boolean, force?: boolean) => void;
 
 	/**
 	 * Controls the visibility of the privacy dialog.

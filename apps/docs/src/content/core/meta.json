@@ -1,5 +1,5 @@
 {
 	"title": "Core",
 	"root": true,
-	"pages": ["index", "how-it-works"]
+	"pages": ["index", "how-it-works", "api-reference"]
 }

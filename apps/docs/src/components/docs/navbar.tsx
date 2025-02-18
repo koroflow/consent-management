@@ -1,6 +1,6 @@
 'use client';
 
-import { cn } from '@consent-management/shadcn/libs';
+import { cn } from '@c15t/shadcn/libs';
 import { ThemeToggle } from 'fumadocs-ui/components/layout/theme-toggle';
 import { Menu, X } from 'lucide-react';
 import Link from 'next/link';

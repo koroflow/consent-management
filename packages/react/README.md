@@ -1,6 +1,6 @@
 <div align="center">
    <img src="https://koroflow.com/logo-icon.png" alt="Koroflow Logo" width="64" height="64" />
-  <h1>@consent-management/react</h1>
+  <h1>@c15t/react</h1>
   <p>Transform privacy consent from a compliance checkbox into a fully observable system</p>
 
   [![GitHub stars](https://img.shields.io/github/stars/koroflow/consent-management?style=flat-square)](https://github.com/koroflow/consent-management)
@@ -22,22 +22,22 @@ React components for building privacy-first user interfaces.
 ## Documentation
 
 For detailed documentation and examples, visit:
-[https://consent.management/docs/framework/react](https://consent.management/docs/framework/react)
+[https://c15t.com/docs/framework/react](https://c15t.com/docs/framework/react)
 
 ## Installation
 
 ```bash
-npm install @consent-management/react
+npm install @c15t/react
 # or
-yarn add @consent-management/react
+yarn add @c15t/react
 # or
-pnpm add @consent-management/react
+pnpm add @c15t/react
 ```
 
 ## Quick Start
 
 ```tsx
-import { ConsentManagerProvider, CookieBanner, ConsentManagerDialog } from "@consent-management/react";
+import { ConsentManagerProvider, CookieBanner, ConsentManagerDialog } from "@c15t/react";
 
 export default function App() {
   return (

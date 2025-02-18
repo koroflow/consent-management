@@ -1,5 +1,5 @@
 {
-	"extends": "@consent-management/typescript-config/react-library.json",
+	"extends": "@c15t/typescript-config/react-library.json",
 	"compilerOptions": {
 		"baseUrl": ".",
 		"lib": ["dom", "dom.iterable", "esnext"],

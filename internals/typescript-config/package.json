@@ -1,5 +1,5 @@
 {
-	"name": "@consent-management/typescript-config",
+	"name": "@c15t/typescript-config",
 	"version": "0.0.1-beta.1",
 	"private": true,
 	"type": "module",

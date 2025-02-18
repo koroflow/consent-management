@@ -12,6 +12,7 @@ import { Box } from '../primitives/box';
 
 import { useState } from 'react';
 import { useTranslations } from '../common/store/use-translations';
+import { ConsentManagementIcon } from '../ui/components/logo';
 import {
 	ConsentManagerWidgetAccordion,
 	ConsentManagerWidgetAccordionItems,
@@ -100,17 +101,14 @@ export const ConsentManagerWidget = ({
 			</ConsentManagerWidgetFooter>
 			{!hideBrading && (
 				<Box
-					baseClassName="kf-consent-manager-widget-branding"
+					baseClassName="c15t-consent-manager-widget-branding"
 					themeKey="consent-manager-widget.branding"
 				>
 					<a
-						className="kf-consent-manager-widget-branding-link"
-						href="https://consent.management"
+						className="c15t-consent-manager-widget-branding-link"
+						href="https://c15t.com"
 					>
-						Secured by{' '}
-						<span className="kf-consent-manager-widget-branding-link-span">
-							consent.management
-						</span>
+						Secured by <ConsentManagementIcon className="h-4" />
 					</a>
 				</Box>
 			)}

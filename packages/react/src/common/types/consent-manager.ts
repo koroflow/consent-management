@@ -4,9 +4,10 @@ import type {
 	ComplianceSettings,
 	NamespaceProps,
 	PrivacyConsentState,
+	TrackingBlockerConfig,
 	TranslationConfig,
 	createConsentManagerStore,
-} from '@consent-management/core';
+} from 'c15t';
 import type { ReactNode } from 'react';
 
 /**
@@ -38,7 +39,6 @@ export interface ConsentManagerProviderProps extends NamespaceProps {
 	 * should behave in different geographical regions.
 	 */
 	initialComplianceSettings?: Record<ComplianceRegion, ComplianceSettings>;
-
 	/**
 	 * @remarks
 	 * Whether to skip injecting default styles
@@ -75,6 +75,8 @@ export interface ConsentManagerProviderProps extends NamespaceProps {
 	 * ```
 	 */
 	translationConfig?: Partial<TranslationConfig>;
+
+	trackingBlockerConfig?: TrackingBlockerConfig;
 }
 
 /**

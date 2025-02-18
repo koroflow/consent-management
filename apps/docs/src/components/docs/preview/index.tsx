@@ -9,24 +9,25 @@ import {
 	SandboxTabsContent,
 	SandboxTabsList,
 	SandboxTabsTrigger,
-} from '@consent-management/shadcn/components';
+} from '@c15t/shadcn/components';
 import {
 	ResizableHandle,
 	ResizablePanel,
 	ResizablePanelGroup,
-} from '@consent-management/shadcn/components';
-import { cn } from '@consent-management/shadcn/libs';
+} from '@c15t/shadcn/components';
+import { cn } from '@c15t/shadcn/libs';
 import { AppWindowIcon, CodeIcon, TerminalIcon } from 'lucide-react';
 import type { ComponentProps } from 'react';
-import { exampleContent } from '~/examples/cookie-banner/example-page';
-import { PreviewProvider } from './provider';
+import { PreviewProvider, type PreviewProviderProps } from './provider';
 import { tsconfig } from './tsconfig';
 import { utils } from './utils';
 
 type PreviewProps = {
 	name: string;
-	code: string;
+	code: string | Record<string, string>;
 	dependencies?: Record<string, string>;
+	defaultFile?: string;
+	template?: PreviewProviderProps['template'];
 };
 
 const PreviewSkeleton = () => (
@@ -43,16 +44,27 @@ const PreviewSkeleton = () => (
 
 export const Preview = ({
 	code,
+	defaultFile = '/App.tsx',
+	template = 'react-ts',
 	dependencies: demoDependencies,
 }: PreviewProps) => {
 	const dependencies: Record<string, string> = {};
 	const devDependencies: Record<string, string> = {};
 
 	const files: ComponentProps<typeof SandboxProvider>['files'] = {
-		'/App.tsx': code,
 		'/tsconfig.json': tsconfig,
 		'/lib/utils.ts': utils,
-		'/exampleContent.tsx': exampleContent,
+		...(typeof code === 'string'
+			? {
+					[defaultFile.startsWith('/') ? defaultFile : `/${defaultFile}`]: code,
+				}
+			: Object.entries(code).reduce(
+					(acc, [filename, content]) =>
+						Object.assign(acc, {
+							[filename.startsWith('/') ? filename : `/${filename}`]: content,
+						}),
+					{}
+				)),
 	};
 
 	// Scan the demo code for any imports of shadcn/ui components
@@ -76,10 +88,12 @@ export const Preview = ({
 			</div>
 			<div className="absolute inset-0 overflow-hidden">
 				<PreviewProvider
-					template="react-ts"
+					template={template}
 					options={{
 						externalResources: [
-							'https://unpkg.com/@tailwindcss/browser@4',
+							...(template === 'react-ts'
+								? ['https://unpkg.com/@tailwindcss/browser@4']
+								: []),
 							'https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap',
 						],
 						initMode: 'lazy',
@@ -91,8 +105,8 @@ export const Preview = ({
 					customSetup={{
 						dependencies: {
 							...dependencies,
-							'@consent-management/react': 'latest',
-							'@consent-management/dev-tools': 'latest',
+							...(template === 'react-ts' ? { '@c15t/react': 'latest' } : {}),
+							'@c15t/dev-tools': 'latest',
 						},
 						devDependencies: {
 							...devDependencies,

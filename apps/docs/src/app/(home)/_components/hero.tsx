@@ -1,8 +1,8 @@
 'use client';
 
-import { buttonVariants } from '@consent-management/shadcn/components';
+import { buttonVariants } from '@c15t/shadcn/components';
 
-import { cn } from '@consent-management/shadcn/libs';
+import { cn } from '@c15t/shadcn/libs';
 import Link from 'next/link';
 import { useRef } from 'react';
 

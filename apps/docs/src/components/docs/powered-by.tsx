@@ -1,5 +1,5 @@
 // import { env } from "@/env";
-import { cn } from '@consent-management/shadcn/libs';
+import { cn } from '@c15t/shadcn/libs';
 
 import Image from 'next/image';
 

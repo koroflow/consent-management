@@ -1,4 +1,4 @@
-import { Button } from '@consent-management/shadcn/components';
+import { Button } from '@c15t/shadcn/components';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { BorderIcon } from '~/components/marketing/border-icon';

@@ -1,6 +1,6 @@
 {
-	"name": "@consent-management/dev-tools",
-	"version": "0.0.1-rc.1",
+	"name": "@c15t/dev-tools",
+	"version": "0.0.1-rc.4",
 	"type": "module",
 	"main": "dist/index.cjs",
 	"module": "dist/index.js",
@@ -14,7 +14,7 @@
 	},
 	"browserslist": [">0.2%", "not dead", "not op_mini all"],
 	"dependencies": {
-		"@consent-management/core": "workspace:*",
+		"c15t": "workspace:*",
 		"@radix-ui/react-accordion": "1.2.3",
 		"@radix-ui/react-scroll-area": "^1.2.3",
 		"@radix-ui/react-slot": "1.1.2",
@@ -31,7 +31,7 @@
 		"zustand": "^5.0.3"
 	},
 	"devDependencies": {
-		"@consent-management/typescript-config": "workspace:*",
+		"@c15t/typescript-config": "workspace:*",
 		"postcss": "^8.5.2"
 	},
 	"peerDependencies": {

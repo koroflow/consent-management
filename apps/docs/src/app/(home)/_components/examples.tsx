@@ -18,7 +18,7 @@ const featureOptions: FeatureOption[] = [
 		code: (
 			<CodeBlock
 				lang="jsx"
-				code={`import { ConsentManagerProvider,ConsentManagerDialog, CookieBanner } from "@consent-management/react"
+				code={`import { ConsentManagerProvider,ConsentManagerDialog, CookieBanner } from "@c15t/react"
 
 function Layout({ children }: { children: ReactNode }) {
   return (
@@ -40,7 +40,7 @@ function Layout({ children }: { children: ReactNode }) {
 		code: (
 			<CodeBlock
 				lang="jsx"
-				code={`import { ConsentManagerProvider,ConsentManagerDialog,CookieBanner } from "@consent-management/react"
+				code={`import { ConsentManagerProvider,ConsentManagerDialog,CookieBanner } from "@c15t/react"
 
 const modernTheme = {
   'cookie-banner.root': 'fixed bottom-0 w-full p-4 bg-white/80 backdrop-blur-sm',

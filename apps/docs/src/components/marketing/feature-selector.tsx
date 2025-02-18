@@ -1,10 +1,10 @@
-import { cn } from '@consent-management/shadcn/libs';
+import { cn } from '@c15t/shadcn/libs';
 
 import { type HTMLAttributes, type ReactNode, forwardRef } from 'react';
 import { BorderIcon } from './border-icon';
 
 // Types
-interface FeatureProps extends HTMLAttributes<HTMLDivElement> {
+export interface FeatureProps extends HTMLAttributes<HTMLDivElement> {
 	title: string;
 	description: string;
 	icon: ReactNode;

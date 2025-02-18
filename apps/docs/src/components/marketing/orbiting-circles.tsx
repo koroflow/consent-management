@@ -1,4 +1,4 @@
-import { cn } from '@consent-management/shadcn/libs';
+import { cn } from '@c15t/shadcn/libs';
 import type { CSSProperties, ReactNode } from 'react';
 
 export interface OrbitingCirclesProps {

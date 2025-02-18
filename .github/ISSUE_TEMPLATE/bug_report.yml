@@ -1,5 +1,5 @@
 name: "🐛 Bug Report"
-description: Report a bug in consent.management
+description: Report a bug in c15t.com
 labels: ["Bug", "Needs Approval"]
 body:
   - type: markdown
@@ -10,7 +10,7 @@ body:
         Before reporting:
         1. Search [existing issues](https://github.com/koroflow/consent-management/issues)
         2. Try the latest version
-        3. Read the [documentation](https://consent.management/docs)
+        3. Read the [documentation](https://c15t.com/docs)
   
   - type: dropdown
     id: severity
@@ -29,7 +29,7 @@ body:
     id: version
     attributes:
       label: Version
-      description: What version of consent.management are you using?
+      description: What version of c15t.com are you using?
       placeholder: "e.g., 1.0.0"
     validations:
       required: true

@@ -1,4 +1,4 @@
-import type { PrivacyConsentState } from '@consent-management/core';
+import type { PrivacyConsentState } from 'c15t';
 import type { ThemeContextValue } from '../../theme';
 
 interface ThemeContextValueWithConsent
@@ -16,6 +16,7 @@ export function createThemeContextValue(
 	const result = Object.assign(fn, {
 		...consentManager,
 		...themeProps,
+		noStyle: themeProps.noStyle ?? consentManager.noStyle,
 	});
 
 	// Type guard to ensure type safety

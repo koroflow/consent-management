@@ -1,5 +1,5 @@
 name: "✨ Feature Request"
-description: Suggest a new feature for consent.management
+description: Suggest a new feature for c15t.com
 labels: ["Feature", "Needs Approval"]
 body:
   - type: markdown
@@ -9,8 +9,8 @@ body:
         
         Before submitting:
         1. Search [existing requests](https://github.com/koroflow/consent-management/issues)
-        2. Read the [documentation](https://consent.management/docs)
-        3. Join our [Discord](https://consent.management/discord) for discussions
+        2. Read the [documentation](https://c15t.com/docs)
+        3. Join our [Discord](https://c15t.com/discord) for discussions
 
   - type: dropdown
     id: type

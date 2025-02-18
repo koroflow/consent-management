@@ -1,3 +1,1 @@
-import { ConsentManagerDevTool } from './dev-tool';
-
-export default ConsentManagerDevTool;
+export { C15TDevTools } from './dev-tool';

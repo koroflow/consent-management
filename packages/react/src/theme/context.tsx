@@ -2,7 +2,7 @@
 
 /**
  * @packageDocumentation
- * Provides theme context and hooks for @consent-management/react components.
+ * Provides theme context and hooks for @c15t/react components.
  * Implements a flexible theming system with TypeScript support and runtime safety.
  */
 

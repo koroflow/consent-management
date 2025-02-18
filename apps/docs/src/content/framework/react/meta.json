@@ -4,11 +4,14 @@
 	"pages": [
 		"--- Introduction ---",
 		"index",
+		"api-reference",
 		"--- Components ---",
 		"cookie-banner",
 		"consent-manager-widget",
 		"consent-manager-dialog",
 		"dev-tool",
+		"--- Hooks ---",
+		"use-consent-manager",
 		"--- Guides ---",
 		"guides/customization",
 		"guides/translation"

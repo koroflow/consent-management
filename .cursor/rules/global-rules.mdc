@@ -46,9 +46,9 @@ const Status = Object.freeze({
 
 Each component should follow this pattern:
 ```typescript
-import { forwardRef, ElementRef, HTMLAttributes, ReactNode } from 'react';
+import { forwardRef, type ComponentRef, HTMLAttributes, ReactNode } from 'react';
 
-type ComponentElement = ElementRef<'element_type'>;
+type ComponentElement = ComponentRef<'element_type'>;
 type ComponentProps = {
   // Required props first
   name?: string;

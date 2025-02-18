@@ -1,5 +1,5 @@
 {
-	"extends": "@consent-management/typescript-config/next.json",
+	"extends": "@c15t/typescript-config/next.json",
 	"compilerOptions": {
 		"baseUrl": "./src",
 		"paths": {

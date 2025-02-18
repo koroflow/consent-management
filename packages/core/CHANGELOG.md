@@ -1,4 +1,4 @@
-# @consent-management/core
+# c15t
 
 
 ## 1.0.0-rc.1

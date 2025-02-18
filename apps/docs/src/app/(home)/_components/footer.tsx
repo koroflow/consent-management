@@ -10,7 +10,7 @@ export function Footer() {
 				{/* Logo and Description Column */}
 				<div className="col-span-2 flex flex-col items-center sm:col-span-3 sm:items-start xl:col-span-2">
 					<LogoWithBadge />
-					<div className="mt-8 font-normal text-sm text-white/60 leading-6">
+					<div className="mt-8 font-normal text-sm leading-6 dark:text-white/60">
 						{siteConfig.footer.bottomText}
 					</div>
 				</div>
@@ -21,7 +21,7 @@ export function Footer() {
 						key={section.title}
 						className="col-span-1 flex flex-col gap-8 text-left"
 					>
-						<span className="w-full font-display font-medium text-sm text-white tracking-wider">
+						<span className="w-full font-display font-medium text-sm tracking-wider dark:text-white">
 							{section.title}
 						</span>
 						<ul className="flex flex-col gap-4 md:gap-6">
@@ -29,7 +29,7 @@ export function Footer() {
 								<li key={link.text}>
 									<Link
 										href={link.url}
-										className="font-normal text-sm text-white/70 transition hover:text-white/40"
+										className="font-normal text-sm transition dark:text-white/70 hover:dark:text-white/40"
 									>
 										{link.text}
 									</Link>
@@ -43,8 +43,8 @@ export function Footer() {
 			{/* BorderText Component */}
 			<div className="container mt-4 h-[135px] overflow-hidden">
 				<div className="flex w-full justify-center">
-					<div className="bg-gradient-to-tr from-white/40 to-white/10 bg-clip-text font-bold text-[125px] text-transparent tracking-tighter">
-						consent.management
+					<div className="bg-gradient-to-tr from-black/40 to-black/10 bg-clip-text font-bold text-[125px] text-transparent tracking-tighter dark:from-white/40 dark:to-white/10">
+						c15t.com
 					</div>
 				</div>
 			</div>

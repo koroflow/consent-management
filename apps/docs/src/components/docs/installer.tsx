@@ -7,7 +7,7 @@ import {
 	SnippetTabsContent,
 	SnippetTabsList,
 	SnippetTabsTrigger,
-} from '@consent-management/shadcn/components';
+} from '@c15t/shadcn/components';
 
 import Image from 'next/image';
 import { useState } from 'react';

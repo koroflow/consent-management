@@ -12,6 +12,7 @@ import { useTranslations } from '../../common/store/use-translations';
 import { ConsentManagerWidget } from '../../consent-manager-widget/consent-manager-widget';
 import { Box, type BoxProps } from '../../primitives/box';
 import type { ClassNameStyle } from '../../theme';
+import { ConsentManagementIcon } from '../../ui/components/logo';
 /**
  * Props for the DialogCard and related components
  * @public
@@ -42,7 +43,7 @@ const DialogCard = forwardRef<HTMLDivElement, DialogCardProps>(
 		return (
 			<Box
 				ref={ref as Ref<HTMLDivElement>}
-				baseClassName="kf-card kf-consent-manager-dialog-card"
+				baseClassName="c15t-card c15t-consent-manager-dialog-card"
 				{...props}
 				themeKey="consent-manager-dialog.root"
 				data-testid="consent-manager-dialog-root"
@@ -67,7 +68,7 @@ const DialogHeader = forwardRef<HTMLDivElement, Omit<BoxProps, 'themeKey'>>(
 		return (
 			<Box
 				ref={ref as Ref<HTMLDivElement>}
-				baseClassName="kf-card-header kf-consent-manager-dialog-card"
+				baseClassName="c15t-card-header c15t-consent-manager-dialog-card"
 				{...props}
 				themeKey="consent-manager-dialog.header"
 				data-testid="consent-manager-dialog-header"
@@ -94,7 +95,7 @@ const DialogHeaderTitle = forwardRef<
 	return (
 		<Box
 			ref={ref as Ref<HTMLDivElement>}
-			baseClassName="kf-card-title"
+			baseClassName="c15t-card-title"
 			themeKey="consent-manager-dialog.title"
 			{...props}
 			data-testid="consent-manager-dialog-title"
@@ -120,7 +121,7 @@ const DialogHeaderDescription = forwardRef<
 	return (
 		<Box
 			ref={ref as Ref<HTMLDivElement>}
-			baseClassName="kf-card-description"
+			baseClassName="c15t-card-description"
 			themeKey="consent-manager-dialog.description"
 			{...props}
 			data-testid="consent-manager-dialog-description"
@@ -144,7 +145,7 @@ const DialogContent = forwardRef<HTMLDivElement, Omit<BoxProps, 'themeKey'>>(
 		return (
 			<Box
 				ref={ref as Ref<HTMLDivElement>}
-				baseClassName="kf-card-content"
+				baseClassName="c15t-card-content"
 				themeKey="consent-manager-dialog.content"
 				data-testid="consent-manager-dialog-content"
 				{...props}
@@ -161,7 +162,7 @@ const DialogContent = forwardRef<HTMLDivElement, Omit<BoxProps, 'themeKey'>>(
  *
  * @remarks
  * - Should be the last child of DialogCard
- * - Includes consent.management branding by default
+ * - Includes c15t.com branding by default
  * - Can be customized through theme configuration
  */
 const DialogFooter = forwardRef<HTMLDivElement, Omit<BoxProps, 'themeKey'>>(
@@ -169,19 +170,16 @@ const DialogFooter = forwardRef<HTMLDivElement, Omit<BoxProps, 'themeKey'>>(
 		return (
 			<Box
 				ref={ref as Ref<HTMLDivElement>}
-				baseClassName="kf-card-footer"
+				baseClassName="c15t-card-footer"
 				themeKey="consent-manager-dialog.footer"
 				{...props}
 				data-testid="consent-manager-dialog-footer"
 			>
 				<a
-					className="consent-manager-widget-branding-link"
-					href="https://koroflow.com"
+					className="c15t-consent-manager-widget-branding-link"
+					href="https://c15t.com"
 				>
-					Secured by{' '}
-					<span className="consent-manager-widget-branding-link-span">
-						consent.management
-					</span>
+					Secured by <ConsentManagementIcon />
 				</a>
 			</Box>
 		);

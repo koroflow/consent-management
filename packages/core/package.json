@@ -1,6 +1,6 @@
 {
-	"name": "@consent-management/core",
-	"version": "0.0.1-rc.1",
+	"name": "c15t",
+	"version": "0.0.1-rc.4",
 	"type": "module",
 	"main": "dist/index.cjs",
 	"module": "dist/index.js",
@@ -10,14 +10,18 @@
 		"check-types": "tsc --noEmit",
 		"dev": "rslib build --watch",
 		"fmt": "pnpm biome format --write .",
-		"lint": "pnpm biome lint ./src"
+		"lint": "pnpm biome lint ./src",
+		"test": "vitest run",
+		"test:watch": "vitest",
+		"test:coverage": "vitest run --coverage"
 	},
 	"browserslist": [">0.2%", "not dead", "not op_mini all"],
 	"dependencies": {
 		"zustand": "^5.0.3"
 	},
 	"devDependencies": {
-		"@consent-management/typescript-config": "workspace:*"
+		"@c15t/typescript-config": "workspace:*",
+		"happy-dom": "^17.1.0"
 	},
 	"publishConfig": {
 		"access": "public"

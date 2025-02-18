@@ -34,7 +34,7 @@ jobs:
             Here is an example:
             ```
             <type>[optional scope]: <description>
-            fix: I fixed something for consent.management
+            fix: I fixed something for c15t.com
             ```
 
             Details:

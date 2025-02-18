@@ -1,9 +1,9 @@
 ---
 title: Styling Guide
-description: Learn how to customize the appearance of @consent-management/react components through our flexible theming system.
+description: Learn how to customize the appearance of @c15t/react components through our flexible theming system.
 ---
 
-Our theming system provides a powerful way to customize the appearance of @consent-management/react components while maintaining their functionality and accessibility. This guide will walk you through the different approaches to styling and help you understand how our theming system works.
+Our theming system provides a powerful way to customize the appearance of @c15t/react components while maintaining their functionality and accessibility. This guide will walk you through the different approaches to styling and help you understand how our theming system works.
 
 ## Understanding the Theming System
 
@@ -80,7 +80,7 @@ theme={{
 
 ## Working with Component Hierarchies
 
-@consent-management/react components often contain nested elements. Understanding this hierarchy helps you style effectively:
+@c15t/react components often contain nested elements. Understanding this hierarchy helps you style effectively:
 
 ```tsx
 // Example of nested component styling
@@ -89,6 +89,7 @@ const theme = {
   'consent-manager-widget.accordion': 'space-y-2',
   'consent-manager-widget.accordion.item': 'border rounded-sm',
   'consent-manager-widget.accordion.trigger': 'p-4 hover:bg-gray-50',
+  'consent-manager-widget.accordion.trigger-inner': '',
   'consent-manager-widget.accordion.content': 'p-4 bg-gray-50'
 }
 ```
@@ -100,7 +101,7 @@ Each level in the hierarchy can be styled independently, giving you fine-grained
 For consistent styling across your application, you can use theme context:
 
 ```tsx
-import { ThemeProvider } from '@consent-management/react'
+import { ThemeProvider } from '@c15t/react'
 
 const globalTheme = {
   // Your theme configuration
@@ -128,7 +129,7 @@ Sometimes you might want to start from scratch. Use the `noStyle` prop to remove
 Our theming system includes TypeScript support to help prevent errors:
 
 ```tsx
-import type { CookieBannerTheme } from '@consent-management/react'
+import type { CookieBannerTheme } from '@c15t/react'
 
 // TypeScript will catch invalid theme keys
 const theme: CookieBannerTheme = {

@@ -1,21 +1,14 @@
 'use client';
 
-import {
-	Cookie,
-	FileText,
-	GanttChartSquare,
-	RefreshCw,
-	ToggleLeft,
-} from 'lucide-react';
+import { GanttChartSquare, ToggleLeft } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useCallback, useState } from 'react';
 
-import type { PrivacyConsentState } from '@consent-management/core';
-import { Button } from '../components/ui/button';
+import type { PrivacyConsentState } from 'c15t';
 import { ExpandableTabs } from '../components/ui/expandable-tabs';
 import { ScrollArea } from '../components/ui/scroll-area';
 import { getStore } from '../dev-tool';
-import { cn } from '../libs/utils';
+import { Badge } from '~/components/ui/badge';
 
 type TabSection = 'Consents' | 'Compliance' | 'Scripts' | 'Conditional';
 
@@ -34,9 +27,9 @@ interface RouterProps {
 	onClose: () => void;
 }
 
-export function Router({ onClose }: RouterProps) {
+export function Router({ onClose: _onClose }: RouterProps) {
 	const privacyConsent = getStore() as PrivacyConsentState;
-	const { clearAllData, setIsPrivacyDialogOpen, setShowPopup } = privacyConsent;
+	// const { clearAllData, setIsPrivacyDialogOpen, setShowPopup } = privacyConsent;
 
 	const [activeSection, setActiveSection] = useState<TabSection>('Consents');
 
@@ -59,39 +52,43 @@ export function Router({ onClose }: RouterProps) {
 	];
 
 	// Compute content items based on active section
-	const contentItems: ContentItem[] =
-		activeSection === 'Consents'
-			? Object.entries(privacyConsent.consents).map(([name, value]) => ({
+	const contentItems: ContentItem[] = (() => {
+		switch (activeSection) {
+			case 'Consents':
+				return Object.entries(privacyConsent.consents).map(([name, value]) => ({
 					title: name,
 					status: value ? 'Enabled' : 'Disabled',
-				}))
-			: activeSection === 'Compliance'
-				? Object.entries(privacyConsent.complianceSettings).map(
-						([region, settings]) => ({
-							title: region,
-							status: settings.enabled ? 'Active' : 'Inactive',
-						})
-					)
-				: activeSection === 'Conditional'
-					? renderingState.map((item) => ({
-							title: item.componentName,
-							status: 'Rendered',
-							details: `Requires: ${item.consentType}`,
-						}))
-					: [];
+				}));
+			case 'Compliance':
+				return Object.entries(privacyConsent.complianceSettings).map(
+					([region, settings]) => ({
+						title: region,
+						status: settings.enabled ? 'Active' : 'Inactive',
+					})
+				);
+			case 'Conditional':
+				return renderingState.map((item) => ({
+					title: item.componentName,
+					status: 'Rendered',
+					details: `Requires: ${item.consentType}`,
+				}));
+			default:
+				return [];
+		}
+	})();
 
-	const handleResetConsent = useCallback(() => {
-		clearAllData();
-		onClose();
-	}, [clearAllData, onClose]);
+	// const handleResetConsent = useCallback(() => {
+	// 	clearAllData();
+	// 	onClose();
+	// }, [clearAllData, onClose]);
 
-	const handleOpenPrivacyModal = useCallback(() => {
-		setIsPrivacyDialogOpen(true);
-	}, [setIsPrivacyDialogOpen]);
+	// const handleOpenPrivacyModal = useCallback(() => {
+	// 	setIsPrivacyDialogOpen(true);
+	// }, [setIsPrivacyDialogOpen]);
 
-	const handleOpenCookiePopup = useCallback(() => {
-		setShowPopup(true);
-	}, [setShowPopup]);
+	// const handleOpenCookiePopup = useCallback(() => {
+	// 	setShowPopup(true);
+	// }, [setShowPopup]);
 
 	return (
 		<>
@@ -126,24 +123,23 @@ export function Router({ onClose }: RouterProps) {
 									</span>
 								)}
 							</div>
-							<span
-								className={cn(
-									'rounded-full px-2 py-1 text-xs',
+							<Badge
+								variant={
 									item.status === 'Enabled' ||
-										item.status === 'Active' ||
-										item.status === 'active' ||
-										item.status === 'Rendered'
-										? 'bg-green-100 text-green-800'
-										: 'bg-red-100 text-red-800'
-								)}
+									item.status === 'Active' ||
+									item.status === 'active' ||
+									item.status === 'Rendered'
+										? 'default'
+										: 'destructive'
+								}
 							>
 								{item.status}
-							</span>
+							</Badge>
 						</motion.div>
 					))}
 				</motion.div>
 			</ScrollArea>
-			<div className="border-t p-4">
+			{/* <div className="border-t p-4">
 				<div className="flex flex-col gap-2">
 					<Button variant="outline" size="sm" onClick={handleResetConsent}>
 						<RefreshCw className="mr-2 h-4 w-4" />
@@ -158,7 +154,7 @@ export function Router({ onClose }: RouterProps) {
 						Open Cookie Popup
 					</Button>
 				</div>
-			</div>
+			</div> */}
 		</>
 	);
 }

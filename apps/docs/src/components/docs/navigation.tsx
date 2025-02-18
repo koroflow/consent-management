@@ -28,7 +28,7 @@ export const navigation = {
 		},
 		{
 			type: 'icon',
-			url: 'https://consent.management/discord',
+			url: 'https://c15t.com/discord',
 			text: 'Discord',
 			icon: <DiscordIcon className="h-5 w-5" />,
 			external: true,

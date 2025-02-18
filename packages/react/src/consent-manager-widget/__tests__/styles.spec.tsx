@@ -46,9 +46,9 @@ const ALL_COMPONENTS: ComponentTestCase[] = [
 		styles: 'custom-accordion-trigger',
 	},
 	{
-		testId: 'consent-manager-widget-accordion-sub-group-marketing',
-		themeKey: 'consent-manager-widget.accordion.trigger-sub-group',
-		styles: 'custom-accordion-trigger-sub-group',
+		testId: 'consent-manager-widget-accordion-trigger-inner-marketing',
+		themeKey: 'consent-manager-widget.accordion.trigger-inner',
+		styles: 'custom-accordion-trigger-inner',
 	},
 	{
 		testId: 'consent-manager-widget-accordion-content-marketing',

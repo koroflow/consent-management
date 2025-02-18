@@ -1,8 +1,5 @@
 'use client';
-import type {
-	NamespaceProps,
-	PrivacyConsentState,
-} from '@consent-management/core';
+import type { NamespaceProps, PrivacyConsentState } from 'c15t';
 
 import {
 	type FC,
@@ -17,7 +14,7 @@ import { ErrorState } from './components/error-state';
 import { Header } from './components/header';
 import DevToolWrapper from './components/wrapper';
 import { Router } from './router/router';
-
+import './styles/theme.css';
 const PrivacyConsentContext = createContext<{
 	state: PrivacyConsentState | null;
 	store: StoreApi<PrivacyConsentState> | null;
@@ -59,12 +56,12 @@ export const getStore = () => {
 
 export default PrivacyConsentContext;
 
-interface ConsentManagerProviderProps extends NamespaceProps {
+export interface ConsentManagerProviderProps extends NamespaceProps {
 	position?: 'bottom-right' | 'top-right' | 'bottom-left' | 'top-left';
 }
 
-export const ConsentManagerDevTool: FC<ConsentManagerProviderProps> = ({
-	namespace = 'ConsentManagerStore',
+export const C15TDevTools: FC<ConsentManagerProviderProps> = ({
+	namespace = 'c15tStore',
 	position = 'bottom-right',
 }) => {
 	const [state, setState] = useState<PrivacyConsentState | null>(null);

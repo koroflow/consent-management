@@ -1,6 +1,6 @@
 'use client';
 
-import { cn } from '@consent-management/shadcn/libs';
+import { cn } from '@c15t/shadcn/libs';
 import { AnimatePresence, motion } from 'motion/react';
 import { type ReactNode, useState } from 'react';
 import { BorderIcon } from '~/components/marketing/border-icon';

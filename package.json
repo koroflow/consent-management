@@ -1,5 +1,5 @@
 {
-	"name": "consent-management",
+	"name": "c15t",
 	"private": true,
 	"scripts": {
 		"build": "turbo build --filter=!./apps/examples/*",

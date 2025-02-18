@@ -5,7 +5,7 @@ import {
 	type PrivacyConsentState,
 	createConsentManagerStore,
 	defaultTranslationConfig,
-} from '@consent-management/core';
+} from 'c15t';
 import { useEffect, useMemo, useState } from 'react';
 import { ConsentStateContext } from '../context/consent-manager-context';
 import type { ConsentManagerProviderProps } from '../types/consent-manager';
@@ -31,9 +31,10 @@ export function ConsentManagerProvider({
 	children,
 	initialGdprTypes,
 	initialComplianceSettings,
-	namespace = 'KoroflowStore',
+	namespace = 'c15tStore',
 	noStyle = false,
 	translationConfig,
+	trackingBlockerConfig,
 }: ConsentManagerProviderProps) {
 	const preparedTranslationConfig = useMemo(() => {
 		const mergedConfig = mergeTranslationConfigs(
@@ -50,18 +51,28 @@ export function ConsentManagerProvider({
 
 	// Create a stable reference to the store with prepared translation config
 	const store = useMemo(() => {
-		const store = createConsentManagerStore(namespace);
+		const store = createConsentManagerStore(namespace, {
+			trackingBlockerConfig,
+		});
 		// Set translation config immediately
 		store.getState().setTranslationConfig(preparedTranslationConfig);
+
+		// Set noStyle immediately
+		store.getState().setNoStyle(noStyle);
+
 		return store;
-	}, [namespace, preparedTranslationConfig]);
+	}, [namespace, preparedTranslationConfig, trackingBlockerConfig, noStyle]);
 
 	// Initialize state with the current state from the consent manager store
 	const [state, setState] = useState<PrivacyConsentState>(store.getState());
 
 	useEffect(() => {
-		const { setGdprTypes, setComplianceSetting, setDetectedCountry } =
-			store.getState();
+		const {
+			setGdprTypes,
+			setComplianceSetting,
+			setDetectedCountry,
+			setNoStyle,
+		} = store.getState();
 
 		// Initialize GDPR types if provided
 		if (initialGdprTypes) {
@@ -76,6 +87,9 @@ export function ConsentManagerProvider({
 				setComplianceSetting(region as ComplianceRegion, settings);
 			}
 		}
+
+		// Update noStyle when prop changes
+		setNoStyle(noStyle);
 
 		// Set detected country
 		const country =
@@ -93,7 +107,7 @@ export function ConsentManagerProvider({
 		return () => {
 			unsubscribe();
 		};
-	}, [store, initialGdprTypes, initialComplianceSettings]);
+	}, [store, initialGdprTypes, initialComplianceSettings, noStyle]);
 
 	// Memoize the context value to prevent unnecessary re-renders
 	const contextValue = useMemo(

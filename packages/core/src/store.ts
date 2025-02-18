@@ -10,6 +10,8 @@ import {
 	hasConsentFor,
 	hasConsented,
 } from './libs/consent-utils';
+import { createTrackingBlocker } from './libs/tracking-blocker';
+import type { TrackingBlockerConfig } from './libs/tracking-blocker';
 import { initialState } from './store.initial-state';
 import type { PrivacyConsentState } from './store.type';
 import {
@@ -63,6 +65,10 @@ const getStoredConsent = (): StoredConsent | null => {
 	}
 };
 
+interface StoreConfig {
+	trackingBlockerConfig?: TrackingBlockerConfig;
+}
+
 /**
  * Creates a new consent manager store instance.
  *
@@ -106,10 +112,20 @@ const getStoredConsent = (): StoredConsent | null => {
  * @public
  */
 export const createConsentManagerStore = (
-	namespace: string | undefined = 'ConsentManagerStore'
+	namespace: string | undefined = 'c15tStore',
+	config?: StoreConfig
 ) => {
 	// Load initial state from localStorage if available
 	const storedConsent = getStoredConsent();
+
+	// Initialize tracking blocker
+	const trackingBlocker =
+		typeof window !== 'undefined'
+			? createTrackingBlocker(
+					config?.trackingBlockerConfig || {},
+					storedConsent?.consents || initialState.consents
+				)
+			: null;
 
 	const store = createStore<PrivacyConsentState>((set, get) => ({
 		...initialState,
@@ -150,13 +166,10 @@ export const createConsentManagerStore = (
 				}
 
 				const newConsents = { ...state.consents, [name]: value };
-				localStorage.setItem(
-					STORAGE_KEY,
-					JSON.stringify({
-						consents: newConsents,
-						consentInfo: state.consentInfo,
-					})
-				);
+
+				// Update tracking blocker with new consents
+				trackingBlocker?.updateConsents(newConsents);
+
 				return { consents: newConsents };
 			});
 			get().updateConsentMode();
@@ -234,6 +247,9 @@ export const createConsentManagerStore = (
 					consentInfo,
 				})
 			);
+
+			// Update tracking blocker with new consents
+			trackingBlocker?.updateConsents(newConsents);
 
 			set({
 				consents: newConsents,
@@ -420,6 +436,15 @@ export const createConsentManagerStore = (
 		 */
 		setTranslationConfig: (config: TranslationConfig) => {
 			set({ translationConfig: config });
+		},
+
+		/**
+		 * Updates the noStyle setting.
+		 *
+		 * @param noStyle - Whether to disable default styling
+		 */
+		setNoStyle: (noStyle) => {
+			set({ noStyle });
 		},
 	}));
 

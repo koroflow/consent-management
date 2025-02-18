@@ -1,3 +1,4 @@
+import { remarkInstall } from 'fumadocs-docgen';
 import { defineConfig, defineDocs } from 'fumadocs-mdx/config';
 
 export const { docs: gettingStarted, meta: gettingStartedMeta } = defineDocs({
@@ -20,4 +21,8 @@ export const { docs: privacyRegulations, meta: privacyRegulationsMeta } =
 		dir: 'src/content/privacy-regulations',
 	});
 
-export default defineConfig();
+export default defineConfig({
+	mdxOptions: {
+		remarkPlugins: [remarkInstall],
+	},
+});

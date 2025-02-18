@@ -1,6 +1,6 @@
-# Contributing to consent.management
+# Contributing to c15t.com
 
-We love your input! We want to make contributing to consent.management as easy and transparent as possible, whether it's:
+We love your input! We want to make contributing to c15t.com as easy and transparent as possible, whether it's:
 
 - Reporting a bug
 - Discussing the current state of the code
@@ -10,7 +10,7 @@ We love your input! We want to make contributing to consent.management as easy a
 
 ## 📜 License
 
-By contributing to consent.management, you agree that your contributions will be licensed under the GNU General Public License v3.0 (GPL-3.0). This is a copyleft license that ensures the software and all derivatives remain free and open source.
+By contributing to c15t.com, you agree that your contributions will be licensed under the GNU General Public License v3.0 (GPL-3.0). This is a copyleft license that ensures the software and all derivatives remain free and open source.
 
 [Read the full license here](LICENSE)
 
@@ -32,7 +32,7 @@ We use the `needs-approval` label to manage contributions:
   - New features
   - Large-scale refactoring
   - Architecture changes
-  - *Wait for an consent.management team member to remove the `needs-approval` label*
+  - *Wait for an c15t.com team member to remove the `needs-approval` label*
 
 - ✅ **Can Start Immediately:**
   - Bug fixes
@@ -171,7 +171,7 @@ Don't hesitate to:
 
 ## Important License Note
 
-consent.management is licensed under the GNU General Public License v3.0 (GPL-3.0). By contributing to this project, you agree to license your contributions under the same license. This means:
+c15t.com is licensed under the GNU General Public License v3.0 (GPL-3.0). By contributing to this project, you agree to license your contributions under the same license. This means:
 
 - ✅ You can use the code commercially
 - ✅ You can modify the code

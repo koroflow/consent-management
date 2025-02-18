@@ -7,16 +7,16 @@
  */
 
 export {
-	ConsentManagerWidgetAccordionSubGroup,
 	ConsentManagerWidgetAccordionTrigger,
+	ConsentManagerWidgetAccordionTriggerInner,
 	ConsentManagerWidgetAccordionContent,
 	ConsentManagerWidgetAccordionArrow,
 	ConsentManagerWidgetAccordion,
 	ConsentManagerWidgetSwitch,
 	ConsentManagerWidgetAccordionItems,
 	ConsentManagerWidgetAccordionItem,
-	AccordionSubGroup,
 	AccordionTrigger,
+	AccordionTriggerInner,
 	AccordionContent,
 	AccordionArrow,
 	Accordion,

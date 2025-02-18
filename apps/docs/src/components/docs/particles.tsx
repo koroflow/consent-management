@@ -1,6 +1,6 @@
 'use client';
 
-import { cn } from '@consent-management/shadcn/libs';
+import { cn } from '@c15t/shadcn/libs';
 import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
 

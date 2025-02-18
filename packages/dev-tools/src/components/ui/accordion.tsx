@@ -2,13 +2,12 @@
 
 import * as AccordionPrimitive from '@radix-ui/react-accordion';
 import { ChevronDown } from 'lucide-react';
-
 import {
 	type ComponentPropsWithoutRef,
 	type ComponentRef,
 	forwardRef,
 } from 'react';
-import { cn } from '../../libs/utils';
+import './accordion.css';
 
 const Accordion = AccordionPrimitive.Root;
 
@@ -18,7 +17,7 @@ const AccordionItem = forwardRef<
 >(({ className, ...props }, ref) => (
 	<AccordionPrimitive.Item
 		ref={ref}
-		className={cn('border-b', className)}
+		className={`c15t-devtool-accordion-item ${className || ''}`}
 		{...props}
 	/>
 ));
@@ -31,14 +30,11 @@ const AccordionTrigger = forwardRef<
 	<AccordionPrimitive.Header className="flex">
 		<AccordionPrimitive.Trigger
 			ref={ref}
-			className={cn(
-				'flex flex-1 items-center justify-between py-4 font-medium transition-all hover:underline [&[data-state=open]>svg]:rotate-180',
-				className
-			)}
+			className={`c15t-devtool-accordion-trigger ${className || ''}`}
 			{...props}
 		>
 			{children}
-			<ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200" />
+			<ChevronDown className="c15t-devtool-accordion-chevron h-4 w-4" />
 		</AccordionPrimitive.Trigger>
 	</AccordionPrimitive.Header>
 ));
@@ -50,13 +46,10 @@ const AccordionContent = forwardRef<
 >(({ className, children, ...props }, ref) => (
 	<AccordionPrimitive.Content
 		ref={ref}
-		className={cn(
-			'overflow-hidden text-sm transition-all data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down',
-			className
-		)}
+		className={`c15t-devtool-accordion-content ${className || ''}`}
 		{...props}
 	>
-		<div className="pt-0 pb-4">{children}</div>
+		<div className="c15t-devtool-accordion-content-inner">{children}</div>
 	</AccordionPrimitive.Content>
 ));
 AccordionContent.displayName = AccordionPrimitive.Content.displayName;
