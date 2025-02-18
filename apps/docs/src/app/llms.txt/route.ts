@@ -10,11 +10,7 @@ export const revalidate = false;
 
 export async function GET() {
 	// Fetch all documents
-	const files = await fg([
-		'./src/content/core/**/*.mdx',
-		'./src/content/framework/**/*.mdx',
-		'./src/content/getting-started/**/*.mdx',
-	]);
+	const files = await fg(['./src/content/**/*.mdx']);
 
 	const scannedDocuments = await Promise.all(
 		files.map(async (file) => {
