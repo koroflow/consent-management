@@ -31,9 +31,15 @@ export async function GET() {
 meta: ${JSON.stringify(data, null, 2)}
         
 ${processed}`;
-		} catch (error) {
+		} catch (error: unknown) {
+			if (error instanceof Error) {
+				// biome-ignore lint/suspicious/noConsole: debug error
+				console.error(`Error processing file ${file}:`, error);
+				return `Error processing file ${file}: ${error.message}`;
+			}
+			// biome-ignore lint/suspicious/noConsole: debug error
 			console.error(`Error processing file ${file}:`, error);
-			return `Error processing file ${file}: ${error.message}`;
+			return `Error processing file ${file}: Unknown error occurred`;
 		}
 	});
 
