@@ -19,12 +19,12 @@ import {
 } from './atoms/accordion';
 import {
 	ConsentManagerWidgetAcceptAllButton,
+	ConsentManagerWidgetRejectButton,
 	ConsentManagerWidgetSaveButton,
 } from './atoms/button';
 import {
 	ConsentManagerWidgetFooter,
 	ConsentManagerWidgetFooterSubGroup,
-	ConsentManagerWidgetRejectButton,
 } from './atoms/footer';
 import { ConsentManagerWidgetRoot } from './atoms/root';
 import type { ConsentManagerWidgetProps } from './types';
