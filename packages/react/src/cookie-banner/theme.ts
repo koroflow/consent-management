@@ -1,5 +1,5 @@
 import type { ThemeValue } from '../theme';
-
+import type { ButtonCSSVariables } from '../ui/components/button';
 /**
  * Configuration object for styling different parts of the CookieBanner component.
  * @public
@@ -20,11 +20,11 @@ export type CookieBannerTheme = Partial<{
 	/** @remarks Styles for the footer sub-group element */
 	'cookie-banner.footer.sub-group': ThemeValue;
 	/** @remarks Styles for the footer reject button element */
-	'cookie-banner.footer.reject-button': ThemeValue;
+	'cookie-banner.footer.reject-button': ThemeValue<ButtonCSSVariables>;
 	/** @remarks Styles for the footer customize button element */
-	'cookie-banner.footer.customize-button': ThemeValue;
+	'cookie-banner.footer.customize-button': ThemeValue<ButtonCSSVariables>;
 	/** @remarks Styles for the footer accept button element */
-	'cookie-banner.footer.accept-button': ThemeValue;
+	'cookie-banner.footer.accept-button': ThemeValue<ButtonCSSVariables>;
 	/** @remarks Styles for the overlay element */
 	'cookie-banner.overlay': ThemeValue;
 }>;

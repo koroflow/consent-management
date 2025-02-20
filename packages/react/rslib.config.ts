@@ -24,6 +24,7 @@ export default defineConfig({
 		cleanDistPath: true,
 		cssModules: {
 			auto: true,
+      
 		},
 	},
 	plugins: [pluginReact()],
