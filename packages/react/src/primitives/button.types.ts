@@ -1,5 +1,6 @@
 import type { ComponentRef, HTMLAttributes } from 'react';
 import type { ExtendThemeKeys, ThemeValue } from '../theme';
+import type { CSSVariables } from '../theme/types/style-types';
 import type { ButtonSharedProps } from '../ui/components/button';
 
 export type ConsentButtonElement = ComponentRef<'button'>;
@@ -10,8 +11,8 @@ export type ConsentButtonElement = ComponentRef<'button'>;
  * @public
  */
 export interface ConsentButtonProps
-	extends HTMLAttributes<HTMLButtonElement>,
-		ExtendThemeKeys {
+	extends Omit<HTMLAttributes<HTMLButtonElement>, 'style'>,
+		ExtendThemeKeys<CSSVariables> {
 	/**
 	 * @remarks
 	 * When true, the button will not apply any styles.

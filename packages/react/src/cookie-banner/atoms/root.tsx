@@ -17,8 +17,8 @@ import { Overlay } from './overlay';
 
 import { useConsentManager } from '../../common';
 import { createThemeContextValue } from '../../common/utils/theme';
+import type { CSSPropertiesWithVars } from '../../theme/types/style-types';
 import type { CookieBannerTheme } from '../theme';
-
 /**
  * Props for the root component of the CookieBanner.
  *
@@ -230,7 +230,7 @@ const CookieBannerRootChildren = forwardRef<
 			baseClassName: [
 				'c15t-cookie-banner c15t-cookie-banner-root c15t-cookie-banner-root-bottom-left',
 			],
-			style,
+			style: style as CSSPropertiesWithVars<Record<string, never>>,
 			className: className || forwardedClassName,
 		});
 

@@ -6,17 +6,14 @@ import type { AllThemeKeys } from './style-keys';
  * Represents CSS properties with optional CSS variables
  * @public
  */
-export type CSSPropertiesWithVars<
-	T extends Record<string, string | number> = Record<string, never>,
-> = CSSProperties & Partial<T>;
+export type CSSPropertiesWithVars<T = Record<string, string | number>> =
+	CSSProperties & Partial<T>;
 
 /**
  * Represents a style configuration that can include both inline styles and class names.
  * @public
  */
-export type ClassNameStyle<
-	T extends Record<string, string | number> = Record<string, never>,
-> = {
+export type ClassNameStyle<T = Record<string, string | number>> = {
 	/** @remarks CSS properties to be applied inline to the component */
 	style?: CSSPropertiesWithVars<T>;
 	/** @remarks CSS class names to be applied to the component */
@@ -31,12 +28,14 @@ export type ClassNameStyle<
  * Represents a style value that can be either a class name string or a {@link ClassNameStyle} object.
  * @public
  */
-export type ThemeValue<
-	T extends Record<string, string | number> = Record<string, never>,
-> = string | ClassNameStyle<T>;
+export type ThemeValue<T = Record<string, string | number>> =
+	| string
+	| ClassNameStyle<T>;
 
-export interface ExtendThemeKeys<
-	T extends Record<string, string | number> = Record<string, never>,
-> extends ClassNameStyle<T> {
+export interface ExtendThemeKeys<T = CSSVariables> extends ClassNameStyle<T> {
 	themeKey: AllThemeKeys;
 }
+
+export type CSSVariables = {
+	[key: string]: string | number;
+};

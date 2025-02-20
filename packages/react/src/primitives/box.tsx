@@ -3,7 +3,6 @@
 import { type HTMLAttributes, forwardRef } from 'react';
 
 import { Slot } from '@radix-ui/react-slot';
-
 import { type ExtendThemeKeys, useStyles } from '../theme';
 
 /**
@@ -13,7 +12,7 @@ import { type ExtendThemeKeys, useStyles } from '../theme';
  * @public
  */
 export interface BoxProps
-	extends HTMLAttributes<HTMLDivElement>,
+	extends Omit<HTMLAttributes<HTMLDivElement>, 'style'>,
 		ExtendThemeKeys {
 	asChild?: boolean;
 }

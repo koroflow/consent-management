@@ -93,7 +93,9 @@ export function useStyles(
 	return useMemo(() => {
 		if (mergedNoStyle) {
 			// When noStyle is true, only return theme styles if they exist
-			if (!themeStylesObject) return {};
+			if (!themeStylesObject) {
+				return {};
+			}
 			const noStyleResult =
 				typeof themeStylesObject === 'string'
 					? { className: themeStylesObject }

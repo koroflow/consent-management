@@ -51,7 +51,7 @@ async function testComponentStyles({
 
 			for (const [property, value] of styleEntries) {
 				// biome-ignore lint/suspicious/noMisplacedAssertion: utility function - will be called inside tests
-				await expect.element(element).toHaveStyle({ [property]: value });
+				await expect.element(element).toHaveStyle({ [property as string]: value });
 			}
 		}
 	}

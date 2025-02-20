@@ -4,6 +4,10 @@ import * as Button from '../ui/components/button';
 
 import type { VariantProps } from 'tailwind-variants';
 import { useStyles, useThemeContext } from '../theme';
+import type {
+	CSSPropertiesWithVars,
+	CSSVariables,
+} from '../theme/types/style-types';
 import type { ConsentButtonElement, ConsentButtonProps } from './button.types';
 
 /**
@@ -69,7 +73,7 @@ export const ConsentButton = forwardRef<
 						size,
 					}).root(),
 			],
-			style,
+			style: style as CSSPropertiesWithVars<CSSVariables>,
 			className: forwardedClassName,
 			noStyle: noStyle,
 		});
