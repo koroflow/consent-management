@@ -1,5 +1,11 @@
 {
 	"title": "Core",
 	"root": true,
-	"pages": ["index", "how-it-works", "api-reference"]
+	"pages": [
+		"index",
+		"how-it-works",
+		"api-reference",
+		"--- Examples ---",
+		"examples/javascript"
+	]
 }

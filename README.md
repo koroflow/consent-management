@@ -104,7 +104,7 @@ pnpm test
 - [Core Concepts](https://c15t.com/docs/concepts)
 - [API Reference](https://c15t.com/docs/api)
 - [UI Components](https://c15t.com/docs/framework/react)
-- [Privacy Regulations](https://c15t.com/docs/regulations)
+- [Privacy Regulations](https://regulations.koroflow.com)
 
 ## 🤝 Contributing
 

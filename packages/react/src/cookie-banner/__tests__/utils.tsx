@@ -35,7 +35,6 @@ async function testComponentStyles({
 				// biome-ignore lint/suspicious/noMisplacedAssertion: utility function - will be called inside tests
 				await expect
 					.element(element)
-					// @ts-expect-error - exact is not a valid prop for toHaveClass
 					.toHaveClass(classNames, { exact: noStyle });
 			}
 		}

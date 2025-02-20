@@ -34,9 +34,18 @@ export {
 	AcceptAllButton,
 	CustomizeButton,
 	SaveButton,
+	RejectButton,
 	ConsentManagerWidgetAcceptAllButton,
 	ConsentManagerWidgetCustomizeButton,
 	ConsentManagerWidgetSaveButton,
+	ConsentManagerWidgetRejectButton,
 } from './atoms/button';
+
+export {
+	ConsentManagerWidgetFooter,
+	ConsentManagerWidgetFooterSubGroup,
+	Footer,
+	FooterSubGroup,
+} from './atoms/footer';
 
 export type { ConsentManagerWidgetTheme } from './theme';

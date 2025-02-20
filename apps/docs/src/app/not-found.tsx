@@ -1,11 +1,10 @@
-import Navbar from '~/components/docs/navbar';
+import { HomeLayout } from 'fumadocs-ui/layouts/home';
+import { homePageOptions } from './layout.config';
 import NotFoundClient from './not-found.client';
-
 export default function NotFound() {
 	return (
-		<>
-			<Navbar />
+		<HomeLayout {...homePageOptions}>
 			<NotFoundClient />
-		</>
+		</HomeLayout>
 	);
 }

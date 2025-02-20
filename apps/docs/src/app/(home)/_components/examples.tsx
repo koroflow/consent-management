@@ -43,14 +43,21 @@ function Layout({ children }: { children: ReactNode }) {
 				code={`import { ConsentManagerProvider,ConsentManagerDialog,CookieBanner } from "@c15t/react"
 
 const modernTheme = {
-  'cookie-banner.root': 'fixed bottom-0 w-full p-4 bg-white/80 backdrop-blur-sm',
-  'cookie-banner.card': 'max-w-2xl mx-auto rounded-lg shadow-lg',
-  'cookie-banner.header.title': 'text-lg font-semibold text-gray-900',
-  'cookie-banner.header.description': 'mt-2 text-sm text-gray-600',
-  'cookie-banner.footer': 'mt-4 flex justify-end gap-3',
-  'cookie-banner.button': 'px-4 py-2 rounded-md transition-colors',
-  'cookie-banner.acceptButton': 'bg-blue-600 text-white hover:bg-blue-700',
-  'cookie-banner.customizeButton': 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+  'cookie-banner.root':
+    'fixed bottom-0 w-full p-4 bg-white backdrop-blur-sm z-50',
+  'cookie-banner.card': 'max-w-2xl mx-auto rounded-lg',
+  'cookie-banner.header.title':
+    'text-lg font-semibold text-gray-900',
+  'cookie-banner.header.description':
+    'mt-2 text-sm text-gray-600',
+  'cookie-banner.footer': 'flex justify-end gap-4',
+  'cookie-banner.footer.sub-group': 'flex flex-row gap-2',
+  'cookie-banner.footer.reject-button':
+    'bg-red-600 text-white hover:bg-red-700 px-2 py-1 rounded-md',
+	'cookie-banner.footer.accept-button': 
+    'bg-blue-600 text-white hover:bg-blue-700 px-2 py-1 rounded-md',
+	'cookie-banner.footer.customize-button': 
+    'bg-gray-100 text-gray-900 hover:bg-gray-200 px-2 py-1 rounded-md',
 }
 
 function BasicCookieBanner() {

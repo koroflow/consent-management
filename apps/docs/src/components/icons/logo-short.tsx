@@ -5,7 +5,7 @@ interface ConsentManagementIconProps {
 	titleId?: string;
 }
 
-export const ConsentManagementIcon = ({
+export const ConsentManagementShortIcon = ({
 	title = 'Consent Management',
 	titleId = 'Consent Management',
 	...props

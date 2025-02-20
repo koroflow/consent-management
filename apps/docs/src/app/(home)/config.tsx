@@ -12,7 +12,7 @@ import { ReactIcon } from '~/components/icons/react';
 export const siteConfig = {
 	name: 'Consent Management',
 	description:
-		'Leverage native React components for seamless integration and high performance in a robust content management solution that empowers your development team while prioritizing privacy and compliance.',
+		'Leverage native React components for seamless integration and high performance in a robust Consent Management solution that empowers your development team while prioritizing privacy and compliance.',
 	url: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
 	keywords: [
 		'Privacy Management',
@@ -27,9 +27,9 @@ export const siteConfig = {
 		github: 'https://github.com/koroflow/consent-management',
 	},
 	hero: {
-		title: 'Content Management Redefined',
+		title: 'Consent Management Redefined',
 		description:
-			'Leverage native React components for seamless integration and high performance in a robust content management solution that empowers your development team while prioritizing privacy and compliance.',
+			'Leverage native React components for seamless integration and high performance in a robust Consent Management solution that empowers your development team while prioritizing privacy and compliance.',
 		cta: { text: 'Get Started', href: '/docs/framework/react' },
 		demo: {
 			text: 'Book A Demo',
@@ -87,7 +87,10 @@ export const siteConfig = {
 				items: [
 					{ text: 'Documentation', url: '/docs' },
 					{ text: 'Components', url: '/docs/framework/react' },
-					{ text: 'Privacy Regulations', url: '/docs/privacy-regulations' },
+					{
+						text: 'Privacy Regulations',
+						url: 'https://regulations.koroflow.com',
+					},
 				],
 			},
 			{
@@ -98,7 +101,7 @@ export const siteConfig = {
 						url: 'https://github.com/koroflow/consent-management',
 						external: true,
 					},
-					{ text: 'Twitter', url: 'https://x.com/koroflow', external: true },
+					// { text: 'Twitter', url: 'https://x.com/koroflow', external: true },
 					{
 						text: 'Contact',
 						url: 'mailto:support@c15t.com',
@@ -109,13 +112,13 @@ export const siteConfig = {
 			{
 				title: 'Legal',
 				items: [
-					{ text: 'Privacy Policy', url: '/privacy' },
-					{ text: 'Terms of Service', url: '/terms' },
+					{ text: 'Privacy Policy', url: '/docs/legals/privacy-policy' },
+					{ text: 'Cookie Policy', url: '/docs/legals/cookie-policy' },
 				],
 			},
 		],
 		bottomText:
-			'Leverage native React components for seamless integration and high performance in a robust content management solution that empowers your development team while prioritizing privacy and compliance.',
+			'Leverage native React components for seamless integration and high performance in a robust Consent Management solution that empowers your development team while prioritizing privacy and compliance.',
 	},
 };
 

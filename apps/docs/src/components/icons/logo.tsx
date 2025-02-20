@@ -20,6 +20,7 @@ export const ConsentManagementIcon = ({
 
 		<path
 			d="M74.1332 51.2928C83.4342 51.2928 90.9742 43.7528 90.9742 34.4518C90.9742 25.1508 83.4342 17.6108 74.1332 17.6108C64.8322 17.6108 57.2922 25.1508 57.2922 34.4518C57.2922 43.7528 64.8322 51.2928 74.1332 51.2928Z"
+			fill="transparent"
 			stroke="currentColor"
 			strokeWidth="13.4728"
 			strokeLinecap="round"
@@ -27,6 +28,7 @@ export const ConsentManagementIcon = ({
 		/>
 		<path
 			d="M62.0082 46.5772L35.7363 72.8491"
+			fill="transparent"
 			stroke="currentColor"
 			strokeWidth="13.4728"
 			strokeLinecap="round"
@@ -34,6 +36,7 @@ export const ConsentManagementIcon = ({
 		/>
 		<path
 			d="M61.0776 124.531L34.8057 98.2592"
+			fill="transparent"
 			stroke="currentColor"
 			strokeWidth="13.4728"
 			strokeLinecap="round"
@@ -41,6 +44,7 @@ export const ConsentManagementIcon = ({
 		/>
 		<path
 			d="M23.6105 101.816C32.9115 101.816 40.4514 94.2756 40.4514 84.9746C40.4514 75.6736 32.9115 68.1337 23.6105 68.1337C14.3095 68.1337 6.76953 75.6736 6.76953 84.9746C6.76953 94.2756 14.3095 101.816 23.6105 101.816Z"
+			fill="transparent"
 			stroke="currentColor"
 			strokeWidth="13.4728"
 			strokeLinecap="round"
@@ -48,6 +52,7 @@ export const ConsentManagementIcon = ({
 		/>
 		<path
 			d="M40.4517 84.9747H107.815"
+			fill="transparent"
 			stroke="currentColor"
 			strokeWidth="13.4728"
 			strokeLinecap="round"
@@ -55,6 +60,7 @@ export const ConsentManagementIcon = ({
 		/>
 		<path
 			d="M124.656 101.816C133.957 101.816 141.497 94.2756 141.497 84.9746C141.497 75.6736 133.957 68.1337 124.656 68.1337C115.355 68.1337 107.815 75.6736 107.815 84.9746C107.815 94.2756 115.355 101.816 124.656 101.816Z"
+			fill="transparent"
 			stroke="currentColor"
 			strokeWidth="13.4728"
 			strokeLinecap="round"
@@ -62,6 +68,7 @@ export const ConsentManagementIcon = ({
 		/>
 		<path
 			d="M74.1332 152.338C83.4342 152.338 90.9742 144.798 90.9742 135.497C90.9742 126.196 83.4342 118.656 74.1332 118.656C64.8322 118.656 57.2922 126.196 57.2922 135.497C57.2922 144.798 64.8322 152.338 74.1332 152.338Z"
+			fill="transparent"
 			stroke="currentColor"
 			strokeWidth="13.4728"
 			strokeLinecap="round"

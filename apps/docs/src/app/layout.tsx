@@ -1,4 +1,4 @@
-import './global.css';
+import './styles/global.css';
 import { C15TDevTools } from '@c15t/dev-tools';
 import {
 	ConsentManagerDialog,

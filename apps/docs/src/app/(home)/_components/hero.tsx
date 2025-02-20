@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useRef } from 'react';
 
 import { ArrowRight } from 'lucide-react';
+import { ConsentManagementIcon } from '~/components/icons/logo';
 import { AuroraText } from '../../../components/marketing/aurora-text';
 import { BorderIcon } from '../../../components/marketing/border-icon';
 import { GoogleGeminiEffect } from '../../../components/marketing/gemini';
@@ -89,11 +90,8 @@ export function Hero() {
 					>
 						{/* <div className="w-full absolute inset-0 bg-linear-to-r from-background via-background/0 to-background z-30" /> */}
 						<div className="absolute inset-0 z-20 flex items-center justify-center">
-							<div className="hidden rounded-full bg-[#000] px-4 py-3 font-bold text-[#FFF] text-xs sm:block md:text-base dark:bg-[#FFF] dark:text-[#000]">
-								Consent Management Platform
-							</div>
-							<div className="block rounded-xl bg-[#000] px-2 py-2 text-center text-[#FFF] text-[0.6rem] sm:hidden md:text-base dark:bg-[#FFF] dark:text-[#000]">
-								Consent <br /> Management <br /> Platform
+							<div className="rounded-full border-2 border-fd-foreground/10 bg-fd-background px-2 py-2 font-bold text-fd-accent-foreground text-xs sm:block sm:px-4 sm:py-3 md:text-base">
+								<ConsentManagementIcon className="h-3 w-auto sm:h-4 md:h-6" />
 							</div>
 						</div>
 						<div className="absolute inset-0 z-10 flex items-center justify-center">
