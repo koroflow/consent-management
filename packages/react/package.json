@@ -24,6 +24,11 @@
 			"import": "./dist/common/index.js",
 			"require": "./dist/common/index.cjs"
 		},
+		"./theme": {
+			"types": "./dist/theme/index.d.ts",
+			"import": "./dist/theme/index.js",
+			"require": "./dist/theme/index.cjs"
+		},
 		".": {
 			"types": "./dist/index.d.ts",
 			"import": "./dist/index.js",

@@ -1,9 +1,5 @@
 import { Slot } from '@radix-ui/react-slot';
 
-import { type VariantProps, tv } from 'tailwind-variants';
-import type { PolymorphicComponentProps } from '../libs/polymorphic';
-import { recursiveCloneChildren } from '../libs/recursive-clone-children';
-import './button.css';
 import {
 	type ButtonHTMLAttributes,
 	type ElementType,
@@ -11,6 +7,10 @@ import {
 	forwardRef,
 	useId,
 } from 'react';
+import { type VariantProps, tv } from 'tailwind-variants';
+import type { PolymorphicComponentProps } from '../../libs/polymorphic';
+import { recursiveCloneChildren } from '../../libs/recursive-clone-children';
+import styles from './button.module.css';
 /**
  * Constants for component display names
  * @internal
@@ -31,8 +31,8 @@ const BUTTON_ICON_NAME = 'ButtonIcon';
  */
 export const buttonVariants = tv({
 	slots: {
-		root: ['c15t-button'],
-		icon: ['c15t-button-icon'],
+		root: [styles.button],
+		icon: [styles['button-icon']],
 	},
 	variants: {
 		variant: {
@@ -46,10 +46,10 @@ export const buttonVariants = tv({
 			ghost: {},
 		},
 		size: {
-			medium: { root: 'c15t-button-medium' },
-			small: { root: 'c15t-button-small' },
-			xsmall: { root: 'c15t-button-xsmall' },
-			xxsmall: { root: 'c15t-button-xxsmall' },
+			medium: { root: styles['button-medium'] },
+			small: { root: styles['button-small'] },
+			xsmall: { root: styles['button-xsmall'] },
+			xxsmall: { root: styles['button-xxsmall'] },
 		},
 	},
 	compoundVariants: [
@@ -57,44 +57,44 @@ export const buttonVariants = tv({
 		{
 			variant: 'primary',
 			mode: 'filled',
-			class: { root: 'c15t-button-primary-filled' },
+			class: { root: styles['button-primary-filled'] },
 		},
 		{
 			variant: 'primary',
 			mode: 'stroke',
-			class: { root: 'c15t-button-primary-stroke' },
+			class: { root: styles['button-primary-stroke'] },
 		},
 		{
 			variant: 'primary',
 			mode: 'lighter',
-			class: { root: 'c15t-button-primary-lighter' },
+			class: { root: styles['button-primary-lighter'] },
 		},
 		{
 			variant: 'primary',
 			mode: 'ghost',
-			class: { root: 'c15t-button-primary-ghost' },
+			class: { root: styles['button-primary-ghost'] },
 		},
 
 		// Neutral variants
 		{
 			variant: 'neutral',
 			mode: 'filled',
-			class: { root: 'c15t-button-neutral-filled' },
+			class: { root: styles['button-neutral-filled'] },
 		},
 		{
 			variant: 'neutral',
 			mode: 'stroke',
-			class: { root: 'c15t-button-neutral-stroke' },
+			class: { root: styles['button-neutral-stroke'] },
 		},
 		{
 			variant: 'neutral',
 			mode: 'lighter',
-			class: { root: 'c15t-button-neutral-lighter' },
+			class: { root: styles['button-neutral-lighter'] },
 		},
 		{
 			variant: 'neutral',
 			mode: 'ghost',
-			class: { root: 'c15t-button-neutral-ghost' },
+			class: { root: styles['button-neutral-ghost'] },
 		},
 	],
 	defaultVariants: {

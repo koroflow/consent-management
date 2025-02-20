@@ -1,7 +1,6 @@
 import type { ClassValue } from 'clsx';
 import type { CSSProperties } from 'react';
 import type { AllThemeKeys } from './style-keys';
-
 /**
  * Represents a style configuration that can include both inline styles and class names.
  * @public
@@ -21,7 +20,7 @@ export type ClassNameStyle = {
  * Represents a style value that can be either a class name string or a {@link ClassNameStyle} object.
  * @public
  */
-export type ThemeValue = string | ClassNameStyle | undefined;
+export type ThemeValue = string | ClassNameStyle ;
 
 export interface ExtendThemeKeys extends ClassNameStyle {
 	themeKey: AllThemeKeys;

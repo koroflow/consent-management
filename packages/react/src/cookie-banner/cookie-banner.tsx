@@ -38,10 +38,9 @@ export interface CookieBannerProps {
 	/**
 	 * Custom styles to apply to the banner and its child components
 	 * @remarks Allows for deep customization of the banner's appearance while maintaining accessibility
-	 * @type {Partial<CookieBannerTheme>}
 	 * @default undefined
 	 */
-	theme?: Partial<CookieBannerTheme>;
+	theme?: CookieBannerTheme;
 
 	/**
 	 * When true, removes all default styling from the component

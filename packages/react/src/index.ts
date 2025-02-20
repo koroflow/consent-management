@@ -15,3 +15,4 @@ export type { ConsentManagerWidgetTheme } from './consent-manager-widget/theme';
 
 // Common
 export * from './common/index';
+export type { ThemeValue, ClassNameStyle } from './theme';
