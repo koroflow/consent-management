@@ -24,7 +24,7 @@ import {
 const STORAGE_KEY = 'privacy-consent-storage';
 
 /**
- * Structure of consent data stored in localStorage.
+ * Structure of consent data stored in localStorage?.
  *
  * @internal
  */
@@ -40,7 +40,7 @@ interface StoredConsent {
 }
 
 /**
- * Retrieves stored consent data from localStorage.
+ * Retrieves stored consent data from localStorage?.
  *
  * @remarks
  * This function handles:
@@ -54,7 +54,7 @@ interface StoredConsent {
 const getStoredConsent = (): StoredConsent | null => {
 	if (typeof window === 'undefined') return null;
 
-	const stored = localStorage.getItem(STORAGE_KEY);
+	const stored = localStorage?.getItem(STORAGE_KEY);
 	if (!stored) return null;
 
 	try {
@@ -240,7 +240,7 @@ export const createConsentManagerStore = (
 				type: type as 'necessary' | 'all' | 'custom',
 			};
 
-			localStorage.setItem(
+			localStorage?.setItem(
 				STORAGE_KEY,
 				JSON.stringify({
 					consents: newConsents,
@@ -280,7 +280,7 @@ export const createConsentManagerStore = (
 					}, {} as ConsentState),
 					consentInfo: null,
 				};
-				localStorage.removeItem(STORAGE_KEY);
+				localStorage?.removeItem(STORAGE_KEY);
 				return resetState;
 			});
 		},
@@ -365,7 +365,7 @@ export const createConsentManagerStore = (
 		 */
 		clearAllData: () => {
 			set(initialState);
-			localStorage.removeItem(STORAGE_KEY);
+			localStorage?.removeItem(STORAGE_KEY);
 		},
 
 		/**

@@ -1,4 +1,4 @@
-import type { AllConsentNames } from 'c15t';
+import type { AllConsentNames } from 'c15t-reloaded';
 
 import {
 	type ComponentPropsWithoutRef,

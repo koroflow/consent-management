@@ -1,4 +1,4 @@
-import type { PrivacyConsentState } from 'c15t';
+import type { PrivacyConsentState } from 'c15t-reloaded';
 import type { ThemeContextValue } from '../../theme';
 
 interface ThemeContextValueWithConsent

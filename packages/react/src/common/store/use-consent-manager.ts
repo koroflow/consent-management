@@ -1,6 +1,7 @@
 'use client';
-import type { PrivacyConsentState, createConsentManagerStore } from 'c15t';
-import { useContext } from 'react';
+import { createConsentManagerStore } from 'c15t-reloaded'; // Adjust the import path as necessary
+import type { PrivacyConsentState } from 'c15t-reloaded';
+import { useContext, useEffect, useState } from 'react';
 import { ConsentStateContext } from '../context/consent-manager-context';
 
 /**
@@ -17,27 +18,12 @@ import { ConsentStateContext } from '../context/consent-manager-context';
  * The hook combines both the static state and dynamic methods from the consent manager store,
  * providing a unified API for consent management.
  *
- * Available methods include:
- * - `hasConsent(type: AllConsentNames)`: Check if a specific consent type is granted
- * - `setGdprTypes(types: AllConsentNames[])`: Update allowed GDPR consent types
- * - `saveConsents(type: 'all' | 'custom' | 'necessary')`: Save current consent preferences
- * - `getConsentedTypes()`: Get array of currently consented types
- * - `setComplianceSetting(region, settings)`: Update compliance settings for a region
- *
- * State properties include:
- * - `isConsentRequired`: Whether consent is required in the current region
- * - `detectedCountry`: The detected country code for the user
- * - `complianceSettings`: Region-specific compliance configuration
- * - `consents`: Current state of all consent types
- *
  * @throws {Error}
  * Throws if used outside of a {@link ConsentManagerProvider} context with the message
  * "useConsentManager must be used within a ConsentManagerProvider"
  *
- * @returns {PrivacyConsentState & ReturnType<typeof createConsentManagerStore>["getState"]}
- * Returns a combined object containing:
- * - All properties from {@link PrivacyConsentState}
- * - All methods from the consent manager store
+ * @returns {PrivacyConsentState} Returns a combined object containing all properties and methods
+ * from the consent manager.
  *
  * @example
  * Basic consent checking:
@@ -54,103 +40,38 @@ import { ConsentStateContext } from '../context/consent-manager-context';
  * }
  * ```
  *
- * @example
- * Managing consent preferences with Do Not Track support:
- * ```tsx
- * function ConsentControls() {
- *   const {
- *     setGdprTypes,
- *     saveConsents,
- *     getConsentedTypes,
- *     honorDoNotTrack
- *   } = useConsentManager();
- *
- *   const handleAcceptAll = () => {
- *     // Set all available consent types
- *     setGdprTypes(['necessary', 'functional', 'analytics', 'marketing']);
- *     // Save preferences with 'all' type
- *     saveConsents('all');
- *   };
- *
- *   const handleCustomize = () => {
- *     // Get current consents and add analytics
- *     const currentConsents = getConsentedTypes();
- *     setGdprTypes([...currentConsents, 'analytics']);
- *     // Save as custom preferences
- *     saveConsents('custom');
- *   };
- *
- *   // Respect Do Not Track setting
- *   if (honorDoNotTrack && window.navigator.doNotTrack === "1") {
- *     return <p>Respecting Do Not Track preference</p>;
- *   }
- *
- *   return (
- *     <div>
- *       <button onClick={handleAcceptAll}>Accept All</button>
- *       <button onClick={handleCustomize}>Customize</button>
- *     </div>
- *   );
- * }
- * ```
- *
- * @example
- * Checking compliance requirements and region-specific settings:
- * ```tsx
- * function CookieBanner() {
- *   const {
- *     isConsentRequired,
- *     detectedCountry,
- *     complianceSettings,
- *     setComplianceSetting
- *   } = useConsentManager();
- *
- *   useEffect(() => {
- *     // Update settings for a specific region
- *     setComplianceSetting('EU', {
- *       requireConsent: true,
- *       showBanner: true,
- *       honorDoNotTrack: true
- *     });
- *   }, []);
- *
- *   if (!isConsentRequired) return null;
- *
- *   const settings = complianceSettings[detectedCountry];
- *
- *   return (
- *     <div>
- *       <h2>Cookie Preferences</h2>
- *       <p>Your current region: {detectedCountry}</p>
- *       {settings.showBanner && (
- *         <ConsentControls />
- *       )}
- *     </div>
- *   );
- * }
- * ```
- *
  * @see {@link ConsentManagerProvider} For the provider component that makes this hook available
  * @see {@link PrivacyConsentState} For the complete state interface
  * @see {@link AllConsentNames} For available consent type names
  *
  * @public
  */
-export function useConsentManager(): PrivacyConsentState &
-	ReturnType<typeof createConsentManagerStore>['getState'] {
+export function useConsentManager(): PrivacyConsentState {
 	const context = useContext(ConsentStateContext);
 
-	if (context === undefined) {
+	if (!context) {
 		throw new Error(
 			'useConsentManager must be used within a ConsentManagerProvider'
 		);
 	}
 
-	const storeState = context.store.getState();
+	const [consentState, setConsentState] = useState<PrivacyConsentState>(
+		context.state
+	);
+
+	useEffect(() => {
+		const store = createConsentManagerStore();
+		const unsubscribe = store.subscribe((newState) => {
+			setConsentState(newState);
+		});
+
+		return () => {
+			unsubscribe();
+		};
+	}, []);
 
 	return {
-		...context.state,
-		...storeState,
-	} as unknown as PrivacyConsentState &
-		ReturnType<typeof createConsentManagerStore>['getState'];
+		...consentState,
+		// Add any additional methods or properties you need to expose
+	};
 }

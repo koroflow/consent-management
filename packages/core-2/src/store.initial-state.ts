@@ -5,7 +5,7 @@
 
 import type { PrivacyConsentState } from './store.type';
 import { defaultTranslationConfig } from './translations';
-import { type ConsentState, consentTypes } from './types';
+import { type AllConsentNames, type ConsentState, consentTypes } from './types';
 
 /**
  * Default initial state for the consent management store.
@@ -40,10 +40,7 @@ import { type ConsentState, consentTypes } from './types';
  *
  * @public
  */
-export const initialState: Omit<
-	PrivacyConsentState,
-	'getEffectiveConsents' | 'hasConsentFor'
-> = {
+export const initialState: PrivacyConsentState = {
 	/** Initial consent states based on default values from consent types */
 	consents: consentTypes.reduce((acc, consent) => {
 		acc[consent.name] = consent.defaultValue;
@@ -106,24 +103,44 @@ export const initialState: Omit<
 	consentTypes: consentTypes,
 
 	// Initialize all methods as no-ops
+	// biome-ignore lint/suspicious/noEmptyBlockStatements: <explanation>
 	setConsent: () => {},
+	// biome-ignore lint/suspicious/noEmptyBlockStatements: <explanation>
 	setShowPopup: () => {},
+	// biome-ignore lint/suspicious/noEmptyBlockStatements: <explanation>
 	setIsPrivacyDialogOpen: () => {},
-	saveConsents: () => {
-		console.log('default saveConsents');
-	},
+	// biome-ignore lint/suspicious/noEmptyBlockStatements: <explanation>
+	saveConsents: () => {},
+	// biome-ignore lint/suspicious/noEmptyBlockStatements: <explanation>
 	resetConsents: () => {},
+	// biome-ignore lint/suspicious/noEmptyBlockStatements: <explanation>
 	setGdprTypes: () => {},
+	// biome-ignore lint/suspicious/noEmptyBlockStatements: <explanation>
 	setComplianceSetting: () => {},
+	// biome-ignore lint/suspicious/noEmptyBlockStatements: <explanation>
 	resetComplianceSettings: () => {},
+	// biome-ignore lint/suspicious/noEmptyBlockStatements: <explanation>
 	setCallback: () => {},
+	// biome-ignore lint/suspicious/noEmptyBlockStatements: <explanation>
 	setDetectedCountry: () => {},
 	getDisplayedConsents: () => [],
 	hasConsented: () => false,
+	// biome-ignore lint/suspicious/noEmptyBlockStatements: <explanation>
 	setTranslationConfig: () => {},
+	// biome-ignore lint/suspicious/noEmptyBlockStatements: <explanation>
 	setNoStyle: () => {},
+	// biome-ignore lint/suspicious/noEmptyBlockStatements: <explanation>
 	clearAllData: () => {},
+	// biome-ignore lint/suspicious/noEmptyBlockStatements: <explanation>
 	updateConsentMode: () => {},
+	// biome-ignore lint/suspicious/noEmptyBlockStatements: <explanation>
 	setPrivacySettings: () => {},
+	// biome-ignore lint/suspicious/noEmptyBlockStatements:
 	setIncludeNonDisplayedConsents: () => {},
+	getEffectiveConsents: (): ConsentState => {
+		throw new Error('Function not implemented.');
+	},
+	hasConsentFor: (consentType: AllConsentNames): boolean => {
+		throw new Error('Function not implemented.');
+	},
 };

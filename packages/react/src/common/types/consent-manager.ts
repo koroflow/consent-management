@@ -7,7 +7,7 @@ import type {
 	TrackingBlockerConfig,
 	TranslationConfig,
 	createConsentManagerStore,
-} from 'c15t';
+} from 'c15t-reloaded';
 import type { ReactNode } from 'react';
 
 /**

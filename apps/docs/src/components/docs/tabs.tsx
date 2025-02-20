@@ -98,7 +98,7 @@ export function Tabs({
 		const onUpdate: ChangeListener = (v) => onChangeRef.current(v);
 
 		const previous = persist
-			? localStorage.getItem(groupId)
+			? localStorage?.getItem(groupId)
 			: sessionStorage.getItem(groupId);
 
 		if (previous) {
@@ -141,7 +141,7 @@ export function Tabs({
 					}
 
 					if (persist) {
-						localStorage.setItem(groupId, v);
+						localStorage?.setItem(groupId, v);
 					} else {
 						sessionStorage.setItem(groupId, v);
 					}

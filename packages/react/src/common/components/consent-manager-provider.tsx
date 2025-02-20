@@ -1,11 +1,11 @@
 'use client';
 
 import {
-	type ComplianceRegion,
 	type PrivacyConsentState,
 	createConsentManagerStore,
 	defaultTranslationConfig,
-} from 'c15t';
+	initialState,
+} from 'c15t-reloaded';
 import { useEffect, useMemo, useState } from 'react';
 import { ConsentStateContext } from '../context/consent-manager-context';
 import type { ConsentManagerProviderProps } from '../types/consent-manager';
@@ -49,67 +49,72 @@ export function ConsentManagerProvider({
 		return { ...mergedConfig, defaultLanguage };
 	}, [translationConfig]);
 
-	// Create a stable reference to the store with prepared translation config
-	const store = useMemo(() => {
-		const store = createConsentManagerStore(namespace, {
-			trackingBlockerConfig,
-		});
-		// Set translation config immediately
-		store.getState().setTranslationConfig(preparedTranslationConfig);
+	const store = useMemo(
+		() => createConsentManagerStore(namespace, { trackingBlockerConfig }),
+		[namespace, trackingBlockerConfig]
+	);
 
-		// Set noStyle immediately
-		store.getState().setNoStyle(noStyle);
-
-		return store;
-	}, [namespace, preparedTranslationConfig, trackingBlockerConfig, noStyle]);
-
-	// Initialize state with the current state from the consent manager store
-	const [state, setState] = useState<PrivacyConsentState>(store.getState());
+	// Use the imported initial state and preparedTranslationConfig
+	const [state, setState] = useState<PrivacyConsentState>(() => ({
+		...initialState,
+		translationConfig: preparedTranslationConfig, // Set the prepared translation config
+		noStyle: store.noStyle ?? false,
+	}));
 
 	useEffect(() => {
-		const {
-			setGdprTypes,
-			setComplianceSetting,
-			setDetectedCountry,
-			setNoStyle,
-		} = store.getState();
-
 		// Initialize GDPR types if provided
 		if (initialGdprTypes) {
-			setGdprTypes(initialGdprTypes);
+			setState((prevState) => ({
+				...prevState,
+				gdprTypes: initialGdprTypes,
+			}));
 		}
 
 		// Initialize compliance settings if provided
 		if (initialComplianceSettings) {
-			for (const [region, settings] of Object.entries(
-				initialComplianceSettings
-			)) {
-				setComplianceSetting(region as ComplianceRegion, settings);
-			}
+			setState((prevState) => ({
+				...prevState,
+				complianceSettings: initialComplianceSettings,
+			}));
 		}
 
 		// Update noStyle when prop changes
-		setNoStyle(noStyle);
+		setState((prevState) => ({ ...prevState, noStyle }));
 
 		// Set detected country
 		const country =
 			document
 				.querySelector('meta[name="user-country"]')
 				?.getAttribute('content') || 'US';
-		setDetectedCountry(country);
+		setState((prevState) => ({
+			...prevState,
+			detectedCountry: country,
+		}));
 
-		// Subscribe to state changes
-		const unsubscribe = store.subscribe((newState) => {
+		// Update translationConfig when it changes
+		setState((prevState) => ({
+			...prevState,
+			translationConfig: preparedTranslationConfig,
+		}));
+
+		// Cleanup logic if needed
+	}, [
+		initialGdprTypes,
+		initialComplianceSettings,
+		noStyle,
+		preparedTranslationConfig,
+	]);
+
+	useEffect(() => {
+		const unsubscribe = store.subscribe((newState: PrivacyConsentState) => {
 			setState(newState);
 		});
 
-		// Cleanup subscription on unmount
 		return () => {
 			unsubscribe();
 		};
-	}, [store, initialGdprTypes, initialComplianceSettings, noStyle]);
+	}, [store]);
 
-	// Memoize the context value to prevent unnecessary re-renders
 	const contextValue = useMemo(
 		() => ({
 			state,

@@ -1,5 +1,5 @@
 import './styles/global.css';
-import { C15TDevTools } from '@c15t/dev-tools';
+// import { C15TDevTools } from '@c15t/dev-tools';
 import {
 	ConsentManagerDialog,
 	ConsentManagerProvider,
@@ -33,7 +33,7 @@ export default function Layout({ children }: { children: ReactNode }) {
 					<ConsentManagerProvider initialGdprTypes={['necessary', 'marketing']}>
 						<CookieBanner />
 						<ConsentManagerDialog />
-						{process.env.NODE_ENV === 'development' && <C15TDevTools />}
+						{/* {process.env.NODE_ENV === 'development' && <C15TDevTools />} */}
 						{children}
 					</ConsentManagerProvider>
 				</RootProvider>

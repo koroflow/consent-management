@@ -21,7 +21,7 @@ export function setupDarkMode() {
 export function clearLocalStorage() {
 	if (typeof window !== 'undefined') {
 		try {
-			localStorage.clear();
+			localStorage?.clear();
 		} catch (error) {
 			console.warn('Error during cleanup:', error);
 		}

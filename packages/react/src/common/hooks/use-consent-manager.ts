@@ -1,4 +1,5 @@
-import { useContext } from 'react';
+import type { PrivacyConsentState } from 'c15t-reloaded';
+import { useContext, useEffect, useState } from 'react';
 import { ConsentStateContext } from '../context/consent-manager-context';
 
 /**
@@ -22,14 +23,28 @@ import { ConsentStateContext } from '../context/consent-manager-context';
 export function useConsentManager() {
 	const context = useContext(ConsentStateContext);
 
-	if (context === undefined) {
+	if (!context) {
 		throw new Error(
 			'useConsentManager must be used within a ConsentManagerProvider'
 		);
 	}
 
+	const { state, store } = context;
+	const [consentState, setConsentState] = useState(state);
+
+	useEffect(() => {
+		const unsubscribe = store.subscribe((newState: PrivacyConsentState) => {
+			setConsentState(newState);
+		});
+
+		return () => {
+			unsubscribe();
+		};
+	}, [store]);
+
 	return {
-		...context.state,
-		...context.store.getState(),
+		...consentState,
+		setConsent: store.setConsent.bind(store),
+		setShowPopup: store.setShowPopup.bind(store),
 	};
 }

@@ -1,5 +1,5 @@
 'use client';
-import type { TranslationConfig, Translations } from 'c15t';
+import type { TranslationConfig, Translations } from 'c15t-reloaded';
 
 type TranslationSection =
 	| 'cookieBanner'

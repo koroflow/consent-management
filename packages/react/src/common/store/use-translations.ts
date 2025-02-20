@@ -1,7 +1,7 @@
 'use client';
 
-import type { Translations } from 'c15t';
-import { defaultTranslationConfig } from 'c15t';
+import type { Translations } from 'c15t-reloaded';
+import { defaultTranslationConfig } from 'c15t-reloaded';
 import { useMemo } from 'react';
 import { useConsentManager } from './use-consent-manager';
 /**
