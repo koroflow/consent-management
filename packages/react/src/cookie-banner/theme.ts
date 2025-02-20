@@ -28,13 +28,3 @@ export type CookieBannerTheme = Partial<{
 	/** @remarks Styles for the overlay element */
 	'cookie-banner.overlay': ThemeValue;
 }>;
-
-const _theme: CookieBannerTheme = {
-	'cookie-banner.footer.reject-button': 'default-style',
-	'cookie-banner.footer.customize-button': 'default-style',
-	'cookie-banner.footer.accept-button': 'default-style',
-	'cookie-banner.overlay': 'default-style',
-};
-
-type x = CookieBannerTheme;
-type y = ThemeValue;

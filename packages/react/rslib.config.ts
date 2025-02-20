@@ -22,6 +22,9 @@ export default defineConfig({
 	output: {
 		target: 'web',
 		cleanDistPath: true,
+		cssModules: {
+			auto: true,
+		},
 	},
 	plugins: [pluginReact()],
 });

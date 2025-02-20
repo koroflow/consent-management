@@ -78,7 +78,7 @@ const ConsentManagerWidgetAccordionItems = () => {
 		<ConsentManagerWidgetAccordionItem
 			value={consent.name}
 			key={consent.name}
-			themeKey={`consent-manager-widget.accordion.item-${consent.name}`}
+			themeKey="consent-manager-widget.accordion.item"
 		>
 			<ConsentManagerWidgetAccordionTrigger
 				themeKey="consent-manager-widget.accordion.trigger"
