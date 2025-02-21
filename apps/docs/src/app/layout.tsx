@@ -31,31 +31,8 @@ export default function Layout({ children }: { children: ReactNode }) {
 			<body className="flex min-h-screen flex-col">
 				<RootProvider>
 					<ConsentManagerProvider initialGdprTypes={['necessary', 'marketing']}>
-						<CookieBanner
-							theme={{
-								'banner.footer.accept-button': {
-									style: {
-										'--button-border-radius': '0px',
-										'--button-border-color': 'red',
-									},
-								},
-							}}
-						/>
-						<ConsentManagerDialog
-							theme={{
-								'widget.switch.track': {
-									style: {
-										'--switch-background-color': 'red',
-                    ''
-									},
-								},
-								'widget.accordion.trigger': {
-									style: {
-										'--accordion-text-color': 'red',
-									},
-								},
-							}}
-						/>
+						<CookieBanner />
+						<ConsentManagerDialog />
 						{process.env.NODE_ENV === 'development' && <C15TDevTools />}
 						{children}
 					</ConsentManagerProvider>
