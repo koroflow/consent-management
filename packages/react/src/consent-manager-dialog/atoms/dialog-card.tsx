@@ -13,6 +13,8 @@ import { ConsentManagerWidget } from '../../consent-manager-widget/consent-manag
 import { Box, type BoxProps } from '../../primitives/box';
 import type { ClassNameStyle } from '../../theme';
 import { ConsentManagementIcon } from '../../ui/components/logo';
+import styles from '../consent-manager-dialog.module.css';
+
 /**
  * Props for the DialogCard and related components
  * @public
@@ -43,9 +45,9 @@ const DialogCard = forwardRef<HTMLDivElement, DialogCardProps>(
 		return (
 			<Box
 				ref={ref as Ref<HTMLDivElement>}
-				baseClassName="c15t-card c15t-consent-manager-dialog-card"
+				className={styles.card}
 				{...props}
-				themeKey="consent-manager-dialog.root"
+				themeKey="dialog.root"
 				data-testid="consent-manager-dialog-root"
 			>
 				{children}
@@ -68,9 +70,9 @@ const DialogHeader = forwardRef<HTMLDivElement, Omit<BoxProps, 'themeKey'>>(
 		return (
 			<Box
 				ref={ref as Ref<HTMLDivElement>}
-				baseClassName="c15t-card-header c15t-consent-manager-dialog-card"
+				className={styles.header}
 				{...props}
-				themeKey="consent-manager-dialog.header"
+				themeKey="dialog.header"
 				data-testid="consent-manager-dialog-header"
 			>
 				{children}
@@ -95,8 +97,8 @@ const DialogHeaderTitle = forwardRef<
 	return (
 		<Box
 			ref={ref as Ref<HTMLDivElement>}
-			baseClassName="c15t-card-title"
-			themeKey="consent-manager-dialog.title"
+			className={styles.title}
+			themeKey="dialog.title"
 			{...props}
 			data-testid="consent-manager-dialog-title"
 		>
@@ -121,8 +123,8 @@ const DialogHeaderDescription = forwardRef<
 	return (
 		<Box
 			ref={ref as Ref<HTMLDivElement>}
-			baseClassName="c15t-card-description"
-			themeKey="consent-manager-dialog.description"
+			className={styles.description}
+			themeKey="dialog.description"
 			{...props}
 			data-testid="consent-manager-dialog-description"
 		>
@@ -145,8 +147,8 @@ const DialogContent = forwardRef<HTMLDivElement, Omit<BoxProps, 'themeKey'>>(
 		return (
 			<Box
 				ref={ref as Ref<HTMLDivElement>}
-				baseClassName="c15t-card-content"
-				themeKey="consent-manager-dialog.content"
+				className={styles.content}
+				themeKey="dialog.content"
 				data-testid="consent-manager-dialog-content"
 				{...props}
 			>
@@ -170,15 +172,12 @@ const DialogFooter = forwardRef<HTMLDivElement, Omit<BoxProps, 'themeKey'>>(
 		return (
 			<Box
 				ref={ref as Ref<HTMLDivElement>}
-				baseClassName="c15t-card-footer"
-				themeKey="consent-manager-dialog.footer"
+				className={styles.footer}
+				themeKey="dialog.footer"
 				{...props}
 				data-testid="consent-manager-dialog-footer"
 			>
-				<a
-					className="c15t-consent-manager-widget-branding-link"
-					href="https://c15t.com"
-				>
+				<a className={styles.branding} href="https://c15t.com">
 					Secured by <ConsentManagementIcon />
 				</a>
 			</Box>

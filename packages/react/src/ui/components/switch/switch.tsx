@@ -5,11 +5,15 @@ import {
 	type ComponentRef,
 	forwardRef,
 } from 'react';
-import { Box } from '../../primitives/box';
+import { Box } from '../../../primitives/box';
 
-import { type ExtendThemeKeys, type ThemeValue, useStyles } from '../../theme';
+import {
+	type ExtendThemeKeys,
+	type ThemeValue,
+	useStyles,
+} from '../../../theme';
 
-import './switch.css';
+import styles from './switch.module.css';
 
 export type SwitchStylesKeys = {
 	'switch.root': ThemeValue;
@@ -37,7 +41,7 @@ const Switch = forwardRef<
 >(({ className, disabled, slot, theme, ...rest }, forwardedRef) => {
 	const switchRoot = useStyles(theme?.root.themeKey ?? 'switch.root', {
 		...theme?.root,
-		baseClassName: ['c15t-switch c15t-switch-root', theme?.root.baseClassName],
+		baseClassName: [styles.root, theme?.root.baseClassName],
 		className,
 	});
 
@@ -45,8 +49,8 @@ const Switch = forwardRef<
 		...theme?.thumb,
 		baseClassName: [
 			theme?.thumb.baseClassName,
-			'c15t-switch-thumb',
-			disabled && 'c15t-switch-thumb-disabled',
+			styles.thumb,
+			disabled && styles['thumb-disabled'],
 		],
 		style: {
 			...theme?.thumb.style,
@@ -64,10 +68,7 @@ const Switch = forwardRef<
 		>
 			<Box
 				themeKey={theme?.track.themeKey ?? 'switch.track'}
-				baseClassName={[
-					'c15t-switch-track',
-					disabled && 'c15t-switch-track-disabled',
-				]}
+				baseClassName={[styles.track, disabled && styles['track-disabled']]}
 				style={theme?.track.style}
 			>
 				<SwitchPrimitives.Thumb {...switchThumb} />

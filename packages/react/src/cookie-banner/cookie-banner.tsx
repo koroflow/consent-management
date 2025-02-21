@@ -10,7 +10,6 @@ import type { FC, ReactNode } from 'react';
 
 import { ErrorBoundary } from './error-boundary';
 import type { CookieBannerTheme } from './theme';
-import './cookie-banner.css';
 
 import { ConsentButton } from '../primitives/button';
 import { CookieBannerRoot } from './atoms/root';
@@ -173,7 +172,7 @@ export const CookieBanner: FC<CookieBannerProps> = ({
 							<ConsentButton
 								action="reject-consent"
 								closeCookieBanner
-								themeKey="cookie-banner.footer.reject-button"
+								themeKey="banner.footer.reject-button"
 								data-testid="cookie-banner-reject-button"
 							>
 								{rejectButtonText || cookieBanner.rejectAll}
@@ -181,7 +180,7 @@ export const CookieBanner: FC<CookieBannerProps> = ({
 							<ConsentButton
 								action="open-consent-dialog"
 								closeCookieBanner
-								themeKey="cookie-banner.footer.customize-button"
+								themeKey="banner.footer.customize-button"
 								data-testid="cookie-banner-customize-button"
 							>
 								{customizeButtonText || cookieBanner.customize}
@@ -191,7 +190,7 @@ export const CookieBanner: FC<CookieBannerProps> = ({
 							action="accept-consent"
 							variant="primary"
 							closeCookieBanner
-							themeKey="cookie-banner.footer.accept-button"
+							themeKey="banner.footer.accept-button"
 							data-testid="cookie-banner-accept-button"
 						>
 							{acceptButtonText || cookieBanner.acceptAll}

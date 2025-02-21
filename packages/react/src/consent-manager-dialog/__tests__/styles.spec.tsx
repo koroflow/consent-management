@@ -13,37 +13,37 @@ type ComponentTestCase = {
 const ALL_COMPONENTS: ComponentTestCase[] = [
 	{
 		testId: 'consent-manager-dialog-root',
-		themeKey: 'consent-manager-dialog.root',
+		themeKey: 'dialog.root',
 		styles: 'custom-dialog-root',
 	},
 	{
 		testId: 'consent-manager-dialog-overlay',
-		themeKey: 'consent-manager-dialog.overlay',
+		themeKey: 'dialog.overlay',
 		styles: 'custom-dialog-overlay',
 	},
 	{
 		testId: 'consent-manager-dialog-header',
-		themeKey: 'consent-manager-dialog.header',
+		themeKey: 'dialog.header',
 		styles: 'custom-dialog-header',
 	},
 	{
 		testId: 'consent-manager-dialog-title',
-		themeKey: 'consent-manager-dialog.title',
+		themeKey: 'dialog.title',
 		styles: 'custom-dialog-title',
 	},
 	{
 		testId: 'consent-manager-dialog-description',
-		themeKey: 'consent-manager-dialog.description',
+		themeKey: 'dialog.description',
 		styles: 'custom-dialog-description',
 	},
 	{
 		testId: 'consent-manager-dialog-content',
-		themeKey: 'consent-manager-dialog.content',
+		themeKey: 'dialog.content',
 		styles: 'custom-dialog-content',
 	},
 	{
 		testId: 'consent-manager-dialog-footer',
-		themeKey: 'consent-manager-dialog.footer',
+		themeKey: 'dialog.footer',
 		styles: 'custom-dialog-footer',
 	},
 ];

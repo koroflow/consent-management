@@ -6,8 +6,7 @@
  * Implements a compound component pattern for flexible consent interface building.
  */
 
-import './consent-manager-widget.css';
-import '../ui/components/card.css';
+// import '../ui/components/card.css';
 import { Box } from '../primitives/box';
 
 import { useState } from 'react';
@@ -79,7 +78,7 @@ export const ConsentManagerWidget = ({
 	return (
 		<ConsentManagerWidgetRoot {...props}>
 			<ConsentManagerWidgetAccordion
-				themeKey="consent-manager-widget.accordion"
+				themeKey="widget.accordion"
 				type="multiple"
 				value={openItems}
 				onValueChange={setOpenItems}
@@ -87,22 +86,22 @@ export const ConsentManagerWidget = ({
 				<ConsentManagerWidgetAccordionItems />
 			</ConsentManagerWidgetAccordion>
 			<ConsentManagerWidgetFooter>
-				<ConsentManagerWidgetFooterSubGroup themeKey="consent-manager-widget.footer.sub-group">
-					<ConsentManagerWidgetRejectButton themeKey="consent-manager-widget.footer.reject-button">
+				<ConsentManagerWidgetFooterSubGroup themeKey="widget.footer.sub-group">
+					<ConsentManagerWidgetRejectButton themeKey="widget.footer.reject-button">
 						{consentManagerWidget.rejectAll}
 					</ConsentManagerWidgetRejectButton>
-					<ConsentManagerWidgetAcceptAllButton themeKey="consent-manager-widget.footer.accept-button">
+					<ConsentManagerWidgetAcceptAllButton themeKey="widget.footer.accept-button">
 						{consentManagerWidget.acceptAll}
 					</ConsentManagerWidgetAcceptAllButton>
 				</ConsentManagerWidgetFooterSubGroup>
-				<ConsentManagerWidgetSaveButton themeKey="consent-manager-widget.footer.save-button">
+				<ConsentManagerWidgetSaveButton themeKey="widget.footer.save-button">
 					{consentManagerWidget.save}
 				</ConsentManagerWidgetSaveButton>
 			</ConsentManagerWidgetFooter>
 			{!hideBrading && (
 				<Box
 					baseClassName="c15t-consent-manager-widget-branding"
-					themeKey="consent-manager-widget.branding"
+					themeKey="widget.branding"
 				>
 					<a
 						className="c15t-consent-manager-widget-branding-link"

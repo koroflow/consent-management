@@ -12,6 +12,7 @@ import { useTranslations } from '../../common/store/use-translations';
 import { Box, type BoxProps } from '../../primitives/box';
 import * as RadixAccordion from '../../ui/components/accordion';
 import * as RadixSwitch from '../../ui/components/switch';
+import styles from '../consent-manager-widget.module.css';
 
 /**
  * Accordion Trigger Component
@@ -28,7 +29,7 @@ const ConsentManagerWidgetAccordionTrigger = forwardRef<
 	return (
 		<Box
 			ref={ref as Ref<HTMLDivElement>}
-			baseClassName="c15t-accordion-trigger"
+			baseClassName={styles.accordionTrigger}
 			themeKey={themeKey}
 			{...props}
 		>
@@ -78,18 +79,21 @@ const ConsentManagerWidgetAccordionItems = () => {
 		<ConsentManagerWidgetAccordionItem
 			value={consent.name}
 			key={consent.name}
-			themeKey="consent-manager-widget.accordion.item"
+			themeKey="widget.accordion.item"
+			className={styles.accordionItem}
 		>
 			<ConsentManagerWidgetAccordionTrigger
-				themeKey="consent-manager-widget.accordion.trigger"
+				themeKey="widget.accordion.trigger"
 				data-testid={`consent-manager-widget-accordion-trigger-${consent.name}`}
 			>
 				<ConsentManagerWidgetAccordionTriggerInner
-					themeKey="consent-manager-widget.accordion.trigger-inner"
+					themeKey="widget.accordion.trigger-inner"
+					className={styles.accordionTriggerInner}
 					data-testid={`consent-manager-widget-accordion-trigger-inner-${consent.name}`}
 				>
 					<ConsentManagerWidgetAccordionArrow
 						data-testid={`consent-manager-widget-accordion-arrow-${consent.name}`}
+						className={styles.accordionArrow}
 					/>
 					{consentTypes[consent.name]?.title ?? formatConsentName(consent.name)}
 				</ConsentManagerWidgetAccordionTriggerInner>
@@ -104,18 +108,24 @@ const ConsentManagerWidgetAccordionItems = () => {
 					}
 					disabled={consent.disabled}
 					theme={{
-						root: { themeKey: 'consent-manager-widget.switch' },
-						thumb: { themeKey: 'consent-manager-widget.switch.thumb' },
-						track: { themeKey: 'consent-manager-widget.switch.track' },
+						root: { themeKey: 'widget.switch', className: styles.switch },
+						thumb: {
+							themeKey: 'widget.switch.thumb',
+							className: styles.switchThumb,
+						},
+						track: { themeKey: 'widget.switch.track' },
 					}}
 					data-testid={`consent-manager-widget-switch-${consent.name}`}
 				/>
 			</ConsentManagerWidgetAccordionTrigger>
 			<ConsentManagerWidgetAccordionContent
 				theme={{
-					content: { themeKey: 'consent-manager-widget.accordion.content' },
+					content: {
+						themeKey: 'widget.accordion.content',
+						className: styles.accordionContent,
+					},
 					contentInner: {
-						themeKey: 'consent-manager-widget.accordion.content',
+						themeKey: 'widget.accordion.content-inner',
 					},
 				}}
 				data-testid={`consent-manager-widget-accordion-content-${consent.name}`}
@@ -130,7 +140,13 @@ const ConsentManagerWidgetAccordionItem = forwardRef<
 	ComponentRef<typeof RadixAccordion.Item>,
 	ComponentPropsWithoutRef<typeof RadixAccordion.Item>
 >(({ className, ...rest }, forwardedRef) => {
-	return <RadixAccordion.Item ref={forwardedRef} {...rest} />;
+	return (
+		<RadixAccordion.Item
+			ref={forwardedRef}
+			className={styles.accordionItem}
+			{...rest}
+		/>
+	);
 });
 
 const AccordionTriggerInner = ConsentManagerWidgetAccordionTriggerInner;

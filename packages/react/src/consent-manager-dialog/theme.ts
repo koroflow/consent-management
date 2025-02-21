@@ -8,14 +8,14 @@ import type { ThemeValue } from '../theme';
 export type ConsentManagerDialogTheme = Partial<
 	{
 		/** @remarks Styles for the root container element */
-		'consent-manager-dialog': ThemeValue;
+		dialog: ThemeValue;
 		/** @remarks Styles for the root container element */
-		'consent-manager-dialog.root': ThemeValue;
-		'consent-manager-dialog.header': ThemeValue;
-		'consent-manager-dialog.title': ThemeValue;
-		'consent-manager-dialog.description': ThemeValue;
-		'consent-manager-dialog.content': ThemeValue;
-		'consent-manager-dialog.footer': ThemeValue;
-		'consent-manager-dialog.overlay': ThemeValue;
+		'dialog.root': ThemeValue;
+		'dialog.header': ThemeValue;
+		'dialog.title': ThemeValue;
+		'dialog.description': ThemeValue;
+		'dialog.content': ThemeValue;
+		'dialog.footer': ThemeValue;
+		'dialog.overlay': ThemeValue;
 	} & ConsentManagerWidgetTheme
 >;

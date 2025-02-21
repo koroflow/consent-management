@@ -9,6 +9,7 @@ import { Box, type BoxProps } from '../primitives/box';
 import { ConsentButton } from '../primitives/button';
 import type { ConsentButtonProps } from '../primitives/button.types';
 import { useThemeContext } from '../theme';
+import styles from './cookie-banner.module.css';
 
 const COOKIE_BANNER_TITLE_NAME = 'CookieBannerTitle';
 const COOKIE_BANNER_DESCRIPTION_NAME = 'CookieBannerDescription';
@@ -41,9 +42,9 @@ const CookieBannerTitle = forwardRef<
 	return (
 		<Box
 			ref={ref as Ref<HTMLDivElement>}
-			baseClassName="c15t-cookie-banner-title"
+			baseClassName={styles.title}
 			data-testid="cookie-banner-title"
-			themeKey="cookie-banner.header.title"
+			themeKey="banner.header.title"
 			{...props}
 		>
 			{children}
@@ -74,9 +75,9 @@ const CookieBannerDescription = forwardRef<
 	return (
 		<Box
 			ref={ref as Ref<HTMLDivElement>}
-			baseClassName="c15t-cookie-banner-description"
+			baseClassName={styles.description}
 			data-testid="cookie-banner-description"
-			themeKey="cookie-banner.header.description"
+			themeKey="banner.header.description"
 			{...props}
 		>
 			{children}
@@ -108,9 +109,9 @@ const CookieBannerFooter = forwardRef<
 	return (
 		<Box
 			ref={ref as Ref<HTMLDivElement>}
-			baseClassName="c15t-cookie-banner-footer"
+			baseClassName={styles.footer}
 			data-testid="cookie-banner-footer"
-			themeKey="cookie-banner.footer"
+			themeKey="banner.footer"
 			{...props}
 		>
 			{children}
@@ -141,9 +142,9 @@ const CookieBannerCard = forwardRef<HTMLDivElement, Omit<BoxProps, 'themeKey'>>(
 		return (
 			<Box
 				ref={ref as Ref<HTMLDivElement>}
-				baseClassName="c15t-cookie-banner-card"
+				baseClassName={styles.card}
 				data-testid="cookie-banner-card"
-				themeKey="cookie-banner.card"
+				themeKey="banner.card"
 				{...props}
 			>
 				{children}
@@ -168,9 +169,9 @@ const CookieBannerHeader = forwardRef<
 	return (
 		<Box
 			ref={ref as Ref<HTMLDivElement>}
-			baseClassName="c15t-cookie-banner-header"
+			baseClassName={styles.header}
 			data-testid="cookie-banner-header"
-			themeKey="cookie-banner.header.root"
+			themeKey="banner.header.root"
 			{...props}
 		>
 			{children}
@@ -194,9 +195,9 @@ const CookieBannerFooterSubGroup = forwardRef<
 	return (
 		<Box
 			ref={ref as Ref<HTMLDivElement>}
-			baseClassName="c15t-cookie-banner-footer-sub-group"
+			baseClassName={styles.footerSubGroup}
 			data-testid="cookie-banner-footer-sub-group"
-			themeKey="cookie-banner.footer.sub-group"
+			themeKey="banner.footer.sub-group"
 			{...props}
 		>
 			{children}

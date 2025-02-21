@@ -17,57 +17,57 @@ type ComponentTestCase = {
 const ALL_COMPONENTS: ComponentTestCase[] = [
 	{
 		testId: 'cookie-banner-root',
-		themeKey: 'cookie-banner.root',
+		themeKey: 'banner.root',
 		styles: 'custom-root',
 	},
 	{
 		testId: 'cookie-banner-card',
-		themeKey: 'cookie-banner.card',
+		themeKey: 'banner.card',
 		styles: 'custom-card',
 	},
 	{
 		testId: 'cookie-banner-header',
-		themeKey: 'cookie-banner.header.root',
+		themeKey: 'banner.header.root',
 		styles: 'custom-header',
 	},
 	{
 		testId: 'cookie-banner-title',
-		themeKey: 'cookie-banner.header.title',
+		themeKey: 'banner.header.title',
 		styles: 'custom-title',
 	},
 	{
 		testId: 'cookie-banner-description',
-		themeKey: 'cookie-banner.header.description',
+		themeKey: 'banner.header.description',
 		styles: 'custom-description',
 	},
 	{
 		testId: 'cookie-banner-footer',
-		themeKey: 'cookie-banner.footer',
+		themeKey: 'banner.footer',
 		styles: 'custom-footer',
 	},
 	{
 		testId: 'cookie-banner-footer-sub-group',
-		themeKey: 'cookie-banner.footer.sub-group',
+		themeKey: 'banner.footer.sub-group',
 		styles: 'custom-footer-sub-group',
 	},
 	{
 		testId: 'cookie-banner-overlay',
-		themeKey: 'cookie-banner.overlay',
+		themeKey: 'banner.overlay',
 		styles: 'custom-overlay',
 	},
 	{
 		testId: 'cookie-banner-reject-button',
-		themeKey: 'cookie-banner.footer.reject-button',
+		themeKey: 'banner.footer.reject-button',
 		styles: 'custom-reject-button',
 	},
 	{
 		testId: 'cookie-banner-customize-button',
-		themeKey: 'cookie-banner.footer.customize-button',
+		themeKey: 'banner.footer.customize-button',
 		styles: 'custom-customize-button',
 	},
 	{
 		testId: 'cookie-banner-accept-button',
-		themeKey: 'cookie-banner.footer.accept-button',
+		themeKey: 'banner.footer.accept-button',
 		styles: 'custom-accept-button',
 	},
 ];

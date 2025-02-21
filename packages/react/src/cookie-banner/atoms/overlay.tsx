@@ -9,6 +9,8 @@ import { type HTMLAttributes, forwardRef } from 'react';
 import { useConsentManager } from '../../common';
 import { useStyles, useThemeContext } from '../../theme';
 
+import styles from '../cookie-banner.module.css';
+
 /**
  * Props for the Overlay component.
  *
@@ -51,9 +53,8 @@ const CookieBannerOverlay = forwardRef<HTMLDivElement, OverlayProps>(
 	({ className, style, noStyle, asChild, ...props }, ref) => {
 		const { showPopup } = useConsentManager();
 		const { disableAnimation, noStyle: contextNoStyle } = useThemeContext();
-		const theme = useStyles('cookie-banner.overlay', {
-			baseClassName:
-				!(contextNoStyle || noStyle) && 'c15t-cookie-banner-overlay',
+		const theme = useStyles('banner.overlay', {
+			baseClassName: !(contextNoStyle || noStyle) && styles.overlay,
 			noStyle,
 		});
 

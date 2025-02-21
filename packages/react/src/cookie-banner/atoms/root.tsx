@@ -19,6 +19,9 @@ import { useConsentManager } from '../../common';
 import { createThemeContextValue } from '../../common/utils/theme';
 import type { CSSPropertiesWithVars } from '../../theme/types/style-types';
 import type { CookieBannerTheme } from '../theme';
+
+import styles from '../cookie-banner.module.css';
+
 /**
  * Props for the root component of the CookieBanner.
  *
@@ -226,10 +229,8 @@ const CookieBannerRootChildren = forwardRef<
 		 * Apply styles from the CookieBanner context and merge with local styles.
 		 * Uses the 'content' style key for consistent theming.
 		 */
-		const contentStyle = useStyles('cookie-banner.root', {
-			baseClassName: [
-				'c15t-cookie-banner c15t-cookie-banner-root c15t-cookie-banner-root-bottom-left',
-			],
+		const contentStyle = useStyles('banner.root', {
+			baseClassName: [styles.root, styles.bottomLeft],
 			style: style as CSSPropertiesWithVars<Record<string, never>>,
 			className: className || forwardedClassName,
 		});

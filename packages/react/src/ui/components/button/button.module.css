@@ -42,7 +42,7 @@
 	/* Base Shadows */
 	--button-shadow: 0px 1px 2px 0px hsla(222, 32%, 8%, 0.06);
 	--button-shadow-dark: 0px 1px 2px 0px hsla(0, 0%, 50%, 0.06);
-	/* rgba(14, 18, 27, 0.06) 0px 1px 2px 0px,  */
+
 	/* Focus Shadows */
 	--button-shadow-primary-focus: 0 0 0 4px hsla(227.93, 100%, 63.92%, 20%);
 	--button-shadow-neutral-focus: 0 0 0 4px hsla(0, 0%, 9.02%, 20%);

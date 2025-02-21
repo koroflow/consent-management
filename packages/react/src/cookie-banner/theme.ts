@@ -1,30 +1,79 @@
 import type { ThemeValue } from '../theme';
 import type { ButtonCSSVariables } from '../ui/components/button';
+
 /**
  * Configuration object for styling different parts of the CookieBanner component.
  * @public
  */
 export type CookieBannerTheme = Partial<{
 	/** @remarks Styles for the root container element */
-	'cookie-banner.root': ThemeValue;
+	'banner.root': ThemeValue<RootCSSVariables>;
 	/** @remarks Styles for the card element */
-	'cookie-banner.card': ThemeValue;
+	'banner.card': ThemeValue<CardCSSVariables>;
 	/** @remarks Styles for the main content wrapper */
-	'cookie-banner.header.root': ThemeValue;
+	'banner.header.root': ThemeValue<HeaderCSSVariables>;
 	/** @remarks Styles for the banner title */
-	'cookie-banner.header.title': ThemeValue;
+	'banner.header.title': ThemeValue<TitleCSSVariables>;
 	/** @remarks Styles for the banner description text */
-	'cookie-banner.header.description': ThemeValue;
+	'banner.header.description': ThemeValue<DescriptionCSSVariables>;
 	/** @remarks Styles for the footer container */
-	'cookie-banner.footer': ThemeValue;
+	'banner.footer': ThemeValue<FooterCSSVariables>;
 	/** @remarks Styles for the footer sub-group element */
-	'cookie-banner.footer.sub-group': ThemeValue;
+	'banner.footer.sub-group': ThemeValue;
 	/** @remarks Styles for the footer reject button element */
-	'cookie-banner.footer.reject-button': ThemeValue<ButtonCSSVariables>;
+	'banner.footer.reject-button': ThemeValue<ButtonCSSVariables>;
 	/** @remarks Styles for the footer customize button element */
-	'cookie-banner.footer.customize-button': ThemeValue<ButtonCSSVariables>;
+	'banner.footer.customize-button': ThemeValue<ButtonCSSVariables>;
 	/** @remarks Styles for the footer accept button element */
-	'cookie-banner.footer.accept-button': ThemeValue<ButtonCSSVariables>;
+	'banner.footer.accept-button': ThemeValue<ButtonCSSVariables>;
 	/** @remarks Styles for the overlay element */
-	'cookie-banner.overlay': ThemeValue;
+	'banner.overlay': ThemeValue<OverlayCSSVariables>;
 }>;
+
+/** Root component CSS variables */
+type RootCSSVariables = {
+	'--border-radius-sm': string;
+	'--border-radius': string;
+	'--max-width': string;
+	'--entry-animation': string;
+	'--exit-animation': string;
+};
+
+/** Card component CSS variables */
+type CardCSSVariables = {
+	'--border-width': string;
+	'--border-color': string;
+	'--border-color-dark': string;
+	'--background-color': string;
+	'--background-color-dark': string;
+	'--shadow': string;
+};
+
+/** Header component CSS variables */
+type HeaderCSSVariables = {
+	'--text-color': string;
+};
+
+/** Title component CSS variables */
+type TitleCSSVariables = {
+	'--title-color': string;
+	'--title-color-dark': string;
+};
+
+/** Description component CSS variables */
+type DescriptionCSSVariables = {
+	'--description-color': string;
+	'--description-color-dark': string;
+};
+
+/** Footer component CSS variables */
+type FooterCSSVariables = {
+	'--footer-background-color': string;
+	'--footer-background-color-dark': string;
+};
+
+/** Overlay component CSS variables */
+type OverlayCSSVariables = {
+	'--overlay-background-color': string;
+	'--overlay-background-color-dark': string;
+};

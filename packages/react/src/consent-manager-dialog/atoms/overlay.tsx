@@ -9,6 +9,8 @@ import type { FC } from 'react';
 import { useConsentManager } from '../../common';
 import { type ThemeValue, useStyles, useThemeContext } from '../../theme';
 
+import styles from '../consent-manager-dialog.module.css';
+
 /**
  * Props for the Overlay component.
  *
@@ -79,8 +81,8 @@ const ConsentManagerDialogOverlay: FC<OverlayProps> = ({
 	const { isPrivacyDialogOpen } = useConsentManager();
 	const { disableAnimation, noStyle: isThemeNoStyle } = useThemeContext();
 
-	const theme = useStyles('consent-manager-dialog.overlay', {
-		baseClassName: 'c15t-consent-manager-overlay',
+	const theme = useStyles('dialog.overlay', {
+		baseClassName: styles.overlay,
 		noStyle: isThemeNoStyle || noStyle,
 	});
 

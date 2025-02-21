@@ -22,7 +22,7 @@ const ConsentManagerWidgetAcceptAllButton = forwardRef<
 			size="small"
 			action="accept-consent"
 			{...props}
-			themeKey="consent-manager-widget.footer.accept-button"
+			themeKey="widget.footer.accept-button"
 			data-testid="consent-manager-widget-footer-accept-button"
 			closeCookieBanner={true}
 			closeCustomizeDialog={true}
@@ -41,7 +41,7 @@ const ConsentManagerWidgetCustomizeButton = forwardRef<
 			ref={ref as Ref<HTMLButtonElement>}
 			action="open-consent-dialog"
 			{...props}
-			themeKey="consent-manager-widget.footer.customize-button"
+			themeKey="widget.footer.customize-button"
 			data-testid="consent-manager-widget-footer-customize-button"
 		>
 			{children}
@@ -60,7 +60,7 @@ const ConsentManagerWidgetSaveButton = forwardRef<
 			variant="primary"
 			closeCustomizeDialog
 			{...props}
-			themeKey="consent-manager-widget.footer.save-button"
+			themeKey="widget.footer.save-button"
 			data-testid="consent-manager-widget-footer-save-button"
 		>
 			{children}
@@ -88,7 +88,7 @@ const ConsentManagerWidgetRejectButton = forwardRef<
 			size="small"
 			action="reject-consent"
 			{...props}
-			themeKey="consent-manager-widget.footer.reject-button"
+			themeKey="widget.footer.reject-button"
 			data-testid="consent-manager-widget-reject-button"
 			closeCookieBanner={true}
 			closeCustomizeDialog={true}

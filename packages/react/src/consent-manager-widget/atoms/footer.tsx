@@ -1,5 +1,6 @@
 import { type Ref, forwardRef } from 'react';
 import { Box, type BoxProps } from '../../primitives/box';
+import styles from '../consent-manager-widget.module.css';
 
 /**
  * Footer component for consent management actions.
@@ -16,10 +17,10 @@ export const ConsentManagerWidgetFooter = forwardRef<
 	return (
 		<Box
 			ref={ref as Ref<HTMLDivElement>}
-			baseClassName="c15t-consent-manager-widget-footer"
+			baseClassName={styles.footer}
 			data-testid="consent-manager-widget-footer"
 			{...props}
-			themeKey="consent-manager-widget.footer"
+			themeKey="widget.footer"
 		>
 			{children}
 		</Box>
@@ -33,10 +34,10 @@ export const ConsentManagerWidgetFooterSubGroup = forwardRef<
 	return (
 		<Box
 			ref={ref as Ref<HTMLDivElement>}
-			baseClassName="c15t-consent-manager-widget-footer-sub-group"
+			baseClassName={styles.footerGroup}
 			data-testid="consent-manager-widget-footer-sub-group"
 			{...props}
-			themeKey="consent-manager-widget.footer.sub-group"
+			themeKey="widget.footer.sub-group"
 		>
 			{children}
 		</Box>

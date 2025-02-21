@@ -12,52 +12,52 @@ type ComponentTestCase = {
 const ALL_COMPONENTS: ComponentTestCase[] = [
 	{
 		testId: 'consent-manager-widget-root',
-		themeKey: 'consent-manager-widget.root',
+		themeKey: 'widget.root',
 		styles: 'custom-root',
 	},
 	{
 		testId: 'consent-manager-widget-footer',
-		themeKey: 'consent-manager-widget.footer',
+		themeKey: 'widget.footer',
 		styles: 'custom-footer',
 	},
 	{
 		testId: 'consent-manager-widget-footer-sub-group',
-		themeKey: 'consent-manager-widget.footer.sub-group',
+		themeKey: 'widget.footer.sub-group',
 		styles: 'custom-footer-sub-group',
 	},
 	{
 		testId: 'consent-manager-widget-reject-button',
-		themeKey: 'consent-manager-widget.footer.reject-button',
+		themeKey: 'widget.footer.reject-button',
 		styles: 'custom-reject-button',
 	},
 	{
 		testId: 'consent-manager-widget-footer-accept-button',
-		themeKey: 'consent-manager-widget.footer.accept-button',
+		themeKey: 'widget.footer.accept-button',
 		styles: 'custom-accept-button',
 	},
 	{
 		testId: 'consent-manager-widget-footer-save-button',
-		themeKey: 'consent-manager-widget.footer.save-button',
+		themeKey: 'widget.footer.save-button',
 		styles: 'custom-save-button',
 	},
 	{
 		testId: 'consent-manager-widget-accordion-trigger-marketing',
-		themeKey: 'consent-manager-widget.accordion.trigger',
+		themeKey: 'widget.accordion.trigger',
 		styles: 'custom-accordion-trigger',
 	},
 	{
 		testId: 'consent-manager-widget-accordion-trigger-inner-marketing',
-		themeKey: 'consent-manager-widget.accordion.trigger-inner',
+		themeKey: 'widget.accordion.trigger-inner',
 		styles: 'custom-accordion-trigger-inner',
 	},
 	{
 		testId: 'consent-manager-widget-accordion-content-marketing',
-		themeKey: 'consent-manager-widget.accordion.content',
+		themeKey: 'widget.accordion.content',
 		styles: 'custom-accordion-content',
 	},
 	{
 		testId: 'consent-manager-widget-switch-marketing',
-		themeKey: 'consent-manager-widget.switch',
+		themeKey: 'widget.switch',
 		styles: 'custom-switch',
 	},
 ];

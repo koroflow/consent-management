@@ -16,8 +16,7 @@ import { ConsentCustomizationCard } from './atoms/dialog-card';
 import { Overlay } from './atoms/overlay';
 import type { ConsentManagerDialogTheme } from './theme';
 
-import './consent-manager-dialog.css';
-import '../ui/components/card.css';
+import styles from './consent-manager-dialog.module.css';
 
 /**
  * Animation variants for the dialog container
@@ -124,7 +123,7 @@ export const ConsentManagerDialog: FC<ConsentManagerDialogProps> = ({
 					<>
 						<Overlay open={open} />
 						<motion.dialog
-							className="c15t-consent-manager-dialog-root"
+							className={styles.root}
 							variants={dialogVariants}
 							initial="hidden"
 							animate="visible"
@@ -134,7 +133,7 @@ export const ConsentManagerDialog: FC<ConsentManagerDialogProps> = ({
 						>
 							<motion.div
 								ref={contentRef}
-								className="c15t-consent-manager-dialog-container"
+								className={styles.container}
 								variants={contentVariants}
 								initial="hidden"
 								animate="visible"
