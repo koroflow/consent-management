@@ -1,18 +1,23 @@
 // CookieBanner
-export { CookieBanner } from './cookie-banner/cookie-banner';
-export type { CookieBannerProps } from './cookie-banner/cookie-banner';
-export type { CookieBannerTheme } from './cookie-banner/theme';
+export { CookieBanner } from '~/components/cookie-banner/cookie-banner';
+export type { CookieBannerProps } from '~/components/cookie-banner/cookie-banner';
+export type { CookieBannerTheme } from '~/components/cookie-banner/theme';
 
 // ConsentManagerDialog
-export { ConsentManagerDialog } from './consent-manager-dialog/consent-manager-dialog';
-export type { ConsentManagerDialogProps } from './consent-manager-dialog/consent-manager-dialog';
-export type { ConsentManagerDialogTheme } from './consent-manager-dialog/theme';
+export { ConsentManagerDialog } from '~/components/consent-manager-dialog/consent-manager-dialog';
+export type { ConsentManagerDialogProps } from '~/components/consent-manager-dialog/consent-manager-dialog';
+export type { ConsentManagerDialogTheme } from '~/components/consent-manager-dialog/theme';
 
 // ConsentManagerWidget
-export { ConsentManagerWidget } from './consent-manager-widget/consent-manager-widget';
-export type { ConsentManagerWidgetProps } from './consent-manager-widget/types';
-export type { ConsentManagerWidgetTheme } from './consent-manager-widget/theme';
+export { ConsentManagerWidget } from '~/components/consent-manager-widget/consent-manager-widget';
+export type { ConsentManagerWidgetProps } from '~/components/consent-manager-widget/types';
+export type { ConsentManagerWidgetTheme } from '~/components/consent-manager-widget/theme';
 
-// Common
-export * from './common/index';
-export type { ThemeValue, ClassNameStyle } from './theme';
+// Hooks
+export * from '~/hooks';
+
+// Providers
+export { ConsentManagerProvider } from '~/providers/consent-manager-provider';
+
+// Types
+export type { ThemeValue, ClassNameStyle } from '~/types/theme';

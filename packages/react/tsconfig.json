@@ -8,6 +8,11 @@
 			"~/*": ["./src/*"]
 		}
 	},
-	"include": ["src"],
+	"include": [
+		"src",
+		"src-old/consent-manager-dialog",
+		"src-old/consent-manager-widget",
+		"src-old/cookie-banner"
+	],
 	"exclude": ["node_modules"]
 }
