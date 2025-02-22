@@ -1,5 +1,5 @@
-import type { ButtonCSSVariables } from '~/components/shared/ui/button';
-import type { ThemeValue } from '~/types/theme';
+import type { ButtonCSSVariables } from '../../components/shared/ui/button';
+import type { ThemeValue } from '../../types/theme';
 
 /**
  * Configuration object for styling different parts of the CookieBanner component.
@@ -7,7 +7,7 @@ import type { ThemeValue } from '~/types/theme';
  */
 export type CookieBannerTheme = Partial<{
 	/** @remarks Styles for the root container element */
-	'banner.root': ThemeValue<RootCSSVariables>;
+	'banner.root': ThemeValue;
 	/** @remarks Styles for the card element */
 	'banner.card': ThemeValue<CardCSSVariables>;
 	/** @remarks Styles for the main content wrapper */
@@ -30,50 +30,46 @@ export type CookieBannerTheme = Partial<{
 	'banner.overlay': ThemeValue<OverlayCSSVariables>;
 }>;
 
-/** Root component CSS variables */
-type RootCSSVariables = {
-	'--border-radius-sm': string;
-	'--border-radius': string;
-	'--max-width': string;
-	'--entry-animation': string;
-	'--exit-animation': string;
-};
-
 /** Card component CSS variables */
 type CardCSSVariables = {
-	'--border-width': string;
-	'--border-color': string;
-	'--border-color-dark': string;
-	'--background-color': string;
-	'--background-color-dark': string;
-	'--shadow': string;
+	'--banner-max-width': string;
+	'--banner-border-radius': string;
+	'--banner-border-width': string;
+	'--banner-border-color': string;
+	'--banner-border-color-dark': string;
+	'--banner-background-color': string;
+	'--banner-background-color-dark': string;
+	'--banner-shadow': string;
+	'--banner-entry-animation': string;
+	'--banner-exit-animation': string;
 };
 
 /** Header component CSS variables */
 type HeaderCSSVariables = {
-	'--text-color': string;
+	'--banner-text-color': string;
+	'--banner-text-color-dark': string;
 };
 
 /** Title component CSS variables */
 type TitleCSSVariables = {
-	'--title-color': string;
-	'--title-color-dark': string;
+	'--banner-title-color': string;
+	'--banner-title-color-dark': string;
 };
 
 /** Description component CSS variables */
 type DescriptionCSSVariables = {
-	'--description-color': string;
-	'--description-color-dark': string;
+	'--banner-description-color': string;
+	'--banner-description-color-dark': string;
 };
 
 /** Footer component CSS variables */
 type FooterCSSVariables = {
-	'--footer-background-color': string;
-	'--footer-background-color-dark': string;
+	'--banner-footer-background-color': string;
+	'--banner-footer-background-color-dark': string;
 };
 
 /** Overlay component CSS variables */
 type OverlayCSSVariables = {
-	'--overlay-background-color': string;
-	'--overlay-background-color-dark': string;
+	'--banner-overlay-background-color': string;
+	'--banner-overlay-background-color-dark': string;
 };

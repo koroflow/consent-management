@@ -1,5 +1,5 @@
-import type { ConsentManagerWidgetTheme } from '~/components/consent-manager-widget/theme';
-import type { ThemeValue } from '~/types/theme';
+import type { ThemeValue } from '../../types/theme';
+import type { ConsentManagerWidgetTheme } from '../consent-manager-widget/theme';
 
 /**
  * Configuration object for styling different parts of the ConsentManagerWidget component.

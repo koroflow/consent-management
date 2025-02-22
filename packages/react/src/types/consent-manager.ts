@@ -9,6 +9,8 @@ import type {
 	createConsentManagerStore,
 } from 'c15t';
 import type { ReactNode } from 'react';
+import type { ConsentManagerDialogTheme } from '../components/consent-manager-dialog/theme';
+import type { CookieBannerTheme } from '../components/cookie-banner/theme';
 
 /**
  * Configuration options for the ConsentManagerProvider component.
@@ -45,6 +47,19 @@ export interface ConsentManagerProviderProps extends NamespaceProps {
 	 * @default false
 	 */
 	noStyle?: boolean;
+
+	/**
+	 * @remarks
+	 * Whether to disable animations
+	 * @default false
+	 */
+	disableAnimation?: boolean;
+
+	/**
+	 * @remarks
+	 * Theme configuration for the consent manager
+	 */
+	theme?: CookieBannerTheme & ConsentManagerDialogTheme;
 
 	/**
 	 * @remarks

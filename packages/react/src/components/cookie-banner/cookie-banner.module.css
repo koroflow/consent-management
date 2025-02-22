@@ -29,6 +29,7 @@
 	--banner-footer-background-color: hsl(0 0% 96.86%);
 	--banner-footer-background-color-dark: hsl(0 0% 10.98%);
 	--banner-text-color: hsl(0 0% 9.02);
+	--banner-text-color-dark: hsl(0 0% 90%);
 	--banner-border-color: hsl(0 0% 92.16%);
 	--banner-border-color-dark: hsl(0 0% 20%);
 	--banner-title-color: hsl(0 0% 9.02);
@@ -47,6 +48,7 @@
 	--banner-title-color: var(--banner-title-color-dark);
 	--banner-description-color: var(--banner-description-color-dark);
 	--banner-overlay-background-color: var(--banner-overlay-background-color-dark);
+	--banner-text-color: var(--banner-text-color-dark);
 }
 
 .root {

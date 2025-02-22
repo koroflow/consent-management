@@ -96,9 +96,6 @@ export const initialState: Omit<
 	/** Default translation configuration */
 	translationConfig: defaultTranslationConfig,
 
-	/** Default styling enabled */
-	noStyle: false,
-
 	/** Don't include non-displayed consents by default */
 	includeNonDisplayedConsents: false,
 
@@ -119,7 +116,6 @@ export const initialState: Omit<
 	getDisplayedConsents: () => [],
 	hasConsented: () => false,
 	setTranslationConfig: () => {},
-	setNoStyle: () => {},
 	clearAllData: () => {},
 	updateConsentMode: () => {},
 	setPrivacySettings: () => {},

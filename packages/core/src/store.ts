@@ -437,15 +437,6 @@ export const createConsentManagerStore = (
 		setTranslationConfig: (config: TranslationConfig) => {
 			set({ translationConfig: config });
 		},
-
-		/**
-		 * Updates the noStyle setting.
-		 *
-		 * @param noStyle - Whether to disable default styling
-		 */
-		setNoStyle: (noStyle) => {
-			set({ noStyle });
-		},
 	}));
 
 	if (typeof window !== 'undefined') {

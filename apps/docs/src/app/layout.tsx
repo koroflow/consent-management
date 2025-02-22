@@ -5,6 +5,7 @@ import {
 	ConsentManagerProvider,
 	CookieBanner,
 } from '@c15t/react';
+import ExpandedCookieBanner from '@c15t/react/cookie-banner';
 import { cn } from '@c15t/shadcn/libs';
 import { RootProvider } from 'fumadocs-ui/provider';
 import { Fira_Mono, Inter } from 'next/font/google';
@@ -32,6 +33,9 @@ export default function Layout({ children }: { children: ReactNode }) {
 				<RootProvider>
 					<ConsentManagerProvider initialGdprTypes={['necessary', 'marketing']}>
 						<CookieBanner />
+						<ExpandedCookieBanner.Root>
+							<div></div>
+						</ExpandedCookieBanner.Root>
 						<ConsentManagerDialog />
 						{process.env.NODE_ENV === 'development' && <C15TDevTools />}
 						{children}

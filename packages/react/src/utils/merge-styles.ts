@@ -1,6 +1,14 @@
 import type { ClassNameStyle, ThemeValue } from '~/types/theme';
 import { cnExt } from '~/utils/cn';
 
+/**
+ * Merges two styles objects, handling theme values and style properties.
+ *
+ * @param style1 - The first style object to merge
+ * @param style2 - The second style object to merge (Takes precedence over style1)
+ *
+ * @returns The merged styles object
+ */
 export function mergeStyles(
 	style1: ThemeValue,
 	style2?: ThemeValue

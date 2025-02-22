@@ -37,6 +37,8 @@ export function ConsentManagerProvider({
 	noStyle = false,
 	translationConfig,
 	trackingBlockerConfig,
+	theme,
+	disableAnimation = false,
 }: ConsentManagerProviderProps) {
 	const preparedTranslationConfig = useMemo(() => {
 		const mergedConfig = mergeTranslationConfigs(
@@ -59,22 +61,15 @@ export function ConsentManagerProvider({
 		// Set translation config immediately
 		store.getState().setTranslationConfig(preparedTranslationConfig);
 
-		// Set noStyle immediately
-		store.getState().setNoStyle(noStyle);
-
 		return store;
-	}, [namespace, preparedTranslationConfig, trackingBlockerConfig, noStyle]);
+	}, [namespace, preparedTranslationConfig, trackingBlockerConfig]);
 
 	// Initialize state with the current state from the consent manager store
 	const [state, setState] = useState<PrivacyConsentState>(store.getState());
 
 	useEffect(() => {
-		const {
-			setGdprTypes,
-			setComplianceSetting,
-			setDetectedCountry,
-			setNoStyle,
-		} = store.getState();
+		const { setGdprTypes, setComplianceSetting, setDetectedCountry } =
+			store.getState();
 
 		// Initialize GDPR types if provided
 		if (initialGdprTypes) {
@@ -89,9 +84,6 @@ export function ConsentManagerProvider({
 				setComplianceSetting(region as ComplianceRegion, settings);
 			}
 		}
-
-		// Update noStyle when prop changes
-		setNoStyle(noStyle);
 
 		// Set detected country
 		const country =
@@ -109,7 +101,7 @@ export function ConsentManagerProvider({
 		return () => {
 			unsubscribe();
 		};
-	}, [store, initialGdprTypes, initialComplianceSettings, noStyle]);
+	}, [store, initialGdprTypes, initialComplianceSettings]);
 
 	// Memoize the context value to prevent unnecessary re-renders
 	const contextValue = useMemo(
@@ -123,10 +115,10 @@ export function ConsentManagerProvider({
 	const themeContextValue = useMemo(
 		() => ({
 			noStyle,
-			theme: {},
-			disableAnimation: false,
+			theme,
+			disableAnimation,
 		}),
-		[noStyle]
+		[noStyle, theme, disableAnimation]
 	);
 
 	return (
