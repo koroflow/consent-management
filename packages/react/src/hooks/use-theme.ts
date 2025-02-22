@@ -74,8 +74,5 @@ export const useTheme = () => {
 	// Deep merge the entire context, with local taking precedence
 	const context = deepMerge(globalContext, localContext || null);
 
-	console.log('globalContext', globalContext);
-	console.log('context', context);
-
 	return context;
 };
