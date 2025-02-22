@@ -46,7 +46,7 @@ export function useStyles(
 	componentStyle?: ThemeValue
 ): ClassNameStyle {
 	const { noStyle: contextNoStyle, theme } = useTheme();
-  
+
 	const mergedNoStyle =
 		typeof componentStyle === 'object' && 'noStyle' in componentStyle
 			? componentStyle.noStyle

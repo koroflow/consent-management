@@ -93,8 +93,7 @@ export const defaultButtonCSSVariables: ButtonCSSVariables = {
 	/* Shadows */
 	'--button-shadow': '0px 1px 2px 0px hsla(222, 32%, 8%, 0.06)',
 	'--button-shadow-dark': '0px 1px 2px 0px hsla(0, 0%, 20%, 1)',
-	'--button-shadow-primary-focus':
-		'0 0 0 4px hsla(227.93, 100%, 63.92%, 20%)',
+	'--button-shadow-primary-focus': '0 0 0 4px hsla(227.93, 100%, 63.92%, 20%)',
 	'--button-shadow-neutral-focus': '0 0 0 4px hsla(0, 0%, 9.02%, 20%)',
 	'--button-shadow-primary':
 		'var(--button-shadow), inset 0 0 0 1px var(--button-primary)',
