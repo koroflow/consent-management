@@ -4,6 +4,8 @@
  * This module provides the main store creation and management functionality.
  */
 
+import { initialState } from './client.initial-state';
+import type { PrivacyConsentState } from './client.type';
 import {
 	getEffectiveConsents,
 	hasConsentFor,
@@ -11,8 +13,6 @@ import {
 } from './libs/consent-utils';
 import type { TrackingBlockerConfig } from './libs/tracking-blocker';
 import { createTrackingBlocker } from './libs/tracking-blocker';
-import { initialState } from './store.initial-state';
-import type { PrivacyConsentState } from './store.type';
 import type {
 	AllConsentNames,
 	CallbackFunction,
@@ -29,50 +29,42 @@ import { localStorage, window as win } from './utils/global-helpers';
 /** Storage key for persisting consent data in localStorage */
 const STORAGE_KEY = 'privacy-consent-storage';
 
+function debugLog(methodName: string, args: unknown[]) {
+	// biome-ignore lint/suspicious/noConsoleLog: we want to log debug messages
+	// biome-ignore lint/suspicious/noConsole: we want to log debug messages
+	console.log(`Called ${methodName} with arguments:`, args);
+}
+
 /**
  * Singleton class that manages consent state and operations
  */
-export class ConsentManager implements PrivacyConsentState {
+export class ConsentManager {
 	private static instance: ConsentManager | null = null;
 	private subscribers: Set<(state: PrivacyConsentState) => void> = new Set();
 	private trackingBlocker: ReturnType<typeof createTrackingBlocker> | null =
 		null;
 
-	// Initialize all state properties from PrivacyConsentState
-	consents: ConsentState = initialState.consents;
-	consentInfo = initialState.consentInfo;
-	showPopup = initialState.showPopup;
-	gdprTypes = initialState.gdprTypes;
-	isPrivacyDialogOpen = initialState.isPrivacyDialogOpen;
-	complianceSettings = initialState.complianceSettings;
-	callbacks = initialState.callbacks;
-	detectedCountry = initialState.detectedCountry;
-	privacySettings = initialState.privacySettings;
-	translationConfig = initialState.translationConfig;
-	noStyle = initialState.noStyle;
-	includeNonDisplayedConsents = initialState.includeNonDisplayedConsents;
-	consentTypes = initialState.consentTypes;
+	// State object with only properties
+	private state: PrivacyConsentState = initialState;
 
 	private constructor(
 		namespace?: string,
 		config?: { trackingBlockerConfig?: TrackingBlockerConfig }
 	) {
-		// Initialize from stored consent if available
 		const storedConsent = this.getStoredConsent();
 		if (storedConsent) {
-			this.consents = storedConsent.consents;
-			this.consentInfo = storedConsent.consentInfo as typeof this.consentInfo;
-			this.showPopup = false;
+			this.state.consents = storedConsent.consents;
+			this.state.consentInfo =
+				storedConsent.consentInfo as typeof this.state.consentInfo;
+			this.state.showPopup = false;
 		}
 
-		// Initialize tracking blocker
 		if (win) {
 			this.trackingBlocker = createTrackingBlocker(
 				config?.trackingBlockerConfig || {},
 				storedConsent?.consents || initialState.consents
 			);
 
-			// Add to window object if namespace provided
 			if (namespace) {
 				(win as unknown as Record<string, ConsentManager>)[namespace] = this;
 			}
@@ -105,7 +97,7 @@ export class ConsentManager implements PrivacyConsentState {
 	 */
 	private notifySubscribers(): void {
 		for (const callback of this.subscribers) {
-			callback(this);
+			callback(this.state);
 		}
 	}
 
@@ -133,41 +125,51 @@ export class ConsentManager implements PrivacyConsentState {
 
 	// Implement all the required methods from PrivacyConsentState
 	setConsent(name: string, value: boolean): void {
-		const consentType = this.consentTypes.find((type) => type.name === name);
+		debugLog('setConsent', [name, value]);
+		const consentType = this.state.consentTypes.find(
+			(type) => type.name === name
+		);
 		if (consentType?.disabled) {
 			return;
 		}
 
-		this.consents = { ...this.consents, [name]: value };
-		this.trackingBlocker?.updateConsents(this.consents);
+		this.state.consents = { ...this.state.consents, [name]: value };
+		this.trackingBlocker?.updateConsents(this.state.consents);
 		this.updateConsentMode();
 		this.notifySubscribers();
 	}
 
 	setShowPopup(show: boolean, force = false): void {
-		debugger;
+		debugLog('setShowPopup', [show, force]);
 		const storedConsent = this.getStoredConsent();
-		if (force || (!storedConsent && !this.consentInfo && show)) {
-			this.showPopup = show;
+		console.log('storedConsent', {
+			show,
+			force,
+			storedConsent,
+			consentInfo: this.state.consentInfo,
+		});
+		if (force || (!storedConsent && !this.state.consentInfo && show)) {
+			this.state.showPopup = show;
 			this.notifySubscribers();
 		}
 	}
 
 	setIsPrivacyDialogOpen(isOpen: boolean): void {
-		this.isPrivacyDialogOpen = isOpen;
+		debugLog('setIsPrivacyDialogOpen', [isOpen]);
+		this.state.isPrivacyDialogOpen = isOpen;
 		this.notifySubscribers();
 	}
 
 	saveConsents(type: 'all' | 'custom' | 'necessary'): void {
-		debugger;
-		const newConsents = { ...this.consents };
+		debugLog('saveConsents', [type]);
+		const newConsents = { ...this.state.consents };
 
 		if (type === 'all') {
-			for (const consent of this.consentTypes) {
+			for (const consent of this.state.consentTypes) {
 				newConsents[consent.name] = true;
 			}
 		} else if (type === 'necessary') {
-			for (const consent of this.consentTypes) {
+			for (const consent of this.state.consentTypes) {
 				newConsents[consent.name] = consent.name === 'necessary';
 			}
 		}
@@ -186,18 +188,19 @@ export class ConsentManager implements PrivacyConsentState {
 		);
 
 		this.trackingBlocker?.updateConsents(newConsents);
-		this.consents = newConsents;
-		this.showPopup = false;
-		this.consentInfo = consentInfo;
+		this.state.consents = newConsents;
+		this.state.showPopup = false;
+		this.state.consentInfo = consentInfo;
 
 		this.updateConsentMode();
-		this.callbacks.onConsentGiven?.();
-		this.callbacks.onPreferenceExpressed?.();
+		this.state.callbacks.onConsentGiven?.();
+		this.state.callbacks.onPreferenceExpressed?.();
 		this.notifySubscribers();
 	}
 
 	resetConsents(): void {
-		this.consents = this.consentTypes.reduce((acc, consent) => {
+		debugLog('resetConsents', []);
+		this.state.consents = this.state.consentTypes.reduce((acc, consent) => {
 			acc[consent.name] = consent.defaultValue;
 			return acc;
 		}, {} as ConsentState);
@@ -206,7 +209,8 @@ export class ConsentManager implements PrivacyConsentState {
 	}
 
 	setGdprTypes(types: AllConsentNames[]): void {
-		this.gdprTypes = types;
+		debugLog('setGdprTypes', [types]);
+		this.state.gdprTypes = types;
 		this.notifySubscribers();
 	}
 
@@ -214,15 +218,17 @@ export class ConsentManager implements PrivacyConsentState {
 		region: ComplianceRegion,
 		settings: Partial<ComplianceSettings>
 	): void {
-		this.complianceSettings = {
-			...this.complianceSettings,
-			[region]: { ...this.complianceSettings[region], ...settings },
+		debugLog('setComplianceSetting', [region, settings]);
+		this.state.complianceSettings = {
+			...this.state.complianceSettings,
+			[region]: { ...this.state.complianceSettings[region], ...settings },
 		};
 		this.notifySubscribers();
 	}
 
 	resetComplianceSettings(): void {
-		this.complianceSettings = initialState.complianceSettings;
+		debugLog('resetComplianceSettings', []);
+		this.state.complianceSettings = initialState.complianceSettings;
 		this.notifySubscribers();
 	}
 
@@ -230,48 +236,55 @@ export class ConsentManager implements PrivacyConsentState {
 		name: keyof Callbacks,
 		callback: CallbackFunction | undefined
 	): void {
+		debugLog('setCallback', [name, callback]);
 		if (callback) {
-			this.callbacks = { ...this.callbacks, [name]: callback };
+			this.state.callbacks = { ...this.state.callbacks, [name]: callback };
 		} else {
-			delete this.callbacks[name];
+			delete this.state.callbacks[name];
 		}
 		this.notifySubscribers();
 	}
 
 	setDetectedCountry(country: string): void {
-		this.detectedCountry = country;
+		debugLog('setDetectedCountry', [country]);
+		this.state.detectedCountry = country;
 		this.notifySubscribers();
 	}
 
 	getDisplayedConsents(): ConsentType[] {
-		return this.consentTypes.filter((consent) =>
-			this.gdprTypes.includes(consent.name)
+		debugLog('getDisplayedConsents', []);
+		return this.state.consentTypes.filter((consent) =>
+			this.state.gdprTypes.includes(consent.name)
 		);
 	}
 
 	hasConsented(): boolean {
-		return hasConsented(this.consentInfo);
+		debugLog('hasConsented', []);
+		return hasConsented(this.state.consentInfo);
 	}
 
 	clearAllData(): void {
-		this.consents = initialState.consents;
-		this.consentInfo = initialState.consentInfo;
-		this.showPopup = initialState.showPopup;
-		this.gdprTypes = initialState.gdprTypes;
-		this.isPrivacyDialogOpen = initialState.isPrivacyDialogOpen;
-		this.complianceSettings = initialState.complianceSettings;
-		this.callbacks = initialState.callbacks;
-		this.detectedCountry = initialState.detectedCountry;
-		this.privacySettings = initialState.privacySettings;
-		this.translationConfig = initialState.translationConfig;
-		this.noStyle = initialState.noStyle;
-		this.includeNonDisplayedConsents = initialState.includeNonDisplayedConsents;
-		this.consentTypes = initialState.consentTypes;
+		debugLog('clearAllData', []);
+		this.state.consents = initialState.consents;
+		this.state.consentInfo = initialState.consentInfo;
+		this.state.showPopup = initialState.showPopup;
+		this.state.gdprTypes = initialState.gdprTypes;
+		this.state.isPrivacyDialogOpen = initialState.isPrivacyDialogOpen;
+		this.state.complianceSettings = initialState.complianceSettings;
+		this.state.callbacks = initialState.callbacks;
+		this.state.detectedCountry = initialState.detectedCountry;
+		this.state.privacySettings = initialState.privacySettings;
+		this.state.translationConfig = initialState.translationConfig;
+		this.state.noStyle = initialState.noStyle;
+		this.state.includeNonDisplayedConsents =
+			initialState.includeNonDisplayedConsents;
+		this.state.consentTypes = initialState.consentTypes;
 		localStorage?.removeItem(STORAGE_KEY);
 		this.notifySubscribers();
 	}
 
 	updateConsentMode(): void {
+		debugLog('updateConsentMode', []);
 		const effectiveConsents = this.getEffectiveConsents();
 		// if (typeof window !== 'undefined' && window.gtag) {
 		//   window.gtag('consent', 'update', {
@@ -285,37 +298,46 @@ export class ConsentManager implements PrivacyConsentState {
 	}
 
 	setPrivacySettings(settings: Partial<PrivacySettings>): void {
-		this.privacySettings = { ...this.privacySettings, ...settings };
+		debugLog('setPrivacySettings', [settings]);
+		this.state.privacySettings = {
+			...this.state.privacySettings,
+			...settings,
+		};
 		this.notifySubscribers();
 	}
 
 	getEffectiveConsents() {
+		debugLog('getEffectiveConsents', []);
 		return getEffectiveConsents(
-			this.consents,
-			this.privacySettings.honorDoNotTrack
+			this.state.consents,
+			this.state.privacySettings.honorDoNotTrack
 		);
 	}
 
 	hasConsentFor(consentType: AllConsentNames): boolean {
+		debugLog('hasConsentFor', [consentType]);
 		return hasConsentFor(
 			consentType,
-			this.consents,
-			this.privacySettings.honorDoNotTrack
+			this.state.consents,
+			this.state.privacySettings.honorDoNotTrack
 		);
 	}
 
 	setIncludeNonDisplayedConsents(include: boolean): void {
-		this.includeNonDisplayedConsents = include;
+		debugLog('setIncludeNonDisplayedConsents', [include]);
+		this.state.includeNonDisplayedConsents = include;
 		this.notifySubscribers();
 	}
 
 	setTranslationConfig(config: TranslationConfig): void {
-		this.translationConfig = config;
+		debugLog('setTranslationConfig', [config]);
+		this.state.translationConfig = config;
 		this.notifySubscribers();
 	}
 
 	setNoStyle(noStyle: boolean): void {
-		this.noStyle = noStyle;
+		debugLog('setNoStyle', [noStyle]);
+		this.state.noStyle = noStyle;
 		this.notifySubscribers();
 	}
 }

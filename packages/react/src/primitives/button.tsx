@@ -76,6 +76,7 @@ export const ConsentButton = forwardRef<
 
 		const buttonClick = useCallback(() => {
 			console.log('buttonClick', action);
+			debugger;
 			switch (action) {
 				case 'accept-consent':
 					saveConsents('all');

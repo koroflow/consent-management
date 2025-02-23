@@ -1,6 +1,6 @@
 // Re-export store
-export { createConsentManagerStore } from './store';
-export type { PrivacyConsentState } from './store.type';
+export { createConsentManagerStore } from './client';
+export type { PrivacyConsentState } from './client.type';
 // Re-export all utilities
 export * from './libs/consent-utils';
 export { createTrackingBlocker } from './libs/tracking-blocker';
@@ -8,7 +8,7 @@ export type { TrackingBlockerConfig } from './libs/tracking-blocker';
 
 // Re-export types and constants
 export { consentTypes } from './types';
-export { initialState } from './store.initial-state';
+export { initialState } from './client.initial-state';
 export type {
 	CallbackFunction,
 	Callbacks,

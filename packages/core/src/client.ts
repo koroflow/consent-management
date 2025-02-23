@@ -5,6 +5,8 @@
  */
 
 import { createStore } from 'zustand/vanilla';
+import { initialState } from './client.initial-state';
+import type { PrivacyConsentState } from './client.type';
 import {
 	getEffectiveConsents,
 	hasConsentFor,
@@ -12,8 +14,6 @@ import {
 } from './libs/consent-utils';
 import { createTrackingBlocker } from './libs/tracking-blocker';
 import type { TrackingBlockerConfig } from './libs/tracking-blocker';
-import { initialState } from './store.initial-state';
-import type { PrivacyConsentState } from './store.type';
 import {
 	type ConsentState,
 	type TranslationConfig,
@@ -217,6 +217,8 @@ export const createConsentManagerStore = (
 		 * 5. Triggers callbacks
 		 */
 		saveConsents: (type) => {
+			debugger;
+			console.log('saveConsents', type);
 			const {
 				callbacks,
 				updateConsentMode,

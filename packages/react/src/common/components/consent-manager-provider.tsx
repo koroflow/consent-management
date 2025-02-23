@@ -58,6 +58,7 @@ export function ConsentManagerProvider({
 	const [state, setState] = useState<PrivacyConsentState>(() => ({
 		...initialState,
 		translationConfig: preparedTranslationConfig, // Set the prepared translation config
+		//@ts-expect-error - noStyle is not defined on the store
 		noStyle: store.noStyle ?? false,
 	}));
 

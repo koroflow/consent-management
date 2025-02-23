@@ -3,7 +3,7 @@
  * Provides the default initial state configuration for the consent management store.
  */
 
-import type { PrivacyConsentState } from './store.type';
+import type { PrivacyConsentState } from './client.type';
 import { defaultTranslationConfig } from './translations';
 import { type ConsentState, consentTypes } from './types';
 

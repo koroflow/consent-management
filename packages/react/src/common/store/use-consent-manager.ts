@@ -46,7 +46,11 @@ import { ConsentStateContext } from '../context/consent-manager-context';
  *
  * @public
  */
-export function useConsentManager(): PrivacyConsentState {
+export function useConsentManager(): {
+	state: PrivacyConsentState;
+	// saveConsents: (type: string) => void;
+	// setShowPopup: (show: boolean, force?: boolean) => void;
+} {
 	const context = useContext(ConsentStateContext);
 
 	if (!context) {
@@ -71,7 +75,9 @@ export function useConsentManager(): PrivacyConsentState {
 	}, []);
 
 	return {
-		...consentState,
+		state: consentState,
+		// saveConsents: store.saveConsents.bind(store),
+
 		// Add any additional methods or properties you need to expose
 	};
 }
