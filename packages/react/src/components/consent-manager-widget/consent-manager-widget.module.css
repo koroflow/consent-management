@@ -57,29 +57,6 @@
 	--widget-accordion-focus-ring-dark: hsl(227.93, 100%, 80%);
 }
 
-/* Dark mode variables */
-/* biome-ignore lint/nursery/noUnknownPseudoClass: it is known */
-:global(.dark) {
-	--widget-background-color: var(--widget-background-color-dark);
-	--widget-border-color: var(--widget-border-color-dark);
-	--widget-text-color: var(--widget-text-color-dark);
-	--widget-text-muted-color: var(--widget-text-muted-color-dark);
-	--widget-footer-background-color: var(--widget-footer-background-color-dark);
-	--widget-link-text-color: var(--widget-link-text-color-dark);
-	--widget-accordion-background-color: var(
-		--widget-accordion-background-color-dark
-	);
-	--widget-accordion-background-hover: var(
-		--widget-accordion-background-hover-dark
-	);
-	--widget-accordion-border-color: var(--widget-accordion-border-color-dark);
-	--widget-accordion-text-color: var(--widget-accordion-text-color-dark);
-	--widget-accordion-icon-color: var(--widget-accordion-icon-color-dark);
-	--widget-accordion-arrow-color: var(--widget-accordion-arrow-color-dark);
-	--widget-accordion-content-color: var(--widget-accordion-content-color-dark);
-	--widget-accordion-focus-ring: var(--widget-accordion-focus-ring-dark);
-}
-
 .widget {
 	isolation: isolate;
 	font-family: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif,
@@ -103,6 +80,12 @@
 	border-radius: var(--widget-radius);
 	border: var(--widget-border-width) solid var(--widget-border-color);
 	background-color: var(--widget-background-color);
+}
+
+/* biome-ignore lint/nursery/noUnknownPseudoClass: <explanation> */
+:global(.dark) .card {
+	background-color: var(--widget-background-color-dark);
+	border-color: var(--widget-border-color-dark);
 }
 
 /* Animation states */
@@ -129,8 +112,18 @@
 	color: var(--widget-text-color);
 }
 
+/* biome-ignore lint/nursery/noUnknownPseudoClass: <explanation> */
+:global(.dark) .title {
+	color: var(--widget-text-color-dark);
+}
+
 .description {
 	color: var(--widget-text-muted-color);
+}
+
+/* biome-ignore lint/nursery/noUnknownPseudoClass: <explanation> */
+:global(.dark) .description {
+	color: var(--widget-text-muted-color-dark);
 }
 
 .content {
@@ -144,6 +137,11 @@
 	gap: 1rem;
 	padding: var(--widget-footer-padding);
 	background-color: var(--widget-footer-background-color);
+}
+
+/* biome-ignore lint/nursery/noUnknownPseudoClass: <explanation> */
+:global(.dark) .footer {
+	background-color: var(--widget-footer-background-color-dark);
 }
 
 @media (max-width: 640px) {
@@ -182,6 +180,11 @@
 	padding-top: 1rem;
 }
 
+/* biome-ignore lint/nursery/noUnknownPseudoClass: <explanation> */
+:global(.dark) .branding {
+	border-color: var(--widget-border-color-dark);
+}
+
 .brandingLink {
 	color: var(--widget-link-text-color);
 	text-decoration: none;
@@ -192,6 +195,11 @@
 	gap: 0.5rem;
 	align-items: center;
 	justify-content: center;
+}
+
+/* biome-ignore lint/nursery/noUnknownPseudoClass: <explanation> */
+:global(.dark) .brandingLink {
+	color: var(--widget-link-text-color-dark);
 }
 
 .brandingLink svg {
@@ -250,6 +258,12 @@
 	overflow: hidden;
 }
 
+/* biome-ignore lint/nursery/noUnknownPseudoClass: <explanation> */
+:global(.dark) .accordionItem {
+	border-color: var(--widget-accordion-border-color-dark);
+	background-color: var(--widget-accordion-background-color-dark);
+}
+
 .accordionTrigger {
 	display: flex;
 	align-items: center;
@@ -264,6 +278,16 @@
 
 .accordionTrigger:hover {
 	background-color: var(--widget-accordion-background-hover);
+}
+
+/* biome-ignore lint/nursery/noUnknownPseudoClass: <explanation> */
+:global(.dark) .accordionTrigger {
+	color: var(--widget-accordion-text-color-dark);
+}
+
+/* biome-ignore lint/nursery/noUnknownPseudoClass: <explanation> */
+:global(.dark) .accordionTrigger:hover {
+	background-color: var(--widget-accordion-background-hover-dark);
 }
 
 .accordionTriggerInner {
@@ -281,12 +305,22 @@
 	line-height: 1.5;
 }
 
+/* biome-ignore lint/nursery/noUnknownPseudoClass: <explanation> */
+:global(.dark) .accordionContent {
+	color: var(--widget-accordion-content-color-dark);
+}
+
 .accordionArrow {
 	color: var(--widget-accordion-arrow-color);
 	width: var(--widget-accordion-icon-size);
 	height: var(--widget-accordion-icon-size);
 	transition: transform var(--widget-accordion-duration)
 		var(--widget-accordion-ease);
+}
+
+/* biome-ignore lint/nursery/noUnknownPseudoClass: <explanation> */
+:global(.dark) .accordionArrow {
+	color: var(--widget-accordion-arrow-color-dark);
 }
 
 .accordionItem[data-state="open"] .accordionArrow {
@@ -307,8 +341,18 @@
 		var(--widget-accordion-ease);
 }
 
+/* biome-ignore lint/nursery/noUnknownPseudoClass: <explanation> */
+:global(.dark) .switch {
+	background-color: var(--widget-accordion-background-hover-dark);
+}
+
 .switch[data-state="checked"] {
 	background-color: var(--widget-accordion-focus-ring);
+}
+
+/* biome-ignore lint/nursery/noUnknownPseudoClass: <explanation> */
+:global(.dark) .switch[data-state="checked"] {
+	background-color: var(--widget-accordion-focus-ring-dark);
 }
 
 .switchThumb {

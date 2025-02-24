@@ -22,6 +22,7 @@
 
 	/* Shadow */
 	--banner-shadow: 0 16px 32px -12px rgba(14, 18, 27, 0.1);
+	--banner-shadow-dark: 0 16px 32px -12px rgba(14, 18, 27, 0.1);
 
 	/* Colors */
 	--banner-background-color: hsl(0 0% 100%);
@@ -38,17 +39,6 @@
 	--banner-description-color-dark: hsl(0 0% 60%);
 	--banner-overlay-background-color: hsl(0 0% 0% / 0.5);
 	--banner-overlay-background-color-dark: hsl(0 0% 0% / 0.5);
-}
-
-/* biome-ignore lint/nursery/noUnknownPseudoClass: it is known */
-:global(.dark) {
-	--banner-background-color: var(--banner-background-color-dark);
-	--banner-border-color: var(--banner-border-color-dark);
-	--banner-footer-background-color: var(--banner-footer-background-color-dark);
-	--banner-title-color: var(--banner-title-color-dark);
-	--banner-description-color: var(--banner-description-color-dark);
-	--banner-overlay-background-color: var(--banner-overlay-background-color-dark);
-	--banner-text-color: var(--banner-text-color-dark);
 }
 
 .root {
@@ -100,6 +90,13 @@
 	overflow: hidden;
 }
 
+/* biome-ignore lint/nursery/noUnknownPseudoClass: <explanation> */
+:global(.dark) .card {
+	background-color: var(--banner-background-color-dark);
+	border-color: var(--banner-border-color-dark);
+	box-shadow: var(--banner-shadow-dark);
+}
+
 /* Animation states */
 .card[data-state="open"] {
 	animation: var(--banner-entry-animation);
@@ -113,6 +110,11 @@
 .card > :not([hidden]) ~ :not([hidden]) {
 	border-top-width: var(--banner-border-width);
 	border-color: var(--banner-border-color);
+}
+
+/* biome-ignore lint/nursery/noUnknownPseudoClass: <explanation> */
+:global(.dark) .card > :not([hidden]) ~ :not([hidden]) {
+	border-color: var(--banner-border-color-dark);
 }
 
 /* Focus styles */
@@ -171,6 +173,11 @@
 	color: var(--banner-text-color);
 }
 
+/* biome-ignore lint/nursery/noUnknownPseudoClass: <explanation> */
+:global(.dark) .header {
+	color: var(--banner-text-color-dark);
+}
+
 @media (min-width: 640px) {
 	.header {
 		padding: 1.5rem;
@@ -195,6 +202,11 @@
 	background-color: var(--banner-footer-background-color);
 }
 
+/* biome-ignore lint/nursery/noUnknownPseudoClass: <explanation> */
+:global(.dark) .footer {
+	background-color: var(--banner-footer-background-color-dark);
+}
+
 @media (min-width: 640px) {
 	.footer {
 		flex-direction: row;
@@ -216,6 +228,11 @@
 	color: var(--banner-description-color);
 }
 
+/* biome-ignore lint/nursery/noUnknownPseudoClass: <explanation> */
+:global(.dark) .description {
+	color: var(--banner-description-color-dark);
+}
+
 .title {
 	font-size: 1rem;
 	line-height: 1.5rem;
@@ -224,9 +241,19 @@
 	color: var(--banner-title-color);
 }
 
+/* biome-ignore lint/nursery/noUnknownPseudoClass: <explanation> */
+:global(.dark) .title {
+	color: var(--banner-title-color-dark);
+}
+
 .overlay {
 	position: fixed;
 	inset: 0px;
 	background-color: var(--banner-overlay-background-color);
 	z-index: 999999997;
+}
+
+/* biome-ignore lint/nursery/noUnknownPseudoClass: <explanation> */
+:global(.dark) .overlay {
+	background-color: var(--banner-overlay-background-color-dark);
 }

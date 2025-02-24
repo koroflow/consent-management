@@ -19,8 +19,8 @@
 	--button-text-dark: hsla(0, 0%, 70%, 1);
 	--button-text-hover: hsla(0, 0%, 9%, 1);
 	--button-text-hover-dark: hsla(0, 0%, 90%, 1);
-	--button-bg: hsla(0, 0%, 100%, 1);
-	--button-bg-dark: hsla(0, 0%, 10%, 1);
+	--button-background-color: hsla(0, 0%, 100%, 1);
+	--button-background-color-dark: hsla(0, 0%, 10%, 1);
 	--button-border: hsla(0, 0%, 36%, 1);
 	--button-border-dark: hsla(220, 15%, 30%, 1);
 	--button-hover-overlay: hsla(220, 15%, 20%, 0.05);
@@ -64,28 +64,6 @@
 	--button-shadow-neutral-hover-dark: none;
 }
 
-/* biome-ignore lint/nursery/noUnknownPseudoClass: it is known */
-:global(.dark) {
-	--button-primary: var(--button-primary-dark);
-	--button-primary-hover: var(--button-primary-hover-dark);
-
-	--button-neutral: var(--button-neutral-dark);
-	--button-neutral-hover: var(--button-neutral-hover-dark);
-
-	--button-text: var(--button-text-dark);
-	--button-text-hover: var(--button-text-hover-dark);
-	--button-bg: var(--button-bg-dark);
-	--button-border: var(--button-border-dark);
-	--button-hover-overlay: var(--button-hover-overlay-dark);
-
-	--button-box-shadow: var(--button-box-shadow-dark);
-	--button-shadow-primary: var(--button-shadow-primary-dark);
-	--button-shadow-neutral: var(--button-shadow-neutral-dark);
-
-	--button-shadow-primary-hover: var(--button-shadow-primary-hover-dark);
-	--button-shadow-neutral-hover: var(--button-shadow-neutral-hover-dark);
-}
-
 /* Base Button Styles */
 .button {
 	display: inline-flex;
@@ -102,6 +80,11 @@
 	line-height: var(--button-line-height);
 	color: var(--button-text);
 	font-family: var(--button-font);
+}
+
+/* biome-ignore lint/nursery/noUnknownPseudoClass: <explanation> */
+:global(.dark) .button {
+	color: var(--button-text-dark);
 }
 
 .button:disabled {
@@ -137,17 +120,35 @@
 /* Primary Button Variants */
 .button-primary-filled {
 	background-color: var(--button-primary);
-	color: var(--button-bg);
+	color: var(--button-background-color);
+}
+
+/* biome-ignore lint/nursery/noUnknownPseudoClass: <explanation> */
+:global(.dark) .button-primary-filled {
+	background-color: var(--button-primary-dark);
+	color: var(--button-background-color-dark);
 }
 
 .button-primary-filled:hover:not(:disabled) {
 	background-color: var(--button-primary-hover);
 }
 
+/* biome-ignore lint/nursery/noUnknownPseudoClass: <explanation> */
+:global(.dark) .button-primary-filled:hover:not(:disabled) {
+	background-color: var(--button-primary-hover-dark);
+}
+
 .button-primary-stroke {
-	background-color: var(--button-bg);
+	background-color: var(--button-background-color);
 	color: var(--button-primary);
 	box-shadow: var(--button-shadow-primary);
+}
+
+/* biome-ignore lint/nursery/noUnknownPseudoClass: <explanation> */
+:global(.dark) .button-primary-stroke {
+	background-color: var(--button-background-color-dark);
+	color: var(--button-primary-dark);
+	box-shadow: var(--button-shadow-primary-dark);
 }
 
 .button-primary-stroke:hover:not(:disabled) {
@@ -155,36 +156,88 @@
 	box-shadow: var(--button-shadow-primary-hover);
 }
 
+/* biome-ignore lint/nursery/noUnknownPseudoClass: <explanation> */
+:global(.dark) .button-primary-stroke:hover:not(:disabled) {
+	background-color: var(--button-primary-hover-dark);
+	box-shadow: var(--button-shadow-primary-hover-dark);
+}
+
 .button-primary-lighter {
 	background-color: color-mix(in srgb, var(--button-primary) 10%, transparent);
 	color: var(--button-primary);
+}
+
+/* biome-ignore lint/nursery/noUnknownPseudoClass: <explanation> */
+:global(.dark) .button-primary-lighter {
+	background-color: color-mix(
+		in srgb,
+		var(--button-primary-dark) 10%,
+		transparent
+	);
+	color: var(--button-primary-dark);
 }
 
 .button-primary-lighter:hover:not(:disabled) {
 	background-color: color-mix(in srgb, var(--button-primary) 20%, transparent);
 }
 
+/* biome-ignore lint/nursery/noUnknownPseudoClass: <explanation> */
+:global(.dark) .button-primary-lighter:hover:not(:disabled) {
+	background-color: color-mix(
+		in srgb,
+		var(--button-primary-dark) 20%,
+		transparent
+	);
+}
+
 .button-primary-ghost {
 	color: var(--button-primary);
+}
+
+/* biome-ignore lint/nursery/noUnknownPseudoClass: <explanation> */
+:global(.dark) .button-primary-ghost {
+	color: var(--button-primary-dark);
 }
 
 .button-primary-ghost:hover:not(:disabled) {
 	background-color: var(--button-hover-overlay);
 }
 
+/* biome-ignore lint/nursery/noUnknownPseudoClass: <explanation> */
+:global(.dark) .button-primary-ghost:hover:not(:disabled) {
+	background-color: var(--button-hover-overlay-dark);
+}
+
 /* Neutral Button Variants */
 .button-neutral-filled {
 	background-color: var(--button-neutral);
-	color: var(--button-bg);
+	color: var(--button-background-color);
+}
+
+/* biome-ignore lint/nursery/noUnknownPseudoClass: <explanation> */
+:global(.dark) .button-neutral-filled {
+	background-color: var(--button-neutral-dark);
+	color: var(--button-background-color-dark);
 }
 
 .button-neutral-filled:hover:not(:disabled) {
 	background-color: var(--button-neutral-hover);
 }
 
+/* biome-ignore lint/nursery/noUnknownPseudoClass: <explanation> */
+:global(.dark) .button-neutral-filled:hover:not(:disabled) {
+	background-color: var(--button-neutral-hover-dark);
+}
+
 .button-neutral-stroke {
-	background-color: var(--button-bg);
+	background-color: var(--button-background-color);
 	box-shadow: var(--button-shadow-neutral);
+}
+
+/* biome-ignore lint/nursery/noUnknownPseudoClass: <explanation> */
+:global(.dark) .button-neutral-stroke {
+	background-color: var(--button-background-color-dark);
+	box-shadow: var(--button-shadow-neutral-dark);
 }
 
 .button-neutral-stroke:hover:not(:disabled) {
@@ -193,21 +246,56 @@
 	color: var(--button-text-hover);
 }
 
+/* biome-ignore lint/nursery/noUnknownPseudoClass: <explanation> */
+:global(.dark) .button-neutral-stroke:hover:not(:disabled) {
+	box-shadow: var(--button-shadow-neutral-hover-dark);
+	color: var(--button-text-hover-dark);
+}
+
 .button-neutral-lighter {
 	background-color: color-mix(in srgb, var(--button-neutral) 10%, transparent);
 	color: var(--button-neutral);
+}
+
+/* biome-ignore lint/nursery/noUnknownPseudoClass: <explanation> */
+:global(.dark) .button-neutral-lighter {
+	background-color: color-mix(
+		in srgb,
+		var(--button-neutral-dark) 10%,
+		transparent
+	);
+	color: var(--button-neutral-dark);
 }
 
 .button-neutral-lighter:hover:not(:disabled) {
 	background-color: color-mix(in srgb, var(--button-neutral) 20%, transparent);
 }
 
+/* biome-ignore lint/nursery/noUnknownPseudoClass: <explanation> */
+:global(.dark) .button-neutral-lighter:hover:not(:disabled) {
+	background-color: color-mix(
+		in srgb,
+		var(--button-neutral-dark) 20%,
+		transparent
+	);
+}
+
 .button-neutral-ghost {
 	color: var(--button-neutral);
 }
 
+/* biome-ignore lint/nursery/noUnknownPseudoClass: <explanation> */
+:global(.dark) .button-neutral-ghost {
+	color: var(--button-neutral-dark);
+}
+
 .button-neutral-ghost:hover:not(:disabled) {
 	background-color: var(--button-hover-overlay);
+}
+
+/* biome-ignore lint/nursery/noUnknownPseudoClass: <explanation> */
+:global(.dark) .button-neutral-ghost:hover:not(:disabled) {
+	background-color: var(--button-hover-overlay-dark);
 }
 
 /* Icon Styles */

@@ -40,6 +40,7 @@ type CardCSSVariables = {
 	'--banner-background-color': string;
 	'--banner-background-color-dark': string;
 	'--banner-shadow': string;
+	'--banner-shadow-dark': string;
 	'--banner-entry-animation': string;
 	'--banner-exit-animation': string;
 };

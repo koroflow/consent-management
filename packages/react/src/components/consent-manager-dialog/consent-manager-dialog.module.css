@@ -59,19 +59,6 @@
 	--dialog-branding-icon-width: auto;
 }
 
-/* biome-ignore lint/nursery/noUnknownPseudoClass: it is known */
-:global(.dark) {
-	--dialog-stroke-color: var(--dialog-stroke-color-dark);
-	--dialog-border-color: var(--dialog-border-color-dark);
-	--dialog-background-color: var(--dialog-background-color-dark);
-	--dialog-foreground-color: var(--dialog-foreground-color-dark);
-	--dialog-muted-color: var(--dialog-muted-color-dark);
-	--dialog-overlay-background-color: var(--dialog-overlay-background-color-dark);
-	--dialog-title-color: var(--dialog-title-color-dark);
-	--dialog-description-color: var(--dialog-description-color-dark);
-	--dialog-link-text-color: var(--dialog-link-text-color-dark);
-}
-
 .root {
 	isolation: isolate;
 	font-family: var(--dialog-font-family);
@@ -146,12 +133,23 @@
 	border-top: solid 1px var(--dialog-stroke-color);
 }
 
+/* biome-ignore lint/nursery/noUnknownPseudoClass: <explanation> */
+:global(.dark) .footer {
+	border-color: var(--dialog-stroke-color-dark);
+}
+
 .overlay {
 	color: var(--dialog-link-text-color);
 	position: fixed;
 	inset: 0px;
 	background-color: var(--dialog-overlay-background-color);
 	z-index: var(--dialog-overlay-z-index);
+}
+
+/* biome-ignore lint/nursery/noUnknownPseudoClass: <explanation> */
+:global(.dark) .overlay {
+	background-color: var(--dialog-overlay-background-color-dark);
+	color: var(--dialog-link-text-color-dark);
 }
 
 .card {
@@ -162,6 +160,13 @@
 	color: var(--dialog-foreground-color);
 	box-shadow: var(--dialog-card-shadow);
 	overflow: hidden;
+}
+
+/* biome-ignore lint/nursery/noUnknownPseudoClass: <explanation> */
+:global(.dark) .card {
+	background-color: var(--dialog-background-color-dark);
+	color: var(--dialog-foreground-color-dark);
+	border-color: var(--dialog-border-color-dark);
 }
 
 .header {
@@ -189,6 +194,11 @@
 	line-height: var(--dialog-description-line-height);
 }
 
+/* biome-ignore lint/nursery/noUnknownPseudoClass: <explanation> */
+:global(.dark) .description {
+	color: var(--dialog-muted-color-dark);
+}
+
 .content {
 	padding: var(--dialog-card-padding);
 	padding-top: 0;
@@ -204,4 +214,9 @@
 	padding-top: var(--dialog-footer-padding-top);
 	border-top: var(--dialog-border-width) var(--dialog-border-style)
 		var(--dialog-stroke-color);
+}
+
+/* biome-ignore lint/nursery/noUnknownPseudoClass: <explanation> */
+:global(.dark) .footer {
+	border-color: var(--dialog-stroke-color-dark);
 }
