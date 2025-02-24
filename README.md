@@ -70,7 +70,7 @@ Prerequisites:
 ```bash
 # Clone repository
 git clone https://github.com/c15t/c15t.git
-cd c1t5
+cd c15t
 
 # Install dependencies
 pnpm install
