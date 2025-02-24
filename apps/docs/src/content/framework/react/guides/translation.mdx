@@ -17,7 +17,7 @@ The translation system is built into the core package and is used by all compone
 To provide your own translations, pass them through the `ConsentManagerProvider` configuration:
 
 ```tsx
-  import { ConsentManagerProvider } from '@koroflow/elements';
+  import { ConsentManagerProvider } from '@c15t/react';
 
 function App() {
   return (
@@ -130,7 +130,7 @@ translationConfig: {
 If you're building custom components that need to access translations, you can use the `useTranslations` hook:
 
 ```tsx
-import { useTranslations } from '@koroflow/elements';
+import { useTranslations } from '@c15t/react';
 
 function CustomComponent() {
   const translations = useTranslations();

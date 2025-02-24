@@ -18,7 +18,7 @@ By contributing to c15t.com, you agree that your contributions will be licensed 
 
 ### Before You Start
 
-- Check existing [issues](https://github.com/koroflow/consent-management/issues) and [PRs](https://github.com/koroflow/consent-management/pulls) first
+- Check existing [issues](https://github.com/c15t/c15t/issues) and [PRs](https://github.com/c15t/c15t/pulls) first
 - **Always create an issue before starting development**
 - Follow our PR template carefully
 
@@ -70,8 +70,8 @@ We leverage several automated workflows to ensure code quality:
 1. Fork the repo and create your branch from `main`:
 
    ```sh
-   git clone https://github.com/your-username/koroflow.git
-   cd koroflow
+   git clone https://github.com/your-username/c15t.git
+   cd c15t
    git switch -c my-feature
    ```
 

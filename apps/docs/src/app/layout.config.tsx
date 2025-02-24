@@ -16,25 +16,11 @@ import { LogoWithBadge } from '~/components/logo';
 export const linkItems: LinkItemType[] = [
 	{
 		type: 'icon',
-		url: 'https://github.com/koroflow/consent-management',
+		url: 'https://github.com/c15t/c15t',
 		text: 'Github',
 		icon: <GithubIcon className="h-5 w-5" />,
 		external: true,
 	},
-	// {
-	// 	type: 'icon',
-	// 	url: 'https://x.com/koroflow',
-	// 	text: 'X',
-	// 	icon: <XIcon className="h-5 w-5" />,
-	// 	external: true,
-	// },
-	// {
-	// 	type: 'icon',
-	// 	url: 'https://bsky.app/profile/koroflow.bsky.social',
-	// 	text: 'BlueSky',
-	// 	icon: <BlueSkyIcon className="h-5 w-5" />,
-	// 	external: true,
-	// },
 ];
 
 /**
