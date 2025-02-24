@@ -4,7 +4,7 @@ export const pages = {
 import { useConsentManager } from '@c15t/react';
 import * as ConsentManagerWidget from '@c15t/react/consent-manager-widget';
 
-export function CustomDialog() {
+export function CustomWidget() {
 	const { hasConsented } = useConsentManager();
 
 	// If the user has consented, don't show the dialog
@@ -58,7 +58,8 @@ export default function App() {
         </ConsentManagerProvider>
     );
 }`,
-	'ExampleContent.tsx': `import { useConsentManager } from '@c15t/react';
+	'ExampleContent.tsx': `
+import { useConsentManager } from '@c15t/react';
 import { useEffect } from 'react';
 import { setupDarkMode } from './lib/utils';
 

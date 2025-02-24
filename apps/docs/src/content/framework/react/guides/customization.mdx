@@ -24,16 +24,16 @@ Let's start with a simple example of customizing a Cookie Banner:
 ```tsx
 <CookieBanner 
   theme={{
-    'cookie-banner.root': 'bg-white p-4 rounded-lg shadow-lg',
-    'cookie-banner.header.title': 'text-xl font-bold text-gray-900',
-    'cookie-banner.header.description': 'text-sm text-gray-600 mt-2',
-    'cookie-banner.footer': 'mt-4 flex justify-end gap-2'
+    'banner.root': 'bg-white p-4 rounded-lg shadow-lg',
+    'banner.header.title': 'text-xl font-bold text-gray-900',
+    'banner.header.description': 'text-sm text-gray-600 mt-2',
+    'banner.footer': 'mt-4 flex justify-end gap-2'
   }}
 />
 ```
 
 Every theme key follows a predictable pattern:
-1. The component name (e.g., 'cookie-banner' or 'consent-manager-widget')
+1. The component name, which will be banner, widget, dialog. 
 2. The element path (e.g., 'header.title' or 'footer.accept-button')
 3. Optional state variations (e.g., 'switch.thumb.checked')
 
@@ -46,7 +46,7 @@ The simplest approach is using class names:
 
 ```tsx
 theme={{
-  'cookie-banner.root': 'my-custom-class another-class'
+  'banner.root': 'my-custom-class another-class'
 }}
 ```
 
@@ -55,7 +55,7 @@ For inline styles, use a style object:
 
 ```tsx
 theme={{
-  'cookie-banner.root': {
+  'banner.root': {
     style: {
       backgroundColor: 'white',
       padding: '1rem'
@@ -64,12 +64,27 @@ theme={{
 }}
 ```
 
+### CSS Variables
+CSS Variables allow you to customize the component using the component's CSS variables.
+
+```tsx
+theme={{
+  'banner.root': {
+    style: {
+      '--banner-background-color': 'white',
+      '--banner-background-color-dark': 'black',
+      '--banner-border-radius': '0.5rem',
+      '--banner-border-color': '1px solid #e0e0e0'
+    }
+  }
+}}
+
 ### Combined Approach
 You can use both classes and inline styles together:
 
 ```tsx
 theme={{
-  'cookie-banner.root': {
+  'banner.root': {
     className: 'my-custom-class',
     style: {
       backgroundColor: 'white'
@@ -85,12 +100,12 @@ theme={{
 ```tsx
 // Example of nested component styling
 const theme = {
-  'consent-manager-widget.root': 'container mx-auto',
-  'consent-manager-widget.accordion': 'space-y-2',
-  'consent-manager-widget.accordion.item': 'border rounded-sm',
-  'consent-manager-widget.accordion.trigger': 'p-4 hover:bg-gray-50',
-  'consent-manager-widget.accordion.trigger-inner': '',
-  'consent-manager-widget.accordion.content': 'p-4 bg-gray-50'
+  'widget.root': 'container mx-auto',
+  'widget.accordion': 'space-y-2',
+  'widget.accordion.item': 'border rounded-sm',
+  'widget.accordion.trigger': 'p-4 hover:bg-gray-50',
+  'widget.accordion.trigger-inner': '',
+  'widget.accordion.content': 'p-4 bg-gray-50'
 }
 ```
 
@@ -133,8 +148,8 @@ import type { CookieBannerTheme } from '@c15t/react'
 
 // TypeScript will catch invalid theme keys
 const theme: CookieBannerTheme = {
-  'cookie-banner.root': 'valid-key',
-  'cookie-banner.invalid': 'TypeScript error!' // Error: invalid key
+  'banner.root': 'valid-key',
+  'banner.invalid': 'TypeScript error!' // Error: invalid key
 }
 ```
 
@@ -144,8 +159,8 @@ You can use media queries and responsive classes just like you would in regular 
 
 ```tsx
 theme={{
-  'cookie-banner.root': 'p-4 md:p-6 lg:p-8',
-  'cookie-banner.header.title': {
+  'banner.root': 'p-4 md:p-6 lg:p-8',
+  'banner.header.title': {
     style: {
       fontSize: 'clamp(1rem, 2vw, 1.5rem)'
     }
@@ -160,19 +175,19 @@ Here are some effective patterns for common styling needs:
 ### Creating a Clean, Modern Look
 ```tsx
 const modernTheme = {
-  'cookie-banner.root': 'bg-white shadow-lg rounded-lg mx-4 sm:mx-auto max-w-2xl',
-  'cookie-banner.header.title': 'text-lg font-semibold text-gray-900',
-  'cookie-banner.header.description': 'text-sm text-gray-600 mt-2',
-  'cookie-banner.footer': 'mt-6 flex flex-col sm:flex-row justify-end gap-3'
+  'banner.root': 'bg-white shadow-lg rounded-lg mx-4 sm:mx-auto max-w-2xl',
+  'banner.header.title': 'text-lg font-semibold text-gray-900',
+  'banner.header.description': 'text-sm text-gray-600 mt-2',
+  'banner.footer': 'mt-6 flex flex-col sm:flex-row justify-end gap-3'
 }
 ```
 
 ### Building Dark Mode Support
 ```tsx
 const darkModeTheme = {
-  'cookie-banner.root': 'bg-gray-900 dark:bg-gray-800',
-  'cookie-banner.header.title': 'text-white dark:text-gray-100',
-  'cookie-banner.header.description': 'text-gray-300 dark:text-gray-400'
+  'banner.root': 'bg-gray-900 dark:bg-gray-800',
+  'banner.header.title': 'text-white dark:text-gray-100',
+  'banner.header.description': 'text-gray-300 dark:text-gray-400'
 }
 ```
 

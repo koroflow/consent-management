@@ -1,5 +1,6 @@
 export const pages = {
-	'App.tsx': `import { ConsentManagerProvider, ConsentManagerDialog, CookieBanner } from '@c15t/react';
+	'App.tsx': `
+import { ConsentManagerProvider, ConsentManagerDialog, CookieBanner } from '@c15t/react';
 import { ExampleContent } from './ExampleContent';
 import { clearLocalStorage } from './lib/utils';
 import buttons from './buttons.module.css';
@@ -12,12 +13,13 @@ export default function App() {
             initialGdprTypes={['necessary', 'marketing']}
         >
           <CookieBanner 							
-            theme={{
-              'cookie-banner.footer.accept-button': {
+				    theme={{
+              'banner.footer.accept-button': {
                 style: {
-                  '--button-primary-color': 'hsl(172 72.2% 48%)',
-                  '--button-primary-dark': 'hsl(172 70.7% 55.9%)',
-                  '--button-primary-alpha-10': 'hsl(172 72.2% 10%)',
+                  '--button-background-color-dark': '#fff',
+                  '--button-shadow-primary-dark': 'none',
+                  '--button-primary-dark': 'black',
+                  '--button-primary': 'red',
                 },
               },
             }}

@@ -14,7 +14,7 @@ export default function App() {
           <CookieBanner 							
             noStyle
             theme={{
-              'cookie-banner.root': {
+              'banner.root': {
                 style: {
                   position: 'fixed',
                   bottom: 0,
@@ -23,28 +23,28 @@ export default function App() {
                   backgroundColor: 'rgba(255, 255, 255, 1.0)',
                 },
               },
-              'cookie-banner.card': {
+              'banner.card': {
                 style: {
                   maxWidth: '32rem',
                   margin: 'auto',
                   borderRadius: '0.375rem',
                 },
               },
-              'cookie-banner.header.title': {
+              'banner.header.title': {
                 style: {
                   fontSize: '1.25rem',
                   fontWeight: 'semibold',
                   color: '#1a202c',
                 },
               },
-              'cookie-banner.header.description': {
+              'banner.header.description': {
                 style: {
                   marginTop: '0.5rem',
                   fontSize: '0.875rem',
                   color: '#637381',
                 },
               },
-              'cookie-banner.footer': {
+              'banner.footer': {
                 style: {
                   display: 'flex',
                   justifyContent: 'flex-end',
@@ -52,7 +52,7 @@ export default function App() {
                   marginTop: '0.5rem',
                 },
               },
-              'cookie-banner.footer.sub-group': {
+              'banner.footer.sub-group': {
                 style: {
                   display: 'flex',
                   flexDirection: 'row',
@@ -60,9 +60,9 @@ export default function App() {
                 },
               },
               // Using CSS Modules
-              'cookie-banner.footer.reject-button': buttons.reject,					
-              'cookie-banner.footer.accept-button': buttons.accept,           
-              'cookie-banner.footer.customize-button': buttons.customize
+              'banner.footer.reject-button': buttons.reject,					
+              'banner.footer.accept-button': buttons.accept,           
+              'banner.footer.customize-button': buttons.customize
         }}
         />
         <ConsentManagerDialog />
