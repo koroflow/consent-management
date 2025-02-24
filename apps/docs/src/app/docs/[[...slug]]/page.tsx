@@ -13,8 +13,6 @@ import { notFound } from 'next/navigation';
 import type { ComponentType } from 'react';
 import { Card } from '~/components/docs/card';
 import { CodeBlock } from '~/components/docs/codeblock';
-import { Installer } from '~/components/docs/installer';
-import { PoweredBy } from '~/components/docs/powered-by';
 import { Preview } from '~/components/docs/preview';
 import { Tab, Tabs } from '~/components/docs/tabs';
 import { docsSource } from '~/lib/source';
@@ -27,9 +25,7 @@ const components = {
 	AutoTypeTable,
 	Tabs,
 	Tab,
-	Installer,
 	Preview,
-	PoweredBy,
 	Steps,
 	Step,
 	Card,

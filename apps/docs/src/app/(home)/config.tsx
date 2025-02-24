@@ -23,8 +23,7 @@ export const siteConfig = {
 	],
 	links: {
 		email: 'support@c15t.com',
-		twitter: 'https://x.com/koroflow',
-		github: 'https://github.com/koroflow/consent-management',
+		github: 'https://github.com/c15t/c15t',
 	},
 	hero: {
 		title: 'Consent Management Redefined',
@@ -87,10 +86,6 @@ export const siteConfig = {
 				items: [
 					{ text: 'Documentation', url: '/docs' },
 					{ text: 'Components', url: '/docs/framework/react' },
-					{
-						text: 'Privacy Regulations',
-						url: 'https://regulations.koroflow.com',
-					},
 				],
 			},
 			{
@@ -98,10 +93,9 @@ export const siteConfig = {
 				items: [
 					{
 						text: 'GitHub',
-						url: 'https://github.com/koroflow/consent-management',
+						url: 'https://github.com/c15t/c15t',
 						external: true,
 					},
-					// { text: 'Twitter', url: 'https://x.com/koroflow', external: true },
 					{
 						text: 'Contact',
 						url: 'mailto:support@c15t.com',
