@@ -28,7 +28,7 @@ import { mergeStyles } from '~/utils/merge-styles';
  * @example
  * ```tsx
  * const MyComponent = () => {
- *   const styles = useStyles('cookie-banner.root', {
+ *   const styles = useStyles('root', {
  *     className: 'custom-class',
  *     style: { backgroundColor: 'white' }
  *   });
