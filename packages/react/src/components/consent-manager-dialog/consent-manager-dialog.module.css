@@ -110,6 +110,11 @@
 	text-decoration: none;
 }
 
+/* biome-ignore lint/nursery/noUnknownPseudoClass: <explanation> */
+:global(.dark) .branding {
+	color: var(--dialog-foreground-color-dark);
+}
+
 .branding svg {
 	width: var(--dialog-branding-icon-width);
 	height: var(--dialog-branding-icon-height);
