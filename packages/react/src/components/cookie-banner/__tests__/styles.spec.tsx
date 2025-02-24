@@ -1,6 +1,7 @@
 import { test } from 'vitest';
 import { CookieBanner } from '~/components/cookie-banner/cookie-banner';
 import type { ThemeValue } from '~/types/theme';
+import type { CookieBannerTheme } from '../theme';
 import testComponentStyles from './utils';
 
 type TestCase = {
@@ -160,15 +161,15 @@ test('No style prop removes default styles but keeps custom classNames', async (
 });
 
 test('Theme prop handles mixed format (string and object) correctly', async () => {
-	const mixedTheme: Record<string, ThemeValue> = {
-		'cookie-banner.root': {
+	const mixedTheme: CookieBannerTheme = {
+		'banner.root': {
 			className: 'custom-root',
 			style: {
 				backgroundColor: 'rgb(255, 255, 255)',
 				padding: '16px',
 			},
 		},
-		'cookie-banner.header.title': 'custom-title',
+		'banner.header.title': 'custom-title',
 	};
 
 	const test = <CookieBanner theme={mixedTheme} />;
@@ -195,11 +196,13 @@ test('Theme prop handles mixed format (string and object) correctly', async () =
 });
 
 test('Theme prop handles edge cases gracefully', async () => {
-	const edgeCaseTheme: Record<string, ThemeValue> = {
-		'cookie-banner.root': '',
-		'cookie-banner.title': '',
-		'cookie-banner.description': '',
-		'cookie-banner.footer': {
+	const edgeCaseTheme: CookieBannerTheme = {
+		'banner.root': '',
+		'banner.card': '',
+		'banner.header.root': '',
+		'banner.header.title': '',
+		'banner.header.description': '',
+		'banner.footer': {
 			className: '',
 			style: {
 				margin: '0',

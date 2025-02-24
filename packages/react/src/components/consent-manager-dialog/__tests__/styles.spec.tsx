@@ -139,15 +139,15 @@ test('No style prop removes default styles but keeps custom classNames', async (
 });
 
 test('Theme prop handles mixed format (string and object) correctly', async () => {
-	const mixedTheme: Record<string, ThemeValue> = {
-		'consent-manager-dialog.root': {
+	const mixedTheme: ConsentManagerDialogTheme = {
+		'dialog.root': {
 			className: 'custom-dialog-root',
 			style: {
 				backgroundColor: 'rgb(255, 255, 255)',
 				padding: '16px',
 			},
 		},
-		'consent-manager-dialog.overlay': 'custom-dialog-overlay',
+		'dialog.overlay': 'custom-dialog-overlay',
 	};
 
 	const test = <ConsentManagerDialog theme={mixedTheme} open />;
@@ -174,10 +174,10 @@ test('Theme prop handles mixed format (string and object) correctly', async () =
 });
 
 test('Theme prop handles edge cases gracefully', async () => {
-	const edgeCaseTheme: Record<string, ThemeValue> = {
-		'consent-manager-dialog.root': '',
-		'consent-manager-dialog.overlay': '',
-		'consent-manager-dialog.content': {
+	const edgeCaseTheme: ConsentManagerDialogTheme = {
+		'dialog.root': '',
+		'dialog.overlay': '',
+		'dialog.content': {
 			className: '',
 			style: {
 				margin: '0',

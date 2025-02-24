@@ -1,6 +1,7 @@
 import { test } from 'vitest';
 import { ConsentManagerWidget } from '~/components/consent-manager-widget/consent-manager-widget';
 import type { ThemeValue } from '~/types/theme';
+import type { ConsentManagerWidgetTheme } from '../theme';
 import testComponentStyles from './utils';
 
 type ComponentTestCase = {
@@ -150,15 +151,15 @@ test('No style prop removes default styles but keeps custom classNames', async (
 });
 
 test('Theme prop handles mixed format (string and object) correctly', async () => {
-	const mixedTheme: Record<string, ThemeValue> = {
-		'consent-manager-widget.root': {
+	const mixedTheme: ConsentManagerWidgetTheme = {
+		'widget.root': {
 			className: 'custom-root',
 			style: {
 				backgroundColor: 'rgb(255, 255, 255)',
 				padding: '16px',
 			},
 		},
-		'consent-manager-widget.accordion.trigger': 'custom-accordion-trigger',
+		'widget.accordion.trigger': 'custom-accordion-trigger',
 	};
 
 	const test = <ConsentManagerWidget theme={mixedTheme} />;
@@ -185,10 +186,10 @@ test('Theme prop handles mixed format (string and object) correctly', async () =
 });
 
 test('Theme prop handles edge cases gracefully', async () => {
-	const edgeCaseTheme: Record<string, ThemeValue> = {
-		'consent-manager-widget.root': '',
-		'consent-manager-widget.accordion': '',
-		'consent-manager-widget.footer': {
+	const edgeCaseTheme: ConsentManagerWidgetTheme = {
+		'widget.root': '',
+		'widget.accordion': '',
+		'widget.footer': {
 			className: '',
 			style: {
 				margin: '0',
