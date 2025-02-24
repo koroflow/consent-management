@@ -26,8 +26,8 @@ const config = {
 			},
 			{
 				source: '/discord',
-				destination: 'https://discord.gg/3NbHyKB94u',
-				permanent: true,
+				destination: 'https://discord.gg/nPJjrw55TZ',
+				permanent: false,
 			},
 			{
 				source: '/docs/framework/react/consent-solution',
