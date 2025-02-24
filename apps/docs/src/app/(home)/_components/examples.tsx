@@ -40,9 +40,10 @@ function Layout({ children }: { children: ReactNode }) {
 		code: (
 			<CodeBlock
 				lang="jsx"
-				code={`import { ConsentManagerProvider,ConsentManagerDialog,CookieBanner } from "@c15t/react"
-
-const modernTheme = {
+				code={`
+import { ConsentManagerProvider, ConsentManagerDialog, CookieBanner, type CookieBannerTheme } from "@c15t/react"
+ 
+const modernTheme: CookieBannerTheme = {
   'banner.root':
     'fixed bottom-0 w-full p-4 bg-white backdrop-blur-sm z-50',
   'banner.card': 'max-w-2xl mx-auto rounded-lg',
