@@ -1,7 +1,7 @@
 import { createEndpoint } from 'better-call';
 
-export const showCookieBanner = createEndpoint(
-	'/show-cookie-banner',
+export const showConsentBanner = createEndpoint(
+	'/show-consent-banner',
 	{
 		method: 'GET',
 		metadata: {
