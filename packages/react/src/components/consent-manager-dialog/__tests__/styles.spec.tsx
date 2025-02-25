@@ -52,6 +52,7 @@ test('Theme prop applies string classnames to all components', async () => {
 	const test = (
 		<ConsentManagerDialog
 			open
+			scrollLock
 			theme={ALL_COMPONENTS.reduce(
 				(acc, { themeKey, styles }) => {
 					acc[themeKey] = styles;
@@ -88,6 +89,7 @@ test('Theme prop supports object format with className and style for all compone
 	const test = (
 		<ConsentManagerDialog
 			open
+			scrollLock
 			theme={testCases.reduce(
 				(acc, { themeKey, className, style }) => {
 					acc[themeKey] = {
@@ -116,6 +118,7 @@ test('Theme prop supports object format with className and style for all compone
 test('No style prop removes default styles but keeps custom classNames', async () => {
 	const test = (
 		<ConsentManagerDialog
+			scrollLock
 			noStyle
 			open
 			theme={ALL_COMPONENTS.reduce(
@@ -150,7 +153,7 @@ test('Theme prop handles mixed format (string and object) correctly', async () =
 		'dialog.overlay': 'custom-dialog-overlay',
 	};
 
-	const test = <ConsentManagerDialog theme={mixedTheme} open />;
+	const test = <ConsentManagerDialog scrollLock theme={mixedTheme} open />;
 
 	await testComponentStyles({
 		component: test,
@@ -186,7 +189,7 @@ test('Theme prop handles edge cases gracefully', async () => {
 		},
 	};
 
-	const test = <ConsentManagerDialog open theme={edgeCaseTheme} />;
+	const test = <ConsentManagerDialog scrollLock open theme={edgeCaseTheme} />;
 
 	await testComponentStyles({
 		component: test,

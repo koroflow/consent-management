@@ -76,6 +76,7 @@ const ALL_COMPONENTS: ComponentTestCase[] = [
 test('Theme prop applies string classnames to all components', async () => {
 	const test = (
 		<CookieBanner
+			scrollLock
 			theme={ALL_COMPONENTS.reduce(
 				(acc, { themeKey, styles }) => {
 					acc[themeKey] = styles;
@@ -111,6 +112,7 @@ test('Theme prop supports object format with className and style for all compone
 
 	const test = (
 		<CookieBanner
+			scrollLock
 			theme={testCases.reduce(
 				(acc, { themeKey, className, style }) => {
 					acc[themeKey] = {
@@ -139,6 +141,7 @@ test('Theme prop supports object format with className and style for all compone
 test('No style prop removes default styles but keeps custom classNames', async () => {
 	const test = (
 		<CookieBanner
+			scrollLock
 			noStyle
 			theme={ALL_COMPONENTS.reduce(
 				(acc, { themeKey, styles }) => {
@@ -172,7 +175,7 @@ test('Theme prop handles mixed format (string and object) correctly', async () =
 		'banner.header.title': 'custom-title',
 	};
 
-	const test = <CookieBanner theme={mixedTheme} />;
+	const test = <CookieBanner scrollLock theme={mixedTheme} />;
 
 	await testComponentStyles({
 		component: test,
@@ -211,7 +214,7 @@ test('Theme prop handles edge cases gracefully', async () => {
 		},
 	};
 
-	const test = <CookieBanner theme={edgeCaseTheme} />;
+	const test = <CookieBanner scrollLock theme={edgeCaseTheme} />;
 
 	await testComponentStyles({
 		component: test,
