@@ -84,7 +84,7 @@ const ConsentManagerDialogOverlay: FC<OverlayProps> = ({
 	const {
 		disableAnimation,
 		noStyle: isThemeNoStyle,
-		scrollLock = true,
+		scrollLock = false,
 	} = useTheme();
 
 	const theme = useStyles('dialog.overlay', {

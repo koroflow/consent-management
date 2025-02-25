@@ -39,7 +39,7 @@ export function ConsentManagerProvider({
 	trackingBlockerConfig,
 	theme,
 	disableAnimation = false,
-	scrollLock = true,
+	scrollLock = false,
 }: ConsentManagerProviderProps) {
 	const preparedTranslationConfig = useMemo(() => {
 		const mergedConfig = mergeTranslationConfigs(
