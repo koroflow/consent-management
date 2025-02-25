@@ -15,9 +15,20 @@ export const showConsentBanner = createEndpoint(
 									type: 'object',
 									properties: {
 										showConsentBanner: { type: 'boolean' },
-										jurisdictionCode: { type: 'string' },
-										message: { type: 'string' },
-										regionCode: { type: 'string' },
+										jurisdiction: {
+											type: 'object',
+											properties: {
+												code: { type: 'string' },
+												message: { type: 'string' },
+											},
+										},
+										location: {
+											type: 'object',
+											properties: {
+												countryCode: { type: 'string' },
+												regionCode: { type: 'string' },
+											},
+										},
 									},
 								},
 							},
@@ -42,7 +53,14 @@ export const showConsentBanner = createEndpoint(
 			countryCode ?? null
 		);
 
-		return { showConsentBanner, jurisdictionCode, message, regionCode };
+		return {
+			showConsentBanner,
+			jurisdiction: {
+				code: jurisdictionCode,
+				message,
+			},
+			location: { countryCode, regionCode },
+		};
 	}
 );
 
