@@ -1,0 +1,28 @@
+{
+	"name": "@c15t/middleware",
+	"version": "0.0.1-rc.9",
+	"license": "GPL-3.0-only",
+	"type": "module",
+	"scripts": {
+		"build": "rslib build",
+		"check-types": "tsc --noEmit",
+		"fmt": "pnpm biome format --write .",
+		"lint": "pnpm biome lint ./src"
+	},
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js",
+			"require": "./dist/index.cjs"
+		}
+	},
+	"main": "./dist/index.cjs",
+	"module": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"dependencies": {
+		"better-call": "^1.0.3"
+	},
+	"devDependencies": {
+		"@c15t/typescript-config": "workspace:*"
+	}
+}

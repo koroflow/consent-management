@@ -1,0 +1,44 @@
+{
+	"name": "@c15t/next",
+	"version": "0.0.1-rc.9",
+	"license": "GPL-3.0-only",
+	"sideEffects": false,
+	"type": "module",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js",
+			"require": "./dist/index.cjs"
+		}
+	},
+	"main": "./dist/index.cjs",
+	"module": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"files": ["dist"],
+	"scripts": {
+		"build": "rslib build",
+		"check-types": "tsc --noEmit",
+		"dev": "rslib build --watch",
+		"fmt": "pnpm biome format --write .",
+		"lint": "pnpm biome lint ./src",
+		"test": "vitest run",
+		"test:coverage": "vitest run --coverage",
+		"test:watch": "vitest"
+	},
+	"browserslist": [">0.2%", "not dead", "not op_mini all"],
+	"dependencies": {
+		"@c15t/middleware": "workspace:*",
+		"@c15t/react": "workspace:*",
+		"next": "15.1.7"
+	},
+	"devDependencies": {
+		"@c15t/typescript-config": "workspace:*"
+	},
+	"peerDependencies": {
+		"react": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0",
+		"react-dom": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

@@ -11,6 +11,7 @@
 		"start": "next start"
 	},
 	"dependencies": {
+		"@c15t/next": "workspace:*",
 		"@c15t/dev-tools": "workspace:*",
 		"@c15t/react": "workspace:*",
 		"@c15t/shadcn": "workspace:*",
@@ -42,6 +43,7 @@
 		"zod": "^3.24.2"
 	},
 	"devDependencies": {
+		"@c15t/middleware": "workspace:*",
 		"@c15t/typescript-config": "workspace:*",
 		"@types/mdx": "^2.0.13",
 		"@types/react": "^19.0.10",
