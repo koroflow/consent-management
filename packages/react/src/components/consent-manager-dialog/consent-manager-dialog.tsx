@@ -59,8 +59,7 @@ export interface ConsentManagerDialogProps
 	extends ThemeContextValue<ConsentManagerDialogTheme> {
 	/** Disables animation when true */
 	disableAnimation?: boolean;
-	/** Removes default styling when true */
-	noStyle?: boolean;
+
 	/** Whether the dialog is open */
 	open?: boolean;
 }
@@ -92,6 +91,7 @@ export const ConsentManagerDialog: FC<ConsentManagerDialogProps> = ({
 	disableAnimation,
 	noStyle,
 	open = false,
+	scrollLock,
 }) => {
 	const consentManager = useConsentManager();
 	const [isMounted, setIsMounted] = useState(false);
@@ -107,6 +107,7 @@ export const ConsentManagerDialog: FC<ConsentManagerDialogProps> = ({
 		theme,
 		noStyle,
 		disableAnimation,
+		scrollLock,
 	};
 
 	/**

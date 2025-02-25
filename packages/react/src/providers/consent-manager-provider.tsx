@@ -39,6 +39,7 @@ export function ConsentManagerProvider({
 	trackingBlockerConfig,
 	theme,
 	disableAnimation = false,
+	scrollLock = true,
 }: ConsentManagerProviderProps) {
 	const preparedTranslationConfig = useMemo(() => {
 		const mergedConfig = mergeTranslationConfigs(
@@ -117,8 +118,9 @@ export function ConsentManagerProvider({
 			noStyle,
 			theme,
 			disableAnimation,
+			scrollLock,
 		}),
-		[noStyle, theme, disableAnimation]
+		[noStyle, theme, disableAnimation, scrollLock]
 	);
 
 	return (

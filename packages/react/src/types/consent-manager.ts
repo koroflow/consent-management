@@ -92,6 +92,13 @@ export interface ConsentManagerProviderProps extends NamespaceProps {
 	translationConfig?: Partial<TranslationConfig>;
 
 	trackingBlockerConfig?: TrackingBlockerConfig;
+
+	/**
+	 * @remarks
+	 * Whether to lock the scroll when a modal is open, scroll lock will show the overlay
+	 * @default true
+	 */
+	scrollLock?: boolean;
 }
 
 /**
