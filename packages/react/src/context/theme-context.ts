@@ -53,6 +53,12 @@ export type ThemeContextValue<Theme = unknown> = {
 	 * @remarks Enables fully custom styling
 	 */
 	noStyle?: boolean;
+
+	/**
+	 * Locks the scroll when true & hides the overlay when disabled
+	 * @remarks Useful for preventing scroll when a modal is open
+	 */
+	scrollLock?: boolean;
 };
 
 /**

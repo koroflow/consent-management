@@ -60,6 +60,13 @@ interface CookieBannerRootProps extends HTMLAttributes<HTMLDivElement> {
 	 * Useful for environments where animations are not desired.
 	 */
 	disableAnimation?: boolean;
+
+	/**
+	 * @remarks
+	 * When true, the cookie banner will lock the scroll of the page.
+	 * Useful for implementing a cookie banner that locks the scroll of the page.
+	 */
+	scrollLock?: boolean;
 }
 
 /**
@@ -105,6 +112,7 @@ const CookieBannerRoot: FC<CookieBannerRootProps> = ({
 	noStyle,
 	disableAnimation,
 	theme,
+	scrollLock,
 	...props
 }) => {
 	/**
@@ -115,6 +123,7 @@ const CookieBannerRoot: FC<CookieBannerRootProps> = ({
 		disableAnimation,
 		noStyle,
 		theme,
+		scrollLock,
 	};
 
 	return (
