@@ -91,6 +91,20 @@ export interface ConsentManagerProviderProps extends NamespaceProps {
 	 */
 	translationConfig?: Partial<TranslationConfig>;
 
+	/**
+	 * @remarks
+	 * The configuration allows you to:
+	 * - Define translations for multiple languages through the translations object
+	 * - Set a default language via defaultLanguage prop
+	 * - Control automatic language switching based on browser settings with disableAutoLanguageSwitch
+	 * - Override specific translation keys while keeping defaults for others
+	 *
+	 * @example
+	 * ```tsx
+	 * <ConsentManagerProvider
+	 *   trackingBlockerConfig={{}}
+	 * />
+	 */
 	trackingBlockerConfig?: TrackingBlockerConfig;
 
 	/**
@@ -99,6 +113,12 @@ export interface ConsentManagerProviderProps extends NamespaceProps {
 	 * @default true
 	 */
 	scrollLock?: boolean;
+
+	/**
+	 * Whether to trap focus when a dialog is open
+	 * @default true
+	 */
+	trapFocus?: boolean;
 }
 
 /**

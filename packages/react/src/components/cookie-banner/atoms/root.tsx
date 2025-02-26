@@ -67,6 +67,14 @@ interface CookieBannerRootProps extends HTMLAttributes<HTMLDivElement> {
 	 * Useful for implementing a cookie banner that locks the scroll of the page.
 	 */
 	scrollLock?: boolean;
+
+	/**
+	 * @remarks
+	 * When true, the cookie banner will trap focus.
+	 * Useful for implementing a cookie banner that traps focus.
+	 * @default true
+	 */
+	trapFocus?: boolean;
 }
 
 /**
@@ -113,6 +121,7 @@ const CookieBannerRoot: FC<CookieBannerRootProps> = ({
 	disableAnimation,
 	theme,
 	scrollLock,
+	trapFocus = true,
 	...props
 }) => {
 	/**
@@ -124,6 +133,7 @@ const CookieBannerRoot: FC<CookieBannerRootProps> = ({
 		noStyle,
 		theme,
 		scrollLock,
+		trapFocus,
 	};
 
 	return (

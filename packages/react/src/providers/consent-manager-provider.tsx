@@ -40,6 +40,7 @@ export function ConsentManagerProvider({
 	theme,
 	disableAnimation = false,
 	scrollLock = false,
+	trapFocus = true,
 }: ConsentManagerProviderProps) {
 	const preparedTranslationConfig = useMemo(() => {
 		const mergedConfig = mergeTranslationConfigs(
@@ -113,15 +114,16 @@ export function ConsentManagerProvider({
 		[state, store]
 	);
 
-	const themeContextValue = useMemo(
-		() => ({
-			noStyle,
+	// Pass theme context values
+	const themeContextValue = useMemo(() => {
+		return {
 			theme,
+			noStyle,
 			disableAnimation,
 			scrollLock,
-		}),
-		[noStyle, theme, disableAnimation, scrollLock]
-	);
+			trapFocus,
+		};
+	}, [theme, noStyle, disableAnimation, scrollLock, trapFocus]);
 
 	return (
 		<ConsentStateContext.Provider value={contextValue}>
