@@ -16,6 +16,12 @@ import {
 	useEffect,
 	useState,
 } from 'react';
+import { cn } from '~/lib/cn';
+import {
+	ResizableHandle,
+	ResizablePanel,
+	ResizablePanelGroup,
+} from '../resizable';
 import {
 	SandboxCodeEditor,
 	SandboxConsole,
@@ -27,16 +33,8 @@ import {
 	SandboxTabsContent,
 	SandboxTabsList,
 	SandboxTabsTrigger,
-} from '~/components/docs/preview/sandbox';
-import {
-	ResizableHandle,
-	ResizablePanel,
-	ResizablePanelGroup,
-} from '~/components/docs/resizable';
-import { cn } from '~/lib/cn';
+} from './sandbox';
 import type { PreviewProps, SandboxTemplate } from './types';
-
-// ----- Client Components -----
 
 /**
  * Error boundary component to catch sandbox errors
@@ -52,6 +50,11 @@ export class ErrorBoundary extends Component<
 
 	static getDerivedStateFromError(error: Error) {
 		return { hasError: true, error };
+	}
+
+	componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+		// You can log the error to an error reporting service
+		console.error('ErrorBoundary caught an error', error, errorInfo);
 	}
 
 	render() {

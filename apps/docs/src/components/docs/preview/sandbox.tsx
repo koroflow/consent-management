@@ -135,7 +135,11 @@ export const SandboxProvider = ({
 				/>
 			) : (
 				<div className="flex h-full w-full items-center justify-center bg-[#151616] dark:bg-[#151616]">
-					<div className="h-8 w-8 animate-pulse rounded-full bg-fd-muted-foreground/20" />
+					<div
+						className="h-8 w-8 animate-pulse rounded-full bg-fd-muted-foreground/20"
+						aria-label="Loading"
+						role="status"
+					/>
 				</div>
 			)}
 		</div>

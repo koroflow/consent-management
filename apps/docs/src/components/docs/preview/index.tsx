@@ -2,7 +2,6 @@ import { PreviewClient } from './client';
 import type { PreviewProps, SandboxFiles, SandboxTemplate } from './types';
 
 // ----- Constants -----
-
 /**
  * TypeScript config used in sandboxes
  */
@@ -28,6 +27,7 @@ const tsconfig = `{
 }`;
 
 /**
+/**
  * Utility functions used in sandboxes
  */
 const utils = `
@@ -39,15 +39,17 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function setupDarkMode() {
-	const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-	const handleChange = (e: MediaQueryListEvent | MediaQueryList) => {
-		document.documentElement.classList.toggle('dark', e.matches);
-		document.documentElement.classList.toggle('light', !e.matches);
-	};
+	if (typeof window !== 'undefined') {
+		const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+		const handleChange = (e: MediaQueryListEvent | MediaQueryList) => {
+			document.documentElement.classList.toggle('dark', e.matches);
+			document.documentElement.classList.toggle('light', !e.matches);
+		};
 
-	handleChange(mediaQuery);
-	mediaQuery.addEventListener('change', handleChange);
-	return () => mediaQuery.removeEventListener('change', handleChange);
+		handleChange(mediaQuery);
+		mediaQuery.addEventListener('change', handleChange);
+		return () => mediaQuery.removeEventListener('change', handleChange);
+	}
 }
 
 export function clearLocalStorage() {
@@ -60,18 +62,6 @@ export function clearLocalStorage() {
 	}
 }
 `;
-
-/**
- * Basic app component for React sandboxes
- */
-const appTsx = `
-import { setupDarkMode } from './lib/utils';
-import { useEffect } from 'react';
-
-export default function App() {
-  useEffect(() => setupDarkMode(), []);
-  return null;
-}`;
 
 // ----- Utility Functions -----
 
