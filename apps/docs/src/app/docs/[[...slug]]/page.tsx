@@ -11,7 +11,6 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import type { ComponentType } from 'react';
 import { Card } from '~/components/docs/card';
-import { CodeBlock } from '~/components/docs/codeblock';
 import { Preview } from '~/components/docs/preview';
 import { Tab, Tabs } from '~/components/docs/tabs';
 import { cn } from '~/lib/cn';
@@ -29,7 +28,6 @@ const components = {
 	Steps,
 	Step,
 	Card,
-	CodeBlock,
 };
 
 interface SharedDocsPageProps {
