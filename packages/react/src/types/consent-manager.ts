@@ -110,7 +110,7 @@ export interface ConsentManagerProviderProps extends NamespaceProps {
 	/**
 	 * @remarks
 	 * Whether to lock the scroll when a modal is open, scroll lock will show the overlay
-	 * @default true
+	 * @default false
 	 */
 	scrollLock?: boolean;
 
