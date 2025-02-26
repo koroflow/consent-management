@@ -7,6 +7,7 @@
 import { AnimatePresence, motion } from 'motion/react';
 import type { FC } from 'react';
 import { useConsentManager } from '~/hooks/use-consent-manager';
+import { useScrollLock } from '~/hooks/use-scroll-lock';
 import { useTheme } from '~/hooks/use-theme';
 import type { ThemeValue } from '~/types/theme';
 import { useStyles } from '~/utils/use-styles';
@@ -80,14 +81,22 @@ const ConsentManagerDialogOverlay: FC<OverlayProps> = ({
 	open = false,
 }) => {
 	const { isPrivacyDialogOpen } = useConsentManager();
-	const { disableAnimation, noStyle: isThemeNoStyle } = useTheme();
+	const {
+		disableAnimation,
+		noStyle: isThemeNoStyle,
+		scrollLock = true,
+	} = useTheme();
 
 	const theme = useStyles('dialog.overlay', {
 		baseClassName: styles.overlay,
 		noStyle: isThemeNoStyle || noStyle,
 	});
 
-	return open || isPrivacyDialogOpen ? (
+	const shouldLockScroll = !!(open || isPrivacyDialogOpen) && scrollLock;
+
+	useScrollLock(shouldLockScroll);
+
+	return shouldLockScroll ? (
 		disableAnimation ? (
 			<div {...theme} data-testid="consent-manager-dialog-overlay" />
 		) : (

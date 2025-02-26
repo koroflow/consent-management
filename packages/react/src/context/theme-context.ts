@@ -39,20 +39,37 @@ export type ThemeContextValue<Theme = unknown> = {
 	/**
 	 * Theme configuration object for styling components
 	 * @remarks Partial to allow incremental theme overrides
+	 * @default undefined
 	 */
 	theme?: Partial<Theme>;
 
 	/**
 	 * Disables all animations when true
 	 * @remarks Useful for reduced motion preferences
+	 * @default false
 	 */
 	disableAnimation?: boolean;
 
 	/**
 	 * Removes default styles when true
 	 * @remarks Enables fully custom styling
+	 * @default false
 	 */
 	noStyle?: boolean;
+
+	/**
+	 * Locks the scroll when true & hides the overlay when disabled
+	 * @remarks Useful for preventing scroll when a modal is open
+	 * @default false
+	 */
+	scrollLock?: boolean;
+
+	/**
+	 * Traps keyboard focus within a dialog when true
+	 * @remarks Enhances accessibility for modal dialogs
+	 * @default true
+	 */
+	trapFocus?: boolean;
 };
 
 /**

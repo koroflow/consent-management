@@ -8,6 +8,7 @@ import { type HTMLAttributes, forwardRef } from 'react';
 
 import { useTheme } from '~/hooks';
 import { useConsentManager } from '~/hooks/use-consent-manager';
+import { useScrollLock } from '~/hooks/use-scroll-lock';
 import { useStyles } from '~/utils/use-styles';
 
 import styles from '../cookie-banner.module.css';
@@ -53,13 +54,19 @@ interface OverlayProps extends HTMLAttributes<HTMLDivElement> {
 const CookieBannerOverlay = forwardRef<HTMLDivElement, OverlayProps>(
 	({ className, style, noStyle, asChild, ...props }, ref) => {
 		const { showPopup } = useConsentManager();
-		const { disableAnimation, noStyle: contextNoStyle } = useTheme();
+		const {
+			disableAnimation,
+			noStyle: contextNoStyle,
+			scrollLock,
+		} = useTheme();
 		const theme = useStyles('banner.overlay', {
 			baseClassName: !(contextNoStyle || noStyle) && styles.overlay,
 			noStyle,
 		});
 
-		return showPopup ? (
+		useScrollLock(!!(showPopup && scrollLock));
+
+		return showPopup && scrollLock ? (
 			disableAnimation ? (
 				<div
 					ref={ref}

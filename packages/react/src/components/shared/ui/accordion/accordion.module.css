@@ -74,7 +74,7 @@
 	grid-template-columns: auto 1fr;
 	align-items: center;
 	gap: 0.625rem;
-	width: calc(100% + (var(--accordion-padding) * 2));
+	width: 90%;
 	margin: calc(-1 * var(--accordion-padding));
 	padding: var(--accordion-padding);
 	font-size: 0.875rem;
@@ -86,6 +86,7 @@
 	border: 0;
 	background: none;
 	cursor: pointer;
+	padding-right: 0;
 }
 
 /* biome-ignore lint/nursery/noUnknownPseudoClass: <explanation> */
