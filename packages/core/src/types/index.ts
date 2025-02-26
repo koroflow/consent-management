@@ -37,8 +37,11 @@
 import type {
 	ComplianceRegion,
 	ComplianceSettings,
+	ConsentBannerResponse,
 	ConsentState,
 	HasConsentedProps,
+	JurisdictionInfo,
+	LocationInfo,
 	NamespaceProps,
 	PrivacySettings,
 } from './compliance';
@@ -47,6 +50,9 @@ export type {
 	ConsentState,
 	ComplianceRegion,
 	ComplianceSettings,
+	JurisdictionInfo,
+	LocationInfo,
+	ConsentBannerResponse,
 	PrivacySettings,
 	HasConsentedProps,
 	NamespaceProps,

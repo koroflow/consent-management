@@ -42,7 +42,7 @@ import { type ConsentState, consentTypes } from './types';
  */
 export const initialState: Omit<
 	PrivacyConsentState,
-	'getEffectiveConsents' | 'hasConsentFor'
+	'getEffectiveConsents' | 'hasConsentFor' | 'fetchConsentBannerInfo'
 > = {
 	/** Initial consent states based on default values from consent types */
 	consents: consentTypes.reduce((acc, consent) => {
@@ -55,6 +55,9 @@ export const initialState: Omit<
 
 	/** Show consent popup by default */
 	showPopup: true,
+
+	/** Initial loading state for consent banner information */
+	isLoadingConsentInfo: false,
 
 	/** Default GDPR consent types to include */
 	gdprTypes: ['necessary', 'marketing'],
@@ -85,7 +88,13 @@ export const initialState: Omit<
 	callbacks: {},
 
 	/** Default to US if no country detected */
-	detectedCountry: 'US',
+	detectedCountry: null,
+
+	/** No location information initially */
+	locationInfo: null,
+
+	/** No jurisdiction information initially */
+	jurisdictionInfo: null,
 
 	/** Default privacy settings */
 	privacySettings: {
@@ -113,6 +122,8 @@ export const initialState: Omit<
 	resetComplianceSettings: () => {},
 	setCallback: () => {},
 	setDetectedCountry: () => {},
+	setLocationInfo: () => {},
+	setJurisdictionInfo: () => {},
 	getDisplayedConsents: () => [],
 	hasConsented: () => false,
 	setTranslationConfig: () => {},

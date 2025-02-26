@@ -26,6 +26,9 @@ export type {
 	ConsentManagerWidgetTranslations,
 	ConsentTypeTranslations,
 	ConsentTypesTranslations,
+	LocationInfo,
+	JurisdictionInfo,
+	ConsentBannerResponse,
 } from './types';
 
 export { defaultTranslationConfig } from './translations';

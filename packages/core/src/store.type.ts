@@ -9,8 +9,11 @@ import type {
 	Callbacks,
 	ComplianceRegion,
 	ComplianceSettings,
+	ConsentBannerResponse,
 	ConsentState,
 	ConsentType,
+	JurisdictionInfo,
+	LocationInfo,
 	PrivacySettings,
 	TranslationConfig,
 	consentTypes,
@@ -56,6 +59,9 @@ export interface PrivacyConsentState {
 	/** Whether to show the consent popup */
 	showPopup: boolean;
 
+	/** Whether consent banner information is currently being loaded */
+	isLoadingConsentInfo: boolean;
+
 	/** Active GDPR consent types */
 	gdprTypes: AllConsentNames[];
 
@@ -69,7 +75,13 @@ export interface PrivacyConsentState {
 	callbacks: Callbacks;
 
 	/** User's detected country code */
-	detectedCountry: string;
+	detectedCountry: string | null;
+
+	/** User's location information */
+	locationInfo: LocationInfo | null;
+
+	/** Applicable jurisdiction information */
+	jurisdictionInfo: JurisdictionInfo | null;
 
 	/** Privacy-related settings */
 	privacySettings: PrivacySettings;
@@ -156,6 +168,27 @@ export interface PrivacyConsentState {
 	 * @param country - The country code
 	 */
 	setDetectedCountry: (country: string) => void;
+
+	/**
+	 * Updates the user's location information.
+	 * @param location - The location information
+	 */
+	setLocationInfo: (location: LocationInfo | null) => void;
+
+	/**
+	 * Updates the applicable jurisdiction information.
+	 * @param jurisdiction - The jurisdiction information
+	 */
+	setJurisdictionInfo: (jurisdiction: JurisdictionInfo | null) => void;
+
+	/**
+	 * Fetches consent banner information from the API and updates the store.
+	 * @param url - The URL to fetch consent banner information from
+	 * @returns A promise that resolves with the consent banner response when the fetch is complete, or undefined if it fails
+	 */
+	fetchConsentBannerInfo: (
+		url?: string
+	) => Promise<ConsentBannerResponse | undefined>;
 
 	/** Retrieves the list of consent types that should be displayed */
 	getDisplayedConsents: () => typeof consentTypes;

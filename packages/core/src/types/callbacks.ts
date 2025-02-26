@@ -24,6 +24,8 @@
  */
 export type CallbackFunction<T = void> = (arg: T) => void;
 
+import type { LocationInfo } from './compliance';
+
 /**
  * Defines the structure for callback functions that respond to consent-related events.
  * These callbacks enable custom actions at different stages of the consent management process.
@@ -149,4 +151,10 @@ export interface Callbacks {
 	 * @param errorMessage - A description of the error that occurred
 	 */
 	onError?: CallbackFunction<string>;
+
+	/**
+	 * Called when the user's location is detected
+	 * @param location - The detected location information
+	 */
+	onLocationDetected?: CallbackFunction<LocationInfo>;
 }

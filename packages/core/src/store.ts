@@ -10,6 +10,10 @@ import {
 	hasConsentFor,
 	hasConsented,
 } from './libs/consent-utils';
+import {
+	DEFAULT_CONSENT_BANNER_API_URL,
+	fetchConsentBannerInfo as fetchConsentBanner,
+} from './libs/fetch-consent-banner';
 import { createTrackingBlocker } from './libs/tracking-blocker';
 import type { TrackingBlockerConfig } from './libs/tracking-blocker';
 import { initialState } from './store.initial-state';
@@ -67,6 +71,8 @@ const getStoredConsent = (): StoredConsent | null => {
 
 interface StoreConfig {
 	trackingBlockerConfig?: TrackingBlockerConfig;
+	/** URL to fetch consent banner information from */
+	consentBannerApiUrl?: string;
 }
 
 /**
@@ -137,9 +143,12 @@ export const createConsentManagerStore = (
 						type: 'necessary' | 'all' | 'custom';
 					} | null,
 					showPopup: false, // Don't show popup if we have stored consent
+					isLoadingConsentInfo: false, // Not loading if we have stored consent
 				}
 			: {
-					showPopup: true, // Show popup if no stored consent
+					// Don't show popup initially - we'll set it after location check
+					showPopup: false,
+					isLoadingConsentInfo: true, // Start in loading state
 				}),
 
 		/**
@@ -184,12 +193,26 @@ export const createConsentManagerStore = (
 		 * @remarks
 		 * The popup will only be shown if:
 		 * - Forcing is enabled, or
-		 * - No stored consent exists and no current consent is given
+		 * - No stored consent exists, no current consent is given, and consent information is not loading
 		 */
 		setShowPopup: (show, force = false) => {
 			const state = get();
 			const storedConsent = getStoredConsent();
-			if (force || (!storedConsent && !state.consentInfo && show)) {
+
+			// Only show popup if:
+			// 1. Force is true, or
+			// 2. All of these are true:
+			//    - No stored consent
+			//    - No current consent info
+			//    - Not currently loading consent info
+			//    - Show parameter is true
+			if (
+				force ||
+				(!storedConsent &&
+					!state.consentInfo &&
+					!state.isLoadingConsentInfo &&
+					show)
+			) {
 				set({ showPopup: show });
 			}
 		},
@@ -336,6 +359,102 @@ export const createConsentManagerStore = (
 		setDetectedCountry: (country) => set({ detectedCountry: country }),
 
 		/**
+		 * Updates the user's location information.
+		 *
+		 * @param location - The location information
+		 */
+		setLocationInfo: (location) => set({ locationInfo: location }),
+
+		/**
+		 * Updates the applicable jurisdiction information.
+		 *
+		 * @param jurisdiction - The jurisdiction information
+		 */
+		setJurisdictionInfo: (jurisdiction) =>
+			set({ jurisdictionInfo: jurisdiction }),
+
+		/**
+		 * Fetches consent banner information from the API and updates the store.
+		 *
+		 * @param url - The URL to fetch consent banner information from
+		 * @returns A promise that resolves when the fetch is complete
+		 *
+		 * @remarks
+		 * This function:
+		 * 1. Fetches consent banner information from the API
+		 * 2. Updates the store with the location and jurisdiction information
+		 * 3. Sets the showPopup state based on the API response
+		 * 4. Updates the detected country based on the location information
+		 * 5. Prevents multiple simultaneous requests
+		 */
+		fetchConsentBannerInfo: async (url) => {
+			// Skip if not in browser environment
+			if (typeof window === 'undefined') {
+				return undefined;
+			}
+
+			// Skip if user has already consented
+			if (get().hasConsented()) {
+				// Make sure loading state is false
+				set({ isLoadingConsentInfo: false });
+				return undefined;
+			}
+
+			// Set loading state to true
+			set({ isLoadingConsentInfo: true });
+
+			// Use the extracted fetchConsentBanner function
+			try {
+				const apiUrl =
+					url || config?.consentBannerApiUrl || DEFAULT_CONSENT_BANNER_API_URL;
+
+				return await fetchConsentBanner(
+					get().hasConsented,
+					(data) => {
+						// Update store with location and jurisdiction information
+						// and set showPopup based on API response
+						set({
+							locationInfo: data.location,
+							jurisdictionInfo: data.jurisdiction,
+							isLoadingConsentInfo: false,
+							// Only update showPopup if we don't have stored consent
+							...(get().consentInfo === null
+								? { showPopup: data.showConsentBanner }
+								: {}),
+						});
+
+						// Update detected country if location information is available
+						if (data.location?.countryCode) {
+							get().setDetectedCountry(data.location.countryCode);
+						}
+
+						// Call the onLocationDetected callback if it exists
+						get().callbacks.onLocationDetected?.(data.location);
+					},
+					(errorMessage) => {
+						// Set loading state to false on error
+						set({ isLoadingConsentInfo: false });
+
+						// Call the onError callback if it exists
+						get().callbacks.onError?.(errorMessage);
+
+						// If fetch fails, default to showing the banner to be safe
+						if (get().consentInfo === null) {
+							set({ showPopup: true });
+						}
+					},
+					apiUrl
+				);
+			} catch (error) {
+				// This catch block should not be reached as errors are handled in the fetchConsentBanner function
+				// But we keep it as a safety measure
+				console.error('Unexpected error in fetchConsentBannerInfo:', error);
+				set({ isLoadingConsentInfo: false });
+				return undefined;
+			}
+		},
+
+		/**
 		 * Retrieves the list of consent types that should be displayed.
 		 *
 		 * @returns Array of consent types that match the active GDPR types
@@ -442,6 +561,21 @@ export const createConsentManagerStore = (
 	if (typeof window !== 'undefined') {
 		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 		(window as any)[namespace] = store;
+
+		// Auto-fetch consent banner information if no stored consent
+		if (!getStoredConsent()) {
+			// Immediately invoke the fetch and wait for it to complete
+			// This ensures we have location data before deciding to show the banner
+			store
+				.getState()
+				.fetchConsentBannerInfo()
+				.catch(() => {
+					// If fetch fails, we've already set showPopup to true in the error handler
+					console.log(
+						'Failed to fetch consent banner information, defaulting to showing banner'
+					);
+				});
+		}
 	}
 
 	return store;

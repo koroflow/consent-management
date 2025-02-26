@@ -203,3 +203,85 @@ export type NamespaceProps = {
 	 */
 	namespace?: string;
 };
+
+/**
+ * Represents location information for the user.
+ *
+ * @remarks
+ * Contains country and region codes to determine applicable privacy regulations.
+ *
+ * @example
+ * ```typescript
+ * const location: LocationInfo = {
+ *   countryCode: 'GB',
+ *   regionCode: 'ENG'
+ * };
+ * ```
+ *
+ * @public
+ */
+export type LocationInfo = {
+	/** ISO country code (e.g., 'US', 'GB', 'DE') */
+	countryCode: string;
+
+	/** Region or state code within the country (e.g., 'CA', 'ENG') */
+	regionCode?: string;
+};
+
+/**
+ * Represents jurisdiction information for consent requirements.
+ *
+ * @remarks
+ * Identifies which privacy regulation applies and provides context.
+ *
+ * @example
+ * ```typescript
+ * const jurisdiction: JurisdictionInfo = {
+ *   code: 'GDPR',
+ *   message: 'GDPR or equivalent regulations require a cookie banner.'
+ * };
+ * ```
+ *
+ * @public
+ */
+export type JurisdictionInfo = {
+	/** Code identifying the applicable regulation (e.g., 'GDPR', 'CCPA') */
+	code: string;
+
+	/** Human-readable message explaining the regulation requirement */
+	message: string;
+};
+
+/**
+ * Response from the consent banner API.
+ *
+ * @remarks
+ * Contains information about whether to show the consent banner and why.
+ *
+ * @example
+ * ```typescript
+ * const response: ConsentBannerResponse = {
+ *   showConsentBanner: true,
+ *   jurisdiction: {
+ *     code: 'GDPR',
+ *     message: 'GDPR or equivalent regulations require a cookie banner.'
+ *   },
+ *   location: {
+ *     countryCode: 'GB',
+ *     regionCode: 'ENG'
+ *   }
+ * };
+ * ```
+ *
+ * @public
+ */
+export type ConsentBannerResponse = {
+	/** Whether to show the consent banner */
+	showConsentBanner: boolean;
+
+	/** Information about the applicable jurisdiction */
+	jurisdiction: JurisdictionInfo;
+
+	/** Information about the user's location */
+	location: LocationInfo;
+};
