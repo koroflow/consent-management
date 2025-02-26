@@ -1,6 +1,5 @@
 'use client';
 
-import { cn } from '@c15t/shadcn/libs';
 import type {
 	TabsProps as BaseProps,
 	TabsContentProps,
@@ -15,6 +14,7 @@ import {
 	useRef,
 	useState,
 } from 'react';
+import { cn } from '~/lib/cn';
 // biome-ignore lint/nursery/noExportedImports: <explanation>
 import * as Primitive from '../ui/tabs';
 

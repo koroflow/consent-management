@@ -1,4 +1,3 @@
-import { cn } from '@c15t/shadcn/libs';
 import { createTypeTable } from 'fumadocs-typescript/ui';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 import defaultMdxComponents from 'fumadocs-ui/mdx';
@@ -12,9 +11,9 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import type { ComponentType } from 'react';
 import { Card } from '~/components/docs/card';
-import { CodeBlock } from '~/components/docs/codeblock';
 import { Preview } from '~/components/docs/preview';
 import { Tab, Tabs } from '~/components/docs/tabs';
+import { cn } from '~/lib/cn';
 import { docsSource } from '~/lib/source';
 import type { Source } from '~/lib/source';
 
@@ -29,7 +28,6 @@ const components = {
 	Steps,
 	Step,
 	Card,
-	CodeBlock,
 };
 
 interface SharedDocsPageProps {

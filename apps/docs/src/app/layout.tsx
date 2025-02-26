@@ -5,10 +5,11 @@ import {
 	ConsentManagerProvider,
 	CookieBanner,
 } from '@c15t/react';
-import { cn } from '@c15t/shadcn/libs';
 import { RootProvider } from 'fumadocs-ui/provider';
 import { Fira_Mono, Inter } from 'next/font/google';
 import type { ReactNode } from 'react';
+import { cn } from '~/lib/cn';
+import { SandPackCSS } from './styles/sandpack-styles';
 
 const inter = Inter({
 	subsets: ['latin'],
@@ -28,6 +29,9 @@ export default function Layout({ children }: { children: ReactNode }) {
 			className={cn(inter.variable, firaMono.variable)}
 			suppressHydrationWarning
 		>
+			<head>
+				<SandPackCSS />
+			</head>
 			<body className="flex min-h-screen flex-col">
 				<RootProvider>
 					<ConsentManagerProvider initialGdprTypes={['necessary', 'marketing']}>

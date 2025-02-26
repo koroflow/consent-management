@@ -1,11 +1,11 @@
 'use client';
-import { cn } from '@c15t/shadcn/libs';
 import * as TabsPrimitive from '@radix-ui/react-tabs';
 import {
 	type ComponentPropsWithoutRef,
 	type ComponentRef,
 	forwardRef,
 } from 'react';
+import { cn } from '~/lib/cn';
 
 const Tabs = forwardRef<
 	ComponentRef<typeof TabsPrimitive.Root>,

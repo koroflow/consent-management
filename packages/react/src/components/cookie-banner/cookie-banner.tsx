@@ -82,6 +82,20 @@ export interface CookieBannerProps {
 	 * @default undefined
 	 */
 	acceptButtonText?: ReactNode;
+
+	/**
+	 * When true, the cookie banner will lock the scroll of the page
+	 * @remarks Useful for implementing a cookie banner that locks the scroll of the page
+	 * @default false
+	 */
+	scrollLock?: boolean;
+
+	/**
+	 * When true, the cookie banner will trap focus
+	 * @remarks Useful for implementing a cookie banner that traps focus
+	 * @default true
+	 */
+	trapFocus?: true;
 }
 
 /**
@@ -152,6 +166,8 @@ export const CookieBanner: FC<CookieBannerProps> = ({
 	rejectButtonText,
 	customizeButtonText,
 	acceptButtonText,
+	scrollLock,
+	trapFocus = true,
 }) => {
 	const { cookieBanner } = useTranslations();
 
@@ -159,7 +175,12 @@ export const CookieBanner: FC<CookieBannerProps> = ({
 		<ErrorBoundary
 			fallback={<div>Something went wrong with the Cookie Banner.</div>}
 		>
-			<CookieBannerRoot theme={theme} noStyle={noStyle}>
+			<CookieBannerRoot
+				theme={theme}
+				noStyle={noStyle}
+				scrollLock={scrollLock}
+				trapFocus={trapFocus}
+			>
 				<CookieBannerCard>
 					<CookieBannerHeader>
 						<CookieBannerTitle>{title || cookieBanner.title}</CookieBannerTitle>

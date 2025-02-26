@@ -91,8 +91,7 @@
 .container {
 	width: 100%;
 	max-width: var(--dialog-max-width);
-	margin-left: auto;
-	margin-right: auto;
+	margin: auto;
 }
 
 .branding {

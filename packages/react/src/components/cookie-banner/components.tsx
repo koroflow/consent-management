@@ -4,7 +4,8 @@
  * Implements accessible, customizable components following GDPR and CCPA requirements.
  */
 
-import { type Ref, forwardRef } from 'react';
+import { type Ref, type RefObject, forwardRef, useRef } from 'react';
+import { useFocusTrap } from '~/hooks/use-focus-trap';
 import { useTheme } from '~/hooks/use-theme';
 import { Box, type BoxProps } from '../shared/primitives/box';
 import { ConsentButton } from '../shared/primitives/button';
@@ -139,12 +140,23 @@ CookieBannerFooter.displayName = COOKIE_BANNER_FOOTER_NAME;
  */
 const CookieBannerCard = forwardRef<HTMLDivElement, Omit<BoxProps, 'themeKey'>>(
 	({ children, ...props }, ref) => {
+		const { trapFocus } = useTheme();
+		const localRef = useRef<HTMLDivElement>(null);
+		const cardRef = (ref || localRef) as RefObject<HTMLElement>;
+
+		// Call the useFocusTrap hook with the appropriate parameters
+		const shouldTrapFocus = Boolean(trapFocus);
+		useFocusTrap(shouldTrapFocus, cardRef);
+
 		return (
 			<Box
-				ref={ref as Ref<HTMLDivElement>}
+				ref={cardRef as Ref<HTMLDivElement>}
+				tabIndex={0}
 				baseClassName={styles.card}
 				data-testid="cookie-banner-card"
 				themeKey="banner.card"
+				aria-modal={shouldTrapFocus ? 'true' : undefined}
+				role={shouldTrapFocus ? 'dialog' : undefined}
 				{...props}
 			>
 				{children}

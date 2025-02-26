@@ -26,9 +26,11 @@ import {
 	useEffect,
 	useState,
 } from 'react';
-import { cn } from '~/libs';
+import { cn } from '~/lib/cn';
 
-export type SandboxProviderProps = SandpackProviderProps;
+export type SandboxProviderProps = SandpackProviderProps & {
+	height?: string | number;
+};
 
 const githubLight = {
 	colors: {
@@ -97,35 +99,12 @@ const githubDark = {
 	},
 };
 
-const SandboxSkeleton = () => (
-	<div className="flex h-full w-full animate-pulse flex-col gap-2 p-4">
-		{/* Header skeleton */}
-		<div className="flex items-center gap-2">
-			<div className="h-4 w-20 rounded-md bg-muted/20" />
-			<div className="h-4 w-16 rounded-md bg-muted/20" />
-		</div>
-
-		{/* Content skeleton */}
-		<div className="flex flex-1 gap-2">
-			{/* Code panel */}
-			<div className="flex-1 space-y-2 rounded-md bg-muted/10 p-4">
-				<div className="h-3 w-3/4 rounded bg-muted/20" />
-				<div className="h-3 w-1/2 rounded bg-muted/20" />
-				<div className="h-3 w-2/3 rounded bg-muted/20" />
-				<div className="h-3 w-1/2 rounded bg-muted/20" />
-			</div>
-
-			{/* Preview panel */}
-			<div className="flex-1 rounded-md bg-muted/10" />
-		</div>
-	</div>
-);
-
 export const SandboxProvider = ({
 	className,
 	theme = 'light',
+	height,
 	...props
-}: SandpackProviderProps) => {
+}: SandboxProviderProps) => {
 	const [isMounted, setIsMounted] = useState(false);
 	const [isSSR, setIsSSR] = useState(true);
 
@@ -138,10 +117,11 @@ export const SandboxProvider = ({
 		<div
 			className={cn(
 				'not-prose relative',
-				'size-full max-h-[30rem]',
+				'size-full',
 				'bg-gradient-to-b from-fd-card/80 to-fd-card',
 				className
 			)}
+			style={height ? { height } : undefined}
 		>
 			{isMounted ? (
 				<SandpackProvider
@@ -154,7 +134,13 @@ export const SandboxProvider = ({
 					{...props}
 				/>
 			) : (
-				<SandboxSkeleton />
+				<div className="flex h-full w-full items-center justify-center bg-[#151616] dark:bg-[#151616]">
+					<div
+						className="h-8 w-8 animate-pulse rounded-full bg-fd-muted-foreground/20"
+						aria-label="Loading"
+						role="status"
+					/>
+				</div>
 			)}
 		</div>
 	);
@@ -162,7 +148,11 @@ export const SandboxProvider = ({
 
 export type SandboxLayoutProps = SandpackLayoutProps;
 
-export const SandboxLayout = ({ className, ...props }: SandpackLayoutProps) => (
+export const SandboxLayout = ({
+	className,
+	style,
+	...props
+}: SandpackLayoutProps) => (
 	<SandpackLayout
 		className={cn(
 			'!rounded-lg !border-none',
@@ -173,6 +163,7 @@ export const SandboxLayout = ({ className, ...props }: SandpackLayoutProps) => (
 			'[&_.sp-preview-container]:!backdrop-blur-sm',
 			className
 		)}
+		style={style}
 		{...props}
 	/>
 );
@@ -241,6 +232,7 @@ export const SandboxTabs = ({
 				)}
 				{...props}
 				data-selected={selectedTab}
+				style={props.style}
 			>
 				{props.children}
 			</div>
@@ -307,11 +299,13 @@ export const SandboxTabsTrigger = ({
 
 export type SandboxTabsContentProps = HTMLAttributes<HTMLDivElement> & {
 	value: string;
+	height?: string | number;
 };
 
 export const SandboxTabsContent = ({
 	className,
 	value,
+	height,
 	...props
 }: SandboxTabsContentProps) => {
 	const { selectedTab } = useSandboxTabsContext();
@@ -325,10 +319,13 @@ export const SandboxTabsContent = ({
 				'ring-offset-background',
 				'focus-visible:outline-none',
 				'focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-				'h-full min-h-[300px]',
+				'flex h-full flex-col',
 				selectedTab === value ? 'fade-in-0 animate-in' : 'hidden',
 				className
 			)}
+			style={{
+				height: height || '100%',
+			}}
 			{...props}
 		/>
 	);
@@ -338,9 +335,23 @@ export type SandboxCodeEditorProps = CodeEditorProps;
 
 export const SandboxCodeEditor = ({
 	showTabs = false,
+	className,
+	showLineNumbers = true,
+	showInlineErrors = true,
+	wrapContent = false,
+	closableTabs = false,
 	...props
 }: SandboxCodeEditorProps) => (
-	<SandpackCodeEditor showTabs={showTabs} {...props} />
+	<SandpackCodeEditor
+		showTabs={showTabs}
+		showLineNumbers={showLineNumbers}
+		showInlineErrors={showInlineErrors}
+		wrapContent={wrapContent}
+		closableTabs={closableTabs}
+		className={cn('sp-editor sp-stack h-full', className)}
+		style={{ height: '100%' }}
+		{...props}
+	/>
 );
 
 export type SandboxConsoleProps = ComponentProps<typeof SandpackConsole>;
@@ -354,26 +365,36 @@ export const SandboxConsole = ({
 
 export type SandboxPreviewProps = PreviewProps & {
 	className?: string;
+	showNavigator?: boolean;
+	height?: string | number;
 };
 
 export const SandboxPreview = ({
 	className,
 	showOpenInCodeSandbox = false,
+	showNavigator = false,
+	height,
 	...props
 }: SandboxPreviewProps) => (
 	<SandpackPreview
 		className={cn(
-			'h-full min-h-[300px]',
+			'h-full',
 			'[&_.sp-preview-container]:!h-full',
 			'[&_.sp-preview-iframe]:!h-full',
+			'[&_.sp-preview-iframe]:!flex-grow',
+			'[&_.sp-preview-container]:!flex',
+			'[&_.sp-preview-container]:!flex-col',
 			'[&_.sp-preview-actions]:!bottom-4',
 			className
 		)}
+		showNavigator={showNavigator}
 		showOpenInCodeSandbox={showOpenInCodeSandbox}
 		style={{
 			height: '100%',
+			width: '100%',
 			flex: '1 1 auto',
-			minHeight: '300px',
+			display: 'flex',
+			flexDirection: 'column',
 		}}
 		{...props}
 	/>

@@ -1,6 +1,5 @@
 export const pages = {
-	'App.tsx': `
-import { ConsentManagerProvider, ConsentManagerDialog, CookieBanner } from '@c15t/react';
+	'App.tsx': `import { ConsentManagerProvider, ConsentManagerDialog, CookieBanner } from '@c15t/react';
 import { ExampleContent } from './ExampleContent';
 import { clearLocalStorage } from './lib/utils';
 import buttons from './buttons.module.css';

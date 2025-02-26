@@ -1,4 +1,4 @@
-import { cn } from '../../../../../internals/shadcn/dist/libs/utils';
+import { cn } from '~/lib/cn';
 import { DotPattern } from '../ui/dot-pattern';
 
 export const HeaderBg = ({ className }: { className?: string }) => (

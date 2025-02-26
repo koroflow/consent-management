@@ -1,6 +1,6 @@
-import { Button } from '@c15t/shadcn/components';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import { Button } from '~/components/docs/button';
 import { BorderIcon } from '~/components/marketing/border-icon';
 import { Section } from '~/components/marketing/section';
 
@@ -8,7 +8,7 @@ export function CTA() {
 	return (
 		<Section id="cta" className="my-12">
 			<div className="relative mx-auto border py-16 text-center">
-				<p className="mx-auto mb-6 max-w-3xl text-wrap text-pretty text-4xl text-foreground">
+				<p className="mx-auto mb-6 max-w-3xl text-pretty text-4xl text-foreground">
 					Transform Your Project with Ready-to-Go Drop-In React Components.
 				</p>
 

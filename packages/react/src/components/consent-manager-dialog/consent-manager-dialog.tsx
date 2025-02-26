@@ -7,7 +7,7 @@
  */
 
 import { AnimatePresence, motion } from 'motion/react';
-import { type FC, useEffect, useRef, useState } from 'react';
+import { type FC, type RefObject, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import {
 	LocalThemeContext,
@@ -18,6 +18,7 @@ import { ConsentCustomizationCard } from './atoms/dialog-card';
 import { Overlay } from './atoms/overlay';
 import type { ConsentManagerDialogTheme } from './theme';
 
+import { useFocusTrap } from '~/hooks/use-focus-trap';
 import styles from './consent-manager-dialog.module.css';
 
 /**
@@ -59,8 +60,7 @@ export interface ConsentManagerDialogProps
 	extends ThemeContextValue<ConsentManagerDialogTheme> {
 	/** Disables animation when true */
 	disableAnimation?: boolean;
-	/** Removes default styling when true */
-	noStyle?: boolean;
+
 	/** Whether the dialog is open */
 	open?: boolean;
 }
@@ -92,10 +92,13 @@ export const ConsentManagerDialog: FC<ConsentManagerDialogProps> = ({
 	disableAnimation,
 	noStyle,
 	open = false,
+	scrollLock = true,
+	trapFocus = true, // Default to true for accessibility
 }) => {
 	const consentManager = useConsentManager();
 	const [isMounted, setIsMounted] = useState(false);
 	const contentRef = useRef<HTMLDivElement>(null);
+	const dialogRef = useRef<HTMLDivElement>(null); // Add this new ref
 
 	// Handle client-side mounting
 	useEffect(() => {
@@ -103,10 +106,20 @@ export const ConsentManagerDialog: FC<ConsentManagerDialogProps> = ({
 		return () => setIsMounted(false);
 	}, []);
 
+	// Add the useFocusTrap hook
+	const isRefObject =
+		dialogRef && typeof dialogRef === 'object' && 'current' in dialogRef;
+	useFocusTrap(
+		(open || consentManager.isPrivacyDialogOpen) && trapFocus,
+		isRefObject ? (dialogRef as RefObject<HTMLElement>) : null
+	);
+
 	const contextValue: ThemeContextValue = {
 		theme,
 		noStyle,
 		disableAnimation,
+		scrollLock,
+		trapFocus,
 	};
 
 	/**
@@ -120,6 +133,7 @@ export const ConsentManagerDialog: FC<ConsentManagerDialogProps> = ({
 					<>
 						<Overlay open={open} />
 						<motion.dialog
+							ref={dialogRef as unknown as RefObject<HTMLDialogElement>}
 							className={styles.root}
 							variants={dialogVariants}
 							initial="hidden"
@@ -127,6 +141,7 @@ export const ConsentManagerDialog: FC<ConsentManagerDialogProps> = ({
 							exit="exit"
 							aria-modal="true"
 							aria-labelledby="privacy-settings-title"
+							tabIndex={-1} // Make the dialog focusable as a fallback
 						>
 							<motion.div
 								ref={contentRef}

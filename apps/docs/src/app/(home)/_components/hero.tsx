@@ -1,10 +1,10 @@
 'use client';
 
-import { buttonVariants } from '@c15t/shadcn/components';
+import { buttonVariants } from '~/components/docs/button';
 
-import { cn } from '@c15t/shadcn/libs';
 import Link from 'next/link';
 import { useRef } from 'react';
+import { cn } from '~/lib/cn';
 
 import { ArrowRight } from 'lucide-react';
 import { ConsentManagementIcon } from '~/components/icons/logo';

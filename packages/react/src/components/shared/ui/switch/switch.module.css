@@ -115,6 +115,14 @@
 	cursor: not-allowed;
 }
 
+.root:focus {
+	outline: 2px solid var(--accordion-focus-ring);
+}
+/* biome-ignore lint/nursery/noUnknownPseudoClass: <explanation> */
+:global(.dark) .root:focus {
+	outline: 2px solid var(--accordion-focus-ring-dark);
+}
+
 .track-disabled {
 	background-color: var(--switch-background-color-disabled);
 	opacity: 0.4;

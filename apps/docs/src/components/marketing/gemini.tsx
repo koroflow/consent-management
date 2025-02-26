@@ -1,7 +1,7 @@
 'use client';
-import { cn } from '@c15t/shadcn/libs';
 import { motion } from 'motion/react';
 import { Fragment, useId } from 'react';
+import { cn } from '~/lib/cn';
 
 interface PathAnimation {
 	startColor: string;
