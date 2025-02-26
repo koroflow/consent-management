@@ -65,6 +65,7 @@ interface CookieBannerRootProps extends HTMLAttributes<HTMLDivElement> {
 	 * @remarks
 	 * When true, the cookie banner will lock the scroll of the page.
 	 * Useful for implementing a cookie banner that locks the scroll of the page.
+	 * @default false
 	 */
 	scrollLock?: boolean;
 

@@ -92,9 +92,11 @@ const ConsentManagerDialogOverlay: FC<OverlayProps> = ({
 		noStyle: isThemeNoStyle || noStyle,
 	});
 
-	useScrollLock(!!(open || isPrivacyDialogOpen) && scrollLock);
+	const shouldLockScroll = !!(open || isPrivacyDialogOpen) && scrollLock;
 
-	return (open || isPrivacyDialogOpen) && scrollLock ? (
+	useScrollLock(shouldLockScroll);
+
+	return shouldLockScroll ? (
 		disableAnimation ? (
 			<div {...theme} data-testid="consent-manager-dialog-overlay" />
 		) : (
