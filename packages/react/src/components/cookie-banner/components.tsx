@@ -150,7 +150,7 @@ const CookieBannerCard = forwardRef<HTMLDivElement, Omit<BoxProps, 'themeKey'>>(
 
 		return (
 			<Box
-				ref={ref as Ref<HTMLDivElement>}
+				ref={cardRef as Ref<HTMLDivElement>}
 				tabIndex={0}
 				baseClassName={styles.card}
 				data-testid="cookie-banner-card"
