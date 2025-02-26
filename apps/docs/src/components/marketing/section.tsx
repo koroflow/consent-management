@@ -1,6 +1,6 @@
 'use client';
 
-import { cn } from '@c15t/shadcn/libs';
+import { cn } from '~/lib/cn';
 
 import { type ReactNode, forwardRef, useRef } from 'react';
 

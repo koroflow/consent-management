@@ -5,10 +5,10 @@ import {
 	ConsentManagerProvider,
 	CookieBanner,
 } from '@c15t/react';
-import { cn } from '@c15t/shadcn/libs';
 import { RootProvider } from 'fumadocs-ui/provider';
 import { Fira_Mono, Inter } from 'next/font/google';
 import type { ReactNode } from 'react';
+import { cn } from '~/lib/cn';
 
 const inter = Inter({
 	subsets: ['latin'],

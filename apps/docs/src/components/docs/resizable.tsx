@@ -2,7 +2,7 @@
 import { DotSquare } from 'lucide-react';
 import type { ComponentProps } from 'react';
 import * as ResizablePrimitive from 'react-resizable-panels';
-import { cn } from '~/libs';
+import { cn } from '~/lib/cn';
 
 const ResizablePanelGroup = ({
 	className,

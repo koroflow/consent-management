@@ -1,6 +1,6 @@
 'use client';
 
-import { cn } from '@c15t/shadcn/libs';
+import { cn } from '~/lib/cn';
 import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
 

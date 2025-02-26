@@ -3,7 +3,6 @@
 @import "fumadocs-ui/css/preset.css";
 
 @source "../../../node_modules/fumadocs-ui/dist/**/*.js";
-@source "../../../node_modules/@c15t/shadcn/dist/**/*.js";
 
 #nd-docs-layout,
 #nd-sidebar {

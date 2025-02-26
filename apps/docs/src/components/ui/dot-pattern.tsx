@@ -1,5 +1,5 @@
-import { cn } from '@c15t/shadcn/libs';
 import { type SVGProps, useId } from 'react';
+import { cn } from '~/lib/cn';
 
 interface DotPatternProps extends SVGProps<SVGSVGElement> {
 	width?: number;

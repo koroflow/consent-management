@@ -26,7 +26,7 @@ import {
 	useEffect,
 	useState,
 } from 'react';
-import { cn } from '~/libs';
+import { cn } from '~/lib/cn';
 
 export type SandboxProviderProps = SandpackProviderProps;
 

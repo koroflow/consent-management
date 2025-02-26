@@ -1,4 +1,4 @@
-import { cn } from '@c15t/shadcn/libs';
+import { cn } from '~/lib/cn';
 
 import { type CSSProperties, type HTMLAttributes, forwardRef } from 'react';
 

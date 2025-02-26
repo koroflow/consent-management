@@ -1,5 +1,5 @@
-import { cn } from '@c15t/shadcn/libs';
 import type { CSSProperties, ReactNode } from 'react';
+import { cn } from '~/lib/cn';
 
 export interface OrbitingCirclesProps {
 	className?: string;
