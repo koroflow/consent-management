@@ -5,7 +5,7 @@ export function toNextJsHandler(
 		  }
 		| ((request: Request) => Promise<Response>)
 ) {
-	// biome-ignore lint/suspicious/useAwait: <explanation>
+	// biome-ignore lint/suspicious/useAwait: its what nextjs expects
 	const handler = async (request: Request) => {
 		return 'handler' in auth ? auth.handler(request) : auth(request);
 	};

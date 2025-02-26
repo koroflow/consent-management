@@ -1,4 +1,4 @@
-import { c15tMiddleware, toNextJsHandler } from '@c15t/next';
+import { c15tMiddleware, toNextJsHandler } from '@c15t/middleware';
 
 // Mock data for testing different jurisdictions and locations
 const mockResponses = [
