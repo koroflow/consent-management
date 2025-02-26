@@ -31,7 +31,7 @@ export default function Layout({ children }: { children: ReactNode }) {
 			<body className="flex min-h-screen flex-col">
 				<RootProvider>
 					<ConsentManagerProvider initialGdprTypes={['necessary', 'marketing']}>
-						<CookieBanner scrollLock={false} />
+						<CookieBanner />
 						<ConsentManagerDialog />
 						{process.env.NODE_ENV === 'development' && <C15TDevTools />}
 						{children}
