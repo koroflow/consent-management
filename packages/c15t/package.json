@@ -1,0 +1,121 @@
+{
+	"name": "@c15t/config",
+	"version": "0.0.1-rc.10",
+	"license": "GPL-3.0-only",
+	"type": "module",
+	"scripts": {
+		"build": "rslib build",
+		"check-types": "tsc --noEmit",
+		"fmt": "pnpm biome format --write .",
+		"lint": "pnpm biome lint ./src"
+	},
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js",
+			"require": "./dist/index.cjs"
+		},
+		"./core": {
+			"types": "./dist/core.d.ts",
+			"import": "./dist/core.js",
+			"require": "./dist/core.cjs"
+		},
+		"./init": {
+			"types": "./dist/init.d.ts",
+			"import": "./dist/init.js",
+			"require": "./dist/init.cjs"
+		},
+		"./cookies": {
+			"types": "./dist/cookies.d.ts",
+			"import": "./dist/cookies.js",
+			"require": "./dist/cookies.cjs"
+		},
+		"./types": {
+			"types": "./dist/types/index.d.ts",
+			"import": "./dist/types/index.js",
+			"require": "./dist/types/index.cjs"
+		},
+		"./utils": {
+			"types": "./dist/utils/index.d.ts",
+			"import": "./dist/utils/index.js",
+			"require": "./dist/utils/index.cjs"
+		},
+		"./storage": {
+			"types": "./dist/storage/index.d.ts",
+			"import": "./dist/storage/index.js",
+			"require": "./dist/storage/index.cjs"
+		},
+		"./storage/memory": {
+			"types": "./dist/storage/memory/index.d.ts",
+			"import": "./dist/storage/memory/index.js",
+			"require": "./dist/storage/memory/index.cjs"
+		},
+		"./storage/cookie": {
+			"types": "./dist/storage/cookie/index.d.ts",
+			"import": "./dist/storage/cookie/index.js",
+			"require": "./dist/storage/cookie/index.cjs"
+		},
+		"./client": {
+			"types": "./dist/client/index.d.ts",
+			"import": "./dist/client/index.js",
+			"require": "./dist/client/index.cjs"
+		},
+		"./plugins": {
+			"types": "./dist/plugins/index.d.ts",
+			"import": "./dist/plugins/index.js",
+			"require": "./dist/plugins/index.cjs"
+		},
+		"./plugins/analytics": {
+			"types": "./dist/plugins/analytics.d.ts",
+			"import": "./dist/plugins/analytics.js",
+			"require": "./dist/plugins/analytics.cjs"
+		},
+		"./plugins/geo": {
+			"types": "./dist/plugins/geo.d.ts",
+			"import": "./dist/plugins/geo.js",
+			"require": "./dist/plugins/geo.cjs"
+		},
+		"./error": {
+			"types": "./dist/error/index.d.ts",
+			"import": "./dist/error/index.js",
+			"require": "./dist/error/index.cjs"
+		},
+		"./error/codes": {
+			"types": "./dist/error/codes.d.ts",
+			"import": "./dist/error/codes.js",
+			"require": "./dist/error/codes.cjs"
+		},
+		"./package.json": "./package.json",
+		"./integrations": {
+			"types": "./dist/integrations/index.d.ts",
+			"import": "./dist/integrations/index.js",
+			"require": "./dist/integrations/index.cjs"
+		},
+		"./integrations/next": {
+			"types": "./dist/integrations/next.d.ts",
+			"import": "./dist/integrations/next.js",
+			"require": "./dist/integrations/next.cjs"
+		},
+		"./integrations/react": {
+			"types": "./dist/integrations/react.d.ts",
+			"import": "./dist/integrations/react.js",
+			"require": "./dist/integrations/react.cjs"
+		},
+		"./integrations/server": {
+			"types": "./dist/integrations/server.d.ts",
+			"import": "./dist/integrations/server.js",
+			"require": "./dist/integrations/server.cjs"
+		}
+	},
+	"main": "./dist/index.cjs",
+	"module": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"dependencies": {
+		"better-call": "^1.0.3",
+		"defu": "^6.1.4",
+		"zod": "^3.24.2"
+	},
+	"devDependencies": {
+		"@c15t/typescript-config": "workspace:*"
+	}
+}
