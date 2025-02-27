@@ -7,7 +7,10 @@
  */
 import type { Storage } from './storage';
 import type { c15tPlugin } from './plugins';
-import type { LogLevel } from '../utils/logger';
+import type { Logger } from '../utils/logger';
+import type { ConsentContext } from '.';
+import type { AuthMiddleware } from '~/api/call';
+
 
 /**
  * Analytics destination configuration
@@ -110,8 +113,8 @@ export interface c15tOptions {
 
 	/**
 	 * The base path for API endpoints
-	 * @default "/api/consent"
-	 * @example "/api/consent"
+	 * @default "/api/c15t"
+	 * @example "/api/c15t"
 	 */
 	basePath?: string;
 
@@ -250,36 +253,6 @@ export interface c15tOptions {
 	};
 
 	/**
-	 * Rate limiting configuration
-	 * Controls how API requests are rate-limited
-	 */
-	rateLimit?: {
-		/**
-		 * Enable rate limiting
-		 * @default true in production
-		 */
-		enabled?: boolean;
-
-		/**
-		 * Time window in seconds
-		 * @default 60
-		 */
-		window?: number;
-
-		/**
-		 * Max requests per window
-		 * @default 100
-		 */
-		max?: number;
-
-		/**
-		 * Storage for rate limiting
-		 * @default "memory"
-		 */
-		storage?: 'memory' | 'secondary-storage';
-	};
-
-	/**
 	 * Analytics configuration
 	 * Settings for tracking consent-related events
 	 */
@@ -325,25 +298,43 @@ export interface c15tOptions {
 	 * Logger configuration
 	 * Controls how events are logged
 	 */
-	logger?: {
-		/**
-		 * Minimum level to log
-		 * @default "info" in production, "debug" in development
-		 */
-		level?: LogLevel;
-
-		/**
-		 * Custom logger implementation
-		 * Allows integration with external logging systems
-		 */
-		custom?: CustomLogger;
-	};
+	logger?: Logger;
 
 	/**
 	 * Advanced configuration options
 	 * Settings for specialized use cases
 	 */
 	advanced?: {
+		/**
+		 * Ip address configuration
+		 */
+		ipAddress?: {
+			/**
+			 * List of headers to use for ip address
+			 *
+			 * Ip address is used for rate limiting and session tracking
+			 *
+			 * @example ["x-client-ip", "x-forwarded-for"]
+			 *
+			 * @default
+			 * @link https://github.com/better-auth/better-auth/blob/main/packages/better-auth/src/utils/get-request-ip.ts#L8
+			 */
+			ipAddressHeaders?: string[];
+			/**
+			 * Disable ip tracking
+			 *
+			 * ⚠︎ This is a security risk and it may expose your application to abuse
+			 */
+			disableIpTracking?: boolean;
+		};
+
+		/**
+		 * Disable trusted origins check
+		 *
+		 * ⚠︎ This is a security risk and it may expose your application to CSRF attacks
+		 */
+		disableCSRFCheck?: boolean;
+
 		/**
 		 * Function to generate IDs
 		 * Custom ID generation for consent records and other entities
@@ -366,5 +357,36 @@ export interface c15tOptions {
 			 */
 			domain?: string;
 		};
+	};
+	/**
+	 * API error handling
+	 */
+	onAPIError?: {
+		/**
+		 * Throw an error on API error
+		 *
+		 * @default false
+		 */
+		throw?: boolean;
+		/**
+		 * Custom error handler
+		 *
+		 * @param error
+		 * @param ctx - Auth context
+		 */
+		onError?: (error: unknown, ctx: ConsentContext) => void | Promise<void>;
+	};
+	/**
+	 * Hooks
+	 */
+	hooks?: {
+		/**
+		 * Before a request is processed
+		 */
+		before?: AuthMiddleware;
+		/**
+		 * After a request is processed
+		 */
+		after?: AuthMiddleware;
 	};
 }

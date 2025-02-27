@@ -1,147 +1,116 @@
-/**
- * Logging Utilities for c15t
- *
- * This module provides a configurable logging system for the c15t
- * consent management system, supporting different log levels and
- * custom logger implementations.
- */
-import type { c15tOptions } from '../types/options';
-import type { LoggerMetadata } from '../types/options';
+export type LogLevel = 'info' | 'success' | 'warn' | 'error' | 'debug';
 
-/**
- * Log levels supported by the logging system
- * Levels are ordered by increasing severity: debug < info < warn < error
- */
-export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
+export const levels = ['info', 'success', 'warn', 'error', 'debug'] as const;
 
-/**
- * Interface for logger implementations
- *
- * All loggers used in c15t must implement this interface, which
- * provides methods for logging messages at different severity levels.
- */
-export interface LoggerInterface {
-	/**
-	 * Logs a debug-level message
-	 * @param message - The message to log
-	 * @param meta - Optional metadata to include with the log
-	 */
-	debug: (message: string, meta?: LoggerMetadata) => void;
-
-	/**
-	 * Logs an info-level message
-	 * @param message - The message to log
-	 * @param meta - Optional metadata to include with the log
-	 */
-	info: (message: string, meta?: LoggerMetadata) => void;
-
-	/**
-	 * Logs a warning-level message
-	 * @param message - The message to log
-	 * @param meta - Optional metadata to include with the log
-	 */
-	warn: (message: string, meta?: LoggerMetadata) => void;
-
-	/**
-	 * Logs an error-level message
-	 * @param message - The message to log
-	 * @param meta - Optional metadata to include with the log
-	 */
-	error: (message: string, meta?: LoggerMetadata) => void;
+export function shouldPublishLog(
+	currentLogLevel: LogLevel,
+	logLevel: LogLevel
+): boolean {
+	return levels.indexOf(logLevel) <= levels.indexOf(currentLogLevel);
 }
 
-/**
- * Creates a logger instance based on the provided configuration
- *
- * This function returns a logger that respects the configured log level
- * and can either use a custom logger implementation or fall back to
- * a default console-based logger.
- *
- * @param config - Logger configuration options
- * @returns A logger instance implementing the LoggerInterface
- *
- * @example
- * ```typescript
- * // Create a default logger
- * const logger = createLogger();
- * logger.info('Application started');
- *
- * // Create a logger with custom level
- * const debugLogger = createLogger({ level: 'debug' });
- * debugLogger.debug('Debug information', { requestId: '123' });
- * ```
- */
-export function createLogger(config?: c15tOptions['logger']): LoggerInterface {
-	const level = config?.level || (isProduction() ? 'info' : 'debug');
-	const levels: Record<LogLevel, number> = {
-		debug: 0,
-		info: 1,
-		warn: 2,
-		error: 3,
-	};
-
-	/**
-	 * Determines if a message at the given level should be logged
-	 * based on the configured minimum log level
-	 *
-	 * @param messageLevel - The level of the message to be logged
-	 * @returns True if the message should be logged, false otherwise
-	 */
-	const shouldLog = (messageLevel: LogLevel): boolean => {
-		return levels[messageLevel] >= levels[level];
-	};
-
-	// Use custom logger if provided
-	if (config?.custom) {
-		return config.custom;
-	}
-
-	// Default console-based logger
-	return {
-		debug: (message: string, meta?: LoggerMetadata) => {
-			if (shouldLog('debug')) {
-				if (meta) {
-					console.debug(`[c15t:debug] ${message}`, meta);
-				} else {
-					console.debug(`[c15t:debug] ${message}`);
-				}
-			}
-		},
-		info: (message: string, meta?: LoggerMetadata) => {
-			if (shouldLog('info')) {
-				if (meta) {
-					console.info(`[c15t:info] ${message}`, meta);
-				} else {
-					console.info(`[c15t:info] ${message}`);
-				}
-			}
-		},
-		warn: (message: string, meta?: LoggerMetadata) => {
-			if (shouldLog('warn')) {
-				if (meta) {
-					console.warn(`[c15t:warn] ${message}`, meta);
-				} else {
-					console.warn(`[c15t:warn] ${message}`);
-				}
-			}
-		},
-		error: (message: string, meta?: LoggerMetadata) => {
-			if (shouldLog('error')) {
-				if (meta) {
-					console.error(`[c15t:error] ${message}`, meta);
-				} else {
-					console.error(`[c15t:error] ${message}`);
-				}
-			}
-		},
-	};
+export interface Logger {
+	disabled?: boolean;
+	level?: Exclude<LogLevel, 'success'>;
+	log?: (
+		level: Exclude<LogLevel, 'success'>,
+		message: string,
+		...args: any[]
+	) => void;
 }
 
-/**
- * Checks if the application is running in production mode
- *
- * @returns True if NODE_ENV is set to 'production', false otherwise
- */
-function isProduction(): boolean {
-	return process.env.NODE_ENV === 'production';
-}
+export type LogHandlerParams = Parameters<NonNullable<Logger['log']>> extends [
+	LogLevel,
+	...infer Rest,
+]
+	? Rest
+	: never;
+
+const colors = {
+	reset: '\x1b[0m',
+	bright: '\x1b[1m',
+	dim: '\x1b[2m',
+	underscore: '\x1b[4m',
+	blink: '\x1b[5m',
+	reverse: '\x1b[7m',
+	hidden: '\x1b[8m',
+	fg: {
+		black: '\x1b[30m',
+		red: '\x1b[31m',
+		green: '\x1b[32m',
+		yellow: '\x1b[33m',
+		blue: '\x1b[34m',
+		magenta: '\x1b[35m',
+		cyan: '\x1b[36m',
+		white: '\x1b[37m',
+	},
+	bg: {
+		black: '\x1b[40m',
+		red: '\x1b[41m',
+		green: '\x1b[42m',
+		yellow: '\x1b[43m',
+		blue: '\x1b[44m',
+		magenta: '\x1b[45m',
+		cyan: '\x1b[46m',
+		white: '\x1b[47m',
+	},
+};
+
+const levelColors: Record<LogLevel, string> = {
+	info: colors.fg.blue,
+	success: colors.fg.green,
+	warn: colors.fg.yellow,
+	error: colors.fg.red,
+	debug: colors.fg.magenta,
+};
+
+const formatMessage = (level: LogLevel, message: string): string => {
+	const timestamp = new Date().toISOString();
+	return `${colors.dim}${timestamp}${colors.reset} ${
+		levelColors[level]
+	}${level.toUpperCase()}${colors.reset} ${colors.bright}[Better Auth]:${
+		colors.reset
+	} ${message}`;
+};
+
+export const createLogger = (
+	options?: Logger
+): Record<LogLevel, (...params: LogHandlerParams) => void> => {
+	const enabled = options?.disabled !== true;
+	const logLevel = options?.level ?? 'error';
+
+	const LogFunc = (
+		level: LogLevel,
+		message: string,
+		args: any[] = []
+	): void => {
+		if (!enabled || !shouldPublishLog(logLevel, level)) {
+			return;
+		}
+
+		const formattedMessage = formatMessage(level, message);
+
+		if (!options || typeof options.log !== 'function') {
+			if (level === 'error') {
+				console.error(formattedMessage, ...args);
+			} else if (level === 'warn') {
+				console.warn(formattedMessage, ...args);
+			} else {
+				console.log(formattedMessage, ...args);
+			}
+			return;
+		}
+
+		options.log(level === 'success' ? 'info' : level, message, ...args);
+	};
+
+	return Object.fromEntries(
+		levels.map((level) => [
+			level,
+			(...[message, ...args]: LogHandlerParams) =>
+				LogFunc(level, message, args),
+		])
+	) as Record<LogLevel, (...params: LogHandlerParams) => void>;
+};
+
+export const logger = createLogger();

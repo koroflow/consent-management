@@ -21,7 +21,16 @@ export function useConsent() {
 	useEffect(() => {
 		const fetchConsentState = async () => {
 			try {
-				const response = await fetch('/api/consent/status');
+				// Specify the full path to ensure consistency
+				const response = await fetch('/api/c15t/consent/get');
+				
+				// Check if the response is ok before parsing
+				if (!response.ok) {
+					console.error('Error fetching consent:', response.status, response.statusText);
+					setLoading(false);
+					return;
+				}
+				
 				const data = await response.json();
 
 				setConsented(data.consented);
@@ -44,7 +53,7 @@ export function useConsent() {
 
 		try {
 			const updatedPreferences = { ...preferences, ...newPreferences };
-			const response = await fetch('/api/consent/set', {
+			const response = await fetch('/api/c15t/consent/set', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',

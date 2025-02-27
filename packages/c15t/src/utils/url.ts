@@ -1,54 +1,75 @@
-/**
- * URL Utilities for c15t
- *
- * This module provides URL-related utility functions for determining
- * base URLs and constructing API endpoints in the c15t consent management system.
- */
-import { env } from './env';
+import { env } from '../utils/env';
+import { c15tError } from '../error/codes';
 
-/**
- * Determines the base URL for the c15t API
- *
- * This function constructs a complete base URL for the API by combining
- * a provided base URL with a base path. If no base URL is provided, it tries
- * to retrieve one from environment variables.
- *
- * @param baseURL - Optional base URL to use (e.g., 'https://example.com')
- * @param basePath - Optional base path to append to the URL (default: '/api/consent')
- * @returns The complete base URL as a string, or undefined if no base URL could be determined
- *
- * @example
- * ```typescript
- * // With explicit baseURL
- * const apiUrl = getBaseURL('https://myapp.com', '/api/v1/consent');
- * // "https://myapp.com/api/v1/consent"
- *
- * // Using environment variables and default path
- * // (if C15T_URL="https://myapp.com")
- * const apiUrl = getBaseURL();
- * // "https://myapp.com/api/consent"
- * ```
- */
-export function getBaseURL(
-	baseURL?: string,
-	basePath?: string
-): string | undefined {
-	if (baseURL) {
-		const url = new URL(basePath || '/api/consent', baseURL);
-		return url.toString();
+function checkHasPath(url: string): boolean {
+	try {
+		const parsedUrl = new URL(url);
+		return parsedUrl.pathname !== '/';
+	} catch (error) {
+		throw new c15tError(
+			`Invalid base URL: ${url}. Please provide a valid base URL.`
+		);
+	}
+}
+
+function withPath(url: string, path = '/api/auth') {
+	const hasPath = checkHasPath(url);
+	if (hasPath) {
+		return url;
+	}
+	path = path.startsWith('/') ? path : `/${path}`;
+	return `${url.replace(/\/+$/, '')}${path}`;
+}
+
+export function getBaseURL(url?: string, path?: string) {
+	if (url) {
+		return withPath(url, path);
+	}
+	const fromEnv =
+		env.BETTER_AUTH_URL ||
+		env.NEXT_PUBLIC_BETTER_AUTH_URL ||
+		env.PUBLIC_BETTER_AUTH_URL ||
+		env.NUXT_PUBLIC_BETTER_AUTH_URL ||
+		env.NUXT_PUBLIC_AUTH_URL ||
+		(env.BASE_URL !== '/' ? env.BASE_URL : undefined);
+
+	if (fromEnv) {
+		return withPath(fromEnv, path);
 	}
 
-	// Try to get from environment variables
-	const envBaseURL =
-		env.C15T_URL ||
-		env.CONSENT_URL ||
-		env.NEXT_PUBLIC_C15T_URL ||
-		env.NEXT_PUBLIC_CONSENT_URL;
-
-	if (envBaseURL) {
-		const url = new URL(basePath || '/api/consent', envBaseURL);
-		return url.toString();
+	if (typeof window !== 'undefined' && window.location) {
+		return withPath(window.location.origin, path);
 	}
-
 	return undefined;
+}
+
+export function getOrigin(url: string) {
+	try {
+		const parsedUrl = new URL(url);
+		return parsedUrl.origin;
+	} catch (error) {
+		return null;
+	}
+}
+
+export function getProtocol(url: string) {
+	try {
+		const parsedUrl = new URL(url);
+		return parsedUrl.protocol;
+	} catch (error) {
+		return null;
+	}
+}
+
+export const checkURLValidity = (url: string) => {
+	const urlPattern = url.includes('://');
+	return urlPattern;
+};
+
+export function getHost(url: string) {
+	if (url.includes('://')) {
+		const parsedUrl = new URL(url);
+		return parsedUrl.host;
+	}
+	return url;
 }

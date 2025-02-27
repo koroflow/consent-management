@@ -50,7 +50,7 @@
  */
 
 import type { c15tClient } from '~/client';
-import { createConsentEndpoint, createConsentMiddleware } from '../../api/call';
+import { createAuthEndpoint, createAuthMiddleware } from '../../api/call';
 import type { c15tPlugin, ConsentContext, EndpointContext } from '../../types';
 import type { MiddlewareContext, MiddlewareOptions } from 'better-call';
 import type { LoggerMetadata } from '~/types/options';
@@ -204,7 +204,7 @@ export const geo = (options?: GeoPluginOptions): c15tPlugin => {
 	 * Middleware that detects visitor location from IP address
 	 * Adds geo information to the request context
 	 */
-	const geoMiddleware = createConsentMiddleware(
+	const geoMiddleware = createAuthMiddleware(
 		async (ctx: MiddlewareContext<MiddlewareOptions>) => {
 			// Skip if disabled
 			if (options?.enabled === false) {
@@ -271,10 +271,10 @@ export const geo = (options?: GeoPluginOptions): c15tPlugin => {
 						};
 					}
 				} catch (error) {
-					const logger = (ctx as unknown as EndpointContext).context?.logger;
-					if (logger?.error) {
-						logger.error('Error getting geolocation', error as LoggerMetadata);
-					}
+					ctx.context.logger?.error(
+						'Error getting geolocation',
+						error as LoggerMetadata
+					);
 				}
 			}
 
@@ -334,7 +334,7 @@ export const geo = (options?: GeoPluginOptions): c15tPlugin => {
 			 *   "defaultPurposes": []
 			 * }
 			 */
-			getJurisdiction: createConsentEndpoint(
+			getJurisdiction: createAuthEndpoint(
 				'/jurisdiction',
 				{
 					method: 'GET',
@@ -406,7 +406,7 @@ export const geo = (options?: GeoPluginOptions): c15tPlugin => {
 			 *   "source": "cloudflare-headers"
 			 * }
 			 */
-			getGeoInfo: createConsentEndpoint(
+			getGeoInfo: createAuthEndpoint(
 				'/location',
 				{
 					method: 'GET',

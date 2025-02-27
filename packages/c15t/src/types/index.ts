@@ -6,10 +6,10 @@
  * used throughout the system.
  */
 // types/index.ts
+import type { createLogger } from '~/utils';
 import type { c15tOptions } from './options';
 import type { c15tPlugin } from './plugins';
 import type { Storage } from './storage';
-import type { LoggerInterface } from '../utils/logger';
 
 // Re-export important types
 export type { c15tOptions } from './options';
@@ -361,7 +361,7 @@ export interface ConsentContext {
 	/**
 	 * Logger interface
 	 */
-	logger: LoggerInterface;
+	logger: ReturnType<typeof createLogger>;
 
 	/**
 	 * Consent configuration
@@ -493,7 +493,7 @@ export interface EndpointContext {
 export type InferPluginTypes<O extends c15tOptions> =
 	O['plugins'] extends Array<infer P>
 		? P extends c15tPlugin
-			? P['$InferServerPlugin'] extends infer SP
+			? P extends { $InferServerPlugin: infer SP }
 				? SP extends Record<string, unknown>
 					? SP
 					: Record<string, never>

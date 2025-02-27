@@ -14,7 +14,7 @@
  * import { createConsentClient } from '@c15t/integrations/react';
  *
  * const consentClient = createConsentClient({
- *   baseUrl: '/api/consent',
+ *   baseUrl: '/api/c15t',
  *   refreshInterval: 60000, // Check every minute
  * });
  *
@@ -137,7 +137,7 @@ type ConsentStore = ConsentState & ConsentActions;
 interface c15tClientConfig {
 	/**
 	 * Base URL for API endpoints
-	 * @default '/api/consent'
+	 * @default '/api/c15t'
 	 */
 	baseUrl?: string;
 
@@ -255,7 +255,7 @@ interface ConsentClient {
  * ```tsx
  * // Create a client
  * const client = createConsentClient({
- *   baseUrl: '/api/consent',
+ *   baseUrl: '/api/c15t',
  *   refreshInterval: 60000,
  *   defaultPreferences: {
  *     analytics: true,
@@ -284,7 +284,7 @@ export function createConsentClient(
 	config: c15tClientConfig = {}
 ): ConsentClient {
 	const {
-		baseUrl = '/api/consent',
+		baseUrl = '/api/c15t',
 		refreshInterval = 0,
 		defaultPreferences = {
 			analytics: true,

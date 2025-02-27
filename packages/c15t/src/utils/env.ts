@@ -31,3 +31,13 @@ export const isProduction =
  */
 export const isDevelopment =
 	typeof process !== 'undefined' && process.env.NODE_ENV === 'development';
+
+function toBoolean(val: boolean | string | undefined) {
+	return val ? val !== 'false' : false;
+}
+
+export const nodeENV =
+	(typeof process !== 'undefined' && process.env && process.env.NODE_ENV) || '';
+
+/** Detect if `NODE_ENV` environment variable is `test` */
+export const isTest = nodeENV === 'test' || toBoolean(env.TEST);

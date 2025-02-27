@@ -1,4 +1,4 @@
-import { createConsentEndpoint } from '../call';
+import { createAuthEndpoint } from '../call';
 import type { ConsentContext } from '../../types';
 
 /**
@@ -37,7 +37,7 @@ import type { ConsentContext } from '../../types';
  * @returns {number} consent.updateAge - Days after which consent should be refreshed
  * @returns {number} consent.expiresIn - Days after which consent expires completely
  */
-export const status = createConsentEndpoint(
+export const status = createAuthEndpoint(
 	'/status',
 	{
 		method: 'GET',

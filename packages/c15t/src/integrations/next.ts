@@ -2,424 +2,174 @@
  * Next.js integration for c15t
  *
  * This module provides handlers and utilities for integrating the c15t consent management
- * system with Next.js applications. It includes adapters for handling API routes,
- * middleware for cookie management, and utilities for consent verification.
- *
- * The implementation avoids direct dependencies on Next.js types to prevent requiring
- * Next.js as a peer dependency, making it more flexible for different Next.js versions.
- *
- * @example
- * ```typescript
- * import { toNextJsHandler } from '@c15t/integrations/next';
- * import { c15t } from '../lib/c15t';
- *
- * // Create a Next.js API route handler
- * export default toNextJsHandler(c15t, 'getConsent');
- * ```
+ * system with Next.js applications. It includes adapters for Next.js App Router API routes
+ * and a plugin for cookie management.
  */
 
+import type { CookieOptions } from '~/cookies';
 import type { c15tInstance } from '~/core';
-
-/**
- * Cookie options interface for standardizing cookie parameters
- */
-interface CookieOptions {
-	/** Path where the cookie is available */
-	path?: string;
-	/** Domain where the cookie is available */
-	domain?: string;
-	/** Maximum age of the cookie in seconds */
-	maxAge?: number;
-	/** Date when the cookie expires */
-	expires?: string | Date;
-	/** Whether the cookie is only accessible via HTTP(S) requests */
-	httpOnly?: boolean;
-	/** Whether the cookie should only be sent over HTTPS */
-	secure?: boolean;
-	/** Controls whether the cookie is sent with cross-site requests */
-	sameSite?: 'strict' | 'lax' | 'none';
-}
-
-/**
- * Basic representation of Next.js NextRequest interface without direct dependency.
- *
- * This interface models the essential properties of a Next.js request object
- * to allow for type checking without importing from Next.js directly.
- */
-interface GenericNextRequest {
-	headers: {
-		get: (name: string) => string | null;
-		has: (name: string) => boolean;
-		[key: string]: unknown;
-	};
-	cookies: {
-		get: (name: string) => { name: string; value: string } | undefined;
-		getAll: () => Array<{ name: string; value: string }>;
-		has: (name: string) => boolean;
-		[key: string]: unknown;
-	};
-	nextUrl?: {
-		pathname: string;
-		searchParams: URLSearchParams;
-		[key: string]: unknown;
-	};
-	[key: string]: unknown;
-}
-
-/**
- * Type for cookie extraction function used in middleware.
- *
- * This function extracts a cookie value from a Next.js request object.
- */
-type CookieExtractor = (
-	request: GenericNextRequest,
-	cookieName?: string
-) => string | null;
-
-/**
- * Context interface for cookie handling in Next.js.
- *
- * This interface provides a standardized way to interact with cookies
- * across different Next.js API contexts.
- */
-interface NextCookieContext {
-	/**
-	 * Sets a cookie in the response
-	 *
-	 * @param name - Cookie name
-	 * @param value - Cookie value
-	 * @param options - Cookie options (path, expires, etc.)
-	 */
-	setCookie: (name: string, value: string, options?: CookieOptions) => void;
-
-	/**
-	 * Gets a cookie value from the request
-	 *
-	 * @param name - Cookie name
-	 * @returns The cookie value or undefined if not found
-	 */
-	getCookie: (name: string) => string | undefined;
-
-	/**
-	 * Deletes a cookie by setting its expiration to the past
-	 *
-	 * @param name - Cookie name to delete
-	 */
-	deleteCookie: (name: string) => void;
-
-	/**
-	 * Response object if available
-	 */
-	response?: Response;
-
-	/**
-	 * Next.js cookies API if available
-	 */
-	cookies?: {
-		set: (name: string, value: string, options?: CookieOptions) => void;
-		get: (name: string) => { name: string; value: string } | undefined;
-		delete: (name: string) => void;
-		has: (name: string) => boolean;
-	};
-}
-
-/**
- * JSON-serializable data types that can be used in API responses
- */
-type JsonValue =
-	| string
-	| number
-	| boolean
-	| null
-	| JsonValue[]
-	| { [key: string]: JsonValue };
 
 /**
  * Convert a c15t handler to a Next.js API route handler.
  *
- * This function adapts a c15t handler to work as a Next.js API route handler,
- * handling the request/response conversion between the two systems.
+ * This function adapts a c15t handler to work with Next.js App Router API routes,
+ * providing GET and POST handler functions.
  *
  * @example
  * ```typescript
- * // pages/api/consent.ts
+ * // app/api/c15t/route.ts
  * import { toNextJsHandler } from '@c15t/integrations/next';
- * import { c15t } from '../../lib/c15t';
+ * import { c15t } from '@/lib/c15t';
  *
- * export default toNextJsHandler(c15t, 'getConsent');
+ * export const { GET, POST } = toNextJsHandler(c15t);
  * ```
  *
- * @param c15t - c15t instance containing the handler
- * @param handlerName - Name of the handler to use from the c15t instance
- * @returns Next.js API route handler function
+ * @param c15t - c15t instance containing the handler or a handler function
+ * @returns Next.js API route handler functions for GET and POST
  */
-export function toNextJsHandler(c15t: c15tInstance, handlerName: string) {
-	return async function handler(
-		req: Request,
-		{ params }: { params?: Record<string, string | string[]> } = {}
-	) {
-		// Create context object with headers, cookies, etc.
-		const headers = new Headers();
-		const cookies: NextCookieContext = {
-			setCookie: (name, value, options: CookieOptions = {}) => {
-				// Convert options to cookie string parts
-				const parts: string[] = [`${name}=${value}`];
-
-				if (options.path) parts.push(`Path=${options.path}`);
-				if (options.domain) parts.push(`Domain=${options.domain}`);
-				if (options.maxAge) parts.push(`Max-Age=${options.maxAge}`);
-				if (options.expires) parts.push(`Expires=${options.expires}`);
-				if (options.httpOnly) parts.push('HttpOnly');
-				if (options.secure) parts.push('Secure');
-				if (options.sameSite) parts.push(`SameSite=${options.sameSite}`);
-
-				headers.append('Set-Cookie', parts.join('; '));
-			},
-			getCookie: (name) => {
-				const cookieHeader = req.headers.get('cookie');
-				if (!cookieHeader) return undefined;
-
-				const match = new RegExp(`${name}=([^;]+)`).exec(cookieHeader);
-				return match ? match[1] : undefined;
-			},
-			deleteCookie: (name) => {
-				headers.append('Set-Cookie', `${name}=; Path=/; Max-Age=0`);
-			},
-		};
-
-		try {
-			// Parse request
-			const url = new URL(req.url);
-			const query = Object.fromEntries(url.searchParams.entries());
-			const method = req.method;
-
-			// Parse body if available
-			let body: Record<string, unknown> | undefined;
-			try {
-				if (['POST', 'PUT', 'PATCH'].includes(method)) {
-					const contentType = req.headers.get('content-type') || '';
-					if (contentType.includes('application/json')) {
-						body = await req.json();
-					} else if (
-						contentType.includes('application/x-www-form-urlencoded')
-					) {
-						const formData = await req.formData();
-						body = Object.fromEntries(formData.entries());
-					}
-				}
-			} catch (e) {
-				// Ignore body parsing errors
-				console.error('Error parsing request body:', e);
-			}
-
-			// Create endpoint context
-			const endpointContext = {
-				context: { cookies },
-				request: req,
-				body,
-				params: params || {},
-				query,
-				headers: req.headers,
-				cookies,
-				json: (data: JsonValue, status = 200) => {
-					return new Response(JSON.stringify(data), {
-						status,
-						headers: {
-							'Content-Type': 'application/json',
-							...Object.fromEntries(headers.entries()),
-						},
-					});
-				},
-				setCookie: cookies.setCookie,
-				getCookie: cookies.getCookie,
-				getSignedCookie: (name: string) => cookies.getCookie(name),
-			};
-
-			// Call the appropriate handler
-			// @ts-ignore - Dynamic handler access
-			const result = await c15t[handlerName](endpointContext);
-
-			if (result instanceof Response) {
-				// If the handler returned a Response directly, use it
-				// But ensure we include our headers (e.g., Set-Cookie)
-				const origHeaders = Object.fromEntries(result.headers.entries());
-				const combinedHeaders = { ...origHeaders };
-
-				headers.forEach((value, key) => {
-					if (key.toLowerCase() === 'set-cookie') {
-						// Append rather than replace Set-Cookie headers
-						if (combinedHeaders[key]) {
-							// For Set-Cookie, we need to keep it as a string
-							// Multiple cookies should be separated by a newline
-							combinedHeaders[key] = `${combinedHeaders[key]}\n${value}`;
-						} else {
-							combinedHeaders[key] = value;
-						}
-					} else {
-						combinedHeaders[key] = value;
-					}
-				});
-
-				return new Response(result.body, {
-					status: result.status,
-					statusText: result.statusText,
-					headers: combinedHeaders,
-				});
-			}
-
-			// If a plain object was returned, convert to JSON response
-			return new Response(JSON.stringify(result), {
-				status: 200,
-				headers: {
-					'Content-Type': 'application/json',
-					...Object.fromEntries(headers.entries()),
-				},
-			});
-		} catch (error) {
-			console.error('Error in Next.js API route handler:', error);
-
-			return new Response(
-				JSON.stringify({
-					error: error instanceof Error ? error.message : 'Unknown error',
-					status: 'error',
-				}),
-				{
-					status: 500,
-					headers: {
-						'Content-Type': 'application/json',
-						...Object.fromEntries(headers.entries()),
-					},
-				}
-			);
-		}
-	};
+export function toNextJsHandler(
+  c15t: c15tInstance | ((request: Request) => Promise<Response>)
+) {
+  const handler = async (request: Request) => {
+    console.log('DEBUG next.ts handler - Request URL:', request.url);
+    console.log('DEBUG next.ts handler - Request headers:', JSON.stringify(Object.fromEntries([...request.headers.entries()]), null, 2));
+    
+    try {
+      // Check if c15t is properly configured
+      if ('handler' in c15t) {
+        console.log('DEBUG next.ts handler - Using c15t instance handler');
+        
+        // Ensure the baseURL is set correctly for the c15t instance
+        if ('$context' in c15t && c15t.$context) {
+          const contextPromise = c15t.$context;
+          try {
+            const context = await contextPromise;
+            
+            // If baseURL is not set, initialize it from the request URL
+            if (!context.baseURL || context.baseURL.trim() === '') {
+              const url = new URL(request.url);
+              const basePath = context.options?.basePath || '/api/c15t';
+              const baseURL = `${url.origin}${basePath}`;
+              
+              console.log('DEBUG next.ts handler - Setting missing baseURL:', baseURL);
+              context.baseURL = baseURL;
+              if (context.options) {
+                context.options.baseURL = baseURL;
+              }
+            }
+            
+            console.log('DEBUG next.ts handler - c15t context baseURL:', context.baseURL);
+            console.log('DEBUG next.ts handler - c15t options:', JSON.stringify({
+              baseURL: context.options?.baseURL,
+              basePath: context.options?.basePath
+            }, null, 2));
+          } catch (e) {
+            console.error('DEBUG next.ts handler - Error accessing c15t context:', e);
+          }
+        }
+        
+        return c15t.handler(request);
+      } else {
+        console.log('DEBUG next.ts handler - Using function handler');
+        return c15t(request);
+      }
+    } catch (error) {
+      console.error('DEBUG next.ts handler - Error in handler:', error);
+      throw error;
+    }
+  };
+  
+  return {
+    GET: handler,
+    POST: handler,
+  };
 }
 
 /**
- * Extract the consent cookie from a Next.js request.
- *
- * This function retrieves the consent cookie value from either the cookies API
- * or the cookie header, depending on what's available in the request.
- *
- * @example
- * ```typescript
- * // In a middleware or API route
- * import { getConsentCookie } from '@c15t/integrations/next';
- *
- * export default function middleware(request) {
- *   const consentValue = getConsentCookie(request);
- *   // Use the consent value to make decisions
- * }
- * ```
- *
- * @param request - Next.js request object
- * @param cookieName - Name of the consent cookie (defaults to 'c15t-consent')
- * @returns The consent cookie value or null if not found
+ * Cookie property interface for parsed cookie values
  */
-export const getConsentCookie: CookieExtractor = (
-	request: GenericNextRequest,
-	cookieName = 'c15t-consent'
-) => {
-	// Try the modern cookies API first
-	if (request.cookies?.get) {
-		const cookie = request.cookies.get(cookieName);
-		if (cookie) return cookie.value;
-	}
-
-	// Fall back to headers
-	const cookieHeader = request.headers.get('cookie');
-	if (!cookieHeader) return null;
-
-	// Parse the cookie header
-	const cookies = cookieHeader
-		.split(';')
-		.reduce<Record<string, string>>((acc, cookie) => {
-			const [key, value] = cookie.trim().split('=');
-			if (key && value) acc[key] = value;
-			return acc;
-		}, {});
-
-	return cookies[cookieName] || null;
-};
-
-/**
- * Interface for options passed to the checkConsentCookie function
- */
-interface CheckConsentOptions {
-	/**
-	 * List of consent purpose IDs that are required for the operation
-	 */
-	requiredConsent?: string[];
-
-	/**
-	 * The name of the cookie containing consent information
-	 * @default 'c15t-consent'
-	 */
-	cookieName?: string;
+interface CookieProperties {
+  value: string;
+  domain?: string;
+  path?: string;
+  'max-age'?: number;
+  expires?: string;
+  secure?: boolean;
+  httponly?: boolean;
+  samesite?: 'strict' | 'lax' | 'none';
+  [key: string]: unknown;
 }
 
 /**
- * Check if the user has provided consent based on the cookie.
- *
- * This function verifies whether the user has consented to specific purposes
- * by checking the consent cookie. If no specific consent purposes are required,
- * it simply checks if the consent cookie exists.
- *
- * @example
- * ```typescript
- * // In a middleware or API route
- * import { checkConsentCookie } from '@c15t/integrations/next';
- *
- * export default function middleware(request) {
- *   const hasConsent = checkConsentCookie(request, {
- *     requiredConsent: ['analytics', 'marketing']
- *   });
- *
- *   if (!hasConsent) {
- *     // Redirect to consent page or show consent banner
- *   }
- * }
- * ```
- *
- * @param request - Next.js request object
- * @param options - Options for the check including required consent purposes
- * @returns Whether the user has consented to all required purposes
+ * Parse a Set-Cookie header into a Map of cookie name to cookie properties
+ * 
+ * @param setCookieHeader - The Set-Cookie header value
+ * @returns A Map of cookie name to cookie properties
  */
-export const checkConsentCookie = (
-	request: GenericNextRequest,
-	options: CheckConsentOptions = {}
-) => {
-	const { requiredConsent = [], cookieName = 'c15t-consent' } = options;
-
-	// Get the consent cookie
-	const consentCookie = getConsentCookie(request, cookieName);
-
-	if (!consentCookie) {
-		return false;
-	}
-
-	try {
-		// Parse the cookie
-		const preferences = JSON.parse(decodeURIComponent(consentCookie));
-
-		// If no specific consent is required, just check if consent exists
-		if (requiredConsent.length === 0) {
-			return true;
-		}
-
-		// Check if all required consents are given
-		return requiredConsent.every((key) => preferences[key] === true);
-	} catch (e) {
-		console.error('Error parsing consent cookie:', e);
-		return false;
-	}
-};
+function parseSetCookieHeader(setCookieHeader: string): Map<string, CookieProperties> {
+  const cookies = new Map<string, CookieProperties>();
+  
+  // Split multiple cookies (they might be separated by newlines)
+  const cookieStrings = setCookieHeader.split(/\r?\n/);
+  
+  for (const cookieStr of cookieStrings) {
+    // Split the first part which is name=value from the rest
+    const parts = cookieStr.split(';');
+    const nameValuePair = parts.shift();
+    if (!nameValuePair) { continue; }
+    
+    const nameValue = nameValuePair.split('=');
+    if (nameValue.length < 2) { continue; }
+    
+    const name = nameValue[0]?.trim();
+    if (!name) { continue; }
+    
+    // Join back in case the value itself contains '='
+    const value = nameValue.slice(1).join('=');
+    
+    const cookie: CookieProperties = { value };
+    
+    // Parse other cookie attributes
+    for (const part of parts) {
+      const [attrName, ...attrValueParts] = part.trim().split('=');
+      if (!attrName) { continue; }
+      
+      const lowerAttrName = attrName.toLowerCase();
+      
+      if (attrValueParts.length > 0) {
+        const attrValue = attrValueParts.join('=');
+        if (lowerAttrName === 'max-age') {
+          cookie[lowerAttrName] = Number.parseInt(attrValue, 10);
+        } else {
+          cookie[lowerAttrName] = attrValue;
+        }
+      } else {
+        // Boolean attributes like 'Secure' and 'HttpOnly'
+        cookie[lowerAttrName] = true;
+      }
+    }
+    
+    cookies.set(name, cookie);
+  }
+  
+  return cookies;
+}
 
 /**
- * A Next.js plugin for handling cookies in server actions.
+ * Context interface for the plugin handler
+ */
+interface PluginContext {
+  _flag?: string;
+  response?: Response;
+  responseHeader?: Headers;
+  [key: string]: unknown;
+}
+
+/**
+ * A Next.js plugin for handling cookies in server components and actions.
  *
- * This plugin provides hooks for managing cookies in Next.js server actions,
- * allowing for seamless integration between c15t and Next.js cookie handling.
+ * This plugin integrates c15t with Next.js cookie handling, automatically
+ * transferring cookies set in c15t responses to the Next.js cookie store.
  *
  * @example
  * ```typescript
@@ -432,40 +182,146 @@ export const checkConsentCookie = (
  * });
  * ```
  *
- * @returns A plugin configuration object compatible with the c15t plugin system
+ * @returns A plugin configuration object for c15t
  */
 export function nextCookies() {
-	return {
-		name: 'next-cookies',
-		hooks: {
-			afterResponse: [
-				{
-					matcher: () => true,
-					handler: async (ctx: NextCookieContext) => {
-						// Extract Set-Cookie header and set it using Next.js cookies API
-						if (
-							ctx.response instanceof Response &&
-							ctx.response.headers.has('Set-Cookie')
-						) {
-							const cookieHeader = ctx.response.headers.get('Set-Cookie');
-
-							// If we're in a Server Action context and have access to cookies API
-							if (typeof ctx.cookies?.set === 'function') {
-								// Parse cookie header and set it
-								const cookieMatch = /^([^=]+)=([^;]+);.+/.exec(
-									cookieHeader || ''
-								);
-								if (cookieMatch) {
-									const [, name, value] = cookieMatch;
-									if (name && value) {
-										ctx.cookies.set(name, value);
-									}
-								}
-							}
-						}
-					},
-				},
-			],
-		},
-	};
+  return {
+    name: 'next-cookies',
+    hooks: {
+      afterResponse: [
+        {
+          matcher: () => true,
+          handler: async (ctx: PluginContext) => {
+            if (ctx._flag === 'router') {
+              return;
+            }
+            
+            const responseHeader = ctx.response?.headers || ctx.responseHeader;
+            if (!responseHeader || !responseHeader.has('Set-Cookie')) {
+              return;
+            }
+            
+            try {
+              const setCookieHeader = responseHeader.get('Set-Cookie');
+              if (!setCookieHeader) return;
+              
+              // Import Next.js cookies API dynamically
+              //@ts-expect-error
+              const { cookies } = await import('next/headers');
+              type CookieStore = {
+                set: (name: string, value: string, options?: CookieOptions) => void;
+              };
+              const cookieStore = cookies() as CookieStore;
+              // Parse and set cookies
+              const parsedCookies = parseSetCookieHeader(setCookieHeader);
+              parsedCookies.forEach((value, key) => {
+                if (!key) { return; }
+                
+                const opts = {
+                  sameSite: value.samesite as 'strict' | 'lax' | 'none' | undefined,
+                  secure: value.secure,
+                  maxAge: value['max-age'],
+                  httpOnly: value.httponly,
+                  domain: value.domain,
+                  path: value.path,
+                } as const;
+                
+                try {
+                  cookieStore.set(key, decodeURIComponent(value.value), opts);
+                } catch (e) {
+                  // This will fail if called in a server component
+                  // biome-ignore lint/suspicious/noConsole: <explanation>
+                                    console.debug('Failed to set cookie with Next.js API:', e);
+                }
+              });
+            } catch (e) {
+              // Ignore errors when cookies API is not available
+              // biome-ignore lint/suspicious/noConsole: <explanation>
+                            console.debug('Next.js cookies API not available:', e);
+            }
+          },
+        },
+      ],
+    },
+  };
 }
+
+/**
+ * Extract the consent cookie from a Next.js request.
+ *
+ * @param request - Next.js request object
+ * @param cookieName - Name of the consent cookie (defaults to 'c15t-consent')
+ * @returns The consent cookie value or null if not found
+ */
+export const getConsentCookie = (
+  request: Request,
+  cookieName = 'c15t-consent'
+): string | null => {
+  const cookieHeader = request.headers.get('cookie');
+  if (!cookieHeader) { return null; }
+
+  // Parse the cookie header
+  const cookies = cookieHeader
+    .split(';')
+    .reduce<Record<string, string>>((acc, cookie) => {
+      const [key, value] = cookie.trim().split('=');
+      if (key && value) { acc[key] = value; }
+      return acc;
+    }, {});
+
+  return cookies[cookieName] || null;
+};
+
+/**
+ * Interface for options passed to the checkConsentCookie function
+ */
+interface CheckConsentOptions {
+  /**
+   * List of consent purpose IDs that are required for the operation
+   */
+  requiredConsent?: string[];
+
+  /**
+   * The name of the cookie containing consent information
+   * @default 'c15t-consent'
+   */
+  cookieName?: string;
+}
+
+/**
+ * Check if the user has provided consent based on the cookie.
+ *
+ * @param request - Next.js request object
+ * @param options - Options for the check including required consent purposes
+ * @returns Whether the user has consented to all required purposes
+ */
+export const checkConsentCookie = (
+  request: Request,
+  options: CheckConsentOptions = {}
+): boolean => {
+  const { requiredConsent = [], cookieName = 'c15t-consent' } = options;
+
+  // Get the consent cookie
+  const consentCookie = getConsentCookie(request, cookieName);
+
+  if (!consentCookie) {
+    return false;
+  }
+
+  try {
+    // Parse the cookie
+    const preferences = JSON.parse(decodeURIComponent(consentCookie));
+
+    // If no specific consent is required, just check if consent exists
+    if (requiredConsent.length === 0) {
+      return true;
+    }
+
+    // Check if all required consents are given
+    return requiredConsent.every((key) => preferences[key] === true);
+  } catch (e) {
+    // biome-ignore lint/suspicious/noConsole: <explanation>
+    console.error('Error parsing consent cookie:', e);
+    return false;
+  }
+}; 

@@ -7,6 +7,7 @@ export function ConsentBanner() {
 	const [showDetails, setShowDetails] = useState(false);
 	const { loading, consented, preferences, updateConsent, acceptAll, rejectAll } = useConsent();
 	
+  console.log(consented, preferences)
 	// Don't show the banner if still loading or if already consented
 	if (loading || consented) {
 		return null;

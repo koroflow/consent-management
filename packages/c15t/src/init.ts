@@ -75,7 +75,7 @@ export const init = async (options: c15tOptions): Promise<ConsentContext> => {
 		...options,
 		secret,
 		baseURL: baseURL ? new URL(baseURL).origin : '',
-		basePath: options.basePath || '/api/consent',
+		basePath: options.basePath || '/api/c15t',
 		plugins: plugins.concat(internalPlugins),
 	};
 
@@ -96,7 +96,7 @@ export const init = async (options: c15tOptions): Promise<ConsentContext> => {
 		trustedOrigins: getTrustedOrigins(finalOptions),
 		baseURL: baseURL || '',
 		secret,
-		logger,
+		logger: logger,
 		storage,
 		secondaryStorage: finalOptions.secondaryStorage,
 		generateId: generateIdFunc,

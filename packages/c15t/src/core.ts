@@ -84,7 +84,7 @@ export type WithJsDoc<T, D> = Expand<T & D>;
  * });
  *
  * // Use in an Express app
- * app.use('/api/consent', (req, res) => {
+ * app.use('/api/c15t', (req, res) => {
  *   c15tInstance.handler(new Request(req.url, {
  *     method: req.method,
  *     headers: req.headers,
@@ -105,34 +105,84 @@ export const c15t = <O extends c15tOptions>(options: O) => {
 	const consentContextPromise = init(options);
 
 	// Create a handler that awaits context initialization
+	// const handler = async (request: Request): Promise<Response> => {
+	// 	const ctx = await consentContextPromise;
+
+	// 	// Set up base path and URL
+	// 	const basePath = ctx.options.basePath || '/api/c15t';
+
+	// 	console.log("===== CORE HANDLER DEBUG =====");
+	// 	console.log("Request URL:", request.url);
+	// 	console.log("Request Method:", request.method);
+	// 	console.log("Request constructor name:", request.constructor.name);
+	// 	console.log("Request headers:", Object.fromEntries([...request.headers.entries()].map(([k, v]) => [k, v])));
+
+	// 	// Simplified URL handling: trust the request URL or create a simple fallback
+	// 	let url: URL;
+	// 	try {
+	// 		// Try to use the request URL directly
+	// 		url = new URL(request.url);
+	// 		console.log("[CORE] Using URL from request:", url.toString());
+	// 	} catch (error) {
+	// 		// Simple fallback if URL parsing fails
+	// 		const host = request.headers.get('host') || 'localhost';
+	// 		const protocol = host.includes('localhost') ? 'http' : 'https';
+	// 		url = new URL(`${protocol}://${host}${basePath}`);
+	// 		console.log("[CORE] Using fallback URL:", url.toString());
+	// 	}
+
+	// 	if (ctx.options.baseURL) {
+	// 		console.log("[CORE] Using existing baseURL:", ctx.options.baseURL);
+	// 	} else {
+	// 		const baseURL =
+	// 			getBaseURL(undefined, basePath) || `${url.origin}${basePath}`;
+	// 		ctx.options.baseURL = baseURL;
+	// 		ctx.baseURL = baseURL;
+	// 		console.log("[CORE] Set baseURL:", baseURL);
+	// 	}
+
+	// 	// Set trusted origins
+	// 	ctx.trustedOrigins = [
+	// 		...(options.trustedOrigins
+	// 			? Array.isArray(options.trustedOrigins)
+	// 				? options.trustedOrigins
+	// 				: options.trustedOrigins(request)
+	// 			: []),
+	// 		ctx.options.baseURL ?? url.origin,
+	// 		url.origin,
+	// 	];
+
+	// 	// Get router handler and process request
+	// 	const { handler: routerHandler } = router(ctx, options);
+	// 	console.log("[CORE] Calling router handler");
+	// 	const response = await routerHandler(request);
+	// 	console.log("[CORE] Router handler response status:", response.status);
+	// 	return response;
+	// };
+
 	const handler = async (request: Request): Promise<Response> => {
 		const ctx = await consentContextPromise;
-
-		// Set up base path and URL
-		const basePath = ctx.options.basePath || '/api/consent';
+		const basePath = ctx.options.basePath || '/api/auth';
 		const url = new URL(request.url);
-
 		if (!ctx.options.baseURL) {
 			const baseURL =
 				getBaseURL(undefined, basePath) || `${url.origin}${basePath}`;
 			ctx.options.baseURL = baseURL;
 			ctx.baseURL = baseURL;
 		}
-
-		// Set trusted origins
 		ctx.trustedOrigins = [
 			...(options.trustedOrigins
-				? Array.isArray(options.trustedOrigins)
+				? // biome-ignore lint/nursery/noNestedTernary: <explanation>
+					Array.isArray(options.trustedOrigins)
 					? options.trustedOrigins
 					: options.trustedOrigins(request)
 				: []),
-			ctx.options.baseURL ?? url.origin,
+			// biome-ignore lint/style/noNonNullAssertion: <explanation>
+			ctx.options.baseURL!,
 			url.origin,
 		];
-
-		// Get router handler and process request
-		const { handler: routerHandler } = router(ctx, options);
-		return routerHandler(request);
+		const { handler } = router(ctx, options);
+		return handler(request);
 	};
 
 	// Store additional plugin error codes
@@ -146,11 +196,34 @@ export const c15t = <O extends c15tOptions>(options: O) => {
 	// Get API endpoints (lazy-loaded)
 	const getApi = async () => {
 		const context = await consentContextPromise;
-		const { endpoints } = router(context, options);
-		return endpoints;
+		
+		// Make sure context has a valid baseURL before calling router
+		if (!context.baseURL) {
+			// Log the warning but return the endpoints anyway to prevent 404s
+			// This allows clients to access endpoints even if the baseURL isn't set yet
+			console.log("WARNING: baseURL not initialized, using default endpoint paths");
+			
+			try {
+				// Set a default baseURL temporarily to get endpoints
+				context.baseURL = '/api/c15t';
+				const { endpoints } = router(context, options);
+				return endpoints;
+			} catch (error) {
+				console.error("Error in getApi when calling router:", error);
+				return {};
+			}
+		}
+		
+		try {
+			const { endpoints } = router(context, options);
+			return endpoints;
+		} catch (error) {
+			console.error("Error in getApi when calling router:", error);
+			return {};
+		}
 	};
 
-	// Create a promise for the API endpoints
+	// Create a promise for the API endpoints but don't await it during initialization
 	const apiPromise = getApi();
 
 	return {
@@ -226,4 +299,12 @@ export type c15tInstance = {
 	 * to the context is required.
 	 */
 	$context: Promise<ConsentContext>;
+
+	/**
+	 * Index signature for dynamic access to API handlers
+	 *
+	 * This allows using string keys to access API handlers, which is useful
+	 * for integration adapters that need to dynamically call handlers.
+	 */
+	[key: string]: unknown;
 };

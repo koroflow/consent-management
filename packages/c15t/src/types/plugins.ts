@@ -5,9 +5,11 @@
  * Plugins provide a way to extend functionality with additional features like analytics,
  * geolocation, custom consent flows, and more.
  */
-import type { ConsentContext, EndpointContext } from './index';
-import type { c15tOptions } from './options';
-import type { ConsentEndpoint } from '../api/call';
+import type { Endpoint } from 'better-call';
+import type { AuthMiddleware } from '~/api/call';
+import type { HookEndpointContext } from './context';
+import type { LiteralString, DeepPartial } from './helper';
+import type { c15tOptions, ConsentContext, EndpointContext } from './index';
 
 /**
  * Context object provided to plugin hooks
@@ -107,67 +109,70 @@ export type PluginServerExtension = Record<string, unknown>;
  * ```
  */
 export interface c15tPlugin {
+	id: LiteralString;
 	/**
-	 * Unique plugin identifier
-	 * This ID should be unique across all plugins in the system
+	 * The init function is called when the plugin is initialized.
+	 * You can return a new context or modify the existing context.
 	 */
-	id: string;
-
-	/**
-	 * Plugin initialization function
-	 * Called when the plugin is first registered with the system
-	 *
-	 * @param context - The consent system context
-	 * @returns Optional context and options updates, or nothing
-	 */
-	init?: (context: ConsentContext) =>
-		| {
-				context?: Partial<ConsentContext>;
-				options?: Partial<c15tOptions>;
-		  }
-		| undefined;
-
-	/**
-	 * Additional API endpoints provided by the plugin
-	 * These endpoints are registered with the API and can be called by clients
-	 */
-	endpoints?: Record<string, ConsentEndpoint>;
-
-	/**
-	 * Plugin schema extensions
-	 * Can include additional types, validation schemas, or other schema-related extensions
-	 */
-	schema?: PluginSchema;
-
-	/**
-	 * Plugin hooks
-	 * Hooks run at specific points in the request lifecycle
-	 */
-	hooks?: {
-		/**
-		 * Hooks that run before an endpoint handler
-		 * These can modify the request or perform authorization checks
-		 */
-		before?: PluginHook[];
-
-		/**
-		 * Hooks that run after an endpoint handler but before sending the response
-		 * These can modify the response or perform logging
-		 */
-		after?: PluginHook[];
+	init?: (ctx: ConsentContext) => {
+		context?: DeepPartial<Omit<ConsentContext, 'options'>>;
+		options?: Partial<c15tOptions>;
+	} | void;
+	endpoints?: {
+		[key: string]: Endpoint;
 	};
-
+	middlewares?: {
+		path: string;
+		middleware: Endpoint;
+	}[];
+	onRequest?: (
+		request: Request,
+		ctx: ConsentContext
+	) => Promise<
+		| {
+				response: Response;
+		  }
+		| {
+				request: Request;
+		  }
+		| void
+	>;
+	onResponse?: (
+		response: Response,
+		ctx: ConsentContext
+	) => Promise<{
+		response: Response;
+	} | void>;
+	hooks?: {
+		before?: {
+			matcher: (context: HookEndpointContext) => boolean;
+			handler: AuthMiddleware;
+		}[];
+		after?: {
+			matcher: (context: HookEndpointContext) => boolean;
+			handler: AuthMiddleware;
+		}[];
+	};
 	/**
-	 * Error codes defined by this plugin
-	 * These are used to standardize error responses
+	 * The options of the plugin
+	 */
+	options?: Record<string, any>;
+	/**
+	 * types to be inferred
+	 */
+	$Infer?: Record<string, any>;
+	/**
+	 * The rate limit rules to apply to specific paths.
+	 */
+	rateLimit?: {
+		window: number;
+		max: number;
+		pathMatcher: (path: string) => boolean;
+	}[];
+	/**
+	 * The error codes returned by the plugin
 	 */
 	$ERROR_CODES?: Record<string, string>;
-
-	/**
-	 * Type inference helpers for this plugin
-	 * Used for TypeScript type inference of plugin extensions
-	 */
-	$InferServerPlugin?: PluginServerExtension;
 }
 
 /**

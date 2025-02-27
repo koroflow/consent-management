@@ -1,4 +1,4 @@
-import { createConsentEndpoint } from '../call';
+import { createAuthEndpoint } from '../call';
 import { APIError } from 'better-call';
 import type { ConsentContext } from '~/types';
 
@@ -51,7 +51,7 @@ import type { ConsentContext } from '~/types';
  *
  * @throws {APIError} BAD_REQUEST - When preferences are invalid or cannot be saved
  */
-export const setConsent = createConsentEndpoint(
+export const setConsent = createAuthEndpoint(
 	'/consent/set',
 	{
 		method: 'POST',

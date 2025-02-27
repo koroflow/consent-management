@@ -34,7 +34,7 @@ Follow these steps to add c15t to your Next.js project:
 
 3. Create the API route handler:
    ```typescript
-   // app/api/consent/[...route]/route.ts
+   // app/api/c15t/[...route]/route.ts
    import { toNextJsHandler } from '@c15t/new/integrations/next';
    import { c15tInstance } from '@/lib/c15t';
    
@@ -48,7 +48,7 @@ Follow these steps to add c15t to your Next.js project:
    import { createConsentClient } from '@c15t/new/integrations/react';
    
    export const consentClient = createConsentClient({
-     baseUrl: '/api/consent',
+     baseUrl: '/api/c15t',
      refreshInterval: 60 * 1000, // Check every minute (optional)
    });
    
@@ -234,7 +234,7 @@ export const consentClient = createConsentClient({
 
 ### Common Issues
 
-1. **API Route Not Found**: Make sure your route file is placed correctly at `app/api/consent/[...route]/route.ts` or adjust your c15t configuration to match your route path.
+1. **API Route Not Found**: Make sure your route file is placed correctly at `app/api/c15t/[...route]/route.ts` or adjust your c15t configuration to match your route path.
 
 2. **Cookie Not Set**: Ensure your API calls include `credentials: 'same-origin'` to allow cookies to be set. For server actions, make sure you're using the `cookies()` helper.
 

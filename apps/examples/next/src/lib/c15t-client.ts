@@ -7,7 +7,7 @@ export const {
   useConsent,
   useConditionalContent
 } = createConsentClient({
-  baseUrl: '/api/consent',
+  baseUrl: '/api/c15t',
   defaultPreferences: {
     analytics: true,
     marketing: true,
