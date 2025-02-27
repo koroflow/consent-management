@@ -1,18 +1,18 @@
 /**
  * Analytics Plugin for c15t
- * 
+ *
  * This plugin provides analytics tracking capabilities with consent management.
  * It allows tracking events for different analytics providers while ensuring
  * proper user consent has been given for each provider.
- * 
+ *
  * The plugin supports multiple analytics providers, each with their own
  * purpose ID for consent. It automatically registers consent purposes
  * for configured providers during initialization.
- * 
+ *
  * @example
  * ```typescript
  * import { analytics, analyticsClient } from '@c15t/plugins/analytics';
- * 
+ *
  * // Server-side setup
  * const c15t = createc15t({
  *   plugins: [
@@ -28,12 +28,12 @@
  *     })
  *   ]
  * });
- * 
+ *
  * // Client-side usage
  * const client = createc15tClient({
  *   plugins: [analyticsClient()]
  * });
- * 
+ *
  * // Track an event if user has consented
  * client.analytics.track('page_view', 'google-analytics');
  * ```
@@ -52,12 +52,12 @@ export const ERROR_CODES = {
 	 * Analytics functionality is disabled in configuration
 	 */
 	ANALYTICS_DISABLED: 'analytics_disabled',
-	
+
 	/**
 	 * The requested analytics provider is not configured
 	 */
 	INVALID_PROVIDER: 'invalid_provider',
-	
+
 	/**
 	 * Missing required consent for the analytics provider
 	 */
@@ -97,7 +97,10 @@ interface AnalyticsProvider {
 /**
  * Properties that can be included with an analytics event
  */
-type EventProperties = Record<string, string | number | boolean | null | undefined>;
+type EventProperties = Record<
+	string,
+	string | number | boolean | null | undefined
+>;
 
 /**
  * Configuration options for the analytics plugin
@@ -139,10 +142,10 @@ interface TrackRequestBody {
 
 /**
  * Create an analytics plugin instance
- * 
+ *
  * This plugin enables analytics tracking with consent management, supporting
  * multiple providers with separate consent purposes.
- * 
+ *
  * @param options - Configuration options for the analytics plugin
  * @returns A configured analytics plugin
  */
@@ -157,10 +160,10 @@ export const analytics = (options?: AnalyticsPluginOptions): c15tPlugin => {
 
 		/**
 		 * Initialize the analytics plugin
-		 * 
+		 *
 		 * This method sets up the analytics configuration and registers
 		 * consent purposes for each configured provider.
-		 * 
+		 *
 		 * @param context - The consent context
 		 * @returns Object containing any modifications to the context or options
 		 */
@@ -215,12 +218,12 @@ export const analytics = (options?: AnalyticsPluginOptions): c15tPlugin => {
 						context.logger.error('Error initializing analytics purposes:', err);
 					});
 			}
-			
+
 			// Return an object that satisfies the expected return type
 			return {
 				options: {
-					analytics: finalOptions
-				}
+					analytics: finalOptions,
+				},
 			};
 		},
 
@@ -244,20 +247,20 @@ export const analytics = (options?: AnalyticsPluginOptions): c15tPlugin => {
 										properties: {
 											event: {
 												type: 'string',
-												description: 'Event name to track'
+												description: 'Event name to track',
 											},
 											provider: {
 												type: 'string',
-												description: 'ID of the analytics provider'
+												description: 'ID of the analytics provider',
 											},
 											properties: {
 												type: 'object',
-												description: 'Additional event properties'
-											}
-										}
-									}
-								}
-							}
+												description: 'Additional event properties',
+											},
+										},
+									},
+								},
+							},
 						},
 						responses: {
 							'200': {
@@ -268,12 +271,12 @@ export const analytics = (options?: AnalyticsPluginOptions): c15tPlugin => {
 											type: 'object',
 											properties: {
 												success: {
-													type: 'boolean'
-												}
-											}
-										}
-									}
-								}
+													type: 'boolean',
+												},
+											},
+										},
+									},
+								},
 							},
 							'400': {
 								description: 'Invalid provider ID',
@@ -284,16 +287,16 @@ export const analytics = (options?: AnalyticsPluginOptions): c15tPlugin => {
 											properties: {
 												success: {
 													type: 'boolean',
-													example: false
+													example: false,
 												},
 												message: {
 													type: 'string',
-													example: 'invalid_provider'
-												}
-											}
-										}
-									}
-								}
+													example: 'invalid_provider',
+												},
+											},
+										},
+									},
+								},
 							},
 							'403': {
 								description: 'Analytics disabled or missing consent',
@@ -304,19 +307,19 @@ export const analytics = (options?: AnalyticsPluginOptions): c15tPlugin => {
 											properties: {
 												success: {
 													type: 'boolean',
-													example: false
+													example: false,
 												},
 												message: {
 													type: 'string',
-													enum: ['analytics_disabled', 'missing_consent']
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
+													enum: ['analytics_disabled', 'missing_consent'],
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
 				},
 				async (ctx) => {
 					const context = (ctx as unknown as EndpointContext).context;
@@ -335,7 +338,11 @@ export const analytics = (options?: AnalyticsPluginOptions): c15tPlugin => {
 					const requestBody = ctx.body as unknown;
 					// Validate the structure before using it
 					const body = requestBody as TrackRequestBody;
-					if (!body || typeof body.event !== 'string' || typeof body.provider !== 'string') {
+					if (
+						!body ||
+						typeof body.event !== 'string' ||
+						typeof body.provider !== 'string'
+					) {
 						return ctx.json(
 							{
 								success: false,
@@ -385,8 +392,11 @@ export const analytics = (options?: AnalyticsPluginOptions): c15tPlugin => {
 							userId: consent.userId,
 							deviceId: consent.deviceId,
 						};
-						
-						context.logger.info('Analytics event', logData as unknown as LoggerMetadata);
+
+						context.logger.info(
+							'Analytics event',
+							logData as unknown as LoggerMetadata
+						);
 
 						// Here you would integrate with actual analytics services
 						// This is just a placeholder
@@ -425,28 +435,28 @@ export const analytics = (options?: AnalyticsPluginOptions): c15tPlugin => {
 												properties: {
 													id: {
 														type: 'string',
-														description: 'Provider ID'
+														description: 'Provider ID',
 													},
 													name: {
 														type: 'string',
-														description: 'Display name'
+														description: 'Display name',
 													},
 													url: {
 														type: 'string',
-														description: 'Provider website'
+														description: 'Provider website',
 													},
 													purposeId: {
 														type: 'string',
-														description: 'Consent purpose ID'
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
+														description: 'Consent purpose ID',
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
 				},
 				async (ctx) => {
 					// Return configured analytics providers (without sensitive config)
@@ -471,32 +481,35 @@ export const analytics = (options?: AnalyticsPluginOptions): c15tPlugin => {
 interface c15tClientInstance {
 	/**
 	 * Make a fetch request to an API endpoint
-	 * 
+	 *
 	 * @param path - API path to fetch
 	 * @param options - Fetch options
 	 * @returns Promise resolving to the API response
 	 */
-	$fetch: <T>(path: string, options?: { method: string; body?: unknown }) => Promise<T>;
+	$fetch: <T>(
+		path: string,
+		options?: { method: string; body?: unknown }
+	) => Promise<T>;
 }
 
 /**
  * Client-side analytics plugin
- * 
+ *
  * This plugin adds analytics tracking methods to the c15t client,
  * allowing client-side code to track events if the user has consented.
- * 
+ *
  * @example
  * ```typescript
  * const client = createc15tClient({
  *   plugins: [analyticsClient()]
  * });
- * 
+ *
  * // Track a page view
  * client.analytics.track('page_view', 'google-analytics', {
  *   page: window.location.pathname
  * });
  * ```
- * 
+ *
  * @returns A client plugin with analytics methods
  */
 export const analyticsClient = () => {
@@ -505,7 +518,7 @@ export const analyticsClient = () => {
 		methods: {
 			/**
 			 * Track an analytics event
-			 * 
+			 *
 			 * @param event - Event name to track
 			 * @param provider - Analytics provider ID
 			 * @param properties - Additional event properties
@@ -529,7 +542,7 @@ export const analyticsClient = () => {
 
 			/**
 			 * Get a list of configured analytics providers
-			 * 
+			 *
 			 * @returns Promise resolving to an array of provider information
 			 */
 			getProviders: async function (this: c15tClientInstance) {

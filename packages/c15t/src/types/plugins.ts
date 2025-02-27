@@ -1,6 +1,6 @@
 /**
  * Plugin System for c15t Consent Management
- * 
+ *
  * This module defines the plugin system architecture for the c15t consent management system.
  * Plugins provide a way to extend functionality with additional features like analytics,
  * geolocation, custom consent flows, and more.
@@ -11,7 +11,7 @@ import type { ConsentEndpoint } from '../api/call';
 
 /**
  * Context object provided to plugin hooks
- * 
+ *
  * This extends the standard endpoint context with additional properties
  * specific to plugin hooks, such as the request path and geolocation data.
  */
@@ -20,7 +20,7 @@ export interface PluginHookContext extends EndpointContext {
 	 * The path of the current request
 	 */
 	path: string;
-	
+
 	/**
 	 * Geolocation information (added by the geo plugin)
 	 */
@@ -29,17 +29,17 @@ export interface PluginHookContext extends EndpointContext {
 		 * IP address of the request
 		 */
 		ip: string;
-		
+
 		/**
 		 * Country code (ISO 3166-1 alpha-2)
 		 */
 		country?: string;
-		
+
 		/**
 		 * Region or state code
 		 */
 		region?: string;
-		
+
 		/**
 		 * Source of the geolocation data
 		 */
@@ -49,7 +49,7 @@ export interface PluginHookContext extends EndpointContext {
 
 /**
  * Plugin hook definition
- * 
+ *
  * Hooks are used to run custom logic at specific points in the request lifecycle.
  * Each hook includes a matcher function to determine when it should run and
  * a handler function that contains the actual logic.
@@ -57,7 +57,7 @@ export interface PluginHookContext extends EndpointContext {
 export interface PluginHook {
 	/**
 	 * A function to determine if this hook should run for the current request
-	 * 
+	 *
 	 * @param context - The hook context with request details
 	 * @returns True if the hook should run, false otherwise
 	 */
@@ -65,7 +65,7 @@ export interface PluginHook {
 
 	/**
 	 * The hook handler that runs if matcher returns true
-	 * 
+	 *
 	 * @param context - The hook context with request details
 	 * @returns A Promise that resolves when the hook completes, or void
 	 */
@@ -74,7 +74,7 @@ export interface PluginHook {
 
 /**
  * Schema type for plugin extensions
- * 
+ *
  * This can include additional types, validation schemas, or other
  * schema-related extensions provided by plugins.
  */
@@ -87,10 +87,10 @@ export type PluginServerExtension = Record<string, unknown>;
 
 /**
  * c15t Plugin Definition
- * 
+ *
  * This interface defines the structure of a plugin for the c15t consent management system.
  * Plugins can add endpoints, hooks, error codes, and custom functionality.
- * 
+ *
  * @example
  * ```typescript
  * const myPlugin: c15tPlugin = {
@@ -116,14 +116,16 @@ export interface c15tPlugin {
 	/**
 	 * Plugin initialization function
 	 * Called when the plugin is first registered with the system
-	 * 
+	 *
 	 * @param context - The consent system context
 	 * @returns Optional context and options updates, or nothing
 	 */
-	init?: (context: ConsentContext) => {
-		context?: Partial<ConsentContext>;
-		options?: Partial<c15tOptions>;
-	} | undefined;
+	init?: (context: ConsentContext) =>
+		| {
+				context?: Partial<ConsentContext>;
+				options?: Partial<c15tOptions>;
+		  }
+		| undefined;
 
 	/**
 	 * Additional API endpoints provided by the plugin
@@ -170,7 +172,7 @@ export interface c15tPlugin {
 
 /**
  * Type utility to extract options type from a plugin
- * 
+ *
  * @template T - Plugin type
  */
 export type InferPluginOptions<T extends c15tPlugin> = T extends {

@@ -3,16 +3,16 @@ import type { ConsentContext } from '../../types';
 
 /**
  * Status endpoint that returns information about the c15t instance.
- * 
+ *
  * This endpoint provides basic operational information about the c15t instance,
  * including its version, current timestamp, and consent configuration settings.
  * It can be used for:
  * - Health checks to verify the API is operational
  * - Version verification
  * - Retrieving configuration information about the consent system
- * 
+ *
  * The endpoint does not require authentication and is accessible via a GET request.
- * 
+ *
  * @endpoint GET /status
  * @responseExample
  * ```json
@@ -27,7 +27,7 @@ import type { ConsentContext } from '../../types';
  *   }
  * }
  * ```
- * 
+ *
  * @returns {Object} Status information object
  * @returns {string} status - Service status ("ok" when operating normally)
  * @returns {string} version - Version number of the c15t instance

@@ -9,7 +9,8 @@ import { createConsentMiddleware } from '../call';
  * Type extension for the middleware context to include the next function
  * that isn't properly typed in the original definition
  */
-interface ExtendedMiddlewareContext extends MiddlewareContext<MiddlewareOptions> {
+interface ExtendedMiddlewareContext
+	extends MiddlewareContext<MiddlewareOptions> {
 	/**
 	 * The next function to be called in the middleware chain
 	 */
@@ -18,7 +19,7 @@ interface ExtendedMiddlewareContext extends MiddlewareContext<MiddlewareOptions>
 
 /**
  * Configuration options for the rate limiter middleware
- * 
+ *
  * @interface RateLimiterOptions
  */
 interface RateLimiterOptions {
@@ -50,18 +51,18 @@ interface RateLimiterOptions {
 
 /**
  * Interface for rate limiter storage implementations
- * 
+ *
  * This interface defines the required methods for any storage mechanism
  * used to track rate limit counters. Implementations can use memory,
  * Redis, or any other storage mechanism as long as they conform to this
  * interface.
- * 
+ *
  * @interface RateLimiterStore
  */
 export interface RateLimiterStore {
 	/**
 	 * Increment a counter and return the current count
-	 * 
+	 *
 	 * @param key - Unique identifier for the rate limit counter
 	 * @param ttl - Time-to-live in seconds for the counter
 	 * @returns Promise resolving to the current count after incrementing
@@ -70,7 +71,7 @@ export interface RateLimiterStore {
 
 	/**
 	 * Reset a counter
-	 * 
+	 *
 	 * @param key - Unique identifier for the rate limit counter to reset
 	 * @returns Promise that resolves when the counter has been reset
 	 */
@@ -79,11 +80,11 @@ export interface RateLimiterStore {
 
 /**
  * In-memory store implementation for rate limiting
- * 
+ *
  * This implementation stores rate limit counters in memory. It's suitable
  * for single-instance deployments or testing, but for production environments
  * with multiple instances, consider using a distributed store like Redis.
- * 
+ *
  * @implements {RateLimiterStore}
  */
 export class MemoryStore implements RateLimiterStore {
@@ -94,7 +95,7 @@ export class MemoryStore implements RateLimiterStore {
 
 	/**
 	 * Increment a counter and return the current count
-	 * 
+	 *
 	 * @param key - Unique identifier for the rate limit counter
 	 * @param ttl - Time-to-live in seconds for the counter
 	 * @returns Promise resolving to the current count after incrementing
@@ -119,7 +120,7 @@ export class MemoryStore implements RateLimiterStore {
 
 	/**
 	 * Reset a counter
-	 * 
+	 *
 	 * @param key - Unique identifier for the rate limit counter to reset
 	 * @returns Promise that resolves when the counter has been reset
 	 */
@@ -142,7 +143,7 @@ const DEFAULT_OPTIONS: Required<Omit<RateLimiterOptions, 'keyExtractor'>> = {
 
 /**
  * Extract IP address from request for use as rate limit key
- * 
+ *
  * @param ctx - Middleware context containing request information
  * @returns IP address or 'unknown' if not available
  */
@@ -159,12 +160,12 @@ function defaultKeyExtractor(
 
 /**
  * Creates a rate limiter middleware
- * 
+ *
  * This middleware limits the number of requests from a single client
  * within a specified time window. It uses the configured store to track
  * request counts and throws a TOO_MANY_REQUESTS error when the limit is
  * exceeded.
- * 
+ *
  * @example
  * ```typescript
  * // Create a rate limiter with custom options
@@ -173,13 +174,13 @@ function defaultKeyExtractor(
  *   window: 60 * 15,     // Per 15 minutes
  *   keyExtractor: (ctx) => ctx.headers?.get('authorization') || 'anonymous'
  * });
- * 
+ *
  * // Apply to your API
  * const api = createAPI({
  *   middlewares: [apiRateLimiter]
  * });
  * ```
- * 
+ *
  * @param options - Configuration options for the rate limiter
  * @returns Middleware function for rate limiting requests
  * @throws {APIError} When rate limit is exceeded (status: TOO_MANY_REQUESTS)

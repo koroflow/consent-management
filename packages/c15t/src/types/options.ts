@@ -1,6 +1,6 @@
 /**
  * c15t Consent Management System Configuration Types
- * 
+ *
  * This module defines the configuration options for the c15t consent management system.
  * It includes types for setting up storage, API endpoints, cookies, rate limiting,
  * analytics, geo-targeting, plugins, logging, and other advanced features.
@@ -17,7 +17,7 @@ export interface AnalyticsDestination {
 	 * Type of analytics destination (e.g., 'google-analytics', 'segment')
 	 */
 	type: string;
-	
+
 	/**
 	 * Configuration options specific to this analytics destination
 	 */
@@ -32,24 +32,24 @@ export interface CookieOptions {
 	 * Domain for the cookie
 	 */
 	domain?: string;
-	
+
 	/**
 	 * Path for the cookie
 	 * @default "/"
 	 */
 	path?: string;
-	
+
 	/**
 	 * Maximum age of the cookie in seconds
 	 */
 	maxAge?: number;
-	
+
 	/**
 	 * SameSite attribute
 	 * @default "lax"
 	 */
 	sameSite?: 'strict' | 'lax' | 'none';
-	
+
 	/**
 	 * Secure attribute
 	 * @default true in production
@@ -60,7 +60,10 @@ export interface CookieOptions {
 /**
  * Logger metadata type
  */
-export type LoggerMetadata = Record<string, string | number | boolean | null | undefined>;
+export type LoggerMetadata = Record<
+	string,
+	string | number | boolean | null | undefined
+>;
 
 /**
  * Custom logger implementation
@@ -72,21 +75,21 @@ export interface CustomLogger {
 	 * @param meta - Optional metadata to include
 	 */
 	debug: (message: string, meta?: LoggerMetadata) => void;
-	
+
 	/**
 	 * Log info level messages
 	 * @param message - Message to log
 	 * @param meta - Optional metadata to include
 	 */
 	info: (message: string, meta?: LoggerMetadata) => void;
-	
+
 	/**
 	 * Log warning level messages
 	 * @param message - Message to log
 	 * @param meta - Optional metadata to include
 	 */
 	warn: (message: string, meta?: LoggerMetadata) => void;
-	
+
 	/**
 	 * Log error level messages
 	 * @param message - Message to log
@@ -177,31 +180,31 @@ export interface c15tOptions {
 			 * Whether to enable cookie storage for consent
 			 */
 			enabled: boolean;
-			
+
 			/**
 			 * How long to cache consent data in the cookie
 			 * @default 600 (10 minutes)
 			 */
 			maxAge?: number;
-			
+
 			/**
 			 * Cookie domain configuration
 			 * @example ".example.com" for all subdomains
 			 */
 			domain?: string;
-			
+
 			/**
 			 * Cookie path
 			 * @default "/"
 			 */
 			path?: string;
-			
+
 			/**
 			 * Same site attribute
 			 * @default "lax"
 			 */
 			sameSite?: 'strict' | 'lax' | 'none';
-			
+
 			/**
 			 * Secure attribute
 			 * @default true in production
@@ -356,7 +359,7 @@ export interface c15tOptions {
 			 * Whether to enable cross-subdomain cookies
 			 */
 			enabled: boolean;
-			
+
 			/**
 			 * Root domain to use for cookies
 			 * @example ".example.com"

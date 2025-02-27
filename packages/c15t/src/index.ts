@@ -1,7 +1,7 @@
 /**
  * c15t Consent Management System
- * 
- * This is the main entry point for the c15t library, exporting all public APIs, 
+ *
+ * This is the main entry point for the c15t library, exporting all public APIs,
  * components, and types needed to implement consent management in your application.
  */
 

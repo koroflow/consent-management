@@ -4,18 +4,18 @@ import type { ConsentContext } from '~/types';
 
 /**
  * Endpoint for setting user consent preferences.
- * 
+ *
  * This endpoint allows clients to save a user's consent preferences. It validates
  * that the provided preferences contain all required fields before saving them.
  * The required fields are:
  * - analytics: Controls if analytics tracking is allowed
  * - marketing: Controls if marketing communications are allowed
  * - preferences: Controls if preference/functional cookies are allowed
- * 
+ *
  * Upon successful processing, it returns the saved preferences and a success indicator.
  * If validation fails or an error occurs during processing, it returns a BAD_REQUEST
  * error with details about what went wrong.
- * 
+ *
  * @endpoint POST /consent/set
  * @requestExample
  * ```json
@@ -27,7 +27,7 @@ import type { ConsentContext } from '~/types';
  *   }
  * }
  * ```
- * 
+ *
  * @responseExample
  * ```json
  * {
@@ -40,7 +40,7 @@ import type { ConsentContext } from '~/types';
  *   "timestamp": "2023-04-01T12:34:56.789Z"
  * }
  * ```
- * 
+ *
  * @returns {Object} Result of setting consent preferences
  * @returns {boolean} success - Whether the preferences were successfully saved
  * @returns {Object} preferences - The saved consent preferences
@@ -48,7 +48,7 @@ import type { ConsentContext } from '~/types';
  * @returns {boolean} preferences.marketing - Whether marketing communications are allowed
  * @returns {boolean} preferences.preferences - Whether preference/functional cookies are allowed
  * @returns {string} timestamp - ISO timestamp of when the preferences were saved
- * 
+ *
  * @throws {APIError} BAD_REQUEST - When preferences are invalid or cannot be saved
  */
 export const setConsent = createConsentEndpoint(
@@ -99,7 +99,7 @@ export const setConsent = createConsentEndpoint(
 						error?: (message: string, error: unknown) => void;
 					};
 				};
-				
+
 				contextWithLogger.logger?.error?.(
 					'Error setting consent preferences:',
 					error

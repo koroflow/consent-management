@@ -1,18 +1,18 @@
 /**
  * Next.js integration for c15t
- * 
+ *
  * This module provides handlers and utilities for integrating the c15t consent management
  * system with Next.js applications. It includes adapters for handling API routes,
  * middleware for cookie management, and utilities for consent verification.
- * 
+ *
  * The implementation avoids direct dependencies on Next.js types to prevent requiring
  * Next.js as a peer dependency, making it more flexible for different Next.js versions.
- * 
+ *
  * @example
  * ```typescript
  * import { toNextJsHandler } from '@c15t/integrations/next';
  * import { c15t } from '../lib/c15t';
- * 
+ *
  * // Create a Next.js API route handler
  * export default toNextJsHandler(c15t, 'getConsent');
  * ```
@@ -42,7 +42,7 @@ interface CookieOptions {
 
 /**
  * Basic representation of Next.js NextRequest interface without direct dependency.
- * 
+ *
  * This interface models the essential properties of a Next.js request object
  * to allow for type checking without importing from Next.js directly.
  */
@@ -68,7 +68,7 @@ interface GenericNextRequest {
 
 /**
  * Type for cookie extraction function used in middleware.
- * 
+ *
  * This function extracts a cookie value from a Next.js request object.
  */
 type CookieExtractor = (
@@ -78,40 +78,40 @@ type CookieExtractor = (
 
 /**
  * Context interface for cookie handling in Next.js.
- * 
+ *
  * This interface provides a standardized way to interact with cookies
  * across different Next.js API contexts.
  */
 interface NextCookieContext {
 	/**
 	 * Sets a cookie in the response
-	 * 
+	 *
 	 * @param name - Cookie name
 	 * @param value - Cookie value
 	 * @param options - Cookie options (path, expires, etc.)
 	 */
 	setCookie: (name: string, value: string, options?: CookieOptions) => void;
-	
+
 	/**
 	 * Gets a cookie value from the request
-	 * 
+	 *
 	 * @param name - Cookie name
 	 * @returns The cookie value or undefined if not found
 	 */
 	getCookie: (name: string) => string | undefined;
-	
+
 	/**
 	 * Deletes a cookie by setting its expiration to the past
-	 * 
+	 *
 	 * @param name - Cookie name to delete
 	 */
 	deleteCookie: (name: string) => void;
-	
+
 	/**
 	 * Response object if available
 	 */
 	response?: Response;
-	
+
 	/**
 	 * Next.js cookies API if available
 	 */
@@ -126,7 +126,7 @@ interface NextCookieContext {
 /**
  * JSON-serializable data types that can be used in API responses
  */
-type JsonValue = 
+type JsonValue =
 	| string
 	| number
 	| boolean
@@ -136,19 +136,19 @@ type JsonValue =
 
 /**
  * Convert a c15t handler to a Next.js API route handler.
- * 
+ *
  * This function adapts a c15t handler to work as a Next.js API route handler,
  * handling the request/response conversion between the two systems.
- * 
+ *
  * @example
  * ```typescript
  * // pages/api/consent.ts
  * import { toNextJsHandler } from '@c15t/integrations/next';
  * import { c15t } from '../../lib/c15t';
- * 
+ *
  * export default toNextJsHandler(c15t, 'getConsent');
  * ```
- * 
+ *
  * @param c15t - c15t instance containing the handler
  * @param handlerName - Name of the handler to use from the c15t instance
  * @returns Next.js API route handler function
@@ -297,21 +297,21 @@ export function toNextJsHandler(c15t: c15tInstance, handlerName: string) {
 
 /**
  * Extract the consent cookie from a Next.js request.
- * 
+ *
  * This function retrieves the consent cookie value from either the cookies API
  * or the cookie header, depending on what's available in the request.
- * 
+ *
  * @example
  * ```typescript
  * // In a middleware or API route
  * import { getConsentCookie } from '@c15t/integrations/next';
- * 
+ *
  * export default function middleware(request) {
  *   const consentValue = getConsentCookie(request);
  *   // Use the consent value to make decisions
  * }
  * ```
- * 
+ *
  * @param request - Next.js request object
  * @param cookieName - Name of the consent cookie (defaults to 'c15t-consent')
  * @returns The consent cookie value or null if not found
@@ -350,7 +350,7 @@ interface CheckConsentOptions {
 	 * List of consent purpose IDs that are required for the operation
 	 */
 	requiredConsent?: string[];
-	
+
 	/**
 	 * The name of the cookie containing consent information
 	 * @default 'c15t-consent'
@@ -360,27 +360,27 @@ interface CheckConsentOptions {
 
 /**
  * Check if the user has provided consent based on the cookie.
- * 
+ *
  * This function verifies whether the user has consented to specific purposes
  * by checking the consent cookie. If no specific consent purposes are required,
  * it simply checks if the consent cookie exists.
- * 
+ *
  * @example
  * ```typescript
  * // In a middleware or API route
  * import { checkConsentCookie } from '@c15t/integrations/next';
- * 
+ *
  * export default function middleware(request) {
  *   const hasConsent = checkConsentCookie(request, {
  *     requiredConsent: ['analytics', 'marketing']
  *   });
- *   
+ *
  *   if (!hasConsent) {
  *     // Redirect to consent page or show consent banner
  *   }
  * }
  * ```
- * 
+ *
  * @param request - Next.js request object
  * @param options - Options for the check including required consent purposes
  * @returns Whether the user has consented to all required purposes
@@ -417,21 +417,21 @@ export const checkConsentCookie = (
 
 /**
  * A Next.js plugin for handling cookies in server actions.
- * 
+ *
  * This plugin provides hooks for managing cookies in Next.js server actions,
  * allowing for seamless integration between c15t and Next.js cookie handling.
- * 
+ *
  * @example
  * ```typescript
  * // In your c15t configuration
  * import { nextCookies } from '@c15t/integrations/next';
- * 
+ *
  * const c15t = createc15t({
  *   plugins: [nextCookies()],
  *   // other options
  * });
  * ```
- * 
+ *
  * @returns A plugin configuration object compatible with the c15t plugin system
  */
 export function nextCookies() {

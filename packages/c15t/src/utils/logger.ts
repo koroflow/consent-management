@@ -1,6 +1,6 @@
 /**
  * Logging Utilities for c15t
- * 
+ *
  * This module provides a configurable logging system for the c15t
  * consent management system, supporting different log levels and
  * custom logger implementations.
@@ -16,7 +16,7 @@ export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
 /**
  * Interface for logger implementations
- * 
+ *
  * All loggers used in c15t must implement this interface, which
  * provides methods for logging messages at different severity levels.
  */
@@ -27,21 +27,21 @@ export interface LoggerInterface {
 	 * @param meta - Optional metadata to include with the log
 	 */
 	debug: (message: string, meta?: LoggerMetadata) => void;
-	
+
 	/**
 	 * Logs an info-level message
 	 * @param message - The message to log
 	 * @param meta - Optional metadata to include with the log
 	 */
 	info: (message: string, meta?: LoggerMetadata) => void;
-	
+
 	/**
 	 * Logs a warning-level message
 	 * @param message - The message to log
 	 * @param meta - Optional metadata to include with the log
 	 */
 	warn: (message: string, meta?: LoggerMetadata) => void;
-	
+
 	/**
 	 * Logs an error-level message
 	 * @param message - The message to log
@@ -52,20 +52,20 @@ export interface LoggerInterface {
 
 /**
  * Creates a logger instance based on the provided configuration
- * 
+ *
  * This function returns a logger that respects the configured log level
  * and can either use a custom logger implementation or fall back to
  * a default console-based logger.
- * 
+ *
  * @param config - Logger configuration options
  * @returns A logger instance implementing the LoggerInterface
- * 
+ *
  * @example
  * ```typescript
  * // Create a default logger
  * const logger = createLogger();
  * logger.info('Application started');
- * 
+ *
  * // Create a logger with custom level
  * const debugLogger = createLogger({ level: 'debug' });
  * debugLogger.debug('Debug information', { requestId: '123' });
@@ -83,7 +83,7 @@ export function createLogger(config?: c15tOptions['logger']): LoggerInterface {
 	/**
 	 * Determines if a message at the given level should be logged
 	 * based on the configured minimum log level
-	 * 
+	 *
 	 * @param messageLevel - The level of the message to be logged
 	 * @returns True if the message should be logged, false otherwise
 	 */
@@ -139,7 +139,7 @@ export function createLogger(config?: c15tOptions['logger']): LoggerInterface {
 
 /**
  * Checks if the application is running in production mode
- * 
+ *
  * @returns True if NODE_ENV is set to 'production', false otherwise
  */
 function isProduction(): boolean {

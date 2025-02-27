@@ -4,20 +4,20 @@ import type { ConsentContext } from '~/types';
 
 /**
  * Endpoint for retrieving the current consent status and preferences.
- * 
- * This endpoint allows clients to check if consent has been provided and 
- * retrieve the specific consent preferences if available. It's typically 
+ *
+ * This endpoint allows clients to check if consent has been provided and
+ * retrieve the specific consent preferences if available. It's typically
  * used when a user visits a site to determine if a consent banner should
  * be displayed.
- * 
+ *
  * The response includes:
  * - Whether the user has provided consent
  * - The specific preferences if consent exists
  * - A timestamp of when the response was generated
- * 
+ *
  * If an error occurs during processing, it returns a BAD_REQUEST error
  * with details about what went wrong.
- * 
+ *
  * @endpoint GET /consent
  * @responseExample
  * ```json
@@ -31,7 +31,7 @@ import type { ConsentContext } from '~/types';
  *   "timestamp": "2023-04-01T12:34:56.789Z"
  * }
  * ```
- * 
+ *
  * @returns {Object} Consent status and preferences
  * @returns {boolean} consented - Whether consent has been provided
  * @returns {Object|null} preferences - User's consent preferences if consented, null otherwise
@@ -39,7 +39,7 @@ import type { ConsentContext } from '~/types';
  * @returns {boolean} preferences.marketing - Whether marketing communications are allowed
  * @returns {boolean} preferences.preferences - Whether preference/functional cookies are allowed
  * @returns {string} timestamp - ISO timestamp of when the request was processed
- * 
+ *
  * @throws {APIError} BAD_REQUEST - When consent status cannot be retrieved
  */
 export const getConsent = createConsentEndpoint(
@@ -73,7 +73,7 @@ export const getConsent = createConsentEndpoint(
 						error?: (message: string, error: unknown) => void;
 					};
 				};
-				
+
 				contextWithLogger.logger?.error?.(
 					'Error getting consent status:',
 					error
