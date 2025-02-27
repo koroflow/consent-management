@@ -11,7 +11,6 @@ import type { Logger } from '../utils/logger';
 import type { ConsentContext } from '.';
 import type { AuthMiddleware } from '~/api/call';
 
-
 /**
  * Analytics destination configuration
  */

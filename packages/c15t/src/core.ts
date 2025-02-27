@@ -196,29 +196,31 @@ export const c15t = <O extends c15tOptions>(options: O) => {
 	// Get API endpoints (lazy-loaded)
 	const getApi = async () => {
 		const context = await consentContextPromise;
-		
+
 		// Make sure context has a valid baseURL before calling router
 		if (!context.baseURL) {
 			// Log the warning but return the endpoints anyway to prevent 404s
 			// This allows clients to access endpoints even if the baseURL isn't set yet
-			console.log("WARNING: baseURL not initialized, using default endpoint paths");
-			
+			console.log(
+				'WARNING: baseURL not initialized, using default endpoint paths'
+			);
+
 			try {
 				// Set a default baseURL temporarily to get endpoints
 				context.baseURL = '/api/c15t';
 				const { endpoints } = router(context, options);
 				return endpoints;
 			} catch (error) {
-				console.error("Error in getApi when calling router:", error);
+				console.error('Error in getApi when calling router:', error);
 				return {};
 			}
 		}
-		
+
 		try {
 			const { endpoints } = router(context, options);
 			return endpoints;
 		} catch (error) {
-			console.error("Error in getApi when calling router:", error);
+			console.error('Error in getApi when calling router:', error);
 			return {};
 		}
 	};

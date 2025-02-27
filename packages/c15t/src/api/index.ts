@@ -66,7 +66,6 @@ export function getEndpoints<
 			.filter((plugin) => plugin !== undefined)
 			.flat() || [];
 
-
 	const endpoints = {
 		...baseEndpoints,
 		...pluginEndpoints,
@@ -85,17 +84,17 @@ export const router = <C extends ConsentContext, Option extends c15tOptions>(
 	options: Option
 ) => {
 	const { api, middlewares } = getEndpoints(ctx, options);
-	
+
 	// Add debug logs to see what endpoints are registered
-	console.log("DEBUG Registered endpoints:", Object.keys(api));
-	
+	console.log('DEBUG Registered endpoints:', Object.keys(api));
+
 	// Check for baseURL and properly handle it
 	let basePath = '';
 	try {
 		if (ctx.baseURL) {
 			basePath = new URL(ctx.baseURL).pathname;
-			console.log("DEBUG Router basePath:", basePath);
-		} 
+			console.log('DEBUG Router basePath:', basePath);
+		}
 	} catch (error) {
 		console.error('ERROR creating URL from ctx.baseURL:', error);
 		console.error('Invalid baseURL value:', ctx.baseURL);
@@ -108,7 +107,7 @@ export const router = <C extends ConsentContext, Option extends c15tOptions>(
 		openapi: {
 			disabled: true,
 		},
-    basePath,
+		basePath,
 		routerMiddleware: [
 			{
 				path: '/**',
@@ -187,11 +186,17 @@ export const router = <C extends ConsentContext, Option extends c15tOptions>(
 			}
 		},
 	});
-	
+
 	// Log the router's handler and endpoints for debugging
-	console.log("DEBUG Router handler available:", typeof routerInstance.handler === 'function');
-	console.log("DEBUG Router endpoints:", routerInstance.endpoints ? "Available" : "Not available");
-	
+	console.log(
+		'DEBUG Router handler available:',
+		typeof routerInstance.handler === 'function'
+	);
+	console.log(
+		'DEBUG Router endpoints:',
+		routerInstance.endpoints ? 'Available' : 'Not available'
+	);
+
 	return routerInstance;
 };
 
