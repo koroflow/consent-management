@@ -21,7 +21,7 @@ Follow these steps to add c15t to your Next.js project:
    import { c15t } from '@c15t/new';
    import { memoryAdapter } from '@c15t/new/storage/memory';
    
-   export const c15tInstance = c15t({
+   export const C15TInstance = c15t({
      appName: 'My Next.js App',
      trustedOrigins: ['http://localhost:3000'],
      storage: memoryAdapter(), // Use a persistent adapter for production
@@ -36,10 +36,10 @@ Follow these steps to add c15t to your Next.js project:
    ```typescript
    // app/api/c15t/[...route]/route.ts
    import { toNextJsHandler } from '@c15t/new/integrations/next';
-   import { c15tInstance } from '@/lib/c15t';
+   import { C15TInstance } from '@/lib/c15t';
    
    // Export all HTTP methods
-   export const { GET, POST, PUT, DELETE, OPTIONS } = toNextJsHandler(c15tInstance);
+   export const { GET, POST, PUT, DELETE, OPTIONS } = toNextJsHandler(C15TInstance);
    ```
 
 4. Create a React client for client components:
@@ -114,10 +114,10 @@ export function AnalyticsContent() {
 // app/protected-content/page.tsx
 import { getServerConsent } from '@c15t/new/integrations/server';
 import { headers } from 'next/headers';
-import { c15tInstance } from '@/lib/c15t';
+import { C15TInstance } from '@/lib/c15t';
 
 export default async function ProtectedPage() {
-  const consent = await getServerConsent(c15tInstance, { headers: headers() });
+  const consent = await getServerConsent(C15TInstance, { headers: headers() });
   
   if (!consent.consented) {
     return (
@@ -144,11 +144,11 @@ export default async function ProtectedPage() {
 'use server'
 import { setServerConsent } from '@c15t/new/integrations/server';
 import { cookies } from 'next/headers';
-import { c15tInstance } from '@/lib/c15t';
+import { C15TInstance } from '@/lib/c15t';
 
 export async function acceptAllCookies() {
   return await setServerConsent(
-    c15tInstance,
+    C15TInstance,
     { 
       preferences: { analytics: true, marketing: true, preferences: true } 
     },
@@ -158,7 +158,7 @@ export async function acceptAllCookies() {
 
 export async function rejectAllCookies() {
   return await setServerConsent(
-    c15tInstance,
+    C15TInstance,
     { 
       preferences: { analytics: false, marketing: false, preferences: false } 
     },
@@ -202,7 +202,7 @@ For production use, consider using a persistent storage adapter:
 import { c15t } from '@c15t/new';
 import { cookieAdapter } from '@c15t/new/storage/cookie';
 
-export const c15tInstance = c15t({
+export const C15TInstance = c15t({
   // ... other config
   storage: cookieAdapter({
     secure: process.env.NODE_ENV === 'production',

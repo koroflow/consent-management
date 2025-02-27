@@ -1,9 +1,9 @@
 import type { EndpointContext, InputContext } from 'better-call';
-import type { ConsentContext } from '.';
+import type { C15TContext } from '.';
 
 export type HookEndpointContext = EndpointContext<string, any> &
 	Omit<InputContext<string, any>, 'method'> & {
-		context: ConsentContext & {
+		context: C15TContext & {
 			returned?: unknown;
 			responseHeaders?: Headers;
 		};
@@ -11,5 +11,5 @@ export type HookEndpointContext = EndpointContext<string, any> &
 	};
 
 export type GenericEndpointContext = EndpointContext<string, any> & {
-	context: ConsentContext;
+	context: C15TContext;
 };

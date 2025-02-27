@@ -15,13 +15,13 @@ import { Header } from './components/header';
 import DevToolWrapper from './components/wrapper';
 import { Router } from './router/router';
 import './styles/theme.css';
-const PrivacyConsentContext = createContext<{
+const PrivacyC15TContext = createContext<{
 	state: PrivacyConsentState | null;
 	store: StoreApi<PrivacyConsentState> | null;
 } | null>(null);
 
 export const getStore = () => {
-	const context = useContext(PrivacyConsentContext);
+	const context = useContext(PrivacyC15TContext);
 	if (context === null) {
 		throw new Error(
 			'useConsentManagerContext must be used within a ConsentManagerProvider'
@@ -54,7 +54,7 @@ export const getStore = () => {
 	return localState;
 };
 
-export default PrivacyConsentContext;
+export default PrivacyC15TContext;
 
 export interface ConsentManagerProviderProps extends NamespaceProps {
 	position?: 'bottom-right' | 'top-right' | 'bottom-left' | 'top-left';
@@ -99,7 +99,7 @@ export const C15TDevTools: FC<ConsentManagerProviderProps> = ({
 	}, [namespace]);
 
 	return (
-		<PrivacyConsentContext.Provider value={{ state, store }}>
+		<PrivacyC15TContext.Provider value={{ state, store }}>
 			<DevToolWrapper
 				isOpen={isOpen}
 				toggleOpen={toggleOpen}
@@ -112,6 +112,6 @@ export const C15TDevTools: FC<ConsentManagerProviderProps> = ({
 					<ErrorState namespace={namespace} />
 				)}
 			</DevToolWrapper>
-		</PrivacyConsentContext.Provider>
+		</PrivacyC15TContext.Provider>
 	);
 };

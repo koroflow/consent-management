@@ -7,7 +7,7 @@
  */
 
 import type { CookieOptions } from '~/cookies';
-import type { c15tInstance } from '~/core';
+import type { C15TInstance } from '~/core';
 
 /**
  * Convert a c15t handler to a Next.js API route handler.
@@ -28,7 +28,7 @@ import type { c15tInstance } from '~/core';
  * @returns Next.js API route handler functions for GET and POST
  */
 export function toNextJsHandler(
-	c15t: c15tInstance | ((request: Request) => Promise<Response>)
+	c15t: C15TInstance | ((request: Request) => Promise<Response>)
 ) {
 	const handler = async (request: Request) => {
 		console.log('DEBUG next.ts handler - Request URL:', request.url);

@@ -9,7 +9,7 @@ import type { Endpoint } from 'better-call';
 import type { AuthMiddleware } from '~/api/call';
 import type { HookEndpointContext } from './context';
 import type { LiteralString, DeepPartial } from './helper';
-import type { c15tOptions, ConsentContext, EndpointContext } from './index';
+import type { C15TOptions, C15TContext, EndpointContext } from './index';
 
 /**
  * Context object provided to plugin hooks
@@ -114,9 +114,9 @@ export interface c15tPlugin {
 	 * The init function is called when the plugin is initialized.
 	 * You can return a new context or modify the existing context.
 	 */
-	init?: (ctx: ConsentContext) => {
-		context?: DeepPartial<Omit<ConsentContext, 'options'>>;
-		options?: Partial<c15tOptions>;
+	init?: (ctx: C15TContext) => {
+		context?: DeepPartial<Omit<C15TContext, 'options'>>;
+		options?: Partial<C15TOptions>;
 	} | void;
 	endpoints?: {
 		[key: string]: Endpoint;
@@ -127,7 +127,7 @@ export interface c15tPlugin {
 	}[];
 	onRequest?: (
 		request: Request,
-		ctx: ConsentContext
+		ctx: C15TContext
 	) => Promise<
 		| {
 				response: Response;
@@ -139,7 +139,7 @@ export interface c15tPlugin {
 	>;
 	onResponse?: (
 		response: Response,
-		ctx: ConsentContext
+		ctx: C15TContext
 	) => Promise<{
 		response: Response;
 	} | void>;

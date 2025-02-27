@@ -32,7 +32,7 @@
  * ```
  */
 
-import type { c15tInstance } from '~/core';
+import type { C15TInstance } from '~/core';
 
 /**
  * Generic server header object interface
@@ -205,7 +205,7 @@ interface ServerResponse {
  * server-side consent functions. It includes references to headers
  * and cookies objects from the server framework.
  */
-export interface ServerConsentContext {
+export interface ServerC15TContext {
 	/**
 	 * Headers object for reading/writing HTTP headers
 	 */
@@ -263,13 +263,13 @@ interface ConsentResult {
  * });
  * ```
  *
- * @param c15t - c15tInstance to use for consent management
+ * @param c15t - C15TInstance to use for consent management
  * @param context - Server context with headers and/or cookies
  * @returns Consent status and preferences
  */
 export const getServerConsent = (
-	_c15t: c15tInstance,
-	context: ServerConsentContext
+	_c15t: C15TInstance,
+	context: ServerC15TContext
 ): ConsentResult => {
 	// Get cookie name from context or use default
 	const cookieName = context.cookieName || 'c15t-consent';
@@ -338,15 +338,15 @@ export const getServerConsent = (
  * });
  * ```
  *
- * @param c15t - c15tInstance to use for consent management
+ * @param c15t - C15TInstance to use for consent management
  * @param context - Server context with headers and/or cookies
  * @param preferences - Consent preferences to set
  * @param options - Cookie options
  * @returns Updated consent preferences
  */
 export const setServerConsent = (
-	c15t: c15tInstance,
-	context: ServerConsentContext,
+	c15t: C15TInstance,
+	context: ServerC15TContext,
 	preferences: Record<string, boolean>,
 	options?: CookieOptions
 ): ConsentResult => {
@@ -457,12 +457,12 @@ interface ConsentMiddlewareOptions {
  * });
  * ```
  *
- * @param c15t - c15tInstance to use for consent management
+ * @param c15t - C15TInstance to use for consent management
  * @param options - Options for the consent check
  * @returns A middleware function
  */
 export const createConsentMiddleware = (
-	c15t: c15tInstance,
+	c15t: C15TInstance,
 	options: ConsentMiddlewareOptions = {}
 ) => {
 	const {
@@ -473,7 +473,7 @@ export const createConsentMiddleware = (
 
 	return (req: ServerRequest, res: ServerResponse, next: () => void) => {
 		// Create context from request/response objects
-		const context: ServerConsentContext = {
+		const context: ServerC15TContext = {
 			cookieName,
 			cookies: {
 				get: (name: string) => {

@@ -41,7 +41,7 @@
 
 // plugins/analytics/index.ts
 import { createEndpoint } from 'better-call';
-import type { c15tPlugin, ConsentContext, EndpointContext } from '../../types';
+import type { c15tPlugin, C15TContext, EndpointContext } from '../../types';
 import type { LoggerMetadata } from '~/types/options';
 
 /**
@@ -167,7 +167,7 @@ export const analytics = (options?: AnalyticsPluginOptions): c15tPlugin => {
 		 * @param context - The consent context
 		 * @returns Object containing any modifications to the context or options
 		 */
-		init(context: ConsentContext) {
+		init(context: C15TContext) {
 			// Default options
 			const finalOptions = {
 				enabled: options?.enabled !== false,

@@ -6,14 +6,14 @@ import {
 	type InputContext,
 } from 'better-call';
 import type { AuthEndpoint, AuthMiddleware } from './call';
-import type { ConsentContext } from '../types';
+import type { C15TContext } from '../types';
 import defu from 'defu';
 import type { HookEndpointContext } from '~/types/context';
 
 type InternalContext = InputContext<string, any> &
 	EndpointContext<string, any> & {
 		asResponse?: boolean;
-		context: ConsentContext & {
+		context: C15TContext & {
 			returned?: unknown;
 			responseHeaders?: Headers;
 		};
@@ -21,7 +21,7 @@ type InternalContext = InputContext<string, any> &
 
 export function toAuthEndpoints<E extends Record<string, AuthEndpoint>>(
 	endpoints: E,
-	ctx: ConsentContext | Promise<ConsentContext>
+	ctx: C15TContext | Promise<C15TContext>
 ) {
 	const api: Record<
 		string,
@@ -35,11 +35,11 @@ export function toAuthEndpoints<E extends Record<string, AuthEndpoint>>(
 
 	for (const [key, endpoint] of Object.entries(endpoints)) {
 		api[key] = async (context) => {
-			const ConsentContext = await ctx;
+			const C15TContext = await ctx;
 			let internalContext: InternalContext = {
 				...context,
 				context: {
-					...ConsentContext,
+					...C15TContext,
 					returned: undefined,
 					responseHeaders: undefined,
 					session: null,
@@ -47,7 +47,7 @@ export function toAuthEndpoints<E extends Record<string, AuthEndpoint>>(
 				path: endpoint.path,
 				headers: context?.headers ? new Headers(context?.headers) : undefined,
 			};
-			const { beforeHooks, afterHooks } = getHooks(ConsentContext);
+			const { beforeHooks, afterHooks } = getHooks(C15TContext);
 			const before = await runBeforeHooks(internalContext, beforeHooks);
 			/**
 			 * If `before.context` is returned, it should
@@ -188,18 +188,16 @@ async function runAfterHooks(
 			};
 			if (result.headers) {
 				result.headers.forEach((value, key) => {
-					if (!context.context.responseHeaders) {
-						context.context.responseHeaders = new Headers({
-							[key]: value,
-						});
-					} else {
+					if (context.context.responseHeaders) {
 						if (key.toLowerCase() === 'set-cookie') {
 							context.context.responseHeaders.append(key, value);
-						} else {
-							context.context.responseHeaders.set(key, value);
+						} else if (key.toLowerCase() === 'set-cookie') {
+							context.context.responseHeaders.setnkey,Hvalued;ey, value);
 						}
-					}
-				});
+		}		} else{
+						context.context.responseHeaders =cnewxHeaders(t.context.responseHeaders.set(key, value);
+						}[]:,
+				}););
 			}
 			if (result.response) {
 				context.context.returned = result.response;
@@ -212,8 +210,8 @@ async function runAfterHooks(
 	};
 }
 
-function getHooks(ConsentContext: ConsentContext) {
-	const plugins = ConsentContext.options.plugins || [];
+function getHooks(C15TContext: C15TContext) {
+	const plugins = C15TContext.options.plugins || [];
 	const beforeHooks: {
 		matcher: (context: HookEndpointContext) => boolean;
 		handler: AuthMiddleware;
@@ -222,16 +220,16 @@ function getHooks(ConsentContext: ConsentContext) {
 		matcher: (context: HookEndpointContext) => boolean;
 		handler: AuthMiddleware;
 	}[] = [];
-	if (ConsentContext.options.hooks?.before) {
+	if (C15TContext.options.hooks?.before) {
 		beforeHooks.push({
 			matcher: () => true,
-			handler: ConsentContext.options.hooks.before,
+			handler: C15TContext.options.hooks.before,
 		});
 	}
-	if (ConsentContext.options.hooks?.after) {
+	if (C15TContext.options.hooks?.after) {
 		afterHooks.push({
 			matcher: () => true,
-			handler: ConsentContext.options.hooks.after,
+			handler: C15TContext.options.hooks.after,
 		});
 	}
 	const pluginBeforeHooks = plugins

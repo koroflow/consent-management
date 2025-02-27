@@ -4,7 +4,7 @@ import {
 	type UnionToIntersection,
 	createRouter,
 } from 'better-call';
-import type { c15tOptions, c15tPlugin, ConsentContext } from '../types';
+import type { C15TOptions, c15tPlugin, C15TContext } from '../types';
 
 import { originCheckMiddleware } from './middlewares/origin-check';
 import { baseEndpoints } from './routes';
@@ -18,8 +18,8 @@ import { toAuthEndpoints } from './to-auth-endpoints';
 import { logger } from '~/utils/logger';
 
 export function getEndpoints<
-	C extends ConsentContext,
-	Option extends c15tOptions,
+	C extends C15TContext,
+	Option extends C15TOptions,
 >(ctx: Promise<C> | C, options: Option) {
 	const pluginEndpoints = options.plugins?.reduce(
 		(acc, plugin) => {
@@ -79,7 +79,7 @@ export function getEndpoints<
 	};
 }
 
-export const router = <C extends ConsentContext, Option extends c15tOptions>(
+export const router = <C extends C15TContext, Option extends C15TOptions>(
 	ctx: C,
 	options: Option
 ) => {

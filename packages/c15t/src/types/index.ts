@@ -7,12 +7,12 @@
  */
 // types/index.ts
 import type { createLogger } from '~/utils';
-import type { c15tOptions } from './options';
+import type { C15TOptions } from './options';
 import type { c15tPlugin } from './plugins';
 import type { Storage } from './storage';
 
 // Re-export important types
-export type { c15tOptions } from './options';
+export type { C15TOptions } from './options';
 export type { c15tPlugin } from './plugins';
 export type { Storage } from './storage';
 
@@ -307,11 +307,11 @@ export interface RequestBody {
  * This is the main context object passed around throughout the system
  * and made available to plugins and endpoint handlers
  */
-export interface ConsentContext {
+export interface C15TContext {
 	/**
 	 * Configuration options
 	 */
-	options: c15tOptions;
+	options: C15TOptions;
 
 	/**
 	 * Application name
@@ -430,7 +430,7 @@ export interface EndpointContext {
 	/**
 	 * Consent system context
 	 */
-	context: ConsentContext;
+	context: C15TContext;
 
 	/**
 	 * The HTTP request
@@ -490,7 +490,7 @@ export interface EndpointContext {
  * This type utility extracts the plugin types from a configuration object,
  * allowing TypeScript to understand the extensions provided by plugins.
  */
-export type InferPluginTypes<O extends c15tOptions> =
+export type InferPluginTypes<O extends C15TOptions> =
 	O['plugins'] extends Array<infer P>
 		? P extends c15tPlugin
 			? P extends { $InferServerPlugin: infer SP }
@@ -507,7 +507,7 @@ export type InferPluginTypes<O extends c15tOptions> =
  * This type utility extracts the error codes defined by plugins from a configuration object,
  * allowing TypeScript to understand the possible error codes.
  */
-export type InferPluginErrorCodes<O extends c15tOptions> =
+export type InferPluginErrorCodes<O extends C15TOptions> =
 	O['plugins'] extends Array<infer P>
 		? P extends c15tPlugin
 			? P['$ERROR_CODES'] extends infer EC

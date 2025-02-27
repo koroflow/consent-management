@@ -1,6 +1,6 @@
 import { createAuthEndpoint } from '../call';
 import { APIError } from 'better-call';
-import type { ConsentContext } from '~/types';
+import type { C15TContext } from '~/types';
 
 /**
  * Endpoint for setting user consent preferences.
@@ -59,7 +59,7 @@ export const setConsent = createAuthEndpoint(
 	async (ctx) => {
 		try {
 			// Cast context to proper type
-			const context = ctx.context as unknown as ConsentContext;
+			const context = ctx.context as unknown as C15TContext;
 
 			const { preferences } = ctx.body || {};
 

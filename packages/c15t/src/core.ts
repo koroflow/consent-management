@@ -32,11 +32,11 @@
  */
 import { init } from './init';
 import { router } from './api/index';
-import type { c15tOptions } from './types/options';
+import type { C15TOptions } from './types/options';
 import type {
 	InferPluginErrorCodes,
 	InferPluginTypes,
-	ConsentContext,
+	C15TContext,
 	Expand,
 } from './types';
 import { getBaseURL } from './utils/url';
@@ -61,14 +61,14 @@ export type WithJsDoc<T, D> = Expand<T & D>;
  * It initializes the consent management context, sets up request handling,
  * configures plugins, and exposes the necessary API endpoints.
  *
- * @template O - The specific c15tOptions type with plugin types
+ * @template O - The specific C15TOptions type with plugin types
  * @param options - Configuration options for the c15t instance
  * @returns A fully initialized c15t instance with request handler and API
  *
  * @example
  * ```typescript
  * // Create a c15t instance with custom storage and plugins
- * const c15tInstance = c15t({
+ * const C15TInstance = c15t({
  *   secret: 'your-secure-secret-key',
  *   storage: sqliteAdapter({
  *     filename: './consent.db'
@@ -85,7 +85,7 @@ export type WithJsDoc<T, D> = Expand<T & D>;
  *
  * // Use in an Express app
  * app.use('/api/c15t', (req, res) => {
- *   c15tInstance.handler(new Request(req.url, {
+ *   C15TInstance.handler(new Request(req.url, {
  *     method: req.method,
  *     headers: req.headers,
  *     body: req.body
@@ -101,67 +101,11 @@ export type WithJsDoc<T, D> = Expand<T & D>;
  * });
  * ```
  */
-export const c15t = <O extends c15tOptions>(options: O) => {
-	const consentContextPromise = init(options);
-
-	// Create a handler that awaits context initialization
-	// const handler = async (request: Request): Promise<Response> => {
-	// 	const ctx = await consentContextPromise;
-
-	// 	// Set up base path and URL
-	// 	const basePath = ctx.options.basePath || '/api/c15t';
-
-	// 	console.log("===== CORE HANDLER DEBUG =====");
-	// 	console.log("Request URL:", request.url);
-	// 	console.log("Request Method:", request.method);
-	// 	console.log("Request constructor name:", request.constructor.name);
-	// 	console.log("Request headers:", Object.fromEntries([...request.headers.entries()].map(([k, v]) => [k, v])));
-
-	// 	// Simplified URL handling: trust the request URL or create a simple fallback
-	// 	let url: URL;
-	// 	try {
-	// 		// Try to use the request URL directly
-	// 		url = new URL(request.url);
-	// 		console.log("[CORE] Using URL from request:", url.toString());
-	// 	} catch (error) {
-	// 		// Simple fallback if URL parsing fails
-	// 		const host = request.headers.get('host') || 'localhost';
-	// 		const protocol = host.includes('localhost') ? 'http' : 'https';
-	// 		url = new URL(`${protocol}://${host}${basePath}`);
-	// 		console.log("[CORE] Using fallback URL:", url.toString());
-	// 	}
-
-	// 	if (ctx.options.baseURL) {
-	// 		console.log("[CORE] Using existing baseURL:", ctx.options.baseURL);
-	// 	} else {
-	// 		const baseURL =
-	// 			getBaseURL(undefined, basePath) || `${url.origin}${basePath}`;
-	// 		ctx.options.baseURL = baseURL;
-	// 		ctx.baseURL = baseURL;
-	// 		console.log("[CORE] Set baseURL:", baseURL);
-	// 	}
-
-	// 	// Set trusted origins
-	// 	ctx.trustedOrigins = [
-	// 		...(options.trustedOrigins
-	// 			? Array.isArray(options.trustedOrigins)
-	// 				? options.trustedOrigins
-	// 				: options.trustedOrigins(request)
-	// 			: []),
-	// 		ctx.options.baseURL ?? url.origin,
-	// 		url.origin,
-	// 	];
-
-	// 	// Get router handler and process request
-	// 	const { handler: routerHandler } = router(ctx, options);
-	// 	console.log("[CORE] Calling router handler");
-	// 	const response = await routerHandler(request);
-	// 	console.log("[CORE] Router handler response status:", response.status);
-	// 	return response;
-	// };
-
+export const c15t = <O extends C15TOptions>(options: O) => {
+	const C15TContextPromise = init(options);
+  
 	const handler = async (request: Request): Promise<Response> => {
-		const ctx = await consentContextPromise;
+		const ctx = await C15TContextPromise;
 		const basePath = ctx.options.basePath || '/api/auth';
 		const url = new URL(request.url);
 		if (!ctx.options.baseURL) {
@@ -172,13 +116,14 @@ export const c15t = <O extends c15tOptions>(options: O) => {
 		}
 		ctx.trustedOrigins = [
 			...(options.trustedOrigins
-				? // biome-ignore lint/nursery/noNestedTernary: <explanation>
+				? 
+					// biome-ignore lint/nursery/noNestedTernary: its okay
 					Array.isArray(options.trustedOrigins)
 					? options.trustedOrigins
 					: options.trustedOrigins(request)
 				: []),
-			// biome-ignore lint/style/noNonNullAssertion: <explanation>
-			ctx.options.baseURL!,
+
+			ctx.options.baseURL || '',
 			url.origin,
 		];
 		const { handler } = router(ctx, options);
@@ -195,13 +140,13 @@ export const c15t = <O extends c15tOptions>(options: O) => {
 
 	// Get API endpoints (lazy-loaded)
 	const getApi = async () => {
-		const context = await consentContextPromise;
+		const context = await C15TContextPromise;
 
 		// Make sure context has a valid baseURL before calling router
 		if (!context.baseURL) {
 			// Log the warning but return the endpoints anyway to prevent 404s
 			// This allows clients to access endpoints even if the baseURL isn't set yet
-			console.log(
+			context.logger.warn(
 				'WARNING: baseURL not initialized, using default endpoint paths'
 			);
 
@@ -211,7 +156,7 @@ export const c15t = <O extends c15tOptions>(options: O) => {
 				const { endpoints } = router(context, options);
 				return endpoints;
 			} catch (error) {
-				console.error('Error in getApi when calling router:', error);
+				context.logger.error('Error in getApi when calling router:', error);
 				return {};
 			}
 		}
@@ -220,12 +165,13 @@ export const c15t = <O extends c15tOptions>(options: O) => {
 			const { endpoints } = router(context, options);
 			return endpoints;
 		} catch (error) {
-			console.error('Error in getApi when calling router:', error);
+			context.logger.error('Error in getApi when calling router:', error);
 			return {};
 		}
 	};
 
 	// Create a promise for the API endpoints but don't await it during initialization
+	// biome-ignore lint/correctness/noUnusedVariables: warm up the api promise
 	const apiPromise = getApi();
 
 	return {
@@ -233,10 +179,10 @@ export const c15t = <O extends c15tOptions>(options: O) => {
 		// We're type-casting this for now since the API is loaded asynchronously
 		api: {} as FilterActions<ReturnType<typeof router>['endpoints']>,
 		options: options as O,
-		$context: consentContextPromise,
+		$context: C15TContextPromise,
 		$Infer: {} as {
 			Consent: {
-				Context: ConsentContext;
+				Context: C15TContext;
 				Record: InferPluginTypes<O>;
 			};
 			Error: InferPluginErrorCodes<O> & typeof BASE_ERROR_CODES;
@@ -263,7 +209,7 @@ export const c15t = <O extends c15tOptions>(options: O) => {
  * - Error codes from the core system and plugins
  * - Access to the underlying consent context (for advanced usage)
  */
-export type c15tInstance = {
+export type C15TInstance = {
 	/**
 	 * Request handler for processing incoming consent-related requests
 	 *
@@ -285,7 +231,7 @@ export type c15tInstance = {
 	/**
 	 * Configuration options used to create the instance
 	 */
-	options: c15tOptions;
+	options: C15TOptions;
 
 	/**
 	 * Error codes from the core system and all registered plugins
@@ -300,7 +246,7 @@ export type c15tInstance = {
 	 * This is mainly for advanced usage scenarios where direct access
 	 * to the context is required.
 	 */
-	$context: Promise<ConsentContext>;
+	$context: Promise<C15TContext>;
 
 	/**
 	 * Index signature for dynamic access to API handlers

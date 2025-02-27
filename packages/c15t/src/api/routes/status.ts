@@ -1,5 +1,5 @@
 import { createAuthEndpoint } from '../call';
-import type { ConsentContext } from '../../types';
+import type { C15TContext } from '../../types';
 
 /**
  * Status endpoint that returns information about the c15t instance.
@@ -44,7 +44,7 @@ export const status = createAuthEndpoint(
 	},
 	async (ctx) => {
 		// Cast context to proper type
-		const context = ctx.context as unknown as ConsentContext;
+		const context = ctx.context as unknown as C15TContext;
 
 		return {
 			status: 'ok',

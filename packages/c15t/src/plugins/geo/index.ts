@@ -51,7 +51,7 @@
 
 import type { c15tClient } from '~/client';
 import { createAuthEndpoint, createAuthMiddleware } from '../../api/call';
-import type { c15tPlugin, ConsentContext, EndpointContext } from '../../types';
+import type { c15tPlugin, C15TContext, EndpointContext } from '../../types';
 import type { MiddlewareContext, MiddlewareOptions } from 'better-call';
 import type { LoggerMetadata } from '~/types/options';
 
@@ -299,7 +299,7 @@ export const geo = (options?: GeoPluginOptions): c15tPlugin => {
 		 * @param context - The c15t consent context
 		 * @returns Object containing modifications to options
 		 */
-		init(context: ConsentContext) {
+		init(context: C15TContext) {
 			// Add the geo configuration to the global options
 			context.options.geo = {
 				...context.options.geo,

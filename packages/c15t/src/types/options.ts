@@ -8,7 +8,7 @@
 import type { Storage } from './storage';
 import type { c15tPlugin } from './plugins';
 import type { Logger } from '../utils/logger';
-import type { ConsentContext } from '.';
+import type { C15TContext } from '.';
 import type { AuthMiddleware } from '~/api/call';
 
 /**
@@ -103,7 +103,7 @@ export interface CustomLogger {
 /**
  * Main configuration options for the c15t consent management system
  */
-export interface c15tOptions {
+export interface C15TOptions {
 	/**
 	 * The base URL for the API (optional if running in a browser)
 	 * @example "https://example.com"
@@ -373,7 +373,7 @@ export interface c15tOptions {
 		 * @param error
 		 * @param ctx - Auth context
 		 */
-		onError?: (error: unknown, ctx: ConsentContext) => void | Promise<void>;
+		onError?: (error: unknown, ctx: C15TContext) => void | Promise<void>;
 	};
 	/**
 	 * Hooks

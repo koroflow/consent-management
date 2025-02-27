@@ -19,7 +19,7 @@
  * ```
  */
 import { memoryAdapter } from './memory';
-import type { c15tOptions } from '../types/options';
+import type { C15TOptions } from '../types/options';
 import type { Storage } from '../types/storage';
 import { c15tError } from '../error/codes';
 import type { ConsentRecord } from '~/types';
@@ -36,7 +36,7 @@ import type { ConsentRecord } from '~/types';
  * @throws {c15tError} If the storage type is invalid or initialization fails
  */
 export async function getStorageAdapter(
-	options: c15tOptions
+	options: C15TOptions
 ): Promise<Storage> {
 	// Get primary storage adapter
 	const storageAdapter = await resolveStorage(options.storage);

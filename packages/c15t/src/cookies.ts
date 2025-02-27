@@ -10,7 +10,7 @@
  */
 import type { ConsentRecord } from './types';
 import type { EndpointContext } from './types';
-import type { c15tOptions } from './types/options';
+import type { C15TOptions } from './types/options';
 import { binary } from './utils/binary';
 import { createHMAC } from './utils/crypto';
 import { base64 } from './utils/encode';
@@ -122,7 +122,7 @@ export interface c15tCookies {
  * // Creates cookies named "myapp.consent_token" and "myapp.consent_data"
  * ```
  */
-export function getCookies(options: Partial<c15tOptions>): c15tCookies {
+export function getCookies(options: Partial<C15TOptions>): c15tCookies {
 	const prefix = options.cookies?.prefix || 'c15t';
 	const path = options.cookies?.path || '/';
 	const secure = options.cookies?.secure ?? isProduction;
@@ -165,13 +165,13 @@ export function getCookies(options: Partial<c15tOptions>): c15tCookies {
  *
  * @example
  * ```typescript
- * const createCookie = createCookieGetter(c15tOptions);
+ * const createCookie = createCookieGetter(C15TOptions);
  *
  * // Generate a cookie string with the configured options
  * const cookieStr = createCookie('user_pref', 'theme:dark', { maxAge: 86400 });
  * ```
  */
-export function createCookieGetter(options: Partial<c15tOptions>) {
+export function createCookieGetter(options: Partial<C15TOptions>) {
 	const cookies = getCookies(options);
 
 	/**

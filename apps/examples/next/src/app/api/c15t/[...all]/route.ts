@@ -1,4 +1,4 @@
 import { toNextJsHandler } from "@c15t/new/integrations";
-import { c15tInstance } from "~/lib/c15t";
+import { C15TInstance } from "~/lib/c15t";
 
-export const { GET, POST } = toNextJsHandler(c15tInstance.handler);
+export const { GET, POST } = toNextJsHandler(C15TInstance.handler);

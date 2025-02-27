@@ -1,5 +1,5 @@
 import { createEndpoint, createMiddleware } from 'better-call';
-import type { ConsentContext } from '~/types';
+import type { C15TContext } from '~/types';
 
 export const optionsMiddleware = createMiddleware(async () => {
 	/**
@@ -7,7 +7,7 @@ export const optionsMiddleware = createMiddleware(async () => {
 	 * the context. Used to infer the type
 	 * here.
 	 */
-	return {} as ConsentContext;
+	return {} as C15TContext;
 });
 
 export const createAuthMiddleware = createMiddleware.create({

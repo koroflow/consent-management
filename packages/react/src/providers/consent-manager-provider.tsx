@@ -41,6 +41,7 @@ export function ConsentManagerProvider({
 	disableAnimation = false,
 	scrollLock = false,
 	trapFocus = true,
+	store: customStore,
 }: ConsentManagerProviderProps) {
 	const preparedTranslationConfig = useMemo(() => {
 		const mergedConfig = mergeTranslationConfigs(
@@ -56,7 +57,14 @@ export function ConsentManagerProvider({
 	}, [translationConfig]);
 
 	// Create a stable reference to the store with prepared translation config
+	// Use the custom store if provided, otherwise create a new one
 	const store = useMemo(() => {
+		// If a custom store is provided (e.g., from c15t adapter), use it
+		if (customStore) {
+			return customStore;
+		}
+		
+		// Otherwise, create a core store (legacy approach)
 		const store = createConsentManagerStore(namespace, {
 			trackingBlockerConfig,
 		});
@@ -64,35 +72,38 @@ export function ConsentManagerProvider({
 		store.getState().setTranslationConfig(preparedTranslationConfig);
 
 		return store;
-	}, [namespace, preparedTranslationConfig, trackingBlockerConfig]);
+	}, [namespace, preparedTranslationConfig, trackingBlockerConfig, customStore]);
 
 	// Initialize state with the current state from the consent manager store
 	const [state, setState] = useState<PrivacyConsentState>(store.getState());
 
 	useEffect(() => {
-		const { setGdprTypes, setComplianceSetting, setDetectedCountry } =
-			store.getState();
+		// Skip initialization if using a custom store, as it should have been initialized already
+		if (!customStore) {
+			const { setGdprTypes, setComplianceSetting, setDetectedCountry } =
+				store.getState();
 
-		// Initialize GDPR types if provided
-		if (initialGdprTypes) {
-			setGdprTypes(initialGdprTypes);
-		}
-
-		// Initialize compliance settings if provided
-		if (initialComplianceSettings) {
-			for (const [region, settings] of Object.entries(
-				initialComplianceSettings
-			)) {
-				setComplianceSetting(region as ComplianceRegion, settings);
+			// Initialize GDPR types if provided
+			if (initialGdprTypes) {
+				setGdprTypes(initialGdprTypes);
 			}
-		}
 
-		// Set detected country
-		const country =
-			document
-				.querySelector('meta[name="user-country"]')
-				?.getAttribute('content') || 'US';
-		setDetectedCountry(country);
+			// Initialize compliance settings if provided
+			if (initialComplianceSettings) {
+				for (const [region, settings] of Object.entries(
+					initialComplianceSettings
+				)) {
+					setComplianceSetting(region as ComplianceRegion, settings);
+				}
+			}
+
+			// Set detected country
+			const country =
+				document
+					.querySelector('meta[name="user-country"]')
+					?.getAttribute('content') || 'US';
+			setDetectedCountry(country);
+		}
 
 		// Subscribe to state changes
 		const unsubscribe = store.subscribe((newState) => {
@@ -103,7 +114,7 @@ export function ConsentManagerProvider({
 		return () => {
 			unsubscribe();
 		};
-	}, [store, initialGdprTypes, initialComplianceSettings]);
+	}, [store, initialGdprTypes, initialComplianceSettings, customStore]);
 
 	// Memoize the context value to prevent unnecessary re-renders
 	const contextValue = useMemo(

@@ -98,26 +98,42 @@ declare module './types/plugins' {
 }
 
 //------------------------------------------------------------------------------
-// Framework Integrations (Commented out until implementation is complete)
+// Framework Integrations
 //------------------------------------------------------------------------------
 
-/*
-// Next.js integration components and utilities
+/**
+ * Next.js integration components and utilities
+ */
 export {
-	createNextIntegration,
-	createNextMiddleware,
-	withConsent
+	createNextAdapter,
+	withConsentPages,
+	withConsentApi,
+	useConsentStatus,
 } from './integrations/next';
 
-// React integration components and hooks
+/**
+ * React integration components and hooks
+ */
 export {
-	createReactIntegration,
-	ConsentProvider,
-	useConsent
+	createConsentClient,
+	createCompatibilityStore,
+	useConsentManager,
+	useConditionalContent,
 } from './integrations/react';
 
-// Generic server integration
+/**
+ * Server integration utilities
+ */
 export {
-	createServerIntegration
+	createServerAdapter,
+	createServerMiddleware,
 } from './integrations/server';
-*/
+
+//------------------------------------------------------------------------------
+// Example Components
+//------------------------------------------------------------------------------
+
+/**
+ * Example components for rapid implementation
+ */
+export * as Examples from './examples';

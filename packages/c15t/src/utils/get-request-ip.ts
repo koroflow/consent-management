@@ -1,9 +1,9 @@
-import type { c15tOptions } from '../types';
+import type { C15TOptions } from '../types';
 import { isTest } from '../utils/env';
 
 export function getIp(
 	req: Request | Headers,
-	options: c15tOptions
+	options: C15TOptions
 ): string | null {
 	if (options.advanced?.ipAddress?.disableIpTracking) {
 		return null;

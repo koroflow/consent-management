@@ -1,7 +1,7 @@
 import { c15t, memoryAdapter } from '@c15t/new';
 
 // Create a new shared instance of c15t with configuration
-export const c15tInstance = c15t({
+export const C15TInstance = c15t({
 	appName: 'Next.js Example App',
 	// Add any trusted origins if needed
 	trustedOrigins: ['http://localhost:3000'],

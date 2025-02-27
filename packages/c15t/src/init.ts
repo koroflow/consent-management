@@ -21,8 +21,8 @@ import { getStorageAdapter } from './storage/utils';
 import { getCookies, createCookieGetter } from './cookies';
 import { generateId } from './utils/id';
 import { env, isProduction } from './utils/env';
-import type { ConsentContext } from './types';
-import type { c15tOptions, c15tPlugin } from './types';
+import type { C15TContext } from './types';
+import type { C15TOptions, c15tPlugin } from './types';
 
 /**
  * Default secret used when no secret is provided
@@ -52,7 +52,7 @@ const DEFAULT_SECRET = 'c15t-default-secret-please-change-in-production';
  * // Now use the context to handle consent management
  * ```
  */
-export const init = async (options: c15tOptions): Promise<ConsentContext> => {
+export const init = async (options: C15TOptions): Promise<C15TContext> => {
 	const storage = await getStorageAdapter(options);
 	const plugins = options.plugins || [];
 	const internalPlugins = getInternalPlugins(options);
@@ -82,7 +82,7 @@ export const init = async (options: c15tOptions): Promise<ConsentContext> => {
 	const cookies = getCookies(finalOptions);
 
 	// Set up ID generation function
-	const generateIdFunc: ConsentContext['generateId'] = ({ model, size }) => {
+	const generateIdFunc: C15TContext['generateId'] = ({ model, size }) => {
 		if (typeof finalOptions?.advanced?.generateId === 'function') {
 			return finalOptions.advanced.generateId({ model, size });
 		}
@@ -90,7 +90,7 @@ export const init = async (options: c15tOptions): Promise<ConsentContext> => {
 	};
 
 	// Create context
-	const ctx: ConsentContext = {
+	const ctx: C15TContext = {
 		appName: finalOptions.appName || 'c15t Consent Manager',
 		options: finalOptions,
 		trustedOrigins: getTrustedOrigins(finalOptions),
@@ -126,10 +126,10 @@ export const init = async (options: c15tOptions): Promise<ConsentContext> => {
  * @param ctx - The current consent context
  * @returns The updated context after plugin initialization
  */
-function runPluginInit(ctx: ConsentContext) {
+function runPluginInit(ctx: C15TContext) {
 	let options = ctx.options;
 	const plugins = options.plugins || [];
-	let context: ConsentContext = ctx;
+	let context: C15TContext = ctx;
 
 	for (const plugin of plugins) {
 		if (plugin.init) {
@@ -141,7 +141,7 @@ function runPluginInit(ctx: ConsentContext) {
 				if (result.context) {
 					context = {
 						...context,
-						...(result.context as Partial<ConsentContext>),
+						...(result.context as Partial<C15TContext>),
 					};
 				}
 			}
@@ -161,7 +161,7 @@ function runPluginInit(ctx: ConsentContext) {
  * @param options - The c15t configuration options
  * @returns An array of internal plugins to include
  */
-function getInternalPlugins(options: c15tOptions): c15tPlugin[] {
+function getInternalPlugins(options: C15TOptions): c15tPlugin[] {
 	const plugins: c15tPlugin[] = [];
 
 	// Add internal plugins based on options
@@ -186,7 +186,7 @@ function getInternalPlugins(options: c15tOptions): c15tPlugin[] {
  * @param options - The c15t configuration options
  * @returns An array of trusted origin URLs
  */
-function getTrustedOrigins(options: c15tOptions): string[] {
+function getTrustedOrigins(options: C15TOptions): string[] {
 	const baseURL = getBaseURL(options.baseURL, options.basePath);
 	if (!baseURL) {
 		return [];
