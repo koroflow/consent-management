@@ -7,23 +7,23 @@ import type {
 
 /**
  * Client for interacting with the c15t consent management API.
- * 
+ *
  * This class provides methods for retrieving and updating consent preferences,
  * listing consent purposes, and accessing consent history. It handles HTTP requests
  * to the c15t API and provides a type-safe interface for working with consent data.
- * 
+ *
  * @example
  * ```typescript
  * import { createConsentClient } from '@c15t/client';
- * 
+ *
  * const client = createConsentClient({
  *   baseURL: 'https://example.com/api',
  *   headers: { 'X-API-Key': 'your-api-key' }
  * });
- * 
+ *
  * // Get current consent
  * const { data, error } = await client.getConsent();
- * 
+ *
  * // Update consent
  * await client.updateConsent({
  *   analytics: true,
@@ -36,12 +36,12 @@ export class c15tClient {
 	 * Base URL for API requests (without trailing slash)
 	 */
 	private baseURL: string;
-	
+
 	/**
 	 * Default headers to include with all requests
 	 */
 	private headers: Record<string, string>;
-	
+
 	/**
 	 * Custom fetch implementation (if provided)
 	 */
@@ -49,7 +49,7 @@ export class c15tClient {
 
 	/**
 	 * Creates a new c15t client instance.
-	 * 
+	 *
 	 * @param options - Configuration options for the client
 	 */
 	constructor(options: c15tClientOptions) {
@@ -67,11 +67,11 @@ export class c15tClient {
 
 	/**
 	 * Generic method for making HTTP requests to the API.
-	 * 
+	 *
 	 * This internal method handles constructing the request, processing the response,
 	 * and executing any callbacks based on the response status. It provides standardized
 	 * error handling and response formatting.
-	 * 
+	 *
 	 * @param path - API endpoint path (will be appended to the baseURL)
 	 * @param options - Request configuration options
 	 * @returns A response context object containing the data, response metadata, and any errors
@@ -209,21 +209,21 @@ export class c15tClient {
 
 	/**
 	 * Retrieves the current consent preferences.
-	 * 
+	 *
 	 * This method fetches the current consent settings for the user,
 	 * including which purposes they have consented to and when the
 	 * consent was last updated.
-	 * 
+	 *
 	 * @example
 	 * ```typescript
 	 * const { data, error } = await client.getConsent();
-	 * 
+	 *
 	 * if (data) {
 	 *   console.log('User consented to analytics:', data.preferences.analytics);
 	 *   console.log('Consent last updated:', data.updatedAt);
 	 * }
 	 * ```
-	 * 
+	 *
 	 * @param options - Optional fetch configuration options
 	 * @returns Response context containing the consent preferences if successful
 	 */
@@ -238,15 +238,15 @@ export class c15tClient {
 
 	/**
 	 * Lists all available consent purposes.
-	 * 
+	 *
 	 * This method retrieves all consent purposes configured in the system,
 	 * including their IDs, names, descriptions, and whether they are required
 	 * or optional.
-	 * 
+	 *
 	 * @example
 	 * ```typescript
 	 * const { data } = await client.listPurposes();
-	 * 
+	 *
 	 * if (data) {
 	 *   // Display available consent purposes to the user
 	 *   data.forEach(purpose => {
@@ -255,7 +255,7 @@ export class c15tClient {
 	 *   });
 	 * }
 	 * ```
-	 * 
+	 *
 	 * @param options - Optional fetch configuration options
 	 * @returns Response context containing the list of consent purposes if successful
 	 */
@@ -270,10 +270,10 @@ export class c15tClient {
 
 	/**
 	 * Updates the user's consent preferences.
-	 * 
+	 *
 	 * This method sends the user's updated consent choices to the server,
 	 * recording which purposes they have agreed to and which they have declined.
-	 * 
+	 *
 	 * @example
 	 * ```typescript
 	 * const { data, error } = await client.updateConsent({
@@ -281,13 +281,13 @@ export class c15tClient {
 	 *   marketing: false,
 	 *   preferences: true
 	 * });
-	 * 
+	 *
 	 * if (data) {
 	 *   console.log('Consent updated successfully');
 	 *   console.log('New preferences:', data.preferences);
 	 * }
 	 * ```
-	 * 
+	 *
 	 * @param preferences - Record mapping purpose IDs to boolean consent values
 	 * @param options - Optional fetch configuration options
 	 * @returns Response context containing the updated consent preferences if successful
@@ -305,18 +305,18 @@ export class c15tClient {
 
 	/**
 	 * Retrieves the history of consent changes.
-	 * 
+	 *
 	 * This method fetches a chronological record of consent preference changes,
 	 * showing when and how consent settings were modified.
-	 * 
+	 *
 	 * @example
 	 * ```typescript
 	 * // Get consent history for a specific user
-	 * const { data } = await client.getConsentHistory({ 
+	 * const { data } = await client.getConsentHistory({
 	 *   userId: '123',
 	 *   limit: 10
 	 * });
-	 * 
+	 *
 	 * if (data) {
 	 *   data.forEach(event => {
 	 *     console.log(`Change at ${event.timestamp}`);
@@ -324,7 +324,7 @@ export class c15tClient {
 	 *   });
 	 * }
 	 * ```
-	 * 
+	 *
 	 * @param query - Query parameters to filter the history results
 	 * @param options - Optional fetch configuration options
 	 * @returns Response context containing the list of consent change events if successful
@@ -348,10 +348,10 @@ export class c15tClient {
 
 	/**
 	 * Makes a custom API request to any endpoint.
-	 * 
+	 *
 	 * This method allows for making requests to custom endpoints not covered
 	 * by the standard methods, such as plugin-specific endpoints.
-	 * 
+	 *
 	 * @example
 	 * ```typescript
 	 * // Call a custom analytics endpoint
@@ -363,7 +363,7 @@ export class c15tClient {
 	 *   }
 	 * });
 	 * ```
-	 * 
+	 *
 	 * @param path - The API endpoint path
 	 * @param options - Request configuration options
 	 * @returns Response context containing the requested data if successful
@@ -378,15 +378,15 @@ export class c15tClient {
 
 /**
  * Creates and returns a new c15t client instance.
- * 
+ *
  * This is the recommended way to create a client for interacting with the c15t API.
  * It provides a convenient factory function that instantiates a properly configured
  * client based on the provided options.
- * 
+ *
  * @example
  * ```typescript
  * import { createConsentClient } from '@c15t/client';
- * 
+ *
  * // Create a client for your application
  * const client = createConsentClient({
  *   baseURL: 'https://api.example.com/consent',
@@ -398,11 +398,11 @@ export class c15tClient {
  *     customFetchImpl: customFetch
  *   }
  * });
- * 
+ *
  * // Use the client in your application
  * const { data } = await client.getConsent();
  * ```
- * 
+ *
  * @param options - Configuration options for the client
  * @returns A new c15tClient instance
  */

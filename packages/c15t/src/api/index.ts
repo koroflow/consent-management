@@ -7,24 +7,24 @@ import { APIError } from 'better-call';
 
 /**
  * Aggregates and returns all endpoints from base routes and plugins.
- * 
+ *
  * This function combines the core consent management endpoints with any
  * additional endpoints provided by plugins. It serves as the central point
  * for building the complete API surface of the c15t system.
- * 
+ *
  * @example
  * ```typescript
  * import { getEndpoints } from '@c15t/api';
- * 
+ *
  * // Get all available endpoints
  * const { endpoints } = getEndpoints(context, {
  *   plugins: [myCustomPlugin]
  * });
- * 
+ *
  * // Use endpoints in your application
  * const api = createAPI({ endpoints });
  * ```
- * 
+ *
  * @param context - The consent context object containing application state and helpers
  * @param options - Configuration options including plugins
  * @returns Object containing all available endpoints
@@ -61,39 +61,39 @@ export function getEndpoints(context: ConsentContext, options: c15tOptions) {
 
 /**
  * Creates a router that handles API requests for the consent management system.
- * 
+ *
  * This function sets up a complete request handler that can process API requests
  * for consent management. It configures:
  * - Base URL path for the API
  * - CORS handling (enabled by default)
  * - Logging middleware
  * - Error handling
- * 
+ *
  * The returned object provides various ways to use the router:
  * - `api` and `endpoints`: Access to all endpoints for programmatic use
  * - `handler`: Fetch API compatible request handler
  * - `nodeHandler`: Node.js compatible request handler
  * - `routerConfig`: Configuration details for the router
- * 
+ *
  * @example
  * ```typescript
  * import { router } from '@c15t/api';
- * 
+ *
  * // Create an API router
  * const api = router(context, {
  *   basePath: '/api/v1/consent',
  *   cors: true
  * });
- * 
+ *
  * // Use with fetch API
  * addEventListener('fetch', (event) => {
  *   event.respondWith(api.handler(event.request));
  * });
- * 
+ *
  * // Or use with Node.js
  * app.use('/api/consent', (req, res) => api.nodeHandler(req, res));
  * ```
- * 
+ *
  * @param context - The consent context object containing application state and helpers
  * @param options - Configuration options for the router
  * @returns Object containing handler functions and endpoints
@@ -145,7 +145,7 @@ export function router(context: ConsentContext, options: c15tOptions) {
 
 	/**
 	 * Fetch API compatible request handler for the consent API.
-	 * 
+	 *
 	 * @param request - Fetch API Request object
 	 * @returns Response object for the API request
 	 */
@@ -232,14 +232,23 @@ export function router(context: ConsentContext, options: c15tOptions) {
 
 	/**
 	 * Node.js compatible request handler for the consent API.
-	 * 
+	 *
 	 * @param req - Node.js HTTP request object
 	 * @param res - Node.js HTTP response object
 	 * @returns Promise that resolves when the response is sent
 	 */
 	const nodeHandler = (
-		req: { url?: string; method?: string; headers: Record<string, string | string[] | undefined> },
-		res: { statusCode: number; setHeader: (key: string, value: string) => void; write: (chunk: string) => void; end: () => void }
+		req: {
+			url?: string;
+			method?: string;
+			headers: Record<string, string | string[] | undefined>;
+		},
+		res: {
+			statusCode: number;
+			setHeader: (key: string, value: string) => void;
+			write: (chunk: string) => void;
+			end: () => void;
+		}
 	) => {
 		// Convert Node.js request to fetch Request
 		const url = new URL(
@@ -249,7 +258,10 @@ export function router(context: ConsentContext, options: c15tOptions) {
 		const request = new Request(url.toString(), {
 			method: req.method,
 			headers: new Headers(req.headers as Record<string, string>),
-			body: req.method !== 'GET' && req.method !== 'HEAD' ? JSON.stringify(req) : undefined,
+			body:
+				req.method !== 'GET' && req.method !== 'HEAD'
+					? JSON.stringify(req)
+					: undefined,
 		});
 
 		// Call our handler with the Request
@@ -286,7 +298,7 @@ export function router(context: ConsentContext, options: c15tOptions) {
 				res.statusCode = 500;
 				res.setHeader('Content-Type', 'application/json');
 				res.end(
-          // @ts-expect-error
+					// @ts-expect-error
 					JSON.stringify({
 						error: 'internal_server_error',
 						message: 'An unexpected error occurred in the handler',

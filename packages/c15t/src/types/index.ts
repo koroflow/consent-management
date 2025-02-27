@@ -1,6 +1,6 @@
 /**
  * c15t Core Type Definitions
- * 
+ *
  * This module provides the core type definitions for the c15t consent management system.
  * It includes types for consent records, purposes, preferences, and the context objects
  * used throughout the system.
@@ -48,28 +48,28 @@ export interface CookieOptions {
 	 * Domain for the cookie
 	 */
 	domain?: string;
-	
+
 	/**
 	 * Path for the cookie
 	 * @default "/"
 	 */
 	path?: string;
-	
+
 	/**
 	 * Max age in seconds
 	 */
 	maxAge?: number;
-	
+
 	/**
 	 * HTTP only flag
 	 */
 	httpOnly?: boolean;
-	
+
 	/**
 	 * Secure flag
 	 */
 	secure?: boolean;
-	
+
 	/**
 	 * SameSite attribute
 	 */
@@ -78,7 +78,7 @@ export interface CookieOptions {
 
 /**
  * Definition of a consent purpose
- * 
+ *
  * A purpose represents a specific use of personal data that requires consent,
  * such as analytics, marketing, or personalization.
  */
@@ -87,28 +87,28 @@ export interface ConsentPurpose {
 	 * Unique identifier for the purpose
 	 */
 	id: string;
-	
+
 	/**
 	 * Human-readable name of the purpose
 	 */
 	name: string;
-	
+
 	/**
 	 * Detailed description of what this purpose entails
 	 */
 	description: string;
-	
+
 	/**
 	 * Whether consent for this purpose is required
 	 * Required purposes cannot be declined
 	 */
 	required: boolean;
-	
+
 	/**
 	 * Default consent value if not explicitly set
 	 */
 	default?: boolean;
-	
+
 	/**
 	 * Legal basis for processing under GDPR
 	 */
@@ -119,17 +119,17 @@ export interface ConsentPurpose {
 		| 'contract'
 		| 'vital_interest'
 		| 'public_interest';
-	
+
 	/**
 	 * Expiry in seconds for this specific purpose
 	 */
 	expiry?: number;
-	
+
 	/**
 	 * When this purpose was created
 	 */
 	createdAt: Date;
-	
+
 	/**
 	 * When this purpose was last updated
 	 */
@@ -138,7 +138,7 @@ export interface ConsentPurpose {
 
 /**
  * A specific consent preference for a purpose
- * 
+ *
  * Represents the consent status for a specific purpose, user, and/or device.
  */
 export interface ConsentPreference {
@@ -146,37 +146,37 @@ export interface ConsentPreference {
 	 * Unique identifier for the preference
 	 */
 	id: string;
-	
+
 	/**
 	 * User ID (if available)
 	 */
 	userId?: string;
-	
+
 	/**
 	 * Device ID (if available)
 	 */
 	deviceId?: string;
-	
+
 	/**
 	 * The purpose this preference applies to
 	 */
 	purposeId: string;
-	
+
 	/**
 	 * Whether consent is granted for this purpose
 	 */
 	allowed: boolean;
-	
+
 	/**
 	 * When this preference expires
 	 */
 	expiresAt: Date;
-	
+
 	/**
 	 * When this preference was created
 	 */
 	createdAt: Date;
-	
+
 	/**
 	 * When this preference was last updated
 	 */
@@ -185,7 +185,7 @@ export interface ConsentPreference {
 
 /**
  * A complete consent record
- * 
+ *
  * Represents the full consent state for a user/device combination,
  * including all purpose preferences
  */
@@ -194,52 +194,52 @@ export interface ConsentRecord {
 	 * Unique identifier for the consent record
 	 */
 	id: string;
-	
+
 	/**
 	 * User ID (if available)
 	 */
 	userId?: string;
-	
+
 	/**
 	 * Device ID (if available)
 	 */
 	deviceId?: string;
-	
+
 	/**
 	 * Map of purpose IDs to consent status
 	 */
 	preferences: Record<string, boolean>;
-	
+
 	/**
 	 * When this record was created
 	 */
 	createdAt: Date;
-	
+
 	/**
 	 * When this record was last updated
 	 */
 	updatedAt: Date;
-	
+
 	/**
 	 * When this record expires
 	 */
 	expiresAt: Date;
-	
+
 	/**
 	 * IP address of the user when consent was given
 	 */
 	ipAddress?: string;
-	
+
 	/**
 	 * User agent of the browser/device when consent was given
 	 */
 	userAgent?: string;
-	
+
 	/**
 	 * Country code (if geo-targeting is enabled)
 	 */
 	country?: string;
-	
+
 	/**
 	 * Region or state code (if geo-targeting is enabled)
 	 */
@@ -248,7 +248,7 @@ export interface ConsentRecord {
 
 /**
  * Record of a consent change
- * 
+ *
  * Represents a historical change to a consent preference,
  * useful for audit trails and compliance
  */
@@ -257,37 +257,37 @@ export interface ConsentChangeEvent {
 	 * When the change occurred
 	 */
 	timestamp: Date;
-	
+
 	/**
 	 * ID of the consent record that was changed
 	 */
 	recordId: string;
-	
+
 	/**
 	 * User ID (if available)
 	 */
 	userId?: string;
-	
+
 	/**
 	 * Device ID (if available)
 	 */
 	deviceId?: string;
-	
+
 	/**
 	 * The purpose ID that was changed
 	 */
 	purposeId: string;
-	
+
 	/**
 	 * The previous consent state
 	 */
 	previousState?: boolean;
-	
+
 	/**
 	 * The new consent state
 	 */
 	newState: boolean;
-	
+
 	/**
 	 * Source of the change
 	 */
@@ -303,7 +303,7 @@ export interface RequestBody {
 
 /**
  * Context interface for the consent system
- * 
+ *
  * This is the main context object passed around throughout the system
  * and made available to plugins and endpoint handlers
  */
@@ -312,57 +312,57 @@ export interface ConsentContext {
 	 * Configuration options
 	 */
 	options: c15tOptions;
-	
+
 	/**
 	 * Application name
 	 */
 	appName: string;
-	
+
 	/**
 	 * Base URL for API endpoints
 	 */
 	baseURL: string;
-	
+
 	/**
 	 * Trusted origins for CORS
 	 */
 	trustedOrigins: string[];
-	
+
 	/**
 	 * Current consent record
 	 */
 	currentConsent: ConsentRecord | null;
-	
+
 	/**
 	 * Set a new consent record
 	 */
 	setNewConsent: (consent: ConsentRecord | null) => void;
-	
+
 	/**
 	 * New consent record (if one is being created/updated)
 	 */
 	newConsent: ConsentRecord | null;
-	
+
 	/**
 	 * Primary storage adapter
 	 */
 	storage: Storage;
-	
+
 	/**
 	 * Secondary storage adapter (if configured)
 	 */
 	secondaryStorage?: Storage;
-	
+
 	/**
 	 * Secret for signing cookies and tokens
 	 */
 	secret: string;
-	
+
 	/**
 	 * Logger interface
 	 */
 	logger: LoggerInterface;
-	
+
 	/**
 	 * Consent configuration
 	 */
@@ -371,44 +371,48 @@ export interface ConsentContext {
 		 * Consent expiration time in seconds
 		 */
 		expiresIn: number;
-		
+
 		/**
 		 * Time in seconds before refreshing consent data
 		 */
 		updateAge: number;
-		
+
 		/**
 		 * Whether consent is enabled
 		 */
 		enabled?: boolean;
 	};
-	
+
 	/**
 	 * Generate an ID for a model
 	 */
 	generateId: (options: { model: string; size?: number }) => string;
-	
+
 	/**
 	 * Create a consent cookie
 	 */
-	createConsentCookie: (name: string, value: string, options?: CookieOptions) => string;
+	createConsentCookie: (
+		name: string,
+		value: string,
+		options?: CookieOptions
+	) => string;
 
 	// API methods
 	/**
 	 * API version
 	 */
 	version?: string;
-	
+
 	/**
 	 * Get overall consent status
 	 */
 	getConsentStatus?: () => Promise<boolean>;
-	
+
 	/**
 	 * Get all consent preferences
 	 */
 	getConsentPreferences?: () => Promise<Record<string, boolean> | null>;
-	
+
 	/**
 	 * Set multiple consent preferences
 	 */
@@ -419,7 +423,7 @@ export interface ConsentContext {
 
 /**
  * API endpoint context
- * 
+ *
  * This context is available to API endpoint handlers
  */
 export interface EndpointContext {
@@ -427,52 +431,52 @@ export interface EndpointContext {
 	 * Consent system context
 	 */
 	context: ConsentContext;
-	
+
 	/**
 	 * The HTTP request
 	 */
 	request: Request;
-	
+
 	/**
 	 * URL path parameters
 	 */
 	params: Record<string, string>;
-	
+
 	/**
 	 * Query string parameters
 	 */
 	query: Record<string, string | string[] | undefined>;
-	
+
 	/**
 	 * Request body
 	 */
 	body: RequestBody;
-	
+
 	/**
 	 * Request headers
 	 */
 	headers: Headers;
-	
+
 	/**
 	 * Cookies from the request
 	 */
 	cookies: Record<string, string>;
-	
+
 	/**
 	 * Send a JSON response
 	 */
 	json: <T>(data: T, options?: { status?: number }) => Response;
-	
+
 	/**
 	 * Set a cookie in the response
 	 */
 	setCookie: (name: string, value: string, options?: CookieOptions) => void;
-	
+
 	/**
 	 * Get a cookie from the request
 	 */
 	getCookie: (name: string) => string | undefined;
-	
+
 	/**
 	 * Get and verify a signed cookie
 	 */
@@ -482,7 +486,7 @@ export interface EndpointContext {
 // Plugin type inference
 /**
  * Infer plugin types from configuration options
- * 
+ *
  * This type utility extracts the plugin types from a configuration object,
  * allowing TypeScript to understand the extensions provided by plugins.
  */
@@ -499,7 +503,7 @@ export type InferPluginTypes<O extends c15tOptions> =
 
 /**
  * Infer plugin error codes from configuration options
- * 
+ *
  * This type utility extracts the error codes defined by plugins from a configuration object,
  * allowing TypeScript to understand the possible error codes.
  */
@@ -517,17 +521,19 @@ export type InferPluginErrorCodes<O extends c15tOptions> =
 // API inference helpers
 /**
  * Filter action methods from an object type
- * 
+ *
  * This type utility extracts only the method properties from an object type,
  * useful for API type inference.
  */
 export type FilterActions<T> = {
-	[K in keyof T as T[K] extends (...args: unknown[]) => unknown ? K : never]: T[K];
+	[K in keyof T as T[K] extends (...args: unknown[]) => unknown
+		? K
+		: never]: T[K];
 };
 
 /**
  * Infer the return type of an API function
- * 
+ *
  * This type utility extracts the return type of a function,
  * useful for API type inference.
  */

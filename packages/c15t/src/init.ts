@@ -1,16 +1,16 @@
 /**
  * c15t Initialization Module
- * 
+ *
  * This module handles the initialization of the c15t consent management system.
  * It sets up the consent context, configures storage adapters, initializes plugins,
  * and establishes security settings like secrets and trusted origins.
- * 
+ *
  * The initialization process includes:
  * - Setting up storage adapters for consent data
  * - Configuring security credentials and trusted origins
  * - Initializing core and custom plugins
  * - Creating the consent context object that serves as the foundation for the system
- * 
+ *
  * This is an internal module typically not used directly by consumers of the c15t library.
  */
 // init.ts
@@ -21,7 +21,7 @@ import { getStorageAdapter } from './storage/utils';
 import { getCookies, createCookieGetter } from './cookies';
 import { generateId } from './utils/id';
 import { env, isProduction } from './utils/env';
-import type { ConsentContext, } from './types';
+import type { ConsentContext } from './types';
 import type { c15tOptions, c15tPlugin } from './types';
 
 /**
@@ -32,14 +32,14 @@ const DEFAULT_SECRET = 'c15t-default-secret-please-change-in-production';
 
 /**
  * Initializes the c15t consent management system
- * 
+ *
  * This function creates and configures the consent context based on the provided options.
  * It sets up storage adapters, initializes plugins, configures security settings,
  * and establishes the foundation for the consent management system.
- * 
+ *
  * @param options - Configuration options for the c15t instance
  * @returns A Promise resolving to the initialized consent context
- * 
+ *
  * @example
  * ```typescript
  * const contextPromise = init({
@@ -47,7 +47,7 @@ const DEFAULT_SECRET = 'c15t-default-secret-please-change-in-production';
  *   storage: memoryAdapter(),
  *   plugins: [geoPlugin()]
  * });
- * 
+ *
  * const context = await contextPromise;
  * // Now use the context to handle consent management
  * ```
@@ -119,10 +119,10 @@ export const init = async (options: c15tOptions): Promise<ConsentContext> => {
 
 /**
  * Initializes all registered plugins
- * 
+ *
  * This function runs the init method of each plugin in sequence,
  * collecting any context or options modifications they provide.
- * 
+ *
  * @param ctx - The current consent context
  * @returns The updated context after plugin initialization
  */
@@ -154,10 +154,10 @@ function runPluginInit(ctx: ConsentContext) {
 
 /**
  * Retrieves internal plugins based on configuration options
- * 
+ *
  * This function determines which internal plugins should be automatically
  * included based on the provided options.
- * 
+ *
  * @param options - The c15t configuration options
  * @returns An array of internal plugins to include
  */
@@ -179,10 +179,10 @@ function getInternalPlugins(options: c15tOptions): c15tPlugin[] {
 
 /**
  * Builds a list of trusted origins for CORS
- * 
+ *
  * This function determines which origins should be trusted for
  * cross-origin requests based on configuration and environment.
- * 
+ *
  * @param options - The c15t configuration options
  * @returns An array of trusted origin URLs
  */
