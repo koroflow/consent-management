@@ -2,7 +2,6 @@ import type { ConsentContext, EndpointContext } from './index';
 import type { C15tOptions } from './options';
 import type { Endpoint } from '../api/endpoint';
 
-
 export interface PluginHookContext extends EndpointContext {
 	path: string;
 	// Add geo property for geo plugin

@@ -91,12 +91,14 @@ export interface ConsentContext {
 	};
 	generateId: (options: { model: string; size?: number }) => string;
 	createConsentCookie: (name: string, value: string, options?: any) => string;
-    
-    // API methods
-    version?: string;
-    getConsentStatus?: () => Promise<boolean>;
-    getConsentPreferences?: () => Promise<Record<string, boolean> | null>;
-    setConsentPreferences?: (preferences: Record<string, boolean>) => Promise<void>;
+
+	// API methods
+	version?: string;
+	getConsentStatus?: () => Promise<boolean>;
+	getConsentPreferences?: () => Promise<Record<string, boolean> | null>;
+	setConsentPreferences?: (
+		preferences: Record<string, boolean>
+	) => Promise<void>;
 }
 
 // API endpoint context

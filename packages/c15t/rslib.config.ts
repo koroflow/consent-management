@@ -8,12 +8,12 @@ export default defineConfig({
 	lib: [
 		{
 			dts: true,
-      bundle: false,
+			bundle: false,
 			format: 'esm',
 		},
 		{
 			dts: true,
-      bundle: false,
+			bundle: false,
 			format: 'cjs',
 		},
 	],

@@ -5,9 +5,9 @@
 import {
 	APIError,
 	type Endpoint,
-	createMiddleware as betterCallCreateMiddleware
-} from "better-call";
-import { createConsentEndpoint } from "./call";
+	createMiddleware as betterCallCreateMiddleware,
+} from 'better-call';
+import { createConsentEndpoint } from './call';
 import type { EndpointContext, ConsentContext } from '../types';
 
 // Re-export APIError from better-call
@@ -46,7 +46,7 @@ export function createEndpoint<
 	return createConsentEndpoint(
 		path,
 		{
-			method: options.method as any || "GET",
+			method: (options.method as any) || 'GET',
 			requiresConsent: options.requiresConsent,
 		},
 		async (ctx) => {
@@ -73,7 +73,7 @@ export function createEndpoint<
 				getCookie: () => undefined,
 				getSignedCookie: async () => null,
 			};
-			
+
 			return await handler(adaptedContext);
 		}
 	) as Endpoint;
@@ -110,7 +110,7 @@ export function createMiddleware(
 			getCookie: () => undefined,
 			getSignedCookie: async () => null,
 		};
-		
+
 		return await handler(adaptedContext);
 	});
 }

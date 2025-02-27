@@ -3,8 +3,8 @@
 import type { C15tClientOptions, FetchOptions, ResponseContext } from '..';
 import type {
 	ConsentChangeEvent,
-  ConsentPreference,
-  ConsentPurpose,
+	ConsentPreference,
+	ConsentPurpose,
 } from '../types';
 
 export class C15tClient {

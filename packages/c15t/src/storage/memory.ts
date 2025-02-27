@@ -178,19 +178,19 @@ export function memoryAdapter(): Storage {
 		},
 
 		// Consent history
-	async logConsentChange(event): Promise<ConsentChangeEvent> {
-  const eventWithId: ConsentChangeEvent = {
-    ...event,
-    timestamp: event.timestamp || new Date(),
-    recordId: event.recordId,
-    purposeId: event.purposeId,
-    newState: event.newState,
-    source: event.source || 'user',
-  };
-  
-  db.consentHistory.push(eventWithId);
-  return eventWithId;
-},
+		async logConsentChange(event): Promise<ConsentChangeEvent> {
+			const eventWithId: ConsentChangeEvent = {
+				...event,
+				timestamp: event.timestamp || new Date(),
+				recordId: event.recordId,
+				purposeId: event.purposeId,
+				newState: event.newState,
+				source: event.source || 'user',
+			};
+
+			db.consentHistory.push(eventWithId);
+			return eventWithId;
+		},
 
 		async getConsentHistory(options): Promise<ConsentChangeEvent[]> {
 			const { recordId, userId, deviceId, limit = 50, offset = 0 } = options;
