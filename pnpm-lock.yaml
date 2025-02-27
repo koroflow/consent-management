@@ -225,7 +225,7 @@ importers:
 
   apps/examples/next:
     dependencies:
-      '@c15t/config':
+      '@c15t/temp':
         specifier: workspace:*
         version: link:../../../packages/c15t
       next:
