@@ -1,3 +1,31 @@
+/**
+ * ID Generation Utilities for c15t
+ * 
+ * This module provides functions for generating unique identifiers
+ * that are used throughout the c15t consent management system.
+ */
+
+/**
+ * Generates a cryptographically secure random ID string
+ * 
+ * This function creates a random ID using the Web Crypto API when available,
+ * with a fallback to Math.random() for environments without crypto support.
+ * The resulting ID uses a URL-safe character set (A-Z, a-z, 0-9).
+ * 
+ * @param length - The length of the ID to generate (default: 21)
+ * @returns A random string of the specified length
+ * 
+ * @example
+ * ```typescript
+ * // Generate a default length (21 character) ID
+ * const id = generateId();
+ * // "7f4s9hDk3lZx2Yp0qR5tW"
+ * 
+ * // Generate a shorter ID
+ * const shortId = generateId(8);
+ * // "j8Hp4tZx"
+ * ```
+ */
 export function generateId(length = 21): string {
 	if (
 		typeof crypto !== 'undefined' &&

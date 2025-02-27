@@ -1,33 +1,140 @@
 /**
- * Create a stub for React to avoid direct dependency when React is not installed
+ * React integration for c15t consent management system
+ * 
+ * This module provides React hooks and state management for the c15t consent system.
+ * It implements a lightweight store and hooks for integrating consent management
+ * into React applications without requiring specific React dependencies.
+ * 
+ * The implementation is designed to work in various React environments and can
+ * also function in non-React environments by providing a fallback pattern.
+ * 
+ * @example
+ * ```tsx
+ * // Initialize in your app
+ * import { createConsentClient } from '@c15t/integrations/react';
+ * 
+ * const consentClient = createConsentClient({
+ *   baseUrl: '/api/consent',
+ *   refreshInterval: 60000, // Check every minute
+ * });
+ * 
+ * // Use in components
+ * function ConsentBanner() {
+ *   const { isLoading, hasConsented, acceptAll, declineAll } = consentClient.useConsent();
+ *   
+ *   if (isLoading) return <div>Loading...</div>;
+ *   if (hasConsented) return null;
+ *   
+ *   return (
+ *     <div className="consent-banner">
+ *       <h2>We use cookies</h2>
+ *       <button onClick={acceptAll}>Accept All</button>
+ *       <button onClick={declineAll}>Decline All</button>
+ *     </div>
+ *   );
+ * }
+ * ```
+ */
+
+/**
+ * Type definition for a React-like hook function
+ * 
+ * This type facilitates compatibility with React's hooks pattern
+ * without requiring a direct dependency on React.
+ * 
+ * @template T The return type of the hook
  */
 type ReactHook<T> = () => T;
 
-// Type for the consent store state
+/**
+ * State for the consent management store
+ * 
+ * Contains the current consent status, preferences, and loading state.
+ */
 interface ConsentState {
+	/**
+	 * Whether consent data is currently being loaded
+	 */
 	isLoading: boolean;
+
+	/**
+	 * Whether the user has provided consent
+	 * - `true`: User has provided at least one consent
+	 * - `false`: User has explicitly declined all consent
+	 * - `null`: Consent status hasn't been determined yet
+	 */
 	hasConsented: boolean | null;
+
+	/**
+	 * Map of consent purposes to their consent status
+	 * Key is the purpose ID, value is a boolean indicating consent
+	 */
 	preferences: Record<string, boolean> | null;
+
+	/**
+	 * Error that occurred during consent operations
+	 */
 	error: Error | null;
+
+	/**
+	 * Timestamp of when consent was last updated
+	 */
 	lastUpdated: number | null;
 }
 
-// Type for the consent store actions
+/**
+ * Actions that can be performed on the consent store
+ * 
+ * These actions allow modifying the consent state and interacting
+ * with the consent management backend.
+ */
 interface ConsentActions {
+	/**
+	 * Set specific consent preferences
+	 * 
+	 * @param preferences - Map of purpose IDs to consent values
+	 * @returns Promise that resolves when consent is updated
+	 */
 	setConsent: (preferences: Record<string, boolean>) => Promise<void>;
+
+	/**
+	 * Accept all consent purposes
+	 * Uses the default preferences defined in configuration
+	 * 
+	 * @returns Promise that resolves when consent is updated
+	 */
 	acceptAll: () => Promise<void>;
+
+	/**
+	 * Decline all consent purposes
+	 * Sets all purposes to `false`
+	 * 
+	 * @returns Promise that resolves when consent is updated
+	 */
 	declineAll: () => Promise<void>;
+
+	/**
+	 * Refresh the consent status from the server
+	 * 
+	 * @returns Promise that resolves when consent status is refreshed
+	 */
 	refreshStatus: () => Promise<void>;
+
+	/**
+	 * Clear any error state in the store
+	 */
 	clearError: () => void;
 }
 
-// Combined store type
+/**
+ * Combined type for the consent store containing both state and actions
+ */
 type ConsentStore = ConsentState & ConsentActions;
 
 /**
- * Configuration options for the c15t client
+ * Configuration options for the c15t React client
  */
-interface C15tClientConfig {
+interface c15tClientConfig {
 	/**
 	 * Base URL for API endpoints
 	 * @default '/api/consent'
@@ -42,7 +149,17 @@ interface C15tClientConfig {
 	refreshInterval?: number;
 
 	/**
-	 * Default preferences to use for acceptAll
+	 * Default preferences to use for acceptAll action
+	 * These values determine what gets set when a user accepts all consent
+	 * 
+	 * @example
+	 * ```ts
+	 * {
+	 *   analytics: true,
+	 *   marketing: true, 
+	 *   preferences: true
+	 * }
+	 * ```
 	 */
 	defaultPreferences?: {
 		analytics?: boolean;
@@ -53,12 +170,115 @@ interface C15tClientConfig {
 }
 
 /**
+ * Interface for basic store operations
+ * 
+ * Provides a minimal store API similar to common state management libraries
+ * 
+ * @template T The type of state stored in the store
+ */
+interface StoreAPI<T> {
+	/**
+	 * Get the current state
+	 * @returns The current state
+	 */
+	getState: () => T;
+
+	/**
+	 * Update the state
+	 * @param partial - Partial state or function that returns partial state
+	 */
+	setState: (partial: Partial<T> | ((state: T) => Partial<T>)) => void;
+
+	/**
+	 * Subscribe to state changes
+	 * @param listener - Function to call when state changes
+	 * @returns Unsubscribe function
+	 */
+	subscribe: (listener: (state: T) => void) => () => void;
+}
+
+/**
+ * Result of the useConditionalContent hook
+ */
+interface ConditionalContentResult {
+	/**
+	 * Whether consent data is currently loading
+	 */
+	isLoading: boolean;
+	
+	/**
+	 * Whether the user has given any consent
+	 */
+	hasConsented: boolean | null;
+	
+	/**
+	 * Whether content can be shown based on required consent
+	 */
+	canShow: boolean;
+	
+	/**
+	 * Current consent preferences
+	 */
+	preferences: Record<string, boolean> | null;
+}
+
+/**
+ * Result of the createConsentClient function
+ */
+interface ConsentClient {
+	/**
+	 * Store for managing consent state
+	 */
+	store: StoreAPI<ConsentStore>;
+	
+	/**
+	 * Hook for accessing consent state and actions
+	 */
+	useConsent: ReactHook<ConsentStore>;
+	
+	/**
+	 * Hook for conditionally showing content based on consent
+	 */
+	useConditionalContent: (requiredConsent: string | string[]) => ConditionalContentResult;
+}
+
+/**
  * Creates a c15t client for React applications
+ * 
+ * This function creates a store and hooks for managing consent in React applications.
+ * It provides a lightweight implementation that works in various React environments
+ * and degrades gracefully in non-React environments.
  *
- * @param config Client configuration options
+ * @example
+ * ```tsx
+ * // Create a client
+ * const client = createConsentClient({
+ *   baseUrl: '/api/consent',
+ *   refreshInterval: 60000,
+ *   defaultPreferences: {
+ *     analytics: true,
+ *     marketing: false
+ *   }
+ * });
+ * 
+ * // Use in a component
+ * function ConsentStatus() {
+ *   const { preferences, refreshStatus } = client.useConsent();
+ *   
+ *   return (
+ *     <div>
+ *       <h2>Your consent preferences:</h2>
+ *       <pre>{JSON.stringify(preferences, null, 2)}</pre>
+ *       <button onClick={refreshStatus}>Refresh</button>
+ *     </div>
+ *   );
+ * }
+ * ```
+ *
+ * @param config - Client configuration options
  * @returns A client object with store and hooks
  */
-export function createConsentClient(config: C15tClientConfig = {}) {
+export function createConsentClient(config: c15tClientConfig = {}): ConsentClient {
 	const {
 		baseUrl = '/api/consent',
 		refreshInterval = 0,
@@ -69,14 +289,16 @@ export function createConsentClient(config: C15tClientConfig = {}) {
 		},
 	} = config;
 
-	// Define a store type based on common store libraries
-	type StoreAPI<T> = {
-		getState: () => T;
-		setState: (partial: Partial<T> | ((state: T) => Partial<T>)) => void;
-		subscribe: (listener: (state: T) => void) => () => void;
-	};
-
-	// Create a basic store implementation
+	/**
+	 * Create a basic store implementation
+	 * 
+	 * This is a lightweight implementation of a store pattern similar to
+	 * what libraries like Zustand provide, but without dependencies.
+	 * 
+	 * @template T The type of state to store
+	 * @param createState - Function that defines the initial state and actions
+	 * @returns A store API with getState, setState, and subscribe methods
+	 */
 	function createStore<T extends object>(
 		createState: (
 			set: (partial: Partial<T> | ((state: T) => Partial<T>)) => void,
@@ -93,7 +315,10 @@ export function createConsentClient(config: C15tClientConfig = {}) {
 					: { ...state, ...partial };
 
 			state = nextState;
-			listeners.forEach((listener) => listener(state));
+			// Replace forEach with for...of to fix linter error
+			for (const listener of listeners) {
+				listener(state);
+			}
 		};
 
 		const getState = () => state;
@@ -118,6 +343,12 @@ export function createConsentClient(config: C15tClientConfig = {}) {
 		lastUpdated: null,
 
 		// Actions
+		/**
+		 * Update consent preferences for specific purposes
+		 * 
+		 * @param preferences - Map of purpose IDs to consent values
+		 * @returns Promise that resolves when consent is updated
+		 */
 		setConsent: async (preferences: Record<string, boolean>) => {
 			try {
 				set({ isLoading: true, error: null });
@@ -154,6 +385,11 @@ export function createConsentClient(config: C15tClientConfig = {}) {
 			}
 		},
 
+		/**
+		 * Accept all consent purposes using the default preferences
+		 * 
+		 * @returns Promise that resolves when consent is updated
+		 */
 		acceptAll: async () => {
 			// Filter out any undefined values from defaultPreferences
 			const cleanPreferences = Object.entries(defaultPreferences)
@@ -169,6 +405,11 @@ export function createConsentClient(config: C15tClientConfig = {}) {
 			return await get().setConsent(cleanPreferences);
 		},
 
+		/**
+		 * Decline all consent purposes
+		 * 
+		 * @returns Promise that resolves when consent is updated
+		 */
 		declineAll: async () => {
 			const minimalConsent = Object.keys(defaultPreferences).reduce(
 				(acc, key) => {
@@ -181,6 +422,11 @@ export function createConsentClient(config: C15tClientConfig = {}) {
 			return await get().setConsent(minimalConsent);
 		},
 
+		/**
+		 * Refresh consent status from the server
+		 * 
+		 * @returns Promise that resolves when consent status is refreshed
+		 */
 		refreshStatus: async () => {
 			try {
 				set({ isLoading: true, error: null });
@@ -211,13 +457,23 @@ export function createConsentClient(config: C15tClientConfig = {}) {
 			}
 		},
 
+		/**
+		 * Clear any error state
+		 */
 		clearError: () => {
 			set({ error: null });
 		},
 	}));
 
-	// Create a function that mimics a React hook
-	// This should be compatible with most React environments
+	/**
+	 * Hook for accessing consent state and actions
+	 * 
+	 * This hook provides access to the current consent state and
+	 * actions to update consent preferences. It initiates loading
+	 * of consent status and sets up auto-refresh if configured.
+	 * 
+	 * @returns Current consent state and actions
+	 */
 	const useConsent: ReactHook<ConsentStore> = () => {
 		const storeState = consentStore.getState();
 
@@ -248,8 +504,30 @@ export function createConsentClient(config: C15tClientConfig = {}) {
 		return storeState;
 	};
 
-	// Hook to conditionally render content based on consent
-	const useConditionalContent = (requiredConsent: string | string[]) => {
+	/**
+	 * Hook to conditionally render content based on consent
+	 * 
+	 * This hook checks if the user has consented to specific purposes
+	 * and returns a boolean indicating whether the content can be shown.
+	 * 
+	 * @example
+	 * ```tsx
+	 * function AnalyticsComponent() {
+	 *   const { canShow, isLoading } = client.useConditionalContent('analytics');
+	 *   
+	 *   if (isLoading) return <div>Loading...</div>;
+	 *   if (!canShow) return null;
+	 *   
+	 *   return <div>Analytics content is shown because you consented!</div>;
+	 * }
+	 * ```
+	 * 
+	 * @param requiredConsent - Required consent purpose(s) to show content
+	 * @returns Object with loading state, consent status, and whether content can be shown
+	 */
+	const useConditionalContent = (
+		requiredConsent: string | string[]
+	): ConditionalContentResult => {
 		const store = useConsent();
 
 		const canShow = () => {

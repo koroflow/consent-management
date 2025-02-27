@@ -1,9 +1,46 @@
+/**
+ * Cryptographic Utilities for c15t
+ * 
+ * This module provides cryptographic functions used for security-related
+ * operations in the c15t consent management system, such as signing and
+ * verifying data.
+ */
+
+/**
+ * Creates an HMAC (Hash-based Message Authentication Code) utility object
+ * 
+ * This function returns an object with methods for signing and verifying
+ * data using HMAC, with support for different algorithms and encodings.
+ * It works in both browser and Node.js environments.
+ * 
+ * @param algorithm - The hash algorithm to use (default: 'SHA-256')
+ * @param encoding - The output encoding format (default: 'hex')
+ * @returns An object with sign and verify methods
+ * 
+ * @example
+ * ```typescript
+ * // Create an HMAC utility with default settings
+ * const hmac = createHMAC();
+ * 
+ * // Sign some data
+ * const signature = await hmac.sign('my-secret-key', 'data-to-sign');
+ * 
+ * // Verify the signature
+ * const isValid = await hmac.verify('my-secret-key', 'data-to-sign', signature);
+ * ```
+ */
 export function createHMAC(
 	algorithm: 'SHA-256' | 'SHA-512' = 'SHA-256',
 	encoding: 'hex' | 'base64' | 'base64urlnopad' = 'hex'
 ) {
 	const textEncoder = new TextEncoder();
 
+	/**
+	 * Imports a secret string as a CryptoKey for HMAC operations
+	 * 
+	 * @param secret - The secret key as a string
+	 * @returns A Promise resolving to a CryptoKey
+	 */
 	async function getKey(secret: string): Promise<CryptoKey> {
 		const secretBuffer = textEncoder.encode(secret);
 		return await crypto.subtle.importKey(
@@ -15,6 +52,13 @@ export function createHMAC(
 		);
 	}
 
+	/**
+	 * Encodes an ArrayBuffer to the specified output format
+	 * 
+	 * @param buffer - The ArrayBuffer to encode
+	 * @returns The encoded string in the format specified by the encoding parameter
+	 * @throws Error if the encoding is not supported
+	 */
 	function encodeOutput(buffer: ArrayBuffer): string {
 		const bytes = new Uint8Array(buffer);
 
@@ -51,6 +95,13 @@ export function createHMAC(
 	}
 
 	return {
+		/**
+		 * Signs data with the provided secret key
+		 * 
+		 * @param secret - The secret key to use for signing
+		 * @param data - The data to sign
+		 * @returns A Promise resolving to the signature string in the specified encoding
+		 */
 		async sign(secret: string, data: string): Promise<string> {
 			const key = await getKey(secret);
 			const dataBuffer = textEncoder.encode(data);
@@ -58,6 +109,15 @@ export function createHMAC(
 			return encodeOutput(signature);
 		},
 
+		/**
+		 * Verifies that a signature matches the provided data and secret
+		 * 
+		 * @param secret - The secret key used for signing
+		 * @param data - The data that was signed
+		 * @param signature - The signature to verify
+		 * @returns A Promise resolving to a boolean indicating whether the signature is valid
+		 * @throws Error if the encoding is not supported
+		 */
 		async verify(
 			secret: string,
 			data: string,

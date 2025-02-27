@@ -1,33 +1,128 @@
+/**
+ * Cookie Management for c15t
+ * 
+ * This module provides utilities for managing cookies in the c15t consent management system.
+ * It includes functions for creating, setting, reading, and deleting cookies, with special
+ * handling for consent-related cookies.
+ * 
+ * The module supports both standard cookie operations and specialized functions for
+ * consent token management, secure cookie signing, and cookie parsing.
+ */
 import type { ConsentRecord } from './types';
 import type { EndpointContext } from './types';
-import type { C15tOptions } from './types/options';
+import type { c15tOptions } from './types/options';
 import { binary } from './utils/binary';
 import { createHMAC } from './utils/crypto';
 import { base64 } from './utils/encode';
 import { isProduction } from './utils/env';
 
+/**
+ * Cookie configuration options
+ * 
+ * This interface defines the standard options that can be set on cookies,
+ * following the RFC 6265 cookie specification.
+ */
 export interface CookieOptions {
+	/**
+	 * Maximum age of the cookie in seconds
+	 */
 	maxAge?: number;
+	
+	/**
+	 * Expiration date for the cookie
+	 */
 	expires?: Date;
+	
+	/**
+	 * Path for the cookie
+	 * @default "/"
+	 */
 	path?: string;
+	
+	/**
+	 * Domain for the cookie
+	 */
 	domain?: string;
+	
+	/**
+	 * Whether the cookie should only be sent over HTTPS
+	 * @default true in production
+	 */
 	secure?: boolean;
+	
+	/**
+	 * Whether the cookie should be inaccessible to JavaScript
+	 */
 	httpOnly?: boolean;
+	
+	/**
+	 * SameSite attribute for the cookie
+	 * @default "lax"
+	 */
 	sameSite?: 'strict' | 'lax' | 'none';
 }
 
-export interface C15tCookies {
+/**
+ * c15t cookie configuration
+ * 
+ * This interface defines the structure of consent cookies used by the system,
+ * including both the consent token and consent data cookies.
+ */
+export interface c15tCookies {
+	/**
+	 * Configuration for the consent token cookie
+	 * This cookie stores a secure token that identifies the consent record
+	 */
 	consentToken: {
+		/**
+		 * Name of the cookie
+		 */
 		name: string;
+		
+		/**
+		 * Cookie options
+		 */
 		options: CookieOptions;
 	};
+	
+	/**
+	 * Configuration for the consent data cookie
+	 * This cookie stores a cached version of consent preferences for client-side access
+	 */
 	consentData: {
+		/**
+		 * Name of the cookie
+		 */
 		name: string;
+		
+		/**
+		 * Cookie options
+		 */
 		options: CookieOptions;
 	};
 }
 
-export function getCookies(options: Partial<C15tOptions>): C15tCookies {
+/**
+ * Creates cookie configuration objects based on c15t options
+ * 
+ * This function generates the standard cookie configuration used by c15t,
+ * including names and options for consent-related cookies.
+ * 
+ * @param options - c15t configuration options
+ * @returns Cookie configuration for c15t
+ * 
+ * @example
+ * ```typescript
+ * const cookieConfig = getCookies({
+ *   cookies: { 
+ *     prefix: 'myapp',
+ *     domain: '.example.com'
+ *   }
+ * });
+ * // Creates cookies named "myapp.consent_token" and "myapp.consent_data"
+ * ```
+ */
+export function getCookies(options: Partial<c15tOptions>): c15tCookies {
 	const prefix = options.cookies?.prefix || 'c15t';
 	const path = options.cookies?.path || '/';
 	const secure = options.cookies?.secure ?? isProduction;
@@ -59,17 +154,64 @@ export function getCookies(options: Partial<C15tOptions>): C15tCookies {
 	};
 }
 
-export function createCookieGetter(options: Partial<C15tOptions>) {
+/**
+ * Creates a function for generating cookie strings
+ * 
+ * This factory function returns a cookie-generating function that incorporates
+ * the global c15t cookie options with any custom options provided.
+ * 
+ * @param options - c15t configuration options
+ * @returns A function that generates cookie strings
+ * 
+ * @example
+ * ```typescript
+ * const createCookie = createCookieGetter(c15tOptions);
+ * 
+ * // Generate a cookie string with the configured options
+ * const cookieStr = createCookie('user_pref', 'theme:dark', { maxAge: 86400 });
+ * ```
+ */
+export function createCookieGetter(options: Partial<c15tOptions>) {
 	const cookies = getCookies(options);
 
+	/**
+	 * Generates a cookie string with appropriate options
+	 * 
+	 * @param name - Cookie name
+	 * @param value - Cookie value
+	 * @param opts - Additional cookie options that override defaults
+	 * @returns A formatted cookie string for use in Set-Cookie header
+	 */
 	return (name: string, value: string, opts: CookieOptions = {}) => {
-		const cookie = cookies[name as keyof C15tCookies];
+		const cookie = cookies[name as keyof c15tCookies];
 		const cookieOptions = cookie ? { ...cookie.options, ...opts } : opts;
 
 		return serializeCookie(name, value, cookieOptions);
 	};
 }
 
+/**
+ * Serializes cookie name, value, and options into a cookie string
+ * 
+ * This function creates a properly formatted cookie string according to
+ * RFC 6265, suitable for use in Set-Cookie headers.
+ * 
+ * @param name - Cookie name
+ * @param value - Cookie value
+ * @param options - Cookie options
+ * @returns A formatted cookie string
+ * 
+ * @example
+ * ```typescript
+ * const cookieStr = serializeCookie('session', 'abc123', {
+ *   maxAge: 3600,
+ *   path: '/',
+ *   secure: true,
+ *   httpOnly: true
+ * });
+ * // "session=abc123; Max-Age=3600; Path=/; Secure; HttpOnly"
+ * ```
+ */
 export function serializeCookie(
 	name: string,
 	value: string,
@@ -108,6 +250,24 @@ export function serializeCookie(
 	return cookie;
 }
 
+/**
+ * Sets consent cookies in the response
+ * 
+ * This function creates and sets the consent token cookie, which contains
+ * a cryptographically signed consent record ID. It also optionally sets
+ * a client-readable consent data cookie if cookie storage is enabled.
+ * 
+ * @param ctx - The endpoint context for the request/response
+ * @param consent - The consent record to store in cookies
+ * @param options - Additional cookie options to apply
+ * @returns A Promise that resolves when cookies are set
+ * 
+ * @example
+ * ```typescript
+ * // In an endpoint handler:
+ * await setConsentCookie(ctx, consentRecord, { domain: '.example.com' });
+ * ```
+ */
 export async function setConsentCookie(
 	ctx: EndpointContext,
 	consent: ConsentRecord,
@@ -133,6 +293,17 @@ export async function setConsentCookie(
 	}
 }
 
+/**
+ * Sets the consent data cache cookie
+ * 
+ * This function creates a client-readable cookie that contains the consent
+ * preferences and a cryptographic signature to verify their authenticity.
+ * This allows client-side code to access consent settings without an API call.
+ * 
+ * @param ctx - The endpoint context for the request/response
+ * @param consent - The consent record to cache in cookies
+ * @returns A Promise that resolves when the cache cookie is set
+ */
 export async function setCookieCache(
 	ctx: EndpointContext,
 	consent: ConsentRecord
@@ -170,6 +341,20 @@ export async function setCookieCache(
 	});
 }
 
+/**
+ * Deletes consent cookies
+ * 
+ * This function removes both the consent token and consent data cookies
+ * by setting them to empty values with immediate expiration.
+ * 
+ * @param ctx - The endpoint context for the request/response
+ * 
+ * @example
+ * ```typescript
+ * // In a logout or consent revocation handler:
+ * deleteConsentCookie(ctx);
+ * ```
+ */
 export function deleteConsentCookie(ctx: EndpointContext): void {
 	const tokenName = `${ctx.context.options?.cookies?.prefix || 'c15t'}.consent_token`;
 	const dataName = `${ctx.context.options?.cookies?.prefix || 'c15t'}.consent_data`;
@@ -179,6 +364,25 @@ export function deleteConsentCookie(ctx: EndpointContext): void {
 	ctx.setCookie(dataName, '', { maxAge: 0 });
 }
 
+/**
+ * Parses a Cookie header string into a structured format
+ * 
+ * This function takes a raw Cookie header value and parses it into a Map
+ * of cookie names to their values and attributes. It handles quoted values
+ * and various cookie attribute formats.
+ * 
+ * @param cookieHeader - The raw Cookie header string to parse
+ * @returns A Map of cookie names to their values and attributes
+ * 
+ * @example
+ * ```typescript
+ * const cookies = parseCookieHeader(request.headers.get('Cookie'));
+ * 
+ * if (cookies.has('session')) {
+ *   const sessionValue = cookies.get('session')?.value;
+ * }
+ * ```
+ */
 export function parseCookieHeader(
 	cookieHeader: string
 ): Map<string, Record<string, string>> {

@@ -1,5 +1,5 @@
-import { c15t } from '@c15t/temp';
-import { memoryAdapter } from '@c15t/temp';
+import { c15t } from '@c15t/new';
+import { memoryAdapter } from '@c15t/new/storage';
 
 // Create a new shared instance of c15t with configuration
 export const c15tInstance = c15t({

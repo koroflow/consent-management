@@ -30,5 +30,12 @@
 			"indentStyle": "tab",
 			"indentWidth": 2
 		}
-	}
+	},
+  "linter": {
+    "rules": {
+      "suspicious": {
+        "useAwait": "off"
+      }
+    }
+  }
 }

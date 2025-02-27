@@ -1,5 +1,5 @@
 /**
- * C15t Framework Integrations
+ * c15t Framework Integrations
  * This module exports integrations with various frameworks and libraries
  */
 
