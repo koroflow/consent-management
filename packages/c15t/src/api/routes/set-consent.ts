@@ -93,14 +93,7 @@ export const setConsent = createConsentEndpoint(
 			};
 		} catch (error) {
 			if (ctx.context && typeof ctx.context === 'object') {
-				// Type-safe logger access
-				const contextWithLogger = ctx.context as unknown as {
-					logger?: {
-						error?: (message: string, error: unknown) => void;
-					};
-				};
-				
-				contextWithLogger.logger?.error?.(
+				(ctx.context as any).logger?.error?.(
 					'Error setting consent preferences:',
 					error
 				);

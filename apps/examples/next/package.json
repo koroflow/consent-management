@@ -9,7 +9,7 @@
 		"lint": "next lint"
 	},
 	"dependencies": {
-		"@c15t/temp": "workspace:*",
+		"@c15t/new": "workspace:*",
 		"react": "^19.0.0",
 		"react-dom": "^19.0.0",
 		"next": "15.2.0"

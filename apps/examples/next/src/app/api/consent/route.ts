@@ -1,4 +1,4 @@
-import { toNextJsHandler } from '@c15t/temp/integrations/next';
+import { toNextJsHandler } from '@c15t/new/integrations/next';
 import { c15tInstance } from '~/lib/c15t';
 
 // Create handlers for all HTTP methods using the c15t instance

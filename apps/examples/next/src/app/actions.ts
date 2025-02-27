@@ -2,7 +2,7 @@
  * Server actions for managing consent
  */
 import { headers } from "next/headers";
-import { getServerConsent, setServerConsent } from '@c15t/temp/integrations/server';
+import { getServerConsent, setServerConsent } from '@c15t/new/integrations/server';
 import { c15tInstance } from '~/lib/c15t';
 import { createServerCookieContext } from '~/lib/cookieAdapter';
 
