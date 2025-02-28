@@ -13,15 +13,6 @@ import type { ConsentManagerDialogTheme } from '../components/consent-manager-di
 import type { CookieBannerTheme } from '../components/cookie-banner/theme';
 
 /**
- * Store interface that matches the shape of the Zustand store used by the consent manager
- */
-export interface StoreInterface {
-	getState: () => PrivacyConsentState;
-	setState: (state: Partial<PrivacyConsentState>) => void;
-	subscribe: (listener: (state: PrivacyConsentState) => void) => () => void;
-}
-
-/**
  * Configuration options for the ConsentManagerProvider component.
  *
  * @remarks
@@ -128,30 +119,6 @@ export interface ConsentManagerProviderProps extends NamespaceProps {
 	 * @default true
 	 */
 	trapFocus?: boolean;
-	
-	/**
-	 * Custom store to use instead of creating a new one
-	 * 
-	 * This allows for injecting a store created with the c15t adapter
-	 * or any other store that follows the same interface.
-	 * 
-	 * @example
-	 * ```tsx
-	 * import { createC15tAdapter } from '@c15t/react/adapters';
-	 * 
-	 * const adapter = createC15tAdapter({
-	 *   baseUrl: '/api/c15t',
-	 *   refreshInterval: 60000,
-	 * });
-	 * 
-	 * <ConsentManagerProvider
-	 *   store={adapter.store}
-	 * >
-	 *   {children}
-	 * </ConsentManagerProvider>
-	 * ```
-	 */
-	store?: StoreInterface;
 }
 
 /**
@@ -167,5 +134,5 @@ export interface ConsentManagerContextValue {
 	/** Current privacy consent state */
 	state: PrivacyConsentState;
 	/** Store instance for managing consent state */
-	store: ReturnType<typeof createConsentManagerStore> | StoreInterface;
+	store: ReturnType<typeof createConsentManagerStore>;
 }
