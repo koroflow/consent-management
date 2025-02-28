@@ -61,8 +61,8 @@ export const getConsent = createAuthEndpoint(
 			// 	: null;
 
 			return {
-				consented: true,
-				preferences: { analytics: true, marketing: true, preferences: true },
+				consented: false,
+				preferences:null,
 				timestamp: new Date().toISOString(),
 			};
 		} catch (error) {

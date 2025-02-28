@@ -289,6 +289,9 @@ importers:
 
   packages/c15t:
     dependencies:
+      '@better-fetch/fetch':
+        specifier: ^1.1.15
+        version: 1.1.15
       better-call:
         specifier: ^1.0.3
         version: 1.0.3

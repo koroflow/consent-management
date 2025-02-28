@@ -1,4 +1,4 @@
-import { c15t, memoryAdapter } from '@c15t/new';
+import { analytics, c15t, geo, memoryAdapter } from '@c15t/new';
 
 // Create a new shared instance of c15t with configuration
 export const C15TInstance = c15t({
@@ -12,6 +12,7 @@ export const C15TInstance = c15t({
 		expiresIn: 60 * 60 * 24 * 365, // 1 year in seconds
 		updateAge: 60 * 60 * 24, // 24 hours in seconds
 	},
+	plugins: [geo(), analytics()],
 	// Enable analytics plugin if needed
 	analytics: {
 		enabled: true,

@@ -1,7 +1,7 @@
 /**
  * c15t Consent Management System
- *
- * This is the main entry point for the c15t library, exporting all public APIs,
+ * 
+ * This is the main entry point for the c15t library, exporting all public APIs, 
  * components, and types needed to implement consent management in your application.
  */
 
@@ -98,42 +98,26 @@ declare module './types/plugins' {
 }
 
 //------------------------------------------------------------------------------
-// Framework Integrations
+// Framework Integrations (Commented out until implementation is complete)
 //------------------------------------------------------------------------------
 
-/**
- * Next.js integration components and utilities
- */
+/*
+// Next.js integration components and utilities
 export {
-	createNextAdapter,
-	withConsentPages,
-	withConsentApi,
-	useConsentStatus,
+	createNextIntegration,
+	createNextMiddleware,
+	withConsent
 } from './integrations/next';
 
-/**
- * React integration components and hooks
- */
+// React integration components and hooks
 export {
-	createConsentClient,
-	createCompatibilityStore,
-	useConsentManager,
-	useConditionalContent,
+	createReactIntegration,
+	ConsentProvider,
+	useConsent
 } from './integrations/react';
 
-/**
- * Server integration utilities
- */
+// Generic server integration
 export {
-	createServerAdapter,
-	createServerMiddleware,
+	createServerIntegration
 } from './integrations/server';
-
-//------------------------------------------------------------------------------
-// Example Components
-//------------------------------------------------------------------------------
-
-/**
- * Example components for rapid implementation
- */
-export * as Examples from './examples';
+*/

@@ -111,6 +111,7 @@
 	"module": "./dist/index.js",
 	"types": "./dist/index.d.ts",
 	"dependencies": {
+		"@better-fetch/fetch": "^1.1.15",
 		"better-call": "^1.0.3",
 		"defu": "^6.1.4",
 		"zod": "^3.24.2"
