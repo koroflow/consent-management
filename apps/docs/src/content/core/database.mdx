@@ -416,3 +416,550 @@ The database schema defines relationships between tables:
 - `domains`: Self-referential for parent/child relationships
 
 These relationships ensure data integrity and enable complex queries across the system.
+
+## API Routes for Database Operations
+
+The consent management system provides several API endpoints for interacting with the database. These endpoints handle operations like retrieving, storing, and updating consent records.
+
+### Get Consent
+
+```
+GET /api/get-consent
+```
+
+Retrieves the current consent status for a user on a specific domain.
+
+**Request Parameters:**
+| Parameter | Type | Description |
+| --- | --- | --- |
+| userId | UUID | The UUID of the user |
+| domain | string | The domain to check for consent |
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "userId": "550e8400-e29b-41d4-a716-446655440000",
+    "domain": "example.com",
+    "preferences": {
+      "analytics": true,
+      "marketing": false,
+      "functional": true
+    },
+    "givenAt": "2023-08-15T14:30:00Z",
+    "policyVersion": "1.0",
+    "isActive": true
+  }
+}
+```
+
+### Get Consent History
+
+```
+GET /api/get-consent-history
+```
+
+Retrieves the complete consent history for a user, including all consent records, withdrawals, and related audit logs.
+
+**Request Parameters:**
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| userId | UUID | Yes | The UUID of the user |
+| domain | string | No | Optional domain filter to show consents for a specific domain only |
+| limit | number | No | Maximum number of records to return (default: 100) |
+| offset | number | No | Number of records to skip for pagination (default: 0) |
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "userId": "550e8400-e29b-41d4-a716-446655440000",
+    "consents": [
+      {
+        "id": 123,
+        "domain": "example.com",
+        "preferences": {
+          "analytics": true,
+          "marketing": false,
+          "functional": true
+        },
+        "policyVersion": "1.0",
+        "givenAt": "2023-08-15T14:30:00Z",
+        "isActive": false,
+        "metadata": {
+          "source": "cookie_banner",
+          "version": "2.5.0"
+        },
+        "withdrawals": [
+          {
+            "id": 45,
+            "revokedAt": "2023-08-20T09:15:00Z",
+            "reason": "User requested deletion of all data",
+            "method": "web_form",
+            "actor": "user-self"
+          }
+        ],
+        "records": [
+          {
+            "id": 67,
+            "type": "form_submission",
+            "typeDetail": "cookie_banner",
+            "content": {
+              "bannerVersion": "2.5.0",
+              "userAction": "accept_selected"
+            },
+            "createdAt": "2023-08-15T14:30:00Z"
+          },
+          {
+            "id": 89,
+            "type": "withdrawal",
+            "typeDetail": "API withdrawal",
+            "content": {
+              "reason": "User requested deletion of all data",
+              "method": "web_form"
+            },
+            "createdAt": "2023-08-20T09:15:00Z"
+          }
+        ]
+      }
+    ],
+    "auditLogs": [
+      {
+        "id": 234,
+        "timestamp": "2023-08-15T14:30:00Z",
+        "action": "create_consent",
+        "resourceType": "consents",
+        "resourceId": "123",
+        "actor": "user-self",
+        "changes": {
+          "before": null,
+          "after": {
+            "id": 123,
+            "preferences": {
+              "analytics": true,
+              "marketing": false,
+              "functional": true
+            }
+          }
+        }
+      },
+      {
+        "id": 235,
+        "timestamp": "2023-08-20T09:15:00Z",
+        "action": "withdraw_consent",
+        "resourceType": "consents",
+        "resourceId": "123",
+        "actor": "user-self",
+        "changes": {
+          "before": { "isActive": true },
+          "after": { "isActive": false }
+        }
+      }
+    ],
+    "pagination": {
+      "limit": 100,
+      "offset": 0,
+      "total": 1
+    }
+  }
+}
+```
+
+**Error Responses:**
+
+User Not Found:
+```json
+{
+  "success": false,
+  "error": {
+    "code": "NOT_FOUND",
+    "message": "User not found",
+    "details": {
+      "userId": "550e8400-e29b-41d4-a716-446655440000"
+    }
+  }
+}
+```
+
+Validation Error:
+```json
+{
+  "success": false,
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "Invalid request parameters",
+    "details": [
+      {
+        "code": "invalid_string",
+        "validation": "uuid",
+        "path": ["userId"],
+        "message": "Invalid uuid"
+      }
+    ]
+  }
+}
+```
+
+### Set Consent
+
+```
+POST /api/set-consent
+```
+
+Records a new consent record or updates an existing one.
+
+**Request Body:**
+```json
+{
+  "userId": "550e8400-e29b-41d4-a716-446655440000",
+  "domain": "example.com",
+  "preferences": {
+    "analytics": true,
+    "marketing": false,
+    "functional": true
+  },
+  "metadata": {
+    "source": "cookie_banner",
+    "version": "2.5.0"
+  },
+  "policyVersion": "1.0"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "consentId": 123,
+    "userId": "550e8400-e29b-41d4-a716-446655440000",
+    "domain": "example.com",
+    "givenAt": "2023-08-15T14:30:00Z"
+  }
+}
+```
+
+### Withdraw Consent
+
+```
+POST /api/withdraw-consent
+```
+
+Records a consent withdrawal and marks the original consent as inactive. This endpoint handles the complete withdrawal process by creating a withdrawal record, updating the consent status, adding a withdrawal record in the consent records table, and creating an audit log entry.
+
+**Request Body:**
+```json
+{
+  "consentId": 123,
+  "reason": "User requested deletion of all data",
+  "method": "web_form",
+  "actor": "user-self",
+  "metadata": {
+    "source": "privacy_center",
+    "initiatedBy": "customer_support"
+  }
+}
+```
+
+**Request Body Parameters:**
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| consentId | number | Yes | ID of the consent record to withdraw |
+| reason | string | No | Optional reason for the withdrawal |
+| method | string | Yes | Method used for withdrawal (e.g., 'web_form', 'api_call', 'customer_service') |
+| actor | string | No | Entity performing the withdrawal (defaults to 'system' if not provided) |
+| metadata | object | No | Additional context about the withdrawal |
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "withdrawalId": 45,
+    "consentId": 123,
+    "revokedAt": "2023-08-20T09:15:00Z"
+  }
+}
+```
+
+**Error Responses:**
+
+Not Found:
+```json
+{
+  "success": false,
+  "error": {
+    "code": "NOT_FOUND",
+    "message": "Consent record not found",
+    "details": {
+      "consentId": 123
+    }
+  }
+}
+```
+
+Already Withdrawn:
+```json
+{
+  "success": false,
+  "error": {
+    "code": "ALREADY_WITHDRAWN",
+    "message": "Consent has already been withdrawn",
+    "details": {
+      "consentId": 123
+    }
+  }
+}
+```
+
+Validation Error:
+```json
+{
+  "success": false,
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "Invalid request data",
+    "details": [
+      {
+        "code": "invalid_type",
+        "expected": "number",
+        "received": "string",
+        "path": ["consentId"],
+        "message": "Expected number, received string"
+      }
+    ]
+  }
+}
+```
+
+**Implementation Details:**
+
+When a withdrawal request is processed, the API performs these operations in a transaction:
+
+1. Creates a new record in the `consentWithdrawals` table
+2. Updates the related consent record to set `isActive = false`
+3. Creates a new record in the `consentRecords` table with type 'withdrawal'
+4. Adds an entry to the `consentAuditLogs` table with action 'withdraw_consent'
+
+The transaction ensures that all operations succeed or fail together, maintaining data integrity.
+
+## Database Input Flow
+
+When consent data is submitted to the system, the following steps occur:
+
+1. **Request Validation**: The API validates the incoming data against expected schema
+2. **Domain Resolution**: The system resolves the domain string to a domain ID from the domains table
+3. **User Management**:
+   - If the user exists (by UUID), the system uses the existing user record
+   - If the user doesn't exist, a new user record is created
+4. **Consent Record Creation**:
+   - A new record is inserted into the `consents` table
+   - Preferences are stored in the JSON preferences field
+   - IP address and region information are captured
+5. **Evidence Recording**:
+   - A record is added to `consentRecords` with type 'form_submission'
+   - Device info is stored in the recordMetadata field
+6. **Audit Logging**:
+   - The action is logged in `consentAuditLogs` with action type 'create_consent'
+
+### Device Information Capture
+
+During the consent recording process, device information is automatically captured:
+
+```typescript
+// Example of how device info is extracted from the request
+const deviceInfo = req.headers['user-agent'];
+
+// Information is stored in the audit log
+await db.insert(consentAuditLogs).values({
+  action: 'create_consent',
+  userId: user.userId,
+  resourceType: 'consents',
+  resourceId: consentId.toString(),
+  actor: 'user-self',
+  deviceInfo,
+  ipAddress: req.ip,
+});
+```
+
+## Error Handling
+
+API routes implement standardized error responses:
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "NOT_FOUND",
+    "message": "Consent record not found",
+    "details": {
+      "userId": "550e8400-e29b-41d4-a716-446655440000",
+      "domain": "example.com"
+    }
+  }
+}
+```
+
+Common error codes include:
+- `VALIDATION_ERROR`: Invalid request data
+- `NOT_FOUND`: Requested resource not found
+- `CONFLICT`: Operation would create a conflict
+- `INTERNAL_ERROR`: Server-side error
+
+## Integration Examples
+
+### Recording Consent from a Web Application
+
+```javascript
+async function recordConsent(userId, consentChoices) {
+  const response = await fetch('/api/set-consent', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      userId,
+      domain: window.location.hostname,
+      preferences: consentChoices,
+      metadata: {
+        source: 'cookie_banner',
+        version: '1.0',
+      },
+      policyVersion: '2023-05',
+    }),
+  });
+  
+  return await response.json();
+}
+```
+
+### Checking Consent Status
+
+```javascript
+async function checkConsent(userId) {
+  const domain = window.location.hostname;
+  const response = await fetch(`/api/get-consent?userId=${userId}&domain=${domain}`);
+  const result = await response.json();
+  
+  if (result.success) {
+    return result.data.preferences;
+  }
+  
+  return null;
+}
+```
+
+### Retrieving Consent History
+
+```javascript
+async function getConsentHistory(userId, options = {}) {
+  const { domain, limit = 100, offset = 0 } = options;
+  
+  // Build the query string
+  const params = new URLSearchParams({
+    userId,
+    ...(domain && { domain }),
+    limit: limit.toString(),
+    offset: offset.toString(),
+  });
+  
+  const response = await fetch(`/api/get-consent-history?${params.toString()}`);
+  const result = await response.json();
+  
+  if (result.success) {
+    return result.data;
+  }
+  
+  throw new Error(result.error?.message || 'Failed to retrieve consent history');
+}
+
+// Example usage in a privacy dashboard
+async function loadUserConsentHistory(userId) {
+  try {
+    const history = await getConsentHistory(userId);
+    
+    // Process all consents
+    const consentCards = history.consents.map(consent => {
+      const status = consent.isActive ? 'Active' : 'Withdrawn';
+      const statusClass = consent.isActive ? 'status-active' : 'status-withdrawn';
+      
+      return `
+        <div class="consent-card">
+          <h3>${consent.domain}</h3>
+          <span class="status ${statusClass}">${status}</span>
+          <div class="consent-details">
+            <p>Given: ${new Date(consent.givenAt).toLocaleString()}</p>
+            <p>Policy Version: ${consent.policyVersion}</p>
+            ${renderPreferences(consent.preferences)}
+            ${consent.withdrawals.length > 0 ? renderWithdrawals(consent.withdrawals) : ''}
+          </div>
+        </div>
+      `;
+    });
+    
+    // Update the dashboard UI
+    document.getElementById('consent-history').innerHTML = consentCards.join('');
+    
+    // Add the audit log timeline
+    renderAuditTimeline(history.auditLogs);
+  } catch (error) {
+    console.error('Failed to load consent history:', error);
+    showErrorMessage('Could not load consent history. Please try again later.');
+  }
+}
+
+// Helper functions to render different parts of the consent history
+function renderPreferences(preferences) {
+  const items = Object.entries(preferences).map(([key, value]) => 
+    `<li class="${value ? 'accepted' : 'rejected'}">${key}: ${value ? 'Accepted' : 'Rejected'}</li>`
+  );
+  
+  return `
+    <div class="preferences">
+      <h4>Consent Preferences:</h4>
+      <ul>${items.join('')}</ul>
+    </div>
+  `;
+}
+
+function renderWithdrawals(withdrawals) {
+  return `
+    <div class="withdrawals">
+      <h4>Withdrawal Information:</h4>
+      <p>Withdrawn on: ${new Date(withdrawals[0].revokedAt).toLocaleString()}</p>
+      <p>Reason: ${withdrawals[0].reason || 'Not provided'}</p>
+      <p>Method: ${withdrawals[0].method}</p>
+    </div>
+  `;
+}
+
+function renderAuditTimeline(auditLogs) {
+  const timelineItems = auditLogs.map(log => `
+    <li class="timeline-item">
+      <div class="timeline-date">${new Date(log.timestamp).toLocaleString()}</div>
+      <div class="timeline-content">
+        <h4>${formatAction(log.action)}</h4>
+        <p>Resource: ${log.resourceType} #${log.resourceId}</p>
+        <p>Actor: ${log.actor}</p>
+      </div>
+    </li>
+  `);
+  
+  document.getElementById('audit-timeline').innerHTML = `
+    <h3>Consent Activity Timeline</h3>
+    <ul class="timeline">${timelineItems.join('')}</ul>
+  `;
+}
+
+function formatAction(action) {
+  // Format action strings for display
+  const actionMap = {
+    'create_consent': 'Consent Given',
+    'withdraw_consent': 'Consent Withdrawn',
+    'update_preferences': 'Preferences Updated'
+  };
+  
+  return actionMap[action] || action;
+}
