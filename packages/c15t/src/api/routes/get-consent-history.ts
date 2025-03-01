@@ -119,7 +119,7 @@ export const getConsentHistory = createAuthEndpoint(
 
 			// Access the internal adapter from the context
 			const internalAdapter = ctx.context?.internalAdapter;
-			
+
 			if (!internalAdapter) {
 				throw new APIError('INTERNAL_SERVER_ERROR', {
 					message: 'Internal adapter not available',
@@ -143,89 +143,96 @@ export const getConsentHistory = createAuthEndpoint(
 
 			// Apply domain filtering if requested
 			if (params.domain) {
-				userConsents = userConsents.filter(consent => 
-					consent.domainId === params.domain || 
-					// Handle cases where domainId might be a domain object with a domain property
-          //@ts-expect-error
-					(typeof consent.domain === 'object' && 
-             //@ts-expect-error
-					 consent.domain?.domain === params.domain)
+				userConsents = userConsents.filter(
+					(consent) =>
+						consent.domainId === params.domain ||
+						// Handle cases where domainId might be a domain object with a domain property
+						//@ts-expect-error
+						(typeof consent.domain === 'object' &&
+							//@ts-expect-error
+							consent.domain?.domain === params.domain)
 				);
 			}
 
 			// Apply pagination
 			const paginatedConsents = userConsents
-				.sort((a, b) => new Date(b.givenAt || 0).getTime() - new Date(a.givenAt || 0).getTime())
+				.sort(
+					(a, b) =>
+						new Date(b.givenAt || 0).getTime() -
+						new Date(a.givenAt || 0).getTime()
+				)
 				.slice(params.offset, params.offset + params.limit);
 
 			// Get audit logs for this user
 			// Note: The internal adapter may not have a direct method for this
 			// We'll need to simulate this functionality
 			const auditLogs: ConsentAuditLog[] = [];
-			
+
 			// Process each consent to collect detailed information
-			const processedConsents = await Promise.all(paginatedConsents.map(async (consent) => {
-				// Get withdrawal records for this consent
-				// const withdrawals: ConsentWithdrawal[] = [];
-				
-				// // Get consent records (evidence) for this consent
-				// let records: ConsentRecord[] = [];
+			const processedConsents = await Promise.all(
+				paginatedConsents.map(async (consent) => {
+					// Get withdrawal records for this consent
+					// const withdrawals: ConsentWithdrawal[] = [];
 
-				// try {
-				// 	// If the adapter has a method to get consent records, use it
-				// 	if (internalAdapter.getConsentRecords) {
-				// 		records = await internalAdapter.getConsentRecords(consent.id);
-				// 	}
-					
-				// 	// If the adapter has a method to get withdrawal records, use it
-				// 	if (internalAdapter.getConsentWithdrawals) {
-				// 		const withdrawalRecords = await internalAdapter.getConsentWithdrawals(consent.id);
-				// 		withdrawals.push(...withdrawalRecords);
-				// 	}
-					
-				// 	// If the adapter has a method to get audit logs for a consent, use it
-				// 	if (internalAdapter.getConsentAuditLogs) {
-				// 		const consentAuditLogs = await internalAdapter.getConsentAuditLogs(consent.id);
-				// 		auditLogs.push(...consentAuditLogs);
-				// 	}
-				// } catch (error) {
-				// 	// Log error but continue processing
-				// 	if (ctx.context?.logger) {
-				// 		ctx.context.logger.error(`Error retrieving related data for consent ${consent.id}:`, error);
-				// 	}
-				// }
+					// // Get consent records (evidence) for this consent
+					// let records: ConsentRecord[] = [];
 
-				// // Get domain name - in this implementation we're assuming domainId is the domain name
-				// const domainName = typeof consent.domain === 'object' 
-				// 	? consent.domain?.domain 
-				// 	: (consent.domainId || 'unknown');
+					// try {
+					// 	// If the adapter has a method to get consent records, use it
+					// 	if (internalAdapter.getConsentRecords) {
+					// 		records = await internalAdapter.getConsentRecords(consent.id);
+					// 	}
 
-				// Return a processed consent record with all related information
-				return {
-					id: consent.id,
-					domain: 'domainName',
-					preferences: consent.preferences || {},
-					policyVersion: consent.policyId, // Note: renamed from policyVersion to policyId in the adapter
-					givenAt: consent.givenAt,
-					isActive: consent.isActive,
-					metadata: consent.metadata || {},
-          withdrawals: [],
-					// // withdrawals: withdrawals.map((withdrawal) => ({
-					// 	id: withdrawal.id,
-					// 	revokedAt: withdrawal.revokedAt,
-					// 	reason: withdrawal.revocationReason,
-					// 	method: withdrawal.method,
-					// 	actor: withdrawal.actor,
-					// })),
-					// records: records.map((record) => ({
-					// 	id: record.id,
-					// 	type: record.recordType,
-					// 	typeDetail: record.recordTypeDetail,
-					// 	content: record.content,
-					// 	createdAt: record.createdAt,
-					// })),
-				};
-			}));
+					// 	// If the adapter has a method to get withdrawal records, use it
+					// 	if (internalAdapter.getConsentWithdrawals) {
+					// 		const withdrawalRecords = await internalAdapter.getConsentWithdrawals(consent.id);
+					// 		withdrawals.push(...withdrawalRecords);
+					// 	}
+
+					// 	// If the adapter has a method to get audit logs for a consent, use it
+					// 	if (internalAdapter.getConsentAuditLogs) {
+					// 		const consentAuditLogs = await internalAdapter.getConsentAuditLogs(consent.id);
+					// 		auditLogs.push(...consentAuditLogs);
+					// 	}
+					// } catch (error) {
+					// 	// Log error but continue processing
+					// 	if (ctx.context?.logger) {
+					// 		ctx.context.logger.error(`Error retrieving related data for consent ${consent.id}:`, error);
+					// 	}
+					// }
+
+					// // Get domain name - in this implementation we're assuming domainId is the domain name
+					// const domainName = typeof consent.domain === 'object'
+					// 	? consent.domain?.domain
+					// 	: (consent.domainId || 'unknown');
+
+					// Return a processed consent record with all related information
+					return {
+						id: consent.id,
+						domain: 'domainName',
+						preferences: consent.preferences || {},
+						policyVersion: consent.policyId, // Note: renamed from policyVersion to policyId in the adapter
+						givenAt: consent.givenAt,
+						isActive: consent.isActive,
+						metadata: consent.metadata || {},
+						withdrawals: [],
+						// // withdrawals: withdrawals.map((withdrawal) => ({
+						// 	id: withdrawal.id,
+						// 	revokedAt: withdrawal.revokedAt,
+						// 	reason: withdrawal.revocationReason,
+						// 	method: withdrawal.method,
+						// 	actor: withdrawal.actor,
+						// })),
+						// records: records.map((record) => ({
+						// 	id: record.id,
+						// 	type: record.recordType,
+						// 	typeDetail: record.recordTypeDetail,
+						// 	content: record.content,
+						// 	createdAt: record.createdAt,
+						// })),
+					};
+				})
+			);
 
 			// Return consent history
 			return {

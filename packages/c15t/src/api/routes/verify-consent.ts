@@ -3,7 +3,6 @@ import { APIError } from 'better-call';
 import { z } from 'zod';
 import type { C15TContext, User } from '../../types';
 
-
 // Schema for the base verification criteria (at least domain is required)
 const baseVerificationSchema = z.object({
 	domain: z.string(),
@@ -119,7 +118,7 @@ export const verifyConsent = createAuthEndpoint(
 
 			// Access the internal adapter from the context
 			const internalAdapter = ctx.context?.internalAdapter;
-			
+
 			if (!internalAdapter) {
 				throw new APIError('INTERNAL_SERVER_ERROR', {
 					message: 'Internal adapter not available',
@@ -147,7 +146,9 @@ export const verifyConsent = createAuthEndpoint(
 
 			// If not found and externalId provided, try that
 			if (!userRecord && params.externalId) {
-				userRecord = await internalAdapter.findUserByExternalId(params.externalId);
+				userRecord = await internalAdapter.findUserByExternalId(
+					params.externalId
+				);
 
 				if (userRecord) {
 					identifierUsed = 'externalId';
@@ -182,20 +183,25 @@ export const verifyConsent = createAuthEndpoint(
 			}
 
 			// Find active consents for this user
-			const userConsents = await internalAdapter.findUserConsents(userRecord.id);
-			
+			const userConsents = await internalAdapter.findUserConsents(
+				userRecord.id
+			);
+
 			// Filter for active consents that match the domain
 			const activeConsents = userConsents.filter(
 				(consent) => consent.isActive && consent.domainId === domainId
 			);
-			
+
 			// Sort consents by givenAt date, most recent first
-			activeConsents.sort((a, b) => 
-				new Date(b.givenAt || 0).getTime() - new Date(a.givenAt || 0).getTime()
+			activeConsents.sort(
+				(a, b) =>
+					new Date(b.givenAt || 0).getTime() -
+					new Date(a.givenAt || 0).getTime()
 			);
-			
+
 			// Get the most recent active consent for this domain, if any
-			const consentRecord = activeConsents.length > 0 ? activeConsents[0] : null;
+			const consentRecord =
+				activeConsents.length > 0 ? activeConsents[0] : null;
 
 			// If no consent found, return negative verification
 			if (!consentRecord) {
@@ -238,7 +244,7 @@ export const verifyConsent = createAuthEndpoint(
 						// Non-exact match only checks if required trues are true
 						// (only fails if a required true preference is false or doesn't exist)
 						// biome-ignore lint/style/useCollapsedElseIf: <explanation>
-																		if (
+						if (
 							requiredValue === true &&
 							(!hasPreference || !preferenceEnabled)
 						) {

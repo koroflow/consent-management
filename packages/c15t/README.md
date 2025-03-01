@@ -1,4 +1,4 @@
-# Consent Management System (C15T)
+# Consent Management System (c15t)
 
 This package contains the database schema and logic for handling consent management in compliance with privacy regulations like GDPR, CCPA, and other international privacy laws.
 

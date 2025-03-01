@@ -14,7 +14,6 @@ import type {
 	HookEndpointContext,
 	LiteralString,
 	DeepPartial,
-
 } from './index';
 import type { FieldAttribute } from '~/db';
 import type { Migration } from 'kysely';
@@ -122,10 +121,12 @@ export interface C15TPlugin {
 	 * The init function is called when the plugin is initialized.
 	 * You can return a new context or modify the existing context.
 	 */
-	init?: (ctx: C15TContext) => {
-		context?: DeepPartial<Omit<C15TContext, 'options'>>;
-		options?: Partial<C15TOptions>;
-	} | undefined;
+	init?: (ctx: C15TContext) =>
+		| {
+				context?: DeepPartial<Omit<C15TContext, 'options'>>;
+				options?: Partial<C15TOptions>;
+		  }
+		| undefined;
 	endpoints?: {
 		[key: string]: Endpoint;
 	};
@@ -148,9 +149,12 @@ export interface C15TPlugin {
 	onResponse?: (
 		response: Response,
 		ctx: C15TContext
-	) => Promise<{
-		response: Response;
-	} | undefined>;
+	) => Promise<
+		| {
+				response: Response;
+		  }
+		| undefined
+	>;
 	hooks?: {
 		before?: {
 			matcher: (context: HookEndpointContext) => boolean;

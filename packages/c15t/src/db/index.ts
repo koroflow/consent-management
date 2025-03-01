@@ -7,4 +7,4 @@ export * from './utils';
 export * from './migration/get-migration';
 export * from './get-schema';
 export * from './schema';
-export * from './utils'
+export * from './utils';

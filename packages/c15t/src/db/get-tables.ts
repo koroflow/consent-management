@@ -28,7 +28,9 @@ export const getConsentTables = (options: C15TOptions): C15TDbSchema => {
 	const pluginSchema = options.plugins?.reduce(
 		(acc, plugin) => {
 			const schema = plugin.schema;
-			if (!schema) { return acc; }
+			if (!schema) {
+				return acc;
+			}
 			for (const [key, value] of Object.entries(schema)) {
 				acc[key] = {
 					fields: {

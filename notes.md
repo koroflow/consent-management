@@ -101,7 +101,7 @@ Consent.io
 -> oh yeah connect to to our custom c15t server on 1.3 for example. 
 
 
-C15T Instances
+c15t Instances
 -> only use native types, (provide mysql, postgres, sql-lite wrapper)
 -> Basic Endpoints
 

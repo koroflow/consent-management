@@ -46,7 +46,7 @@ export function getEndpoints<C extends C15TContext, Option extends C15TOptions>(
 			?.map((plugin) =>
 				plugin.middlewares?.map((m) => {
 					// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-					const middleware = (async (context: { context: any; }) => {
+					const middleware = (async (context: { context: any }) => {
 						return m.middleware({
 							...context,
 							context: {

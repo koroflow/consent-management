@@ -19,7 +19,7 @@ async function main() {
 		.addCommand(generate)
 		.addCommand(generateSecret)
 		.version(packageInfo.version || "1.1.2")
-		.description("C15T CLI");
+		.description("c15t CLI");
 	program.parse();
 }
 

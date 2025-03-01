@@ -244,8 +244,8 @@ export const getConsentPolicy = createAuthEndpoint(
 						version: policy.version,
 						content: policy.content,
 						availablePreferences: params.includePreferences
-            //@ts-expect-error
-							? policy.availablePreferences
+							? //@ts-expect-error
+								policy.availablePreferences
 							: undefined,
 						createdAt: policy.createdAt,
 					},

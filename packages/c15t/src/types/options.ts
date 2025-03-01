@@ -167,7 +167,7 @@ export interface C15TOptions {
 				/**
 				 * Kysely instance
 				 */
-        				// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+				// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 				db: Kysely<any>;
 				/**
 				 * Database type between postgres, mysql and sqlite
@@ -301,7 +301,7 @@ export interface C15TOptions {
 					| boolean
 					| undefined
 					| {
-            				// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+							// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 							data: Partial<Consent> & Record<string, any>;
 					  }
 				>;
@@ -326,7 +326,7 @@ export interface C15TOptions {
 					| boolean
 					| undefined
 					| {
-            				// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+							// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 							data: Partial<Consent & Record<string, any>>;
 					  }
 				>;
