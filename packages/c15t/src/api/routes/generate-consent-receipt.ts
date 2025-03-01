@@ -3,7 +3,7 @@ import { APIError } from 'better-call';
 import { z } from 'zod';
 import crypto from 'node:crypto';
 import type { C15TContext } from '../../types';
-import type { ConsentRecord } from '~/db/schema/consent-record/schema';
+import type { ConsentRecord } from '~/db/routes/consent-record/schema';
 
 // Define the schema for validating request parameters
 const generateConsentReceiptSchema = z.object({

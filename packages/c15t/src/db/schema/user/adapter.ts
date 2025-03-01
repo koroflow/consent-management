@@ -1,6 +1,7 @@
-import type { C15TOptions, Adapter, GenericEndpointContext } from '~/types';
+import type { GenericEndpointContext } from '~/types';
 import { parseUserOutput, type User } from './schema';
-import type { CreateWithHooks, UpdateWithHooks } from '~/db/hooks/types';
+import { getWithHooks } from '~/db/hooks';
+import type { InternalAdapterContext } from '~/db/internal-adapter';
 
 /**
  * Creates and returns a set of user-related adapter methods to interact with the database.
@@ -30,12 +31,9 @@ import type { CreateWithHooks, UpdateWithHooks } from '~/db/hooks/types';
  * });
  * ```
  */
-export function createUserAdapter(
-	adapter: Adapter,
-	createWithHooks: CreateWithHooks,
-	updateWithHooks: UpdateWithHooks,
-	options: C15TOptions
-) {
+export function createUserAdapter({ adapter, ctx }: InternalAdapterContext) {
+	const { createWithHooks, updateWithHooks } = getWithHooks(adapter, ctx);
+
 	return {
 		/**
 		 * Creates a new user record in the database.
@@ -84,7 +82,7 @@ export function createUserAdapter(
 					},
 				],
 			});
-			return user ? parseUserOutput(options, user) : null;
+			return user ? parseUserOutput(ctx.options, user) : null;
 		},
 
 		/**
@@ -106,7 +104,7 @@ export function createUserAdapter(
 					},
 				],
 			});
-			return user ? parseUserOutput(options, user) : null;
+			return user ? parseUserOutput(ctx.options, user) : null;
 		},
 
 		/**
@@ -137,7 +135,7 @@ export function createUserAdapter(
 				undefined,
 				context
 			);
-			return user ? parseUserOutput(options, user) : null;
+			return user ? parseUserOutput(ctx.options, user) : null;
 		},
 
 		/**

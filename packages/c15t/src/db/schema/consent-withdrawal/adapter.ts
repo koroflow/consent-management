@@ -1,7 +1,8 @@
-import type { C15TOptions, Where } from '~/types';
-import type { Adapter, GenericEndpointContext } from '~/types';
+import type { Where } from '~/types';
+import type { GenericEndpointContext } from '~/types';
 import { type ConsentWithdrawal, parseConsentWithdrawalOutput } from './schema';
-import type { CreateWithHooks } from '~/db/hooks/types';
+import { getWithHooks } from '~/db/hooks';
+import type { InternalAdapterContext } from '~/db/internal-adapter';
 
 /**
  * Creates and returns a set of consent withdrawal adapter methods to interact with the database.
@@ -30,11 +31,11 @@ import type { CreateWithHooks } from '~/db/hooks/types';
  * });
  * ```
  */
-export function createConsentWithdrawalAdapter(
-	adapter: Adapter,
-	createWithHooks: CreateWithHooks,
-	options: C15TOptions
-) {
+export function createConsentWithdrawalAdapter({
+	adapter,
+	ctx,
+}: InternalAdapterContext) {
+	const { createWithHooks, updateWithHooks } = getWithHooks(adapter, ctx);
 	return {
 		/**
 		 * Creates a new consent withdrawal record in the database.
@@ -111,7 +112,7 @@ export function createConsentWithdrawalAdapter(
 			});
 
 			return withdrawals.map((withdrawal) =>
-				parseConsentWithdrawalOutput(options, withdrawal)
+				parseConsentWithdrawalOutput(ctx.options, withdrawal)
 			);
 		},
 
@@ -133,7 +134,7 @@ export function createConsentWithdrawalAdapter(
 				],
 			});
 			return withdrawal
-				? parseConsentWithdrawalOutput(options, withdrawal)
+				? parseConsentWithdrawalOutput(ctx.options, withdrawal)
 				: null;
 		},
 
@@ -161,7 +162,7 @@ export function createConsentWithdrawalAdapter(
 				limit,
 			});
 			return withdrawals.map((withdrawal) =>
-				parseConsentWithdrawalOutput(options, withdrawal)
+				parseConsentWithdrawalOutput(ctx.options, withdrawal)
 			);
 		},
 
@@ -188,7 +189,7 @@ export function createConsentWithdrawalAdapter(
 				// },
 			});
 			return withdrawal
-				? parseConsentWithdrawalOutput(options, withdrawal)
+				? parseConsentWithdrawalOutput(ctx.options, withdrawal)
 				: null;
 		},
 	};

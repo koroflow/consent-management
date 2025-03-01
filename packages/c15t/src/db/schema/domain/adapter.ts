@@ -1,7 +1,7 @@
-import type { C15TOptions, Where } from '~/types';
-import type { Adapter, GenericEndpointContext } from '~/types';
+import type { Where, GenericEndpointContext } from '~/types';
 import { type Domain, parseDomainOutput } from './schema';
-import type { CreateWithHooks, UpdateWithHooks } from '~/db/hooks/types';
+import type { InternalAdapterContext } from '~/db/internal-adapter';
+import { getWithHooks } from '~/db/hooks';
 
 /**
  * Creates and returns a set of domain-related adapter methods to interact with the database.
@@ -31,12 +31,8 @@ import type { CreateWithHooks, UpdateWithHooks } from '~/db/hooks/types';
  * });
  * ```
  */
-export function createDomainAdapter(
-	adapter: Adapter,
-	createWithHooks: CreateWithHooks,
-	updateWithHooks: UpdateWithHooks,
-	options: C15TOptions
-) {
+export function createDomainAdapter({ adapter, ctx }: InternalAdapterContext) {
+	const { createWithHooks, updateWithHooks } = getWithHooks(adapter, ctx);
 	return {
 		/**
 		 * Creates a new domain record in the database.
@@ -96,7 +92,7 @@ export function createDomainAdapter(
 				},
 			});
 
-			return domains.map((domain) => parseDomainOutput(options, domain));
+			return domains.map((domain) => parseDomainOutput(ctx.options, domain));
 		},
 
 		/**
@@ -116,7 +112,7 @@ export function createDomainAdapter(
 					},
 				],
 			});
-			return domain ? parseDomainOutput(options, domain) : null;
+			return domain ? parseDomainOutput(ctx.options, domain) : null;
 		},
 
 		/**
@@ -136,7 +132,7 @@ export function createDomainAdapter(
 					},
 				],
 			});
-			return domain ? parseDomainOutput(options, domain) : null;
+			return domain ? parseDomainOutput(ctx.options, domain) : null;
 		},
 
 		/**
@@ -166,7 +162,7 @@ export function createDomainAdapter(
 				undefined,
 				context
 			);
-			return domain ? parseDomainOutput(options, domain) : null;
+			return domain ? parseDomainOutput(ctx.options, domain) : null;
 		},
 
 		/**

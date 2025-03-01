@@ -1,6 +1,5 @@
 import type { FieldAttribute } from '~/db/fields';
-import type { C15TPluginSchema } from '~/types';
-import type { C15TOptions } from '~/types';
+import type { C15TOptions, C15TPluginSchema } from '~/types';
 import { APIError } from 'better-call';
 
 export function parseOutputData<T extends Record<string, unknown>>(

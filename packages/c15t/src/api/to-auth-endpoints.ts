@@ -6,9 +6,8 @@ import {
 	type InputContext,
 } from 'better-call';
 import type { AuthEndpoint, AuthMiddleware } from './call';
-import type { C15TContext } from '~/types';
 import defu from 'defu';
-import type { HookEndpointContext } from '~/types';
+import type { HookEndpointContext, C15TContext } from '~/types';
 
 type InternalContext = InputContext<string, any> &
 	EndpointContext<string, any> & {

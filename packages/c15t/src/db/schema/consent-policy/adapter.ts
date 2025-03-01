@@ -1,7 +1,7 @@
-import type { C15TOptions } from '~/types';
-import type { Adapter, GenericEndpointContext } from '~/types';
+import type { GenericEndpointContext } from '~/types';
 import { parseConsentPolicyOutput, type ConsentPolicy } from './schema';
-import type { CreateWithHooks, UpdateWithHooks } from '~/db/hooks/types';
+import type { InternalAdapterContext } from '~/db/internal-adapter';
+import { getWithHooks } from '~/db/hooks';
 
 /**
  * Creates and returns a set of consent policy-related adapter methods to interact with the database.
@@ -33,12 +33,11 @@ import type { CreateWithHooks, UpdateWithHooks } from '~/db/hooks/types';
  * });
  * ```
  */
-export function createConsentPolicyAdapter(
-	adapter: Adapter,
-	createWithHooks: CreateWithHooks,
-	updateWithHooks: UpdateWithHooks,
-	options: C15TOptions
-) {
+export function createConsentPolicyAdapter({
+	adapter,
+	ctx,
+}: InternalAdapterContext) {
+	const { createWithHooks, updateWithHooks } = getWithHooks(adapter, ctx);
 	return {
 		/**
 		 * Creates a new consent policy record in the database.
@@ -96,7 +95,7 @@ export function createConsentPolicyAdapter(
 			});
 
 			return policies.map((policy) =>
-				parseConsentPolicyOutput(options, policy)
+				parseConsentPolicyOutput(ctx.options, policy)
 			);
 		},
 
@@ -117,7 +116,7 @@ export function createConsentPolicyAdapter(
 					},
 				],
 			});
-			return policy ? parseConsentPolicyOutput(options, policy) : null;
+			return policy ? parseConsentPolicyOutput(ctx.options, policy) : null;
 		},
 
 		/**
@@ -137,7 +136,7 @@ export function createConsentPolicyAdapter(
 					},
 				],
 			});
-			return policy ? parseConsentPolicyOutput(options, policy) : null;
+			return policy ? parseConsentPolicyOutput(ctx.options, policy) : null;
 		},
 
 		/**
@@ -167,7 +166,7 @@ export function createConsentPolicyAdapter(
 				undefined,
 				context
 			);
-			return policy ? parseConsentPolicyOutput(options, policy) : null;
+			return policy ? parseConsentPolicyOutput(ctx.options, policy) : null;
 		},
 	};
 }

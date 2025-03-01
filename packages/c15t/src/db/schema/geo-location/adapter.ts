@@ -1,11 +1,7 @@
-import type {
-	C15TOptions,
-	Adapter,
-	GenericEndpointContext,
-	Where,
-} from '~/types';
+import type { GenericEndpointContext, Where } from '~/types';
 import { type GeoLocation, parseGeoLocationOutput } from './schema';
-import type { CreateWithHooks } from '~/db/hooks/types';
+import { getWithHooks } from '~/db/hooks/with-hooks-factory';
+import type { InternalAdapterContext } from '~/db/internal-adapter';
 
 /**
  * Creates and returns a set of geo-location-related adapter methods to interact with the database.
@@ -35,11 +31,11 @@ import type { CreateWithHooks } from '~/db/hooks/types';
  * });
  * ```
  */
-export function createGeoLocationAdapter(
-	adapter: Adapter,
-	createWithHooks: CreateWithHooks,
-	options: C15TOptions
-) {
+export function createGeoLocationAdapter({
+	adapter,
+	ctx,
+}: InternalAdapterContext) {
+	const { createWithHooks, updateWithHooks } = getWithHooks(adapter, ctx);
 	return {
 		/**
 		 * Creates a new geo-location record in the database.
@@ -111,7 +107,7 @@ export function createGeoLocationAdapter(
 			});
 
 			return locations.map((location) =>
-				parseGeoLocationOutput(options, location)
+				parseGeoLocationOutput(ctx.options, location)
 			);
 		},
 
@@ -132,7 +128,7 @@ export function createGeoLocationAdapter(
 					},
 				],
 			});
-			return location ? parseGeoLocationOutput(options, location) : null;
+			return location ? parseGeoLocationOutput(ctx.options, location) : null;
 		},
 
 		/**
@@ -158,7 +154,7 @@ export function createGeoLocationAdapter(
 			});
 
 			return locations.map((location) =>
-				parseGeoLocationOutput(options, location)
+				parseGeoLocationOutput(ctx.options, location)
 			);
 		},
 	};

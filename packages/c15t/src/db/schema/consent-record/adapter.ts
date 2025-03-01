@@ -1,7 +1,7 @@
-import type { C15TOptions, Where } from '~/types';
-import type { Adapter, GenericEndpointContext } from '~/types';
+import type { Where, GenericEndpointContext } from '~/types';
 import { type ConsentRecord, parseConsentRecordOutput } from './schema';
-import type { CreateWithHooks } from '~/db/hooks/types';
+import type { InternalAdapterContext } from '~/db/internal-adapter';
+import { getWithHooks } from '~/db/hooks';
 
 /**
  * Creates and returns a set of consent record-related adapter methods to interact with the database.
@@ -30,11 +30,11 @@ import type { CreateWithHooks } from '~/db/hooks/types';
  * });
  * ```
  */
-export function createConsentRecordAdapter(
-	adapter: Adapter,
-	createWithHooks: CreateWithHooks,
-	options: C15TOptions
-) {
+export function createConsentRecordAdapter({
+	adapter,
+	ctx,
+}: InternalAdapterContext) {
+	const { createWithHooks, updateWithHooks } = getWithHooks(adapter, ctx);
 	return {
 		/**
 		 * Creates a new consent record in the database.
@@ -118,7 +118,9 @@ export function createConsentRecordAdapter(
 				limit,
 			});
 
-			return records.map((record) => parseConsentRecordOutput(options, record));
+			return records.map((record) =>
+				parseConsentRecordOutput(ctx.options, record)
+			);
 		},
 
 		/**
@@ -138,7 +140,7 @@ export function createConsentRecordAdapter(
 					},
 				],
 			});
-			return record ? parseConsentRecordOutput(options, record) : null;
+			return record ? parseConsentRecordOutput(ctx.options, record) : null;
 		},
 
 		/**
@@ -164,7 +166,9 @@ export function createConsentRecordAdapter(
 				},
 				limit,
 			});
-			return records.map((record) => parseConsentRecordOutput(options, record));
+			return records.map((record) =>
+				parseConsentRecordOutput(ctx.options, record)
+			);
 		},
 
 		/**
@@ -193,7 +197,9 @@ export function createConsentRecordAdapter(
 				},
 				limit,
 			});
-			return records.map((record) => parseConsentRecordOutput(options, record));
+			return records.map((record) =>
+				parseConsentRecordOutput(ctx.options, record)
+			);
 		},
 	};
 }

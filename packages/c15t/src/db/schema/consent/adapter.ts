@@ -1,7 +1,8 @@
-import type { C15TOptions, Where } from '~/types';
-import type { Adapter, GenericEndpointContext } from '~/types';
+import type { Where, GenericEndpointContext } from '~/types';
 import { type Consent, parseConsentOutput } from './schema';
-import type { CreateWithHooks, UpdateWithHooks } from '~/db/hooks/types';
+import type {} from '~/db/hooks/types';
+import type { InternalAdapterContext } from '~/db/internal-adapter';
+import { getWithHooks } from '~/db/hooks';
 
 /**
  * Creates and returns a set of consent-related adapter methods to interact with the database.
@@ -32,12 +33,9 @@ import type { CreateWithHooks, UpdateWithHooks } from '~/db/hooks/types';
  * });
  * ```
  */
-export function createConsentAdapter(
-	adapter: Adapter,
-	createWithHooks: CreateWithHooks,
-	updateWithHooks: UpdateWithHooks,
-	options: C15TOptions
-) {
+export function createConsentAdapter({ adapter, ctx }: InternalAdapterContext) {
+	const { createWithHooks, updateWithHooks } = getWithHooks(adapter, ctx);
+
 	return {
 		/**
 		 * Creates a new consent record in the database.
@@ -118,7 +116,9 @@ export function createConsentAdapter(
 				},
 			});
 
-			return consents.map((consent) => parseConsentOutput(options, consent));
+			return consents.map((consent) =>
+				parseConsentOutput(ctx.options, consent)
+			);
 		},
 
 		/**
@@ -138,7 +138,7 @@ export function createConsentAdapter(
 					},
 				],
 			});
-			return consent ? parseConsentOutput(options, consent) : null;
+			return consent ? parseConsentOutput(ctx.options, consent) : null;
 		},
 
 		/**
@@ -162,7 +162,9 @@ export function createConsentAdapter(
 					direction: 'desc',
 				},
 			});
-			return consents.map((consent) => parseConsentOutput(options, consent));
+			return consents.map((consent) =>
+				parseConsentOutput(ctx.options, consent)
+			);
 		},
 
 		/**
@@ -195,7 +197,7 @@ export function createConsentAdapter(
 				undefined,
 				context
 			);
-			return consent ? parseConsentOutput(options, consent) : null;
+			return consent ? parseConsentOutput(ctx.options, consent) : null;
 		},
 
 		/**
@@ -233,7 +235,7 @@ export function createConsentAdapter(
 				undefined,
 				context
 			);
-			return consent ? parseConsentOutput(options, consent) : null;
+			return consent ? parseConsentOutput(ctx.options, consent) : null;
 		},
 
 		// revokeConsent: async ({

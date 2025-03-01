@@ -1,10 +1,10 @@
-import type { C15TOptions } from '~/types';
-import type { Adapter, GenericEndpointContext } from '~/types';
+import type { GenericEndpointContext } from '~/types';
 import {
 	type ConsentGeoLocation,
 	parseConsentGeoLocationOutput,
 } from './schema';
-import type { CreateWithHooks } from '~/db/hooks/types';
+import type { InternalAdapterContext } from '~/db/internal-adapter';
+import { getWithHooks } from '~/db/hooks';
 
 /**
  * Creates and returns a set of consent geo-location-related adapter methods to interact with the database.
@@ -35,11 +35,12 @@ import type { CreateWithHooks } from '~/db/hooks/types';
  * });
  * ```
  */
-export function createConsentGeoLocationAdapter(
-	adapter: Adapter,
-	createWithHooks: CreateWithHooks,
-	options: C15TOptions
-) {
+export function createConsentGeoLocationAdapter({
+	adapter,
+	ctx,
+}: InternalAdapterContext) {
+	const { createWithHooks, updateWithHooks } = getWithHooks(adapter, ctx);
+
 	return {
 		/**
 		 * Creates a new consent geo-location record in the database.
@@ -98,7 +99,7 @@ export function createConsentGeoLocationAdapter(
 			});
 
 			return geoLocations.map((geoLocation) =>
-				parseConsentGeoLocationOutput(options, geoLocation)
+				parseConsentGeoLocationOutput(ctx.options, geoLocation)
 			);
 		},
 
@@ -120,7 +121,7 @@ export function createConsentGeoLocationAdapter(
 				],
 			});
 			return geoLocation
-				? parseConsentGeoLocationOutput(options, geoLocation)
+				? parseConsentGeoLocationOutput(ctx.options, geoLocation)
 				: null;
 		},
 	};

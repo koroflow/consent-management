@@ -1,10 +1,11 @@
-import type { C15TOptions } from '~/types';
-import type { Adapter, GenericEndpointContext } from '~/types';
+import type { GenericEndpointContext } from '~/types';
 import {
 	type ConsentPurposeJunction,
 	parseConsentPurposeJunctionOutput,
 } from './schema';
-import type { CreateWithHooks, UpdateWithHooks } from '~/db/hooks/types';
+import type {} from '~/db/hooks/types';
+import type { InternalAdapterContext } from '~/db/internal-adapter';
+import { getWithHooks } from '~/db/hooks';
 
 /**
  * Creates and returns a set of consent-purpose junction adapter methods to interact with the database.
@@ -34,12 +35,11 @@ import type { CreateWithHooks, UpdateWithHooks } from '~/db/hooks/types';
  * });
  * ```
  */
-export function createConsentPurposeJunctionAdapter(
-	adapter: Adapter,
-	createWithHooks: CreateWithHooks,
-	updateWithHooks: UpdateWithHooks,
-	options: C15TOptions
-) {
+export function createConsentPurposeJunctionAdapter({
+	adapter,
+	ctx,
+}: InternalAdapterContext) {
+	const { createWithHooks, updateWithHooks } = getWithHooks(adapter, ctx);
 	return {
 		/**
 		 * Creates a new consent-purpose junction record in the database.
@@ -99,7 +99,7 @@ export function createConsentPurposeJunctionAdapter(
 			});
 
 			return junctions.map((junction) =>
-				parseConsentPurposeJunctionOutput(options, junction)
+				parseConsentPurposeJunctionOutput(ctx.options, junction)
 			);
 		},
 
@@ -126,7 +126,7 @@ export function createConsentPurposeJunctionAdapter(
 			});
 
 			return junctions.map((junction) =>
-				parseConsentPurposeJunctionOutput(options, junction)
+				parseConsentPurposeJunctionOutput(ctx.options, junction)
 			);
 		},
 
@@ -161,7 +161,7 @@ export function createConsentPurposeJunctionAdapter(
 				context
 			);
 			return junction
-				? parseConsentPurposeJunctionOutput(options, junction)
+				? parseConsentPurposeJunctionOutput(ctx.options, junction)
 				: null;
 		},
 

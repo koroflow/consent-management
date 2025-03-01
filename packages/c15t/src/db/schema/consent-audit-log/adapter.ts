@@ -1,7 +1,27 @@
-import type { C15TOptions, Where } from '~/types';
-import type { Adapter, GenericEndpointContext } from '~/types';
+import type {
+	Adapter,
+	C15TOptions,
+	Where,
+	GenericEndpointContext,
+} from '~/types';
 import { type ConsentAuditLog, parseConsentAuditLogOutput } from './schema';
 import type { CreateWithHooks } from '~/db/hooks/types';
+import { getWithHooks } from '~/db/hooks';
+import type { InternalAdapterContext } from '~/db/internal-adapter';
+
+/**
+ * Context object for adapter factory functions
+ */
+export interface AdapterContext {
+	/** Database adapter for performing operations */
+	adapter: Adapter;
+
+	/** Hook function for creating records */
+	createWithHooks: CreateWithHooks;
+
+	/** Configuration options */
+	options: C15TOptions;
+}
 
 /**
  * Creates and returns a set of consent audit log adapter methods to interact with the database.
@@ -15,11 +35,11 @@ import type { CreateWithHooks } from '~/db/hooks/types';
  *
  * @example
  * ```typescript
- * const auditLogAdapter = createConsentAuditLogAdapter(
- *   databaseAdapter,
+ * const auditLogAdapter = createConsentAuditLogAdapter({
+ *   adapter: databaseAdapter,
  *   createWithHooks,
- *   c15tOptions
- * );
+ *   options: c15tOptions
+ * });
  *
  * // Create a new audit log entry
  * const log = await auditLogAdapter.createAuditLog({
@@ -31,11 +51,12 @@ import type { CreateWithHooks } from '~/db/hooks/types';
  * });
  * ```
  */
-export function createConsentAuditLogAdapter(
-	adapter: Adapter,
-	createWithHooks: CreateWithHooks,
-	options: C15TOptions
-) {
+export function createConsentAuditLogAdapter({
+	adapter,
+	ctx,
+}: InternalAdapterContext) {
+	const { createWithHooks, updateWithHooks } = getWithHooks(adapter, ctx);
+
 	return {
 		/**
 		 * Creates a new consent audit log entry in the database.
@@ -123,7 +144,7 @@ export function createConsentAuditLogAdapter(
 				offset,
 			});
 
-			return logs.map((log) => parseConsentAuditLogOutput(options, log));
+			return logs.map((log) => parseConsentAuditLogOutput(ctx.options, log));
 		},
 
 		/**
@@ -143,7 +164,7 @@ export function createConsentAuditLogAdapter(
 					},
 				],
 			});
-			return log ? parseConsentAuditLogOutput(options, log) : null;
+			return log ? parseConsentAuditLogOutput(ctx.options, log) : null;
 		},
 
 		/**
@@ -178,7 +199,7 @@ export function createConsentAuditLogAdapter(
 				},
 				limit,
 			});
-			return logs.map((log) => parseConsentAuditLogOutput(options, log));
+			return logs.map((log) => parseConsentAuditLogOutput(ctx.options, log));
 		},
 
 		/**

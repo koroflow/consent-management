@@ -1,7 +1,7 @@
-import type { C15TOptions, Where } from '~/types';
-import type { Adapter, GenericEndpointContext } from '~/types';
+import type { Where, GenericEndpointContext } from '~/types';
 import { type ConsentPurpose, parseConsentPurposeOutput } from './schema';
-import type { CreateWithHooks, UpdateWithHooks } from '~/db/hooks/types';
+import type { InternalAdapterContext } from '~/db/internal-adapter';
+import { getWithHooks } from '~/db/hooks';
 
 /**
  * Creates and returns a set of consent purpose-related adapter methods to interact with the database.
@@ -32,12 +32,11 @@ import type { CreateWithHooks, UpdateWithHooks } from '~/db/hooks/types';
  * });
  * ```
  */
-export function createConsentPurposeAdapter(
-	adapter: Adapter,
-	createWithHooks: CreateWithHooks,
-	updateWithHooks: UpdateWithHooks,
-	options: C15TOptions
-) {
+export function createConsentPurposeAdapter({
+	adapter,
+	ctx,
+}: InternalAdapterContext) {
+	const { createWithHooks, updateWithHooks } = getWithHooks(adapter, ctx);
 	return {
 		/**
 		 * Creates a new consent purpose record in the database.
@@ -102,7 +101,7 @@ export function createConsentPurposeAdapter(
 			});
 
 			return purposes.map((purpose) =>
-				parseConsentPurposeOutput(options, purpose)
+				parseConsentPurposeOutput(ctx.options, purpose)
 			);
 		},
 
@@ -123,7 +122,7 @@ export function createConsentPurposeAdapter(
 					},
 				],
 			});
-			return purpose ? parseConsentPurposeOutput(options, purpose) : null;
+			return purpose ? parseConsentPurposeOutput(ctx.options, purpose) : null;
 		},
 
 		/**
@@ -156,7 +155,7 @@ export function createConsentPurposeAdapter(
 				undefined,
 				context
 			);
-			return purpose ? parseConsentPurposeOutput(options, purpose) : null;
+			return purpose ? parseConsentPurposeOutput(ctx.options, purpose) : null;
 		},
 	};
 }
