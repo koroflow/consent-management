@@ -1,9 +1,9 @@
 import type { c15tClientOptions, FetchOptions, ResponseContext } from '..';
 import type {
-	ConsentChangeEvent,
-	ConsentPreference,
+	// ConsentChangeEvent,
+	// ConsentPreference,
 	ConsentPurpose,
-} from '../types';
+} from '~/types';
 
 /**
  * Client for interacting with the c15t consent management API.
@@ -207,34 +207,34 @@ export class c15tClient {
 		}
 	}
 
-	/**
-	 * Retrieves the current consent preferences.
-	 *
-	 * This method fetches the current consent settings for the user,
-	 * including which purposes they have consented to and when the
-	 * consent was last updated.
-	 *
-	 * @example
-	 * ```typescript
-	 * const { data, error } = await client.getConsent();
-	 *
-	 * if (data) {
-	 *   console.log('User consented to analytics:', data.preferences.analytics);
-	 *   console.log('Consent last updated:', data.updatedAt);
-	 * }
-	 * ```
-	 *
-	 * @param options - Optional fetch configuration options
-	 * @returns Response context containing the consent preferences if successful
-	 */
-	async getConsent(
-		options?: FetchOptions<ConsentPreference>
-	): Promise<ResponseContext<ConsentPreference>> {
-		return this.fetcher<ConsentPreference>('/get-consent', {
-			method: 'GET',
-			...options,
-		});
-	}
+	// /**
+	//  * Retrieves the current consent preferences.
+	//  *
+	//  * This method fetches the current consent settings for the user,
+	//  * including which purposes they have consented to and when the
+	//  * consent was last updated.
+	//  *
+	//  * @example
+	//  * ```typescript
+	//  * const { data, error } = await client.getConsent();
+	//  *
+	//  * if (data) {
+	//  *   console.log('User consented to analytics:', data.preferences.analytics);
+	//  *   console.log('Consent last updated:', data.updatedAt);
+	//  * }
+	//  * ```
+	//  *
+	//  * @param options - Optional fetch configuration options
+	//  * @returns Response context containing the consent preferences if successful
+	//  */
+	// async getConsent(
+	// 	options?: FetchOptions<ConsentPreference>
+	// ): Promise<ResponseContext<ConsentPreference>> {
+	// 	return this.fetcher<ConsentPreference>('/get-consent', {
+	// 		method: 'GET',
+	// 		...options,
+	// 	});
+	// }
 
 	/**
 	 * Lists all available consent purposes.
@@ -268,83 +268,83 @@ export class c15tClient {
 		});
 	}
 
-	/**
-	 * Updates the user's consent preferences.
-	 *
-	 * This method sends the user's updated consent choices to the server,
-	 * recording which purposes they have agreed to and which they have declined.
-	 *
-	 * @example
-	 * ```typescript
-	 * const { data, error } = await client.updateConsent({
-	 *   analytics: true,
-	 *   marketing: false,
-	 *   preferences: true
-	 * });
-	 *
-	 * if (data) {
-	 *   console.log('Consent updated successfully');
-	 *   console.log('New preferences:', data.preferences);
-	 * }
-	 * ```
-	 *
-	 * @param preferences - Record mapping purpose IDs to boolean consent values
-	 * @param options - Optional fetch configuration options
-	 * @returns Response context containing the updated consent preferences if successful
-	 */
-	async updateConsent(
-		preferences: Record<string, boolean>,
-		options?: FetchOptions<ConsentPreference>
-	): Promise<ResponseContext<ConsentPreference>> {
-		return this.fetcher<ConsentPreference>('/update-consent', {
-			method: 'POST',
-			body: { preferences },
-			...options,
-		});
-	}
+	// /**
+	//  * Updates the user's consent preferences.
+	//  *
+	//  * This method sends the user's updated consent choices to the server,
+	//  * recording which purposes they have agreed to and which they have declined.
+	//  *
+	//  * @example
+	//  * ```typescript
+	//  * const { data, error } = await client.updateConsent({
+	//  *   analytics: true,
+	//  *   marketing: false,
+	//  *   preferences: true
+	//  * });
+	//  *
+	//  * if (data) {
+	//  *   console.log('Consent updated successfully');
+	//  *   console.log('New preferences:', data.preferences);
+	//  * }
+	//  * ```
+	//  *
+	//  * @param preferences - Record mapping purpose IDs to boolean consent values
+	//  * @param options - Optional fetch configuration options
+	//  * @returns Response context containing the updated consent preferences if successful
+	//  */
+	// async updateConsent(
+	// 	preferences: Record<string, boolean>,
+	// 	options?: FetchOptions<ConsentPreference>
+	// ): Promise<ResponseContext<ConsentPreference>> {
+	// 	return this.fetcher<ConsentPreference>('/update-consent', {
+	// 		method: 'POST',
+	// 		body: { preferences },
+	// 		...options,
+	// 	});
+	// }
 
-	/**
-	 * Retrieves the history of consent changes.
-	 *
-	 * This method fetches a chronological record of consent preference changes,
-	 * showing when and how consent settings were modified.
-	 *
-	 * @example
-	 * ```typescript
-	 * // Get consent history for a specific user
-	 * const { data } = await client.getConsentHistory({
-	 *   userId: '123',
-	 *   limit: 10
-	 * });
-	 *
-	 * if (data) {
-	 *   data.forEach(event => {
-	 *     console.log(`Change at ${event.timestamp}`);
-	 *     console.log(`Changed purposes: ${Object.keys(event.changes).join(', ')}`);
-	 *   });
-	 * }
-	 * ```
-	 *
-	 * @param query - Query parameters to filter the history results
-	 * @param options - Optional fetch configuration options
-	 * @returns Response context containing the list of consent change events if successful
-	 */
-	async getConsentHistory(
-		query?: {
-			recordId?: string;
-			userId?: string;
-			deviceId?: string;
-			limit?: number;
-			offset?: number;
-		},
-		options?: FetchOptions<ConsentChangeEvent[]>
-	): Promise<ResponseContext<ConsentChangeEvent[]>> {
-		return this.fetcher<ConsentChangeEvent[]>('/consent-history', {
-			method: 'GET',
-			query,
-			...options,
-		});
-	}
+	// /**
+	//  * Retrieves the history of consent changes.
+	//  *
+	//  * This method fetches a chronological record of consent preference changes,
+	//  * showing when and how consent settings were modified.
+	//  *
+	//  * @example
+	//  * ```typescript
+	//  * // Get consent history for a specific user
+	//  * const { data } = await client.getConsentHistory({
+	//  *   userId: '123',
+	//  *   limit: 10
+	//  * });
+	//  *
+	//  * if (data) {
+	//  *   data.forEach(event => {
+	//  *     console.log(`Change at ${event.timestamp}`);
+	//  *     console.log(`Changed purposes: ${Object.keys(event.changes).join(', ')}`);
+	//  *   });
+	//  * }
+	//  * ```
+	//  *
+	//  * @param query - Query parameters to filter the history results
+	//  * @param options - Optional fetch configuration options
+	//  * @returns Response context containing the list of consent change events if successful
+	//  */
+	// async getConsentHistory(
+	// 	query?: {
+	// 		recordId?: string;
+	// 		userId?: string;
+	// 		deviceId?: string;
+	// 		limit?: number;
+	// 		offset?: number;
+	// 	},
+	// 	options?: FetchOptions<ConsentChangeEvent[]>
+	// ): Promise<ResponseContext<ConsentChangeEvent[]>> {
+	// 	return this.fetcher<ConsentChangeEvent[]>('/consent-history', {
+	// 		method: 'GET',
+	// 		query,
+	// 		...options,
+	// 	});
+	// }
 
 	/**
 	 * Makes a custom API request to any endpoint.

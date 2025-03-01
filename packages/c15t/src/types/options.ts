@@ -5,11 +5,20 @@
  * It includes types for setting up storage, API endpoints, cookies, rate limiting,
  * analytics, geo-targeting, plugins, logging, and other advanced features.
  */
-import type { Storage } from './storage';
-import type { c15tPlugin } from './plugins';
+
+import type { Dialect, Kysely, MysqlPool, PostgresPool } from 'kysely';
 import type { Logger } from '../utils/logger';
-import type { C15TContext } from '.';
+import type {
+	AdapterInstance,
+	C15TContext,
+	C15TPlugin,
+	Consent,
+	GenericEndpointContext,
+} from './index';
 import type { AuthMiddleware } from '~/api/call';
+import type { KyselyDatabaseType } from '~/adapters/kysely-adapter/types';
+import type { Database } from 'better-sqlite3';
+import type { FieldAttribute } from '~/db';
 
 /**
  * Analytics destination configuration
@@ -118,13 +127,6 @@ export interface C15TOptions {
 	basePath?: string;
 
 	/**
-	 * Storage provider for consent data
-	 * This is required and can be a Storage object or a string identifier
-	 * @example "memory"
-	 */
-	storage: Storage;
-
-	/**
 	 * Secondary storage for distributed environments (optional)
 	 * Used as a fallback if primary storage fails and for data redundancy
 	 */
@@ -143,6 +145,43 @@ export interface C15TOptions {
 	secret?: string;
 
 	/**
+	 * Database configuration
+	 */
+	database?:
+		| PostgresPool
+		| MysqlPool
+		| Database
+		| Dialect
+		| AdapterInstance
+		| {
+				dialect: Dialect;
+				type: KyselyDatabaseType;
+				/**
+				 * casing for table names
+				 *
+				 * @default "camel"
+				 */
+				casing?: 'snake' | 'camel';
+		  }
+		| {
+				/**
+				 * Kysely instance
+				 */
+        				// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+				db: Kysely<any>;
+				/**
+				 * Database type between postgres, mysql and sqlite
+				 */
+				type: KyselyDatabaseType;
+				/**
+				 * casing for table names
+				 *
+				 * @default "camel"
+				 */
+				casing?: 'snake' | 'camel';
+		  };
+
+	/**
 	 * Enable CORS support
 	 * @default true
 	 */
@@ -154,66 +193,6 @@ export interface C15TOptions {
 	 * @example ["https://example.com", "https://www.example.com"]
 	 */
 	trustedOrigins?: string[] | ((request: Request) => string[]);
-
-	/**
-	 * Consent configuration options
-	 * Controls how consent is stored, when it expires, and other consent-specific settings
-	 */
-	consent?: {
-		/**
-		 * Default expiration for consent in seconds
-		 * @default 31536000 (1 year)
-		 */
-		expiresIn?: number;
-
-		/**
-		 * Time in seconds before refreshing consent data
-		 * @default 86400 (24 hours)
-		 */
-		updateAge?: number;
-
-		/**
-		 * Store consent in cookies
-		 * When enabled, a summary of consent preferences is stored in a cookie
-		 * for faster access without database queries
-		 */
-		cookieStorage?: {
-			/**
-			 * Whether to enable cookie storage for consent
-			 */
-			enabled: boolean;
-
-			/**
-			 * How long to cache consent data in the cookie
-			 * @default 600 (10 minutes)
-			 */
-			maxAge?: number;
-
-			/**
-			 * Cookie domain configuration
-			 * @example ".example.com" for all subdomains
-			 */
-			domain?: string;
-
-			/**
-			 * Cookie path
-			 * @default "/"
-			 */
-			path?: string;
-
-			/**
-			 * Same site attribute
-			 * @default "lax"
-			 */
-			sameSite?: 'strict' | 'lax' | 'none';
-
-			/**
-			 * Secure attribute
-			 * @default true in production
-			 */
-			secure?: boolean;
-		};
-	};
 
 	/**
 	 * Cookie configuration
@@ -291,7 +270,7 @@ export interface C15TOptions {
 	 * Plugins to extend functionality
 	 * Array of plugin objects that add features to the consent system
 	 */
-	plugins?: c15tPlugin[];
+	plugins?: C15TPlugin[];
 
 	/**
 	 * Logger configuration
@@ -300,6 +279,68 @@ export interface C15TOptions {
 	logger?: Logger;
 
 	/**
+	 * allows you to define custom hooks that can be
+	 * executed during lifecycle of core database
+	 * operations.
+	 */
+	databaseHooks?: {
+		/**
+		 * User hooks
+		 */
+		consent?: {
+			create?: {
+				/**
+				 * Hook that is called before a consent is created.
+				 * if the hook returns false, the consent will not be created.
+				 * If the hook returns an object, it'll be used instead of the original data
+				 */
+				before?: (
+					consent: Consent,
+					context?: GenericEndpointContext
+				) => Promise<
+					| boolean
+					| undefined
+					| {
+            				// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+							data: Partial<Consent> & Record<string, any>;
+					  }
+				>;
+				/**
+				 * Hook that is called after a consent is created.
+				 */
+				after?: (
+					user: Consent,
+					context?: GenericEndpointContext
+				) => Promise<void>;
+			};
+			update?: {
+				/**
+				 * Hook that is called before a consent is updated.
+				 * if the hook returns false, the consent will not be updated.
+				 * If the hook returns an object, it'll be used instead of the original data
+				 */
+				before?: (
+					user: Partial<Consent>,
+					context?: GenericEndpointContext
+				) => Promise<
+					| boolean
+					| undefined
+					| {
+            				// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+							data: Partial<Consent & Record<string, any>>;
+					  }
+				>;
+				/**
+				 * Hook that is called after a user is updated.
+				 */
+				after?: (
+					user: Consent,
+					context?: GenericEndpointContext
+				) => Promise<void>;
+			};
+		};
+	};
+	/*
 	 * Advanced configuration options
 	 * Settings for specialized use cases
 	 */
@@ -316,7 +357,7 @@ export interface C15TOptions {
 			 * @example ["x-client-ip", "x-forwarded-for"]
 			 *
 			 * @default
-			 * @link https://github.com/better-auth/better-auth/blob/main/packages/better-auth/src/utils/get-request-ip.ts#L8
+			 * @link https://github.com/c15t/c15t/blob/main/packages/c15t/src/utils/get-request-ip.ts#L8
 			 */
 			ipAddressHeaders?: string[];
 			/**
@@ -387,5 +428,382 @@ export interface C15TOptions {
 		 * After a request is processed
 		 */
 		after?: AuthMiddleware;
+	};
+
+	/**
+	 * Database table configuration
+	 * Allows customizing table and field names
+	 */
+	user?: {
+		/**
+		 * Custom model name for user table
+		 * @default "user"
+		 */
+		modelName?: string;
+		/**
+		 * Custom field names for user table
+		 */
+		fields?: {
+			id?: string;
+			isIdentified?: string;
+			externalId?: string;
+			identityProvider?: string;
+			lastIpAddress?: string;
+			createdAt?: string;
+			updatedAt?: string;
+			[key: string]: string | undefined;
+		};
+		/**
+		 * Additional fields for the user table
+		 */
+		additionalFields?: Record<string, FieldAttribute>;
+	};
+
+	/**
+	 * Consent purpose configuration
+	 */
+	consentPurpose?: {
+		/**
+		 * Custom model name for consent purpose table
+		 * @default "consentPurpose"
+		 */
+		modelName?: string;
+		/**
+		 * Custom field names for consent purpose table
+		 */
+		fields?: {
+			id?: string;
+			code?: string;
+			name?: string;
+			description?: string;
+			isEssential?: string;
+			dataCategory?: string;
+			legalBasis?: string;
+			isActive?: string;
+			createdAt?: string;
+			updatedAt?: string;
+			[key: string]: string | undefined;
+		};
+		/**
+		 * Additional fields for the consent purpose table
+		 */
+		additionalFields?: Record<string, FieldAttribute>;
+	};
+
+	/**
+	 * Consent policy configuration
+	 */
+	consentPolicy?: {
+		/**
+		 * Custom model name for consent policy table
+		 * @default "consentPolicy"
+		 */
+		modelName?: string;
+		/**
+		 * Custom field names for consent policy table
+		 */
+		fields?: {
+			id?: string;
+			version?: string;
+			name?: string;
+			effectiveDate?: string;
+			expirationDate?: string;
+			content?: string;
+			contentHash?: string;
+			isActive?: string;
+			createdAt?: string;
+			[key: string]: string | undefined;
+		};
+		/**
+		 * Additional fields for the consent policy table
+		 */
+		additionalFields?: Record<string, FieldAttribute>;
+	};
+
+	/**
+	 * Domain configuration
+	 */
+	domain?: {
+		/**
+		 * Custom model name for domain table
+		 * @default "domain"
+		 */
+		modelName?: string;
+		/**
+		 * Custom field names for domain table
+		 */
+		fields?: {
+			id?: string;
+			domain?: string;
+			isPattern?: string;
+			patternType?: string;
+			parentDomainId?: string;
+			description?: string;
+			isActive?: string;
+			createdAt?: string;
+			updatedAt?: string;
+			[key: string]: string | undefined;
+		};
+		/**
+		 * Additional fields for the domain table
+		 */
+		additionalFields?: Record<string, FieldAttribute>;
+	};
+
+	/**
+	 * Geo location configuration
+	 */
+	geoLocation?: {
+		/**
+		 * Custom model name for geo location table
+		 * @default "geoLocation"
+		 */
+		modelName?: string;
+		/**
+		 * Custom field names for geo location table
+		 */
+		fields?: {
+			id?: string;
+			countryCode?: string;
+			countryName?: string;
+			regionCode?: string;
+			regionName?: string;
+			regulatoryZones?: string;
+			createdAt?: string;
+			[key: string]: string | undefined;
+		};
+		/**
+		 * Additional fields for the geo location table
+		 */
+		additionalFields?: Record<string, FieldAttribute>;
+	};
+
+	/**
+	 * Consent fields configuration
+	 * Extends the consent configuration with database fields
+	 */
+	consent?: {
+		/**
+		 * Default expiration for consent in seconds
+		 * @default 31536000 (1 year)
+		 */
+		expiresIn?: number;
+
+		/**
+		 * Time in seconds before refreshing consent data
+		 * @default 86400 (24 hours)
+		 */
+		updateAge?: number;
+
+		/**
+		 * Store consent in cookies
+		 * When enabled, a summary of consent preferences is stored in a cookie
+		 * for faster access without database queries
+		 */
+		cookieStorage?: {
+			/**
+			 * Whether to enable cookie storage for consent
+			 */
+			enabled: boolean;
+
+			/**
+			 * How long to cache consent data in the cookie
+			 * @default 600 (10 minutes)
+			 */
+			maxAge?: number;
+
+			/**
+			 * Cookie domain configuration
+			 * @example ".example.com" for all subdomains
+			 */
+			domain?: string;
+
+			/**
+			 * Cookie path
+			 * @default "/"
+			 */
+			path?: string;
+
+			/**
+			 * Same site attribute
+			 * @default "lax"
+			 */
+			sameSite?: 'strict' | 'lax' | 'none';
+
+			/**
+			 * Secure attribute
+			 * @default true in production
+			 */
+			secure?: boolean;
+		};
+
+		/**
+		 * Custom model name for consent table
+		 * @default "consent"
+		 */
+		modelName?: string;
+
+		/**
+		 * Custom field names for consent table
+		 */
+		fields?: {
+			id?: string;
+			userId?: string;
+			domainId?: string;
+			preferences?: string;
+			metadata?: string;
+			policyId?: string;
+			ipAddress?: string;
+			region?: string;
+			givenAt?: string;
+			validUntil?: string;
+			isActive?: string;
+			[key: string]: string | undefined;
+		};
+
+		/**
+		 * Additional fields for the consent table
+		 */
+		additionalFields?: Record<string, FieldAttribute>;
+	};
+
+	/**
+	 * Consent purpose junction configuration
+	 */
+	consentPurposeJunction?: {
+		/**
+		 * Custom model name for consent purpose junction table
+		 * @default "consentPurposeJunction"
+		 */
+		modelName?: string;
+		/**
+		 * Custom field names for consent purpose junction table
+		 */
+		fields?: {
+			id?: string;
+			consentId?: string;
+			purposeId?: string;
+			isAccepted?: string;
+			[key: string]: string | undefined;
+		};
+		/**
+		 * Additional fields for the consent purpose junction table
+		 */
+		additionalFields?: Record<string, FieldAttribute>;
+	};
+
+	/**
+	 * Consent record configuration
+	 */
+	consentRecord?: {
+		/**
+		 * Custom model name for consent record table
+		 * @default "consentRecord"
+		 */
+		modelName?: string;
+		/**
+		 * Custom field names for consent record table
+		 */
+		fields?: {
+			id?: string;
+			consentId?: string;
+			recordType?: string;
+			recordTypeDetail?: string;
+			content?: string;
+			ipAddress?: string;
+			recordMetadata?: string;
+			createdAt?: string;
+			[key: string]: string | undefined;
+		};
+		/**
+		 * Additional fields for the consent record table
+		 */
+		additionalFields?: Record<string, FieldAttribute>;
+	};
+
+	/**
+	 * Consent geo location configuration
+	 */
+	consentGeoLocation?: {
+		/**
+		 * Custom model name for consent geo location table
+		 * @default "consentGeoLocation"
+		 */
+		modelName?: string;
+		/**
+		 * Custom field names for consent geo location table
+		 */
+		fields?: {
+			id?: string;
+			consentId?: string;
+			geoLocationId?: string;
+			createdAt?: string;
+			[key: string]: string | undefined;
+		};
+		/**
+		 * Additional fields for the consent geo location table
+		 */
+		additionalFields?: Record<string, FieldAttribute>;
+	};
+
+	/**
+	 * Consent withdrawal configuration
+	 */
+	consentWithdrawal?: {
+		/**
+		 * Custom model name for consent withdrawal table
+		 * @default "consentWithdrawal"
+		 */
+		modelName?: string;
+		/**
+		 * Custom field names for consent withdrawal table
+		 */
+		fields?: {
+			id?: string;
+			consentId?: string;
+			revokedAt?: string;
+			revocationReason?: string;
+			method?: string;
+			actor?: string;
+			metadata?: string;
+			createdAt?: string;
+			[key: string]: string | undefined;
+		};
+		/**
+		 * Additional fields for the consent withdrawal table
+		 */
+		additionalFields?: Record<string, FieldAttribute>;
+	};
+
+	/**
+	 * Consent audit log configuration
+	 */
+	consentAuditLog?: {
+		/**
+		 * Custom model name for consent audit log table
+		 * @default "consentAuditLog"
+		 */
+		modelName?: string;
+		/**
+		 * Custom field names for consent audit log table
+		 */
+		fields?: {
+			id?: string;
+			timestamp?: string;
+			action?: string;
+			userId?: string;
+			resourceType?: string;
+			resourceId?: string;
+			actor?: string;
+			changes?: string;
+			deviceInfo?: string;
+			ipAddress?: string;
+			createdAt?: string;
+			[key: string]: string | undefined;
+		};
+		/**
+		 * Additional fields for the consent audit log table
+		 */
+		additionalFields?: Record<string, FieldAttribute>;
 	};
 }

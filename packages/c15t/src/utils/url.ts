@@ -1,12 +1,12 @@
 import { env } from '../utils/env';
-import { c15tError } from '../error/codes';
+import { C15TError } from '~/error';
 
 function checkHasPath(url: string): boolean {
 	try {
 		const parsedUrl = new URL(url);
 		return parsedUrl.pathname !== '/';
 	} catch (error) {
-		throw new c15tError(
+		throw new C15TError(
 			`Invalid base URL: ${url}. Please provide a valid base URL.`
 		);
 	}
@@ -26,10 +26,10 @@ export function getBaseURL(url?: string, path?: string) {
 		return withPath(url, path);
 	}
 	const fromEnv =
-		env.BETTER_AUTH_URL ||
-		env.NEXT_PUBLIC_BETTER_AUTH_URL ||
-		env.PUBLIC_BETTER_AUTH_URL ||
-		env.NUXT_PUBLIC_BETTER_AUTH_URL ||
+		env.C15T_URL ||
+		env.NEXT_PUBLIC_C15T_URL ||
+		env.PUBLIC_C15T_URL ||
+		env.NUXT_PUBLIC_C15T_URL ||
 		env.NUXT_PUBLIC_AUTH_URL ||
 		(env.BASE_URL !== '/' ? env.BASE_URL : undefined);
 

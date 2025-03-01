@@ -103,7 +103,7 @@ export type WithJsDoc<T, D> = Expand<T & D>;
  */
 export const c15t = <O extends C15TOptions>(options: O) => {
 	const C15TContextPromise = init(options);
-  
+
 	const handler = async (request: Request): Promise<Response> => {
 		const ctx = await C15TContextPromise;
 		const basePath = ctx.options.basePath || '/api/auth';
@@ -116,8 +116,7 @@ export const c15t = <O extends C15TOptions>(options: O) => {
 		}
 		ctx.trustedOrigins = [
 			...(options.trustedOrigins
-				? 
-					// biome-ignore lint/nursery/noNestedTernary: its okay
+				? // biome-ignore lint/nursery/noNestedTernary: its okay
 					Array.isArray(options.trustedOrigins)
 					? options.trustedOrigins
 					: options.trustedOrigins(request)

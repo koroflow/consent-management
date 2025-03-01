@@ -1,6 +1,4 @@
 import Image from "next/image";
-import { ManageConsent } from "~/components/ManageConsent";
-import { ConditionalContent } from "~/components/ConditionalContent";
 
 export default function Home() {
   return (
@@ -56,7 +54,7 @@ export default function Home() {
           <p className='mb-4 text-gray-600 text-sm dark:text-gray-400'>
             This section demonstrates how content can be conditionally displayed based on the user's consent preferences:
           </p>
-          <ConditionalContent />
+          {/* <ConditionalContent /> */}
         </div>
       </main>
       <footer className='row-start-3 flex flex-wrap items-center justify-center gap-6'>
@@ -106,7 +104,7 @@ export default function Home() {
           Go to nextjs.org →
         </a>
         <span className='mx-2 h-4 border-gray-300 border-l dark:border-gray-700'></span>
-        <ManageConsent />
+        {/* <ManageConsent /> */}
       </footer>
     </div>
   );

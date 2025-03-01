@@ -7,9 +7,17 @@
  */
 import type { Endpoint } from 'better-call';
 import type { AuthMiddleware } from '~/api/call';
-import type { HookEndpointContext } from './context';
-import type { LiteralString, DeepPartial } from './helper';
-import type { C15TOptions, C15TContext, EndpointContext } from './index';
+
+import type {
+	C15TOptions,
+	C15TContext,
+	HookEndpointContext,
+	LiteralString,
+	DeepPartial,
+
+} from './index';
+import type { FieldAttribute } from '~/db';
+import type { Migration } from 'kysely';
 
 /**
  * Context object provided to plugin hooks
@@ -17,7 +25,7 @@ import type { C15TOptions, C15TContext, EndpointContext } from './index';
  * This extends the standard endpoint context with additional properties
  * specific to plugin hooks, such as the request path and geolocation data.
  */
-export interface PluginHookContext extends EndpointContext {
+export interface PluginHookContext {
 	/**
 	 * The path of the current request
 	 */
@@ -95,7 +103,7 @@ export type PluginServerExtension = Record<string, unknown>;
  *
  * @example
  * ```typescript
- * const myPlugin: c15tPlugin = {
+ * const myPlugin: C15TPlugin = {
  *   id: 'my-plugin',
  *   init: (context) => {
  *     // Initialize plugin
@@ -108,7 +116,7 @@ export type PluginServerExtension = Record<string, unknown>;
  * };
  * ```
  */
-export interface c15tPlugin {
+export interface C15TPlugin {
 	id: LiteralString;
 	/**
 	 * The init function is called when the plugin is initialized.
@@ -117,7 +125,7 @@ export interface c15tPlugin {
 	init?: (ctx: C15TContext) => {
 		context?: DeepPartial<Omit<C15TContext, 'options'>>;
 		options?: Partial<C15TOptions>;
-	} | void;
+	} | undefined;
 	endpoints?: {
 		[key: string]: Endpoint;
 	};
@@ -135,14 +143,14 @@ export interface c15tPlugin {
 		| {
 				request: Request;
 		  }
-		| void
+		| undefined
 	>;
 	onResponse?: (
 		response: Response,
 		ctx: C15TContext
 	) => Promise<{
 		response: Response;
-	} | void>;
+	} | undefined>;
 	hooks?: {
 		before?: {
 			matcher: (context: HookEndpointContext) => boolean;
@@ -154,21 +162,50 @@ export interface c15tPlugin {
 		}[];
 	};
 	/**
+	 * Schema the plugin needs
+	 *
+	 * This will also be used to migrate the database. If the fields are dynamic from the plugins
+	 * configuration each time the configuration is changed a new migration will be created.
+	 *
+	 * NOTE: If you want to create migrations manually using
+	 * migrations option or any other way you
+	 * can disable migration per table basis.
+	 *
+	 * @example
+	 * ```ts
+	 * schema: {
+	 * 	user: {
+	 * 		fields: {
+	 * 			email: {
+	 * 				 type: "string",
+	 * 			},
+	 * 			emailVerified: {
+	 * 				type: "boolean",
+	 * 				defaultValue: false,
+	 * 			},
+	 * 		},
+	 * 	}
+	 * } as AuthPluginSchema
+	 * ```
+	 */
+	schema?: C15TPluginSchema;
+	/**
+	 * The migrations of the plugin. If you define schema that will automatically create
+	 * migrations for you.
+	 *
+	 * ⚠️ Only uses this if you dont't want to use the schema option and you disabled migrations for
+	 * the tables.
+	 */
+	migrations?: Record<string, Migration>;
+	/**
 	 * The options of the plugin
 	 */
-	options?: Record<string, any>;
+	options?: Record<string, unknown>;
 	/**
 	 * types to be inferred
 	 */
-	$Infer?: Record<string, any>;
-	/**
-	 * The rate limit rules to apply to specific paths.
-	 */
-	rateLimit?: {
-		window: number;
-		max: number;
-		pathMatcher: (path: string) => boolean;
-	}[];
+	$Infer?: Record<string, unknown>;
+
 	/**
 	 * The error codes returned by the plugin
 	 */
@@ -180,8 +217,58 @@ export interface c15tPlugin {
  *
  * @template T - Plugin type
  */
-export type InferPluginOptions<T extends c15tPlugin> = T extends {
+export type InferPluginOptions<T extends C15TPlugin> = T extends {
 	options: infer O;
 }
 	? O
 	: Record<string, never>;
+
+/**
+ * Infer plugin types from configuration options
+ *
+ * This type utility extracts the plugin types from a configuration object,
+ * allowing TypeScript to understand the extensions provided by plugins.
+ */
+export type InferPluginTypes<O extends C15TOptions> =
+	O['plugins'] extends Array<infer P>
+		? P extends C15TPlugin
+			? P extends { $InferServerPlugin: infer SP }
+				? SP extends Record<string, unknown>
+					? SP
+					: Record<string, never>
+				: Record<string, never>
+			: Record<string, never>
+		: Record<string, never>;
+
+/**
+ * Infer plugin error codes from configuration options
+ *
+ * This type utility extracts the error codes defined by plugins from a configuration object,
+ * allowing TypeScript to understand the possible error codes.
+ */
+export type InferPluginErrorCodes<O extends C15TOptions> =
+	O['plugins'] extends Array<infer P>
+		? P extends C15TPlugin
+			? P['$ERROR_CODES'] extends infer EC
+				? EC extends Record<string, unknown>
+					? EC
+					: Record<string, never>
+				: Record<string, never>
+			: Record<string, never>
+		: Record<string, never>;
+
+/**
+ * Schema type for plugin extensions
+ *
+ * This can include additional types, validation schemas, or other
+ * schema-related extensions provided by plugins.
+ */
+export type C15TPluginSchema = {
+	[table in string]: {
+		fields: {
+			[field in string]: FieldAttribute;
+		};
+		disableMigration?: boolean;
+		modelName?: string;
+	};
+};

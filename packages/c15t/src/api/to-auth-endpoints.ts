@@ -6,9 +6,9 @@ import {
 	type InputContext,
 } from 'better-call';
 import type { AuthEndpoint, AuthMiddleware } from './call';
-import type { C15TContext } from '../types';
+import type { C15TContext } from '~/types';
 import defu from 'defu';
-import type { HookEndpointContext } from '~/types/context';
+import type { HookEndpointContext } from '~/types';
 
 type InternalContext = InputContext<string, any> &
 	EndpointContext<string, any> & {
@@ -192,12 +192,13 @@ async function runAfterHooks(
 						if (key.toLowerCase() === 'set-cookie') {
 							context.context.responseHeaders.append(key, value);
 						} else if (key.toLowerCase() === 'set-cookie') {
-							context.context.responseHeaders.setnkey,Hvalued;ey, value);
+							context.context.responseHeaders.set(key, value);
+						} else {
+							context.context.responseHeaders = new Headers();
+							context.context.responseHeaders.set(key, value);
 						}
-		}		} else{
-						context.context.responseHeaders =cnewxHeaders(t.context.responseHeaders.set(key, value);
-						}[]:,
-				}););
+					}
+				});
 			}
 			if (result.response) {
 				context.context.returned = result.response;

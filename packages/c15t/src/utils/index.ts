@@ -21,3 +21,4 @@ export * from './id';
 export * from './json';
 export * from './logger';
 export * from './url';
+export * from './misc';

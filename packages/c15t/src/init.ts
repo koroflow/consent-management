@@ -17,12 +17,11 @@
 import { defu } from 'defu';
 import { createLogger } from './utils/logger';
 import { getBaseURL } from './utils/url';
-import { getStorageAdapter } from './storage/utils';
-import { getCookies, createCookieGetter } from './cookies';
 import { generateId } from './utils/id';
 import { env, isProduction } from './utils/env';
 import type { C15TContext } from './types';
-import type { C15TOptions, c15tPlugin } from './types';
+import type { C15TOptions, C15TPlugin } from './types';
+import { createInternalAdapter, getAdapter, getConsentTables } from './db';
 
 /**
  * Default secret used when no secret is provided
@@ -53,7 +52,8 @@ const DEFAULT_SECRET = 'c15t-default-secret-please-change-in-production';
  * ```
  */
 export const init = async (options: C15TOptions): Promise<C15TContext> => {
-	const storage = await getStorageAdapter(options);
+	const adapter = await getAdapter(options);
+
 	const plugins = options.plugins || [];
 	const internalPlugins = getInternalPlugins(options);
 	const logger = createLogger(options.logger);
@@ -79,7 +79,7 @@ export const init = async (options: C15TOptions): Promise<C15TContext> => {
 		plugins: plugins.concat(internalPlugins),
 	};
 
-	const cookies = getCookies(finalOptions);
+	const tables = getConsentTables(options);
 
 	// Set up ID generation function
 	const generateIdFunc: C15TContext['generateId'] = ({ model, size }) => {
@@ -97,19 +97,18 @@ export const init = async (options: C15TOptions): Promise<C15TContext> => {
 		baseURL: baseURL || '',
 		secret,
 		logger: logger,
-		storage,
-		secondaryStorage: finalOptions.secondaryStorage,
 		generateId: generateIdFunc,
 		consentConfig: {
 			expiresIn: finalOptions.consent?.expiresIn || 60 * 60 * 24 * 365, // 1 year
 			updateAge: finalOptions.consent?.updateAge || 60 * 60 * 24, // 24 hours
 		},
-		currentConsent: null,
-		newConsent: null,
-		setNewConsent(consent) {
-			this.newConsent = consent;
-		},
-		createConsentCookie: createCookieGetter(finalOptions),
+		adapter: adapter,
+		internalAdapter: createInternalAdapter(adapter, {
+			options,
+			hooks: options.databaseHooks ? [options.databaseHooks] : [],
+			generateId: generateIdFunc,
+		}),
+		tables,
 	};
 
 	// Initialize plugins
@@ -161,8 +160,8 @@ function runPluginInit(ctx: C15TContext) {
  * @param options - The c15t configuration options
  * @returns An array of internal plugins to include
  */
-function getInternalPlugins(options: C15TOptions): c15tPlugin[] {
-	const plugins: c15tPlugin[] = [];
+function getInternalPlugins(options: C15TOptions): C15TPlugin[] {
+	const plugins: C15TPlugin[] = [];
 
 	// Add internal plugins based on options
 	if (options.advanced?.crossSubDomainCookies?.enabled) {

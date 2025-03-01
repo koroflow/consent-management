@@ -1,53 +1,52 @@
 import {
 	APIError,
+	type Endpoint,
 	type Middleware,
 	type UnionToIntersection,
 	createRouter,
 } from 'better-call';
-import type { C15TOptions, c15tPlugin, C15TContext } from '../types';
+import type { C15TOptions, C15TPlugin, C15TContext } from '~/types';
 
 import { originCheckMiddleware } from './middlewares/origin-check';
 import { baseEndpoints } from './routes';
 import { ok } from './routes/ok';
-// import { signUpEmail } from "./routes/sign-up";
 import { error } from './routes/error';
-// import { logger } from "../utils/logger";
-// import type { BetterAuthPlugin } from "../plugins";
-// import { onRequestRateLimit } from "./rate-limiter";
 import { toAuthEndpoints } from './to-auth-endpoints';
 import { logger } from '~/utils/logger';
 
-export function getEndpoints<
-	C extends C15TContext,
-	Option extends C15TOptions,
->(ctx: Promise<C> | C, options: Option) {
-	const pluginEndpoints = options.plugins?.reduce(
+export function getEndpoints<C extends C15TContext, Option extends C15TOptions>(
+	ctx: Promise<C> | C,
+	options: Option
+) {
+	const pluginEndpoints = options.plugins?.reduce<Record<string, Endpoint>>(
 		(acc, plugin) => {
 			return {
+				// biome-ignore lint/performance/noAccumulatingSpread: <explanation>
 				...acc,
 				...plugin.endpoints,
 			};
 		},
-		{} as Record<string, any>
+		{}
 	);
 
 	type PluginEndpoint = UnionToIntersection<
 		Option['plugins'] extends Array<infer T>
-			? T extends c15tPlugin
+			? T extends C15TPlugin
 				? T extends {
 						endpoints: infer E;
 					}
 					? E
-					: {}
-				: {}
-			: {}
+					: Record<string, never>
+				: Record<string, never>
+			: Record<string, never>
 	>;
 
 	const middlewares =
 		options.plugins
 			?.map((plugin) =>
 				plugin.middlewares?.map((m) => {
-					const middleware = (async (context: any) => {
+					// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+					const middleware = (async (context: { context: any; }) => {
 						return m.middleware({
 							...context,
 							context: {
@@ -85,19 +84,13 @@ export const router = <C extends C15TContext, Option extends C15TOptions>(
 ) => {
 	const { api, middlewares } = getEndpoints(ctx, options);
 
-	// Add debug logs to see what endpoints are registered
-	console.log('DEBUG Registered endpoints:', Object.keys(api));
-
 	// Check for baseURL and properly handle it
 	let basePath = '';
 	try {
 		if (ctx.baseURL) {
 			basePath = new URL(ctx.baseURL).pathname;
-			console.log('DEBUG Router basePath:', basePath);
 		}
 	} catch (error) {
-		console.error('ERROR creating URL from ctx.baseURL:', error);
-		console.error('Invalid baseURL value:', ctx.baseURL);
 		// Fallback to prevent crashing
 		basePath = '/api/c15t';
 	}
@@ -137,6 +130,7 @@ export const router = <C extends C15TContext, Option extends C15TOptions>(
 			}
 			return res;
 		},
+		// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: <explanation>
 		onError(e) {
 			if (e instanceof APIError && e.status === 'FOUND') {
 				return;
@@ -186,16 +180,6 @@ export const router = <C extends C15TContext, Option extends C15TOptions>(
 			}
 		},
 	});
-
-	// Log the router's handler and endpoints for debugging
-	console.log(
-		'DEBUG Router handler available:',
-		typeof routerInstance.handler === 'function'
-	);
-	console.log(
-		'DEBUG Router endpoints:',
-		routerInstance.endpoints ? 'Available' : 'Not available'
-	);
 
 	return routerInstance;
 };

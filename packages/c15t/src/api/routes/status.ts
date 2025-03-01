@@ -1,5 +1,5 @@
 import { createAuthEndpoint } from '../call';
-import type { C15TContext } from '../../types';
+import type { C15TContext } from '~/types';
 
 /**
  * Status endpoint that returns information about the c15t instance.

@@ -1,4 +1,4 @@
-import type { C15TOptions } from '../types';
+import type { C15TOptions } from '~/types';
 import { isTest } from '../utils/env';
 
 export function getIp(

@@ -1,4 +1,4 @@
-import { HIDE_METADATA } from '../../utils/hide-metadata';
+import { HIDE_METADATA } from '~/utils/hide-metadata';
 import { createAuthEndpoint } from '../call';
 
 export const ok = createAuthEndpoint(

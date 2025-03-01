@@ -1,4 +1,4 @@
-import { HIDE_METADATA } from '../../utils/hide-metadata';
+import { HIDE_METADATA } from '~/utils/hide-metadata';
 import { createAuthEndpoint } from '../call';
 
 function sanitize(input: string): string {
@@ -10,7 +10,7 @@ function sanitize(input: string): string {
 		.replace(/'/g, '&#39;');
 }
 
-const html = (errorCode: string = 'Unknown') => `<!DOCTYPE html>
+const html = (errorCode = 'Unknown') => `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">

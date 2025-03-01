@@ -8,13 +8,13 @@
  *
  * @example
  * ```typescript
- * import { BASE_ERROR_CODES, c15tError } from '@c15t/error';
+ * import { BASE_ERROR_CODES, C15TError } from '@c15t/error';
  *
  * // Handle a specific error
  * try {
  *   await consentManager.updateConsent(consentId, preferences);
  * } catch (error) {
- *   if (error instanceof c15tError && error.code === BASE_ERROR_CODES.CONSENT_NOT_FOUND) {
+ *   if (error instanceof C15TError && error.code === BASE_ERROR_CODES.CONSENT_NOT_FOUND) {
  *     // Handle the specific case where consent is not found
  *     console.error('Cannot update: consent record does not exist');
  *   } else {
@@ -155,132 +155,3 @@ export type ErrorCode = keyof typeof BASE_ERROR_CODES;
  * Type for the error message values in BASE_ERROR_CODES
  */
 export type ErrorMessage = (typeof BASE_ERROR_CODES)[ErrorCode];
-
-/**
- * Custom error class for c15t consent management errors.
- *
- * This class extends the standard Error object with additional properties
- * specific to the c15t consent management system, such as error codes,
- * status codes, and contextual data.
- *
- * @example
- * ```typescript
- * // Create and throw a c15t error
- * throw new c15tError('Failed to update user preferences', {
- *   code: BASE_ERROR_CODES.FAILED_TO_UPDATE_CONSENT,
- *   status: 400,
- *   data: { userId: 'user123', preferences: { analytics: true } }
- * });
- *
- * // Create an error from an HTTP response
- * const error = c15tError.fromResponse(response, await response.json());
- * ```
- */
-export class c15tError extends Error {
-	/**
-	 * The error code identifying the type of error
-	 */
-	code?: ErrorMessage;
-
-	/**
-	 * HTTP status code associated with this error
-	 */
-	status?: number;
-
-	/**
-	 * Additional data providing context about the error
-	 */
-	data?: Record<string, unknown>;
-
-	/**
-	 * Creates a new c15tError instance.
-	 *
-	 * @param message - Human-readable error message
-	 * @param options - Additional error options including code, status, and data
-	 */
-	constructor(
-		message: string,
-		options?: {
-			/**
-			 * The error code identifying the type of error
-			 */
-			code?: ErrorMessage;
-
-			/**
-			 * HTTP status code associated with this error
-			 */
-			status?: number;
-
-			/**
-			 * Additional data providing context about the error
-			 */
-			data?: Record<string, unknown>;
-		}
-	) {
-		super(message);
-		this.name = 'c15tError';
-
-		if (options) {
-			this.code = options.code;
-			this.status = options.status;
-			this.data = options.data;
-		}
-
-		// Ensure prototype chain works correctly
-		Object.setPrototypeOf(this, c15tError.prototype);
-	}
-
-	/**
-	 * Creates a c15tError from an HTTP response and optional response data.
-	 *
-	 * @param response - The HTTP Response object
-	 * @param data - Optional parsed response data
-	 * @returns A new c15tError instance with appropriate properties
-	 */
-	static fromResponse(response: Response, data?: unknown): c15tError {
-		// Extract error message from response or data
-		let message = `HTTP error ${response.status}`;
-		let code: ErrorMessage | undefined;
-		let errorData: Record<string, unknown> | undefined;
-
-		// Try to extract more specific error details from the response data
-		if (data && typeof data === 'object' && data !== null) {
-			const errorObj = data as Record<string, unknown>;
-
-			if (typeof errorObj.message === 'string') {
-				message = errorObj.message;
-			}
-
-			if (typeof errorObj.code === 'string') {
-				// Check if the code matches one of our known error codes
-				const isKnownCode = Object.values(BASE_ERROR_CODES).includes(
-					errorObj.code as ErrorMessage
-				);
-				if (isKnownCode) {
-					code = errorObj.code as ErrorMessage;
-				}
-			}
-
-			// Include any additional error data
-			if (typeof errorObj.data === 'object' && errorObj.data !== null) {
-				errorData = errorObj.data as Record<string, unknown>;
-			}
-		}
-
-		return new c15tError(message, {
-			code,
-			status: response.status,
-			data: errorData,
-		});
-	}
-
-	/**
-	 * Determines if an unknown error is a c15tError.
-	 *
-	 * @param error - The error to check
-	 * @returns True if the error is a c15tError instance
-	 */
-	static isc15tError(error: unknown): error is c15tError {
-		return error instanceof c15tError;
-	}
-}

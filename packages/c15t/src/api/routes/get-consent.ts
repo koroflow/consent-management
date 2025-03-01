@@ -1,87 +1,241 @@
 import { createAuthEndpoint } from '../call';
 import { APIError } from 'better-call';
-import type { C15TContext } from '~/types';
+import { z } from 'zod';
+import type { C15TContext, ConsentRecord, User } from '../../types';
+
+// Define schemas for the different identification methods
+const getByUserIdSchema = z.object({
+	userId: z.string().uuid(),
+	domain: z.string().optional(),
+	identifierType: z.literal('userId'),
+});
+
+const getByExternalIdSchema = z.object({
+	externalId: z.string(),
+	domain: z.string().optional(),
+	identifierType: z.literal('externalId'),
+});
+
+const getByIpAddressSchema = z.object({
+	ipAddress: z.string(),
+	domain: z.string(),
+	identifierType: z.literal('ipAddress'),
+});
+
+// Combined schema using discriminated union
+const getConsentSchema = z.discriminatedUnion('identifierType', [
+	getByUserIdSchema,
+	getByExternalIdSchema,
+	getByIpAddressSchema,
+]);
 
 /**
- * Endpoint for retrieving the current consent status and preferences.
+ * Endpoint for retrieving active consent records.
  *
- * This endpoint allows clients to check if consent has been provided and
- * retrieve the specific consent preferences if available. It's typically
- * used when a user visits a site to determine if a consent banner should
- * be displayed.
+ * This endpoint allows clients to retrieve a user's active consent records by specifying:
+ * 1. The user ID (internal UUID) and an optional domain
+ * 2. The external ID and an optional domain
+ * 3. The IP address and a required domain (since IP alone is too broad)
  *
- * The response includes:
- * - Whether the user has provided consent
- * - The specific preferences if consent exists
- * - A timestamp of when the response was generated
+ * @endpoint GET /consent/get
+ * @requestExample
+ * ```
+ * // By userId
+ * GET /api/consent/get?identifierType=userId&userId=550e8400-e29b-41d4-a716-446655440000&domain=example.com
+ * ```
  *
- * If an error occurs during processing, it returns a BAD_REQUEST error
- * with details about what went wrong.
+ * @requestExample
+ * ```
+ * // By externalId
+ * GET /api/consent/get?identifierType=externalId&externalId=user123&domain=example.com
+ * ```
  *
- * @endpoint GET /consent
+ * @requestExample
+ * ```
+ * // By ipAddress
+ * GET /api/consent/get?identifierType=ipAddress&ipAddress=192.168.1.1&domain=example.com
+ * ```
+ *
  * @responseExample
  * ```json
  * {
- *   "consented": true,
- *   "preferences": {
- *     "analytics": true,
- *     "marketing": false,
- *     "preferences": true
- *   },
- *   "timestamp": "2023-04-01T12:34:56.789Z"
+ *   "success": true,
+ *   "data": {
+ *     "hasActiveConsent": true,
+ *     "consentRecords": [
+ *       {
+ *         "id": 123,
+ *         "userId": "550e8400-e29b-41d4-a716-446655440000",
+ *         "domain": "example.com",
+ *         "isActive": true,
+ *         "givenAt": "2023-04-01T12:34:56.789Z",
+ *         "policyVersion": "1.0",
+ *         "preferences": {
+ *           "marketing": "2023-04-01T12:34:56.789Z",
+ *           "analytics": null,
+ *           "thirdParty": null
+ *         }
+ *       }
+ *     ],
+ *     "identifiedBy": "userId"
+ *   }
  * }
  * ```
  *
- * @returns {Object} Consent status and preferences
- * @returns {boolean} consented - Whether consent has been provided
- * @returns {Object|null} preferences - User's consent preferences if consented, null otherwise
- * @returns {boolean} preferences.analytics - Whether analytics tracking is allowed
- * @returns {boolean} preferences.marketing - Whether marketing communications are allowed
- * @returns {boolean} preferences.preferences - Whether preference/functional cookies are allowed
- * @returns {string} timestamp - ISO timestamp of when the request was processed
+ * @returns {Object} Result of getting consent
+ * @returns {boolean} success - Whether the request was successful
+ * @returns {Object} data - Details about the consent
+ * @returns {boolean} data.hasActiveConsent - Whether the user has active consent
+ * @returns {Array} data.consentRecords - Active consent records
+ * @returns {string} data.identifiedBy - The method used to identify the user
  *
- * @throws {APIError} BAD_REQUEST - When consent status cannot be retrieved
+ * @throws {APIError} BAD_REQUEST - When request parameters are invalid
+ * @throws {APIError} NOT_FOUND - When the user or domain doesn't exist
  */
 export const getConsent = createAuthEndpoint(
 	'/consent/get',
 	{
 		method: 'GET',
+		query: getConsentSchema,
 	},
+	// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: <explanation>
 	async (ctx) => {
 		try {
-			// Cast context to proper type
-			const context = ctx.context as unknown as C15TContext;
+			// Validate request query parameters
+			const validatedData = getConsentSchema.safeParse(ctx.query);
 
-			// Get consent status
-			// const hasConsent = await context.getConsentStatus?.();
+			if (!validatedData.success) {
+				throw new APIError('BAD_REQUEST', {
+					message: 'Invalid request data',
+					details: validatedData.error.errors,
+				});
+			}
 
-			// Get user preferences if consent exists
-			// const preferences = hasConsent
-			// 	? await context.getConsentPreferences?.()
-			// 	: null;
+			const params = validatedData.data;
+
+			// Get domain from params if specified (domain validation will need to be handled separately)
+			// This is a simplified approach - in a complete implementation, we would have a domain lookup method
+			const domainId = params.domain ? params.domain : undefined;
+
+			// Access the internal adapter from the context
+			const internalAdapter = ctx.context?.internalAdapter;
+
+			if (!internalAdapter) {
+				throw new APIError('INTERNAL_SERVER_ERROR', {
+					message: 'Internal adapter not available',
+				});
+			}
+
+			// Find user based on identifier type
+			let users: User[] = [];
+
+			// biome-ignore lint/style/useDefaultSwitchClause: <explanation>
+			switch (params.identifierType) {
+				case 'userId': {
+					const userRecord = await internalAdapter.findUserById(params.userId);
+					if (userRecord) {
+						users = [userRecord];
+					}
+					break;
+				}
+				case 'externalId': {
+					const externalUser = await internalAdapter.findUserByExternalId(
+						params.externalId
+					);
+					if (externalUser) {
+						users = [externalUser];
+					}
+					break;
+				}
+				case 'ipAddress': {
+					// For IP address lookups, we require a domain
+					if (!domainId) {
+						throw new APIError('BAD_REQUEST', {
+							message: 'Domain is required when identifying by IP address',
+							details: {
+								ipAddress: params.ipAddress,
+							},
+						});
+					}
+
+					// This is a simplification - in a real implementation, we would need
+					// a method to look up users by IP address, possibly by scanning recent consent records
+					// For now, we'll use an empty array as this would require a custom query
+					users = [];
+					break;
+				}
+			}
+
+			if (users.length === 0) {
+				return {
+					success: true,
+					data: {
+						hasActiveConsent: false,
+						consentRecords: [],
+						identifiedBy: params.identifierType,
+					},
+				};
+			}
+
+			// Get active consent records for these users
+			const consentResults: ConsentRecord[] = [];
+
+			for (const user of users) {
+				// Use the adapter to find user consents
+				const userConsents = await internalAdapter.findUserConsents(
+					user.id,
+					domainId
+				);
+
+				// Filter for active consents only (adapter already does this, but to be explicit)
+				const activeConsents = userConsents.filter(
+					(consent) => consent.isActive
+				);
+
+				// Include user identification in the results
+				for (const consent of activeConsents) {
+					consentResults.push({
+						...consent,
+						id: user.id,
+						consentId: '',
+						recordType: 'form_submission',
+						content: {},
+						createdAt: new Date(),
+					});
+				}
+			}
 
 			return {
-				consented: false,
-				preferences:null,
-				timestamp: new Date().toISOString(),
+				success: true,
+				data: {
+					hasActiveConsent: consentResults.length > 0,
+					consentRecords: consentResults,
+					identifiedBy: params.identifierType,
+				},
 			};
 		} catch (error) {
 			if (ctx.context && typeof ctx.context === 'object') {
 				// Type-safe logger access
-				const contextWithLogger = ctx.context as unknown as {
-					logger?: {
-						error?: (message: string, error: unknown) => void;
-					};
-				};
-
-				contextWithLogger.logger?.error?.(
-					'Error getting consent status:',
-					error
-				);
+				const contextWithLogger = ctx.context as unknown as C15TContext;
+				contextWithLogger.logger?.error?.('Error getting consent:', error);
 			}
 
-			throw new APIError('BAD_REQUEST', {
-				message: 'Failed to retrieve consent status',
+			// Rethrow APIErrors as is
+			if (error instanceof APIError) {
+				throw error;
+			}
+
+			// Handle validation errors
+			if (error instanceof z.ZodError) {
+				throw new APIError('BAD_REQUEST', {
+					message: 'Invalid request data',
+					details: error.errors,
+				});
+			}
+
+			// Handle other errors
+			throw new APIError('INTERNAL_SERVER_ERROR', {
+				message: 'An error occurred while processing the consent request',
 				error: error instanceof Error ? error.message : String(error),
 			});
 		}

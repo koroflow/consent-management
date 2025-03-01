@@ -1,7 +1,7 @@
 /**
  * c15t Consent Management System
- * 
- * This is the main entry point for the c15t library, exporting all public APIs, 
+ *
+ * This is the main entry point for the c15t library, exporting all public APIs,
  * components, and types needed to implement consent management in your application.
  */
 
@@ -24,23 +24,9 @@ export * from './error/codes';
 //------------------------------------------------------------------------------
 
 /**
- * Cookie management utilities for handling consent cookies
- */
-export * from './cookies';
-
-/**
  * General utility functions used throughout the library
  */
 export * from './utils';
-
-//------------------------------------------------------------------------------
-// Storage
-//------------------------------------------------------------------------------
-
-/**
- * In-memory storage adapter for development and testing
- */
-export * from './storage/memory';
 
 //------------------------------------------------------------------------------
 // Client
