@@ -28,5 +28,3 @@ export const createRegistry = (ctx: RegistryContext) => {
 		...withdrawalRegistry(ctx),
 	};
 };
-
-export type InternalAdapter = ReturnType<typeof createRegistry>;

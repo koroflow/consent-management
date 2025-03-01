@@ -1,31 +1,59 @@
-//@ts-nocheck
-
 import { getConsentTables } from '../../db';
 import type { Adapter, C15TOptions, Where } from '~/types';
+import type {
+	ModelName,
+	ModelTypeMap,
+	TableInput,
+	TableOutput,
+} from '~/db/core/types';
+import type { TableFields } from '~/db/schema/definition';
+import type { FieldAttribute } from '~/db/core/fields';
 import { generateId } from '~/utils';
 import { withApplyDefault } from '../utils';
 
 export interface MemoryDB {
-	[key: string]: any[];
+	[key: string]: Record<string, unknown>[];
+}
+
+// Define a type for Where conditions similar to the Kysely adapter
+interface WhereCondition<T extends ModelName> {
+	field: keyof ModelTypeMap[T] | 'id';
+	value: unknown;
+	operator?:
+		| 'in'
+		| 'eq'
+		| 'ne'
+		| 'contains'
+		| 'starts_with'
+		| 'ends_with'
+		| '=';
+	connector?: 'AND' | 'OR';
 }
 
 const createTransform = (options: C15TOptions) => {
 	const schema = getConsentTables(options);
 
-	function getField(model: string, field: string) {
+	function getField<T extends ModelName>(
+		model: T,
+		field: keyof ModelTypeMap[T] | string
+	): string {
 		if (field === 'id') {
 			return field;
 		}
-		const f = schema[model].fields[field];
-		return f.fieldName || field;
+		const modelFields = schema[model]?.fields;
+		const f = modelFields
+			? (modelFields as Record<string, FieldAttribute>)[field as string]
+			: undefined;
+		return f?.fieldName || (field as string);
 	}
+
 	return {
-		transformInput(
-			data: Record<string, any>,
-			model: string,
+		transformInput<T extends ModelName>(
+			data: TableInput<T>,
+			model: T,
 			action: 'update' | 'create'
-		) {
-			const transformedData: Record<string, any> =
+		): Record<string, unknown> {
+			const transformedData: Record<string, unknown> =
 				action === 'update'
 					? {}
 					: {
@@ -38,25 +66,30 @@ const createTransform = (options: C15TOptions) => {
 
 			const fields = schema[model].fields;
 			for (const field in fields) {
-				const value = data[field];
-				if (value === undefined && !fields[field].defaultValue) {
-					continue;
+				if (Object.prototype.hasOwnProperty.call(fields, field)) {
+					const value = data[field as keyof typeof data];
+					const fieldInfo = (fields as Record<string, FieldAttribute>)[field];
+					if (value === undefined && !fieldInfo?.defaultValue) {
+						continue;
+					}
+					const fieldName = fieldInfo?.fieldName || field;
+					transformedData[fieldName] = withApplyDefault(
+						value,
+						fieldInfo as FieldAttribute,
+						action
+					);
 				}
-				transformedData[fields[field].fieldName || field] = withApplyDefault(
-					value,
-					fields[field],
-					action
-				);
 			}
 			return transformedData;
 		},
-		transformOutput(
-			data: Record<string, any>,
-			model: string,
+
+		transformOutput<T extends ModelName>(
+			data: Record<string, unknown> | null,
+			model: T,
 			select: string[] = []
-		) {
+		): TableOutput<T> | null {
 			if (!data) return null;
-			const transformedData: Record<string, any> =
+			const transformedData: Record<string, unknown> =
 				data.id || data._id
 					? select.length === 0 || select.includes('id')
 						? {
@@ -69,33 +102,57 @@ const createTransform = (options: C15TOptions) => {
 				if (select.length && !select.includes(key)) {
 					continue;
 				}
-				const field = tableSchema[key];
+				const field = (tableSchema as Record<string, FieldAttribute>)[key];
 				if (field) {
 					transformedData[key] = data[field.fieldName || key];
 				}
 			}
-			return transformedData as any;
+			return transformedData as TableOutput<T>;
 		},
-		convertWhereClause(where: Where[], table: any[], model: string) {
+
+		convertWhereClause<T extends ModelName>(
+			where: WhereCondition<T>[],
+			table: Record<string, unknown>[],
+			model: T
+		): Record<string, unknown>[] {
 			return table.filter((record) => {
 				return where.every((clause) => {
-					const { field: _field, value, operator } = clause;
+					const { field: _field, value, operator = '=' } = clause;
 					const field = getField(model, _field);
+
 					if (operator === 'in') {
 						if (!Array.isArray(value)) {
 							throw new Error('Value must be an array');
 						}
-						// @ts-ignore
 						return value.includes(record[field]);
-					} else if (operator === 'contains') {
-						return record[field].includes(value);
-					} else if (operator === 'starts_with') {
-						return record[field].startsWith(value);
-					} else if (operator === 'ends_with') {
-						return record[field].endsWith(value);
-					} else {
-						return record[field] === value;
 					}
+
+					if (operator === 'contains') {
+						const fieldValue = record[field];
+						return (
+							typeof fieldValue === 'string' &&
+							fieldValue.includes(value as string)
+						);
+					}
+
+					if (operator === 'starts_with') {
+						const fieldValue = record[field];
+						return (
+							typeof fieldValue === 'string' &&
+							fieldValue.startsWith(value as string)
+						);
+					}
+
+					if (operator === 'ends_with') {
+						const fieldValue = record[field];
+						return (
+							typeof fieldValue === 'string' &&
+							fieldValue.endsWith(value as string)
+						);
+					}
+
+					// Default case (equals)
+					return record[field] === value;
 				});
 			});
 		},
@@ -103,83 +160,215 @@ const createTransform = (options: C15TOptions) => {
 	};
 };
 
-export const memoryAdapter = (db: MemoryDB) => (options: C15TOptions) => {
-	const { transformInput, transformOutput, convertWhereClause, getField } =
-		createTransform(options);
+export const memoryAdapter =
+	(db: MemoryDB) =>
+	(options: C15TOptions): Adapter => {
+		const { transformInput, transformOutput, convertWhereClause, getField } =
+			createTransform(options);
 
-	return {
-		id: 'memory',
-		create: async ({ model, data }) => {
-			const transformed = transformInput(data, model, 'create');
-			db[model].push(transformed);
-			return transformOutput(transformed, model);
-		},
-		findOne: async ({ model, where, select }) => {
-			const table = db[model];
-			const res = convertWhereClause(where, table, model);
-			const record = res[0] || null;
-			return transformOutput(record, model, select);
-		},
-		findMany: async ({ model, where, sortBy, limit, offset }) => {
-			let table = db[model];
-			if (where) {
-				table = convertWhereClause(where, table, model);
-			}
-			if (sortBy) {
-				table = table.sort((a, b) => {
-					const field = getField(model, sortBy.field);
-					if (sortBy.direction === 'asc') {
-						return a[field] > b[field] ? 1 : -1;
-					} else {
-						return a[field] < b[field] ? 1 : -1;
-					}
-				});
-			}
-			if (offset !== undefined) {
-				table = table.slice(offset);
-			}
-			if (limit !== undefined) {
-				table = table.slice(0, limit);
-			}
-			return table.map((record) => transformOutput(record, model));
-		},
-		count: async ({ model }) => {
-			return db[model].length;
-		},
-		update: async ({ model, where, update }) => {
-			const table = db[model];
-			const res = convertWhereClause(where, table, model);
-			res.forEach((record) => {
-				Object.assign(record, transformInput(update, model, 'update'));
-			});
-			return transformOutput(res[0], model);
-		},
-		delete: async ({ model, where }) => {
-			const table = db[model];
-			const res = convertWhereClause(where, table, model);
-			db[model] = table.filter((record) => !res.includes(record));
-		},
-		deleteMany: async ({ model, where }) => {
-			const table = db[model];
-			const res = convertWhereClause(where, table, model);
-			let count = 0;
-			db[model] = table.filter((record) => {
-				if (res.includes(record)) {
-					count++;
-					return false;
+		return {
+			id: 'memory',
+			async create<
+				Model extends ModelName,
+				Data extends Record<string, unknown>,
+				Result extends TableFields<Model>,
+			>(data: {
+				model: Model;
+				data: Data;
+				select?: (keyof Result)[];
+			}): Promise<Result> {
+				const { model, data: values, select } = data;
+				const transformed = transformInput(
+					values as TableInput<Model>,
+					model,
+					'create'
+				);
+
+				// Initialize array if it doesn't exist
+				if (!db[model]) {
+					db[model] = [];
 				}
-				return !res.includes(record);
-			});
-			return count;
-		},
-		updateMany(data) {
-			const { model, where, update } = data;
-			const table = db[model];
-			const res = convertWhereClause(where, table, model);
-			res.forEach((record) => {
-				Object.assign(record, update);
-			});
-			return res[0] || null;
-		},
-	} satisfies Adapter;
-};
+
+				db[model].push(transformed);
+				return transformOutput(
+					transformed,
+					model,
+					select as string[]
+				) as Result;
+			},
+
+			async findOne<
+				Model extends ModelName,
+				Result extends TableFields<Model>,
+			>(data: {
+				model: Model;
+				where: Where<Model>;
+				select?: (keyof Result)[];
+			}): Promise<Result | null> {
+				const { model, where, select } = data;
+				const table = db[model] || [];
+				// Convert Where from Adapter type to internal WhereCondition type
+				const whereArray = (Array.isArray(where)
+					? where
+					: [where]) as unknown as WhereCondition<Model>[];
+				const res = convertWhereClause(whereArray, table, model);
+				const record = res[0] || null;
+				return transformOutput(
+					record,
+					model,
+					select as string[]
+				) as Result | null;
+			},
+
+			async findMany<
+				Model extends ModelName,
+				Result extends TableFields<Model>,
+			>(data: {
+				model: Model;
+				where?: Where<Model>;
+				limit?: number;
+				sortBy?: { field: 'id' | keyof Result; direction: 'asc' | 'desc' };
+				offset?: number;
+			}): Promise<Result[]> {
+				const { model, where, sortBy, limit, offset } = data;
+				let table = db[model] || [];
+
+				if (where) {
+					// Convert Where from Adapter type to internal WhereCondition type
+					const whereArray = (Array.isArray(where)
+						? where
+						: [where]) as unknown as WhereCondition<Model>[];
+					table = convertWhereClause(whereArray, table, model);
+				}
+
+				if (sortBy) {
+					const field = getField(model, sortBy.field as string);
+					table = [...table].sort((a, b) => {
+						if (sortBy.direction === 'asc') {
+							return (a[field] as number) > (b[field] as number) ? 1 : -1;
+						}
+						return (a[field] as number) < (b[field] as number) ? 1 : -1;
+					});
+				}
+
+				let result = table;
+				if (offset !== undefined) {
+					result = result.slice(offset);
+				}
+				if (limit !== undefined) {
+					result = result.slice(0, limit);
+				}
+
+				return result.map((record) => transformOutput(record, model) as Result);
+			},
+
+			async count<Model extends ModelName>(data: {
+				model: Model;
+				where?: Where<Model>;
+			}): Promise<number> {
+				const { model, where } = data;
+				const table = db[model] || [];
+
+				if (!where) {
+					return table.length;
+				}
+
+				// Convert Where from Adapter type to internal WhereCondition type
+				const whereArray = (Array.isArray(where)
+					? where
+					: [where]) as unknown as WhereCondition<Model>[];
+				const filtered = convertWhereClause(whereArray, table, model);
+				return filtered.length;
+			},
+
+			async update<
+				Model extends ModelName,
+				Result extends TableFields<Model>,
+			>(data: {
+				model: Model;
+				where: Where<Model>;
+				update: Partial<TableFields<Model>>;
+			}): Promise<Result | null> {
+				const { model, where, update: values } = data;
+				const table = db[model] || [];
+				// Convert Where from Adapter type to internal WhereCondition type
+				const whereArray = (Array.isArray(where)
+					? where
+					: [where]) as unknown as WhereCondition<Model>[];
+				const res = convertWhereClause(whereArray, table, model);
+
+				for (const record of res) {
+					Object.assign(
+						record,
+						transformInput(values as TableInput<Model>, model, 'update')
+					);
+				}
+
+				return transformOutput(res[0] || null, model) as Result | null;
+			},
+
+			async updateMany<
+				Model extends ModelName,
+				Result extends TableFields<Model>,
+			>(data: {
+				model: Model;
+				where: Where<Model>;
+				update: Partial<TableFields<Model>>;
+			}): Promise<Result[]> {
+				const { model, where, update: values } = data;
+				const table = db[model] || [];
+				// Convert Where from Adapter type to internal WhereCondition type
+				const whereArray = (Array.isArray(where)
+					? where
+					: [where]) as unknown as WhereCondition<Model>[];
+				const res = convertWhereClause(whereArray, table, model);
+
+				for (const record of res) {
+					Object.assign(
+						record,
+						transformInput(values as TableInput<Model>, model, 'update')
+					);
+				}
+
+				return res.map((record) => transformOutput(record, model) as Result);
+			},
+
+			async delete<Model extends ModelName>(data: {
+				model: Model;
+				where: Where<Model>;
+			}): Promise<void> {
+				const { model, where } = data;
+				const table = db[model] || [];
+				// Convert Where from Adapter type to internal WhereCondition type
+				const whereArray = (Array.isArray(where)
+					? where
+					: [where]) as unknown as WhereCondition<Model>[];
+				const res = convertWhereClause(whereArray, table, model);
+				db[model] = table.filter((record) => !res.includes(record));
+			},
+
+			async deleteMany<Model extends ModelName>(data: {
+				model: Model;
+				where: Where<Model>;
+			}): Promise<number> {
+				const { model, where } = data;
+				const table = db[model] || [];
+				// Convert Where from Adapter type to internal WhereCondition type
+				const whereArray = (Array.isArray(where)
+					? where
+					: [where]) as unknown as WhereCondition<Model>[];
+				const res = convertWhereClause(whereArray, table, model);
+				let count = 0;
+
+				db[model] = table.filter((record) => {
+					if (res.includes(record)) {
+						count++;
+						return false;
+					}
+					return true;
+				});
+
+				return count;
+			},
+		};
+	};

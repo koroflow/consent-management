@@ -190,30 +190,3 @@ export function validateTableOutput<T extends keyof C15TDBSchema>(
 		fields: table.fields,
 	}) as TableOutputFields<T>;
 }
-
-/**
- * Test table input data against schema
- *
- * @template T - The table name from C15TDBSchema
- * @param tableName - The name of the table to test against
- * @param data - The data to test
- * @param options - The C15TOptions instance
- * @returns Whether the data is valid according to the table schema
- *
- * @example
- * ```typescript
- * const isValid = testTableInput('user', inputData, options);
- * ```
- */
-export function testTableInput<T extends keyof C15TDBSchema>(
-	tableName: T,
-	data: Record<string, unknown>,
-	options: C15TOptions
-): boolean {
-	try {
-		validateTableInput(tableName, data, options);
-		return true;
-	} catch (error) {
-		return false;
-	}
-}

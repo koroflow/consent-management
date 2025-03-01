@@ -44,6 +44,11 @@
 			"import": "./dist/plugins/index.js",
 			"require": "./dist/plugins/index.cjs"
 		},
+		"./migration": {
+			"types": "./dist/migration/index.d.ts",
+			"import": "./dist/migration/index.js",
+			"require": "./dist/migration/index.cjs"
+		},
 		"./adapters/prisma": {
 			"import": {
 				"types": "./dist/adapters/prisma-adapter/index.d.ts",
@@ -138,7 +143,8 @@
 		"build": "rslib build",
 		"check-types": "tsc --noEmit",
 		"fmt": "pnpm biome format --write .",
-		"lint": "pnpm biome lint ./src"
+		"lint": "pnpm biome lint ./src",
+		"knip": "knip"
 	},
 	"dependencies": {
 		"@better-fetch/fetch": "^1.1.15",
@@ -154,6 +160,9 @@
 	"devDependencies": {
 		"@c15t/typescript-config": "workspace:*",
 		"@types/better-sqlite3": "^7.6.12",
-		"@types/pg": "^8.11.11"
+		"@types/node": "^22.13.8",
+		"@types/pg": "^8.11.11",
+		"knip": "^5.45.0",
+		"typescript": "^5.8.2"
 	}
 }

@@ -1,6 +1,5 @@
 import { z } from 'zod';
-import { getAllFields, parseInputData, parseOutputData } from '~/db/schema';
-import type { C15TOptions } from '~/types';
+import {} from '~/db/schema';
 
 /**
  * Zod schema for validating consent withdrawal entities.
@@ -47,55 +46,3 @@ export const withdrawalSchema = z.object({
  * that are part of the withdrawal entity.
  */
 export type Withdrawal = z.infer<typeof withdrawalSchema>;
-
-/**
- * Processes consent withdrawal data from the database for client-side consumption.
- *
- * Applies output transformations, filters out fields that shouldn't be returned,
- * and ensures the response conforms to configured schema rules.
- *
- * @param options - The C15T configuration options
- * @param withdrawal - The raw withdrawal data from the database
- * @returns Processed withdrawal data safe for client consumption
- *
- * @example
- * ```typescript
- * const rawWithdrawal = await adapter.findOne({ model: 'withdrawal', where: [...] });
- * const processedWithdrawal = parseWithdrawalOutput(options, rawWithdrawal);
- * ```
- */
-export function parseWithdrawalOutput(
-	options: C15TOptions,
-	withdrawal: Withdrawal
-) {
-	const schema = getAllFields(options, 'withdrawal');
-	return parseOutputData(withdrawal, { fields: schema });
-}
-
-/**
- * Processes input data for consent withdrawal creation.
- *
- * Applies input validations, transforms input values, sets default values,
- * and enforces required fields based on the action type (create/update).
- *
- * @param options - The C15T configuration options
- * @param withdrawal - The input withdrawal data to be processed
- * @param action - Whether this is for creating a new withdrawal or updating an existing one
- * @returns Processed input data ready for database operations
- *
- * @throws {APIError} If required fields are missing for withdrawal creation
- *
- * @example
- * ```typescript
- * // For creating a new withdrawal record
- * const validWithdrawalData = parseWithdrawalInput(options, inputData, 'create');
- * ```
- */
-export function parseWithdrawalInput(
-	options: C15TOptions,
-	withdrawal?: Record<string, unknown>,
-	action?: 'create' | 'update'
-) {
-	const schema = getAllFields(options, 'withdrawal');
-	return parseInputData(withdrawal || {}, { fields: schema, action });
-}

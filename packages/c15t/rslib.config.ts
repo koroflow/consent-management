@@ -49,6 +49,7 @@ export default defineConfig({
 	source: {
 		entry: {
 			index: ['./src/index.ts'],
+			migration: ['./src/db/migration/index.ts'],
 			// core: ['./src/core/index.ts'],
 			// init: ['./src/init/index.ts'],
 			// cookies: ['./src/cookies/index.ts'],

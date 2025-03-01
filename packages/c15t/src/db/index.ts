@@ -14,9 +14,6 @@ export {
 	getAllFields,
 } from './schema/index';
 
-// Utility functions
-export { isCoreTable } from './utils/index';
-
 // Field-related exports
 export type {
 	FieldAttribute,

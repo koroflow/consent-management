@@ -1,6 +1,5 @@
 import type { C15TDBSchema } from '../schema/definition';
-import type { FieldAttribute, FieldType } from './fields';
-import type { InferValueType } from './fields/field-inference';
+import type { FieldAttribute } from './fields';
 
 /**
  * Plugin-provided schema type with proper typing
@@ -12,22 +11,6 @@ export type PluginSchema = Record<
 		modelName?: string;
 	}
 >;
-
-/**
- * Improved type to extract field value types with better inference
- */
-export type ExtractFieldType<F extends FieldAttribute> = F extends {
-	type: infer T extends FieldType;
-}
-	? InferValueType<T>
-	: never;
-
-/**
- * Creates a model type from field definitions with improved accuracy
- */
-export type ModelFromFields<Fields extends Record<string, FieldAttribute>> = {
-	[K in keyof Fields]: ExtractFieldType<Fields[K]>;
-};
 
 export type ModelTypeMap = {
 	[K in keyof C15TDBSchema]: C15TDBSchema[K];

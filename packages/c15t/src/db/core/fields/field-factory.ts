@@ -3,11 +3,7 @@ import type {
 	FieldAttribute,
 	FieldAttributeConfig,
 } from './field-types';
-import type {
-	InferValueType,
-	TransformInputFn,
-	TransformOutputFn,
-} from './field-inference';
+import type { TransformInputFn, TransformOutputFn } from './field-inference';
 
 /**
  * Improved transformation type for better type safety
@@ -104,8 +100,3 @@ export const stringArrayField = <C extends TypedFieldConfig<'string[]'>>(
 export const numberArrayField = <C extends TypedFieldConfig<'number[]'>>(
 	config?: C
 ): FieldAttribute<'number[]'> => createFieldAttribute('number[]', config);
-
-// Type helper for accessing proper default value type based on field type
-export type DefaultValueType<T extends FieldType> =
-	| InferValueType<T>
-	| (() => InferValueType<T>);

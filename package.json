@@ -15,6 +15,7 @@
 		"fmt": "turbo fmt",
 		"lint": "turbo lint",
 		"lint:fix": "turbo lint -- --write",
+		"knip": "knip",
 		"release": "pnpm build && changeset publish",
 		"version": "changeset version && pnpm install --lockfile-only"
 	},

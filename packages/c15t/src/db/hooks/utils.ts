@@ -3,34 +3,6 @@ import type { DatabaseHook, HookOperation, HookPhase } from './types';
 import type { ModelName } from '../core/types';
 
 /**
- * Helper to process a single hook result
- */
-export function handleHookResult<T extends Record<string, unknown>>(
-	currentData: T,
-	result: unknown
-): { data: T; abort: boolean } {
-	if (result && typeof result === 'object' && 'kind' in result) {
-		switch (result.kind) {
-			case 'abort':
-				return { data: currentData, abort: true };
-			case 'transform':
-				return {
-					data: {
-						...currentData,
-						...(result as { kind: 'transform'; data: T }).data,
-					} as T,
-					abort: false,
-				};
-			default:
-				// All other cases (including 'continue') just continue with unchanged data
-				return { data: currentData, abort: false };
-		}
-	}
-	// For non-object results or those without a 'kind' property
-	return { data: currentData, abort: false };
-}
-
-/**
  * Process hooks for a given phase and operation
  */
 
