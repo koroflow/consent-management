@@ -1,4 +1,4 @@
-import type { FieldAttribute } from '~/db/fields';
+import type { FieldAttribute } from '~/db/core/fields';
 import type { C15TOptions, C15TPluginSchema } from '~/types';
 import { APIError } from 'better-call';
 

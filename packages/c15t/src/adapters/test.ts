@@ -7,8 +7,8 @@ interface AdapterTestOptions {
 }
 
 export async function runAdapterTest(opts: AdapterTestOptions) {
-	const adapter = await opts.getAdapter();
-	const user = {
+	const _adapter = await opts.getAdapter();
+	const _user = {
 		id: '1',
 		name: 'user',
 		email: 'user@email.com',

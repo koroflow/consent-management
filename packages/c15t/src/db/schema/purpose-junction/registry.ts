@@ -136,10 +136,7 @@ export function purposeJunctionRegistry({ adapter, ...ctx }: RegistryContext) {
 			status: 'active' | 'withdrawn',
 			context?: GenericEndpointContext
 		) => {
-			const junction = await updateWithHooks<
-				Partial<PurposeJunction>,
-				PurposeJunction
-			>({
+			const junction = await updateWithHooks<PurposeJunction>({
 				data: {
 					status,
 					updatedAt: new Date(),

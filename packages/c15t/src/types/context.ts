@@ -1,8 +1,9 @@
 import type { EndpointContext, InputContext } from 'better-call';
 import type { Adapter, C15TOptions } from './index';
 import type { createLogger } from '~/utils';
-import type { createRegistry, getConsentTables } from '~/db';
+import type { getConsentTables, ModelName } from '~/db';
 import type { DatabaseHook } from '~/db/hooks/types';
+import type { createRegistry } from '~/db/create-registry';
 
 // biome-ignore lint/suspicious/noExplicitAny: <explanation>
 export type HookEndpointContext = EndpointContext<string, any> &
@@ -30,7 +31,7 @@ export interface BaseContext {
 export interface RegistryContext extends BaseContext {
 	adapter: Adapter;
 	hooks: DatabaseHook[];
-	generateId: (options: { model: string; size?: number }) => string;
+	generateId: (options: { model: ModelName; size?: number }) => string;
 }
 
 /**
@@ -61,6 +62,7 @@ export interface C15TContext extends BaseContext {
 	trustedOrigins: string[];
 
 	adapter: Adapter;
+
 	registry: ReturnType<typeof createRegistry>;
 
 	/**
@@ -96,7 +98,7 @@ export interface C15TContext extends BaseContext {
 	/**
 	 * Generate an ID for a model
 	 */
-	generateId: (options: { model: string; size?: number }) => string;
+	generateId: (options: { model: ModelName; size?: number }) => string;
 
 	// API methods
 	/**

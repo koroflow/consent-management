@@ -1,4 +1,6 @@
-import type { C15TOptions } from '../types/index';
+import type { C15TOptions } from '~/types';
+import type { KyselyAdapterConfig } from './kysely-adapter';
+import type { ModelName, ModelTypeMap } from '~/db/core/types';
 
 /**
  * Adapter where clause
@@ -16,7 +18,7 @@ export type Where = {
 		| 'starts_with'
 		| 'ends_with'; //eq by default
 	value: string | number | boolean | string[] | number[] | Date | null;
-	field: string;
+	field: keyof ModelTypeMap[ModelName];
 	connector?: 'AND' | 'OR'; //AND by default
 };
 
@@ -25,18 +27,18 @@ export type Where = {
  */
 export type Adapter = {
 	id: string;
-	create: <T extends Record<string, any>, R = T>(data: {
-		model: string;
+	create: <T extends Record<string, unknown>, R = T>(data: {
+		model: ModelName;
 		data: T;
 		select?: string[];
 	}) => Promise<R>;
 	findOne: <T>(data: {
-		model: string;
+		model: ModelName;
 		where: Where[];
 		select?: string[];
 	}) => Promise<T | null>;
 	findMany: <T>(data: {
-		model: string;
+		model: ModelName;
 		where?: Where[];
 		limit?: number;
 		sortBy?: {
@@ -46,7 +48,7 @@ export type Adapter = {
 		offset?: number;
 	}) => Promise<T[]>;
 	count: (data: {
-		model: string;
+		model: ModelName;
 		where?: Where[];
 	}) => Promise<number>;
 	/**
@@ -54,17 +56,17 @@ export type Adapter = {
 	 * if multiple where clauses are provided
 	 */
 	update: <T>(data: {
-		model: string;
+		model: ModelName;
 		where: Where[];
-		update: Record<string, any>;
+		update: Record<string, unknown>;
 	}) => Promise<T | null>;
 	updateMany: (data: {
-		model: string;
+		model: ModelName;
 		where: Where[];
-		update: Record<string, any>;
+		update: Record<string, unknown>;
 	}) => Promise<number>;
-	delete: <T>(data: { model: string; where: Where[] }) => Promise<void>;
-	deleteMany: (data: { model: string; where: Where[] }) => Promise<number>;
+	delete: (data: { model: ModelName; where: Where[] }) => Promise<void>;
+	deleteMany: (data: { model: ModelName; where: Where[] }) => Promise<number>;
 	/**
 	 *
 	 * @param options
@@ -74,7 +76,7 @@ export type Adapter = {
 		options: C15TOptions,
 		file?: string
 	) => Promise<AdapterSchemaCreation>;
-	options?: Record<string, any>;
+	options?: KyselyAdapterConfig | Record<string, unknown>;
 };
 
 export type AdapterSchemaCreation = {

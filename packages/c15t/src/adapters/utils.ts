@@ -1,4 +1,4 @@
-import type { FieldAttribute } from '~/db/fields';
+import type { FieldAttribute } from '~/db/core/fields';
 
 export function withApplyDefault(
 	value: any,

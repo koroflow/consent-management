@@ -1,6 +1,7 @@
-import type { C15TOptions } from '~/types';
+// packages/c15t/src/db/schema/definition.ts
 
-import type { FieldAttribute } from './fields';
+import type { C15TOptions } from '~/types';
+import type { PluginSchema } from './types';
 
 import {
 	getUserTable,
@@ -14,57 +15,28 @@ import {
 	getRecordTable,
 	getWithdrawalTable,
 	getAuditLogTable,
-} from './schema/index';
-
-export type C15TDBSchema = Record<
-	string,
-	{
-		/**
-		 * The name of the table in the database
-		 */
-		modelName: string;
-		/**
-		 * The fields of the table
-		 */
-		fields: Record<string, FieldAttribute>;
-		/**
-		 * Whether to disable migrations for this table
-		 * @default false
-		 */
-		disableMigrations?: boolean;
-		/**
-		 * The order of the table
-		 */
-		order?: number;
-	}
->;
+} from './index';
 
 /**
  * Get all consent-related tables
  */
-export const getConsentTables = (options: C15TOptions): C15TDBSchema => {
-	const pluginSchema = options.plugins?.reduce(
-		(acc, plugin) => {
-			const schema = plugin.schema;
-			if (!schema) {
-				return acc;
-			}
-			for (const [key, value] of Object.entries(schema)) {
-				acc[key] = {
-					fields: {
-						...acc[key]?.fields,
-						...value.fields,
-					},
-					modelName: value.modelName || key,
-				};
-			}
+export const getConsentTables = (options: C15TOptions) => {
+	const pluginSchema = options.plugins?.reduce((acc, plugin) => {
+		const schema = plugin.schema;
+		if (!schema) {
 			return acc;
-		},
-		{} as Record<
-			string,
-			{ fields: Record<string, FieldAttribute>; modelName: string }
-		>
-	);
+		}
+		for (const [key, value] of Object.entries(schema)) {
+			acc[key] = {
+				fields: {
+					...acc[key]?.fields,
+					...value.fields,
+				},
+				modelName: value.modelName || key,
+			};
+		}
+		return acc;
+	}, {} as PluginSchema);
 
 	const {
 		user,
@@ -97,5 +69,7 @@ export const getConsentTables = (options: C15TOptions): C15TDBSchema => {
 		auditLog: getAuditLogTable(options, auditLog?.fields),
 		// geoLocation: getGeoLocationTable(options, geoLocation?.fields),
 		...pluginTables,
-	} satisfies C15TDBSchema;
+	};
 };
+
+export type C15TDBSchema = ReturnType<typeof getConsentTables>;

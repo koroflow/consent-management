@@ -1,4 +1,7 @@
-import type { KyselyDatabaseType } from '~/adapters/kysely-adapter/types';
+import type {
+	Database,
+	KyselyDatabaseType,
+} from '~/adapters/kysely-adapter/types';
 import type { MigrationOperation, TableToCreate, ColumnsToAdd } from './types';
 import { getType } from './type-mapping';
 import { createLogger } from '~/utils/logger';
@@ -17,7 +20,7 @@ import type { C15TOptions } from '~/types';
  * @returns Array of migration operations ready to be executed
  */
 export function buildColumnAddMigrations(
-	db: Kysely<C15TOptions['database']>,
+	db: Kysely<Database>,
 	toBeAdded: ColumnsToAdd[],
 	dbType: KyselyDatabaseType
 ): MigrationOperation[] {
@@ -76,7 +79,7 @@ export function buildColumnAddMigrations(
  * @returns Array of migration operations ready to be executed
  */
 export function buildTableCreateMigrations(
-	db: Kysely<C15TOptions['database']>,
+	db: Kysely<Database>,
 	toBeCreated: TableToCreate[],
 	dbType: KyselyDatabaseType
 ): MigrationOperation[] {

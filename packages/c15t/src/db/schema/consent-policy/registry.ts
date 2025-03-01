@@ -147,7 +147,10 @@ export function policyRegistry({ adapter, ...ctx }: RegistryContext) {
 			data: Partial<ConsentPolicy>,
 			context?: GenericEndpointContext
 		) => {
-			const policy = await updateWithHooks<ConsentPolicy>({
+			const policy = await updateWithHooks<
+				Partial<ConsentPolicy>,
+				ConsentPolicy
+			>({
 				data,
 				where: [
 					{

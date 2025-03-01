@@ -1,5 +1,4 @@
-import type { FieldAttribute } from '~/db/fields';
-import type { C15TDBSchema } from '~/db/get-tables';
+import type { FieldAttribute } from '~/db/core/fields';
 import type { C15TOptions } from '~/types';
 
 /**
@@ -23,7 +22,7 @@ import type { C15TOptions } from '~/types';
 export function getConsentGeoLocationTable(
 	options: C15TOptions,
 	geoLocationFields?: Record<string, FieldAttribute>
-): C15TDBSchema['consentGeoLocation'] {
+) {
 	return {
 		/**
 		 * The name of the geo-location table in the database, configurable through options

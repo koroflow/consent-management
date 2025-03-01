@@ -1,13 +1,19 @@
-//@ts-nocheck
-
-import { getConsentTables } from '../../db';
-import type { Adapter, C15TOptions, Where } from '~/types';
-import { generateId } from '~/utils';
+import type { BinaryOperatorExpression } from 'node_modules/kysely/dist/esm/parser/binary-operation-parser';
+import { getConsentTables, type ModelTypeMap } from '../../db';
+import type { Adapter, C15TOptions, Where } from '../../types';
+import { generateId } from '../../utils';
 import { withApplyDefault } from '../utils';
-import type { KyselyDatabaseType } from './types';
-import type { InsertQueryBuilder, Kysely, UpdateQueryBuilder } from 'kysely';
+import type { Database, KyselyDatabaseType } from './types';
+import type {
+	ExpressionBuilder,
+	InsertQueryBuilder,
+	Kysely,
+	UpdateQueryBuilder,
+} from 'kysely';
+import type { ModelName } from '~/db/core/types';
+import type { TableReference } from 'node_modules/kysely/dist/esm/parser/table-parser';
 
-interface KyselyAdapterConfig {
+export interface KyselyAdapterConfig {
 	/**
 	 * Database type.
 	 */
@@ -15,69 +21,82 @@ interface KyselyAdapterConfig {
 }
 
 const createTransform = (
-	db: Kysely<any>,
+	db: Kysely<Database>,
 	options: C15TOptions,
 	config?: KyselyAdapterConfig
 ) => {
 	const schema = getConsentTables(options);
 
-	function getField(model: string, field: string) {
+	function getField(model: ModelName, field: keyof ModelTypeMap[ModelName]) {
+		//@ts-expect-error
 		if (field === 'id') {
 			return field;
 		}
-		const f = schema[model].fields[field];
+		const f = schema[model]?.fields[field];
 		if (!f) {
+			// biome-ignore lint/suspicious/noConsoleLog: <explanation>
+			// biome-ignore lint/suspicious/noConsole: <explanation>
 			console.log('Field not found', model, field);
 		}
-		return f.fieldName || field;
+		return f?.fieldName || (field as keyof ModelTypeMap[ModelName]);
 	}
 
-	function transformValueToDB(value: any, model: string, field: string) {
+	function transformValueToDB(
+		value: any,
+		model: ModelName,
+		field: keyof ModelTypeMap[ModelName]
+	) {
+		//@ts-expect-error
 		if (field === 'id') {
 			return value;
 		}
 		const { type = 'sqlite' } = config || {};
-		const f = schema[model].fields[field];
+		const f = schema[model]?.fields[field];
 		if (
-			f.type === 'boolean' &&
+			f?.type === 'boolean' &&
 			(type === 'sqlite' || type === 'mssql') &&
 			value !== null &&
 			value !== undefined
 		) {
 			return value ? 1 : 0;
 		}
-		if (f.type === 'date' && value && value instanceof Date) {
+		if (f?.type === 'date' && value && value instanceof Date) {
 			return type === 'sqlite' ? value.toISOString() : value;
 		}
 		return value;
 	}
 
-	function transformValueFromDB(value: any, model: string, field: string) {
+	function transformValueFromDB(
+		value: any,
+		model: ModelName,
+		field: keyof ModelTypeMap[ModelName]
+	) {
 		const { type = 'sqlite' } = config || {};
 
-		const f = schema[model].fields[field];
+		const f = schema[model]?.fields[field];
 		if (
-			f.type === 'boolean' &&
+			f?.type === 'boolean' &&
 			(type === 'sqlite' || type === 'mssql') &&
 			value !== null
 		) {
 			return value === 1;
 		}
-		if (f.type === 'date' && value) {
+		if (f?.type === 'date' && value) {
 			return new Date(value);
 		}
 		return value;
 	}
 
-	function getModelName(model: string) {
-		return schema[model].modelName;
+	function getModelName(model: ModelName) {
+		return schema[model].modelName as TableReference<Database>;
 	}
 
 	const useDatabaseGeneratedId = options?.advanced?.generateId === false;
+
 	return {
 		transformInput(
 			data: Record<string, any>,
-			model: string,
+			model: ModelName,
 			action: 'create' | 'update'
 		) {
 			const transformedData: Record<string, any> =
@@ -103,18 +122,21 @@ const createTransform = (
 		},
 		transformOutput(
 			data: Record<string, any>,
-			model: string,
+			model: ModelName,
 			select: string[] = []
 		) {
-			if (!data) return null;
+			if (!data) {
+				return null;
+			}
 			const transformedData: Record<string, any> = data.id
-				? select.length === 0 || select.includes('id')
+				? // biome-ignore lint/nursery/noNestedTernary: <explanation>
+					select.length === 0 || select.includes('id')
 					? {
 							id: data.id,
 						}
 					: {}
 				: {};
-			const tableSchema = schema[model].fields;
+			const tableSchema = schema[model]?.fields;
 			for (const key in tableSchema) {
 				if (select.length && !select.includes(key)) {
 					continue;
@@ -130,19 +152,20 @@ const createTransform = (
 			}
 			return transformedData as any;
 		},
-		convertWhereClause(model: string, w?: Where[]) {
-			if (!w)
+		convertWhereClause(model: ModelName, w?: Where[]) {
+			if (!w) {
 				return {
 					and: null,
 					or: null,
 				};
+			}
 
 			const conditions = {
 				and: [] as any[],
 				or: [] as any[],
 			};
 
-			w.forEach((condition) => {
+			for (const condition of w) {
 				let {
 					field: _field,
 					value,
@@ -151,7 +174,8 @@ const createTransform = (
 				} = condition;
 				const field = getField(model, _field);
 				value = transformValueToDB(value, model, _field);
-				const expr = (eb: any) => {
+				// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: <explanation>
+				const expr = (eb: ExpressionBuilder<Database, keyof Database>) => {
 					if (operator.toLowerCase() === 'in') {
 						return eb(field, 'in', Array.isArray(value) ? value : [value]);
 					}
@@ -192,7 +216,7 @@ const createTransform = (
 						return eb(field, '<=', value);
 					}
 
-					return eb(field, operator, value);
+					return eb(field, operator as BinaryOperatorExpression, value);
 				};
 
 				if (connector === 'OR') {
@@ -200,7 +224,7 @@ const createTransform = (
 				} else {
 					conditions.and.push(expr);
 				}
-			});
+			}
 
 			return {
 				and: conditions.and.length ? conditions.and : null,
@@ -212,15 +236,15 @@ const createTransform = (
 			builder:
 				| InsertQueryBuilder<any, any, any>
 				| UpdateQueryBuilder<any, string, string, any>,
-			model: string,
+			model: ModelName,
 			where: Where[]
 		) {
 			let res: any;
 			if (config?.type === 'mysql') {
 				//this isn't good, but kysely doesn't support returning in mysql and it doesn't return the inserted id. Change this if there is a better way.
 				await builder.execute();
-				const field = values.id ? 'id' : where[0].field ? where[0].field : 'id';
-				const value = values[field] || where[0].value;
+				const field = values.id ? 'id' : (where[0]?.field ?? 'id');
+				const value = values[field] ?? where[0]?.value;
 				res = await db
 					.selectFrom(getModelName(model))
 					.selectAll()
@@ -241,7 +265,8 @@ const createTransform = (
 };
 
 export const kyselyAdapter =
-	(db: Kysely<any>, config?: KyselyAdapterConfig) => (opts: C15TOptions) => {
+	(db: Kysely<Database>, config?: KyselyAdapterConfig) =>
+	(opts: C15TOptions) => {
 		const {
 			transformInput,
 			withReturning,
@@ -273,9 +298,12 @@ export const kyselyAdapter =
 					query = query.where((eb) => eb.or(or.map((expr) => expr(eb))));
 				}
 				const res = await query.executeTakeFirst();
-				if (!res) return null;
+				if (!res) {
+					return null;
+				}
 				return transformOutput(res, model, select);
 			},
+			// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: <explanation>
 			async findMany(data) {
 				const { model, where, limit, offset, sortBy } = data;
 				const { and, or } = convertWhereClause(model, where);
@@ -311,7 +339,9 @@ export const kyselyAdapter =
 				}
 
 				const res = await query.selectAll().execute();
-				if (!res) return [];
+				if (!res) {
+					return [];
+				}
 				return res.map((r) => transformOutput(r, model));
 			},
 			async update(data) {
@@ -336,7 +366,9 @@ export const kyselyAdapter =
 				const { model, where, update: values } = data;
 				const { and, or } = convertWhereClause(model, where);
 				const transformedData = transformInput(values, model, 'update');
-				let query = db.updateTable(getModelName(model)).set(transformedData);
+				let query = db
+					.updateTable(getModelName(model) as TableReference<Database>)
+					.set(transformedData);
 				if (and) {
 					query = query.where((eb) => eb.and(and.map((expr) => expr(eb))));
 				}
@@ -360,6 +392,7 @@ export const kyselyAdapter =
 					query = query.where((eb) => eb.or(or.map((expr) => expr(eb))));
 				}
 				const res = await query.execute();
+				//@ts-expect-error
 				return res[0].count as number;
 			},
 			async delete(data) {

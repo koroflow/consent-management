@@ -32,7 +32,6 @@ import { getWithHooks } from '~/db/hooks';
  */
 export function consentRegistry({ adapter, ...ctx }: RegistryContext) {
 	const { createWithHooks, updateWithHooks } = getWithHooks(adapter, ctx);
-
 	return {
 		/**
 		 * Creates a new consent record in the database.
@@ -51,11 +50,9 @@ export function consentRegistry({ adapter, ...ctx }: RegistryContext) {
 			const createdConsent = await createWithHooks({
 				data: {
 					createdAt: new Date(),
-					// status: 'active',
 					...consent,
 				},
 				model: 'consent',
-				customFn: undefined,
 				context,
 			});
 
@@ -179,7 +176,7 @@ export function consentRegistry({ adapter, ...ctx }: RegistryContext) {
 			data: Partial<Consent>,
 			context?: GenericEndpointContext
 		) => {
-			const consent = await updateWithHooks({
+			const consent = await updateWithHooks<Consent>({
 				data: {
 					...data,
 					updatedAt: new Date(),
@@ -191,7 +188,6 @@ export function consentRegistry({ adapter, ...ctx }: RegistryContext) {
 					},
 				],
 				model: 'consent',
-				customFn: undefined,
 				context,
 			});
 			return consent ? parseConsentOutput(ctx.options, consent) : null;
@@ -220,7 +216,7 @@ export function consentRegistry({ adapter, ...ctx }: RegistryContext) {
 				updateData.withdrawalReason = withdrawalReason;
 			}
 
-			const consent = await updateWithHooks({
+			const consent = await updateWithHooks<Consent>({
 				data: updateData,
 				where: [
 					{
@@ -229,7 +225,6 @@ export function consentRegistry({ adapter, ...ctx }: RegistryContext) {
 					},
 				],
 				model: 'consent',
-				customFn: undefined,
 				context,
 			});
 

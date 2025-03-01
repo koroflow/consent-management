@@ -1,142 +1,60 @@
-import type {
-	CreateHookParams,
-	HookResult,
-	DatabaseHook,
-	CustomOperationFunction,
-} from './types';
-import type { Adapter, GenericEndpointContext } from '~/types';
+import type { Adapter } from '~/types';
+import type { CreateWithHooksProps, HookContext } from './types';
+import { processHooks } from './utils';
 
 /**
- * Processes data through 'before' hooks
+ * Creates a record with hooks applied before and after creation
  *
  * @template T - Type of the data being created
- * @param data - The data to transform
- * @param model - The model being operated on
- * @param hooks - Collection of hooks to apply
- * @param context - Optional endpoint context
- * @returns Transformed data or null if operation should abort
- */
-async function processBeforeHooks<T extends Record<string, unknown>>(
-	data: T,
-	model: string,
-	hooks: DatabaseHook[],
-	context?: GenericEndpointContext
-) {
-	let currentData = data;
-
-	for (const hook of hooks || []) {
-		const beforeHook = hook[model as keyof typeof hook]?.create?.before;
-		if (beforeHook) {
-			const result = (await beforeHook(currentData, context)) as HookResult<T>;
-
-			// If a hook returns false, abort the operation
-			if (result === false) {
-				return null;
-			}
-
-			// If a hook returns an object with a data property, update the data
-			if (typeof result === 'object' && result !== null && 'data' in result) {
-				currentData = {
-					...currentData,
-					...(result.data as T),
-				};
-			}
-		}
-	}
-
-	return currentData;
-}
-
-/**
- * Executes the create operation using adapter or custom function
- *
- * @template T - Type of the data being created
- * @param adapter - Database adapter
- * @param model - Model to create
- * @param data - Data to create
- * @param customFn - Optional custom function
- * @returns Created record or null
- */
-async function executeCreate<T extends Record<string, unknown>>(
-	adapter: Adapter,
-	model: string,
-	data: T,
-	customFn?: CustomOperationFunction<T>
-) {
-	// Execute the custom function if provided
-	const customCreated = customFn ? await customFn.fn(data) : null;
-
-	// Execute the main adapter create if needed
-	if (!customFn || customFn.executeMainFn) {
-		return await adapter.create<T>({
-			model,
-			data,
-		});
-	}
-
-	return customCreated as T | null;
-}
-
-/**
- * Executes after hooks with created record
- *
- * @template T - Type of the created data
- * @param created - The created record
- * @param model - The model operated on
- * @param hooks - Collection of hooks to apply
- * @param context - Optional endpoint context
- */
-async function processAfterHooks<T extends Record<string, unknown>>(
-	created: T,
-	model: string,
-	hooks: DatabaseHook[],
-	context?: GenericEndpointContext
-) {
-	for (const hook of hooks || []) {
-		const afterHook = hook[model as keyof typeof hook]?.create?.after;
-		if (afterHook) {
-			await afterHook(created, context);
-		}
-	}
-}
-
-/**
- * Executes a database create operation with before and after hooks
- *
- * This function:
- * 1. Runs all 'before' hooks, allowing data transformation
- * 2. Either executes a custom create function, the main adapter create, or both
- * 3. Runs all 'after' hooks with the created data
- *
- * @template T - Type of the data being created
- * @param params - Parameters for the create operation
+ * @template R - Type of the data returned after creation
+ * @param adapter - The database adapter to use
+ * @param ctx - Context containing hooks and options
+ * @param props - Properties for the create operation
  * @returns The created record or null if a hook aborted the operation
  */
-export async function createWithHooks<T extends Record<string, unknown>>({
-	adapter,
-	data,
-	model,
-	hooks,
-	customFn,
-	context,
-}: CreateHookParams<T>) {
+export async function createWithHooks<
+	T extends Record<string, unknown> = Record<string, unknown>,
+	R extends Record<string, unknown> = T,
+>(
+	adapter: Adapter,
+	ctx: HookContext,
+	props: CreateWithHooksProps<T>
+): Promise<R | null> {
+	const { data, model, customFn, context } = props;
+	const hooks = ctx.hooks || [];
+
 	// Process before hooks
-	const transformedData = await processBeforeHooks(data, model, hooks, context);
+	const transformedData = await processHooks<T>(
+		data,
+		model,
+		'create',
+		'before',
+		hooks,
+		context
+	);
 	if (transformedData === null) {
 		return null;
 	}
 
-	// Execute create operation
-	const created = await executeCreate(
-		adapter,
-		model,
-		transformedData,
-		customFn
-	);
+	// Execute operation
+	let created: R | null = null;
+	if (customFn) {
+		created = (await customFn.fn(transformedData)) as R | null;
+		if (!customFn.executeMainFn && created) {
+			return created;
+		}
+	}
 
-	// Process after hooks if creation succeeded
+	if (!created) {
+		created = await adapter.create<R>({
+			model,
+			data: transformedData as unknown as R,
+		});
+	}
+
+	// Process after hooks
 	if (created) {
-		await processAfterHooks(created, model, hooks, context);
+		await processHooks<R>(created, model, 'create', 'after', hooks, context);
 	}
 
 	return created;

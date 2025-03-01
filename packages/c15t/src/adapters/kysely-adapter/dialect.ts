@@ -6,10 +6,15 @@ import {
 	SqliteDialect,
 } from 'kysely';
 import type { C15TOptions } from '~/types';
-import type { KyselyDatabaseType } from './types';
+import type { Database, KyselyDatabaseType } from './types';
+import type {
+	DatabaseConfiguration,
+	KyselyInstanceConfig,
+	DialectConfig,
+} from '~/types/database-config';
 
 function getDatabaseType(
-	db: C15TOptions['database']
+	db: DatabaseConfiguration | undefined
 ): KyselyDatabaseType | null {
 	if (!db) {
 		return null;
@@ -45,7 +50,12 @@ function getDatabaseType(
 	return null;
 }
 
-export const createKyselyAdapter = async (config: C15TOptions) => {
+export const createKyselyAdapter = async (
+	config: C15TOptions
+): Promise<{
+	kysely: Kysely<Database> | null;
+	databaseType: KyselyDatabaseType | null;
+}> => {
 	const db = config.database;
 
 	if (!db) {
@@ -56,16 +66,18 @@ export const createKyselyAdapter = async (config: C15TOptions) => {
 	}
 
 	if ('db' in db) {
+		const kyselyConfig = db as KyselyInstanceConfig;
 		return {
-			kysely: db.db,
-			databaseType: db.type,
+			kysely: kyselyConfig.db,
+			databaseType: kyselyConfig.type,
 		};
 	}
 
 	if ('dialect' in db) {
+		const dialectConfig = db as DialectConfig;
 		return {
-			kysely: new Kysely<any>({ dialect: db.dialect }),
-			databaseType: db.type,
+			kysely: new Kysely({ dialect: dialectConfig.dialect }),
+			databaseType: dialectConfig.type,
 		};
 	}
 
@@ -84,8 +96,9 @@ export const createKyselyAdapter = async (config: C15TOptions) => {
 	}
 
 	if ('getConnection' in db) {
-		// @ts-ignore - mysql2/promise
-		dialect = new MysqlDialect(db);
+		dialect = new MysqlDialect({
+			pool: db,
+		});
 	}
 
 	if ('connect' in db) {
@@ -95,7 +108,7 @@ export const createKyselyAdapter = async (config: C15TOptions) => {
 	}
 
 	return {
-		kysely: dialect ? new Kysely<any>({ dialect }) : null,
+		kysely: dialect ? new Kysely({ dialect }) : null,
 		databaseType,
 	};
 };

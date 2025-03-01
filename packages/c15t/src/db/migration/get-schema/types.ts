@@ -1,4 +1,4 @@
-import type { FieldAttribute } from '~/db/fields';
+import type { FieldAttribute } from '~/db/core/fields';
 
 /**
  * Represents a complete table definition within the schema

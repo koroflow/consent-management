@@ -7,10 +7,9 @@
  *
  * @module db/hooks
  */
-
-export { getWithHooks } from './with-hooks-factory';
-export type {
-	HookContext,
-	CustomOperationFunction,
-	HookResult,
-} from './types';
+export * from './types';
+export * from './utils';
+export * from './create-hooks';
+export * from './update-hooks';
+export * from './update-many-hooks';
+export * from './with-hooks-factory';

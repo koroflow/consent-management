@@ -21,8 +21,10 @@ import { generateId } from './utils/id';
 import { env, isProduction } from './utils/env';
 import type { C15TContext, RegistryContext } from './types/context';
 import type { C15TOptions, C15TPlugin } from './types';
-import { createRegistry, getAdapter, getConsentTables } from './db';
-
+import { getConsentTables } from './db';
+import { getAdapter } from './db/utils';
+import { createRegistry } from './db/create-registry';
+import type { ModelName } from './db/core/types';
 /**
  * Default secret used when no secret is provided
  * This should only be used in development environments
@@ -79,7 +81,7 @@ export const init = async (options: C15TOptions) => {
 	const generateIdFunc = ({
 		model,
 		size,
-	}: { model: string; size?: number }) => {
+	}: { model: ModelName; size?: number }) => {
 		return (
 			finalOptions?.advanced?.generateId?.({ model, size }) ||
 			generateId(size || 21)

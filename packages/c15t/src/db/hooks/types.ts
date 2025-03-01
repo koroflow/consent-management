@@ -1,137 +1,103 @@
-import type {
-	Adapter,
-	C15TOptions,
-	GenericEndpointContext,
-	Where,
-} from '~/types';
-
-export type Models =
-	| 'consent'
-	| 'purpose'
-	| 'record'
-	| 'consentGeoLocation'
-	| 'withdrawal'
-	| 'auditLog'
-	| 'consentPolicy'
-	| 'domain'
-	| 'user'
-	| 'geoLocation'
-	| 'purposeJunction';
+import type { C15TOptions, GenericEndpointContext, Where } from '~/types';
+import type { ModelName, ModelTypeMap } from '../schema/index';
 
 /**
- * Structure for hook functions
+ * Defines hook execution phases
  */
-type HookFunction<T, R = unknown> = (
-	data: T,
-	context?: GenericEndpointContext
-) => Promise<R> | R;
+export type HookPhase = 'before' | 'after';
 
 /**
- * Structure for operation hooks (before/after)
+ * Defines hook operation types
  */
-interface OperationHooks<T> {
-	before?: HookFunction<T, HookResult<T>>;
-	after?: HookFunction<T>;
+export type HookOperation = 'create' | 'update';
+
+/**
+ * Result types for hooks that can control flow
+ */
+export type HookResult<T> =
+	| { kind: 'abort' }
+	| { kind: 'transform'; data: T }
+	| { kind: 'continue' };
+
+/**
+ * Hook function for specific model and operation
+ */
+export interface ModelHook<M extends ModelName = ModelName> {
+	create?: {
+		before?: (
+			data: ModelTypeMap[M],
+			context?: GenericEndpointContext
+		) =>
+			| Promise<HookResult<ModelTypeMap[M]> | undefined>
+			| HookResult<ModelTypeMap[M]>
+			| undefined;
+		after?: (
+			data: ModelTypeMap[M],
+			context?: GenericEndpointContext
+		) => Promise<void> | void;
+	};
+	update?: {
+		before?: (
+			data: Partial<ModelTypeMap[M]>,
+			context?: GenericEndpointContext
+		) =>
+			| Promise<HookResult<Partial<ModelTypeMap[M]>> | undefined>
+			| HookResult<Partial<ModelTypeMap[M]>>
+			| undefined;
+		after?: (
+			data: ModelTypeMap[M],
+			context?: GenericEndpointContext
+		) => Promise<void> | void;
+	};
 }
-
 /**
- * Structure for model operations
- */
-interface ModelOperations<T> {
-	create?: OperationHooks<T>;
-	update?: OperationHooks<T>;
-}
-
-/**
- * Complete definition of a database hook
- * This ensures each hookable model has its own property
+ * A collection of hooks for different models
  */
 export type DatabaseHook = {
-	[M in Models]?: ModelOperations<Record<string, unknown>>;
+	[M in ModelName]?: ModelHook<M>;
 };
 
 /**
- * Context object for hook operations
+ * Context containing options and hooks
  */
 export interface HookContext {
+	hooks: DatabaseHook[];
 	options: C15TOptions;
-	hooks: DatabaseHook[] | undefined;
 }
 
 /**
- * Result of running a hook
- * Hooks can return:
- * - false to abort the operation
- * - an object with a data property to transform the data
- * - any other value to continue with the original data
+ * Custom function definition for database operations
  */
-export type HookResult<T> = false | { data: T } | unknown;
-
-/**
- * Custom function that can replace or augment the default operation
- */
-export interface CustomOperationFunction<T extends Record<string, unknown>> {
-	/**
-	 * Function to execute instead of or along with the main operation
-	 * @param data - The data after processing by 'before' hooks
-	 * @returns The operation result or void
-	 */
-	fn: (data: T) => Promise<T | null> | T | null;
-
-	/**
-	 * Whether to execute the main operation after this function
-	 * If true, both custom and main operation will run
-	 * If false, only the custom function will run
-	 */
+export interface CustomOperationFunction<
+	TInput extends Record<string, unknown> = Record<string, unknown>,
+	TOutput = TInput,
+> {
+	fn: (data: TInput) => Promise<TOutput | null> | TOutput | null;
 	executeMainFn?: boolean;
 }
 
 /**
- * Parameters for hook-enabled operations
+ * Properties for creating a record with hooks
  */
-export interface HookOperationParams {
-	adapter: Adapter;
-	model: Models;
-	hooks: DatabaseHook[];
+export interface CreateWithHooksProps<
+	T extends Record<string, unknown> = Record<string, unknown>,
+> {
+	data: T;
+	model: string;
+	customFn?: CustomOperationFunction<T>;
 	context?: GenericEndpointContext;
 }
 
 /**
- * Parameters for update operations with hooks
+ * Properties for updating records with hooks
  */
-export interface UpdateHookParams<T extends Record<string, unknown>>
-	extends HookOperationParams {
-	data: T;
+export interface UpdateWithHooksProps<
+	T extends Record<string, unknown> = Record<string, unknown>,
+	R = T,
+> {
+	data: Partial<T>;
 	where: Where[];
-	customFn?: CustomOperationFunction<T>;
+	model: string;
+	customFn?: CustomOperationFunction<Partial<T>, R>;
+	context?: GenericEndpointContext;
 }
-
-/**
- * Parameters for create operations with hooks
- */
-export interface CreateHookParams<T extends Record<string, unknown>>
-	extends HookOperationParams {
-	data: T;
-	customFn?: CustomOperationFunction<T>;
-}
-
-/**
- * Type for the createWithHooks function that handles record creation with pre/post hooks
- */
-export type CreateWithHooks = <T extends Record<string, unknown>>(
-	data: T,
-	model: string,
-	customFn?: CustomOperationFunction<T>,
-	context?: GenericEndpointContext
-) => Promise<T | null>;
-
-/**
- * Type for the updateWithHooks function that handles record updates with pre/post hooks
- */
-export type UpdateWithHooks = <T extends Record<string, unknown>>(
-	data: Partial<T>,
-	where: Where[],
-	model: string,
-	customFn?: CustomOperationFunction<T>,
-	context?: GenericEndpointContext
-) => Promise<T | null>;

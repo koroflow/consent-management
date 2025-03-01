@@ -1,7 +1,12 @@
-import type { FieldAttribute } from '~/db/core/fields';
+// packages/c15t/src/db/schema/parser.ts
+
+import type { FieldAttribute } from '../core/fields';
 import type { C15TOptions, C15TPluginSchema } from '~/types';
 import { APIError } from 'better-call';
 
+/**
+ * Parses and transforms output data according to schema field definitions
+ */
 export function parseOutputData<T extends Record<string, unknown>>(
 	data: T,
 	schema: {
@@ -27,6 +32,9 @@ export function parseOutputData<T extends Record<string, unknown>>(
 	return parsedData as T;
 }
 
+/**
+ * Gets all fields for a table, including any from plugins and options
+ */
 export function getAllFields(options: C15TOptions, table: string) {
 	let schema: Record<string, FieldAttribute> = {
 		...(table === 'user' && options.user?.additionalFields
@@ -48,6 +56,9 @@ export function getAllFields(options: C15TOptions, table: string) {
 	return schema;
 }
 
+/**
+ * Parses and validates input data according to schema field definitions
+ */
 // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: <explanation>
 export function parseInputData<T extends Record<string, unknown>>(
 	data: T,
@@ -96,6 +107,9 @@ export function parseInputData<T extends Record<string, unknown>>(
 	return parsedData as Partial<T>;
 }
 
+/**
+ * Merges additional schema information with an existing schema
+ */
 export function mergeSchema<S extends C15TPluginSchema>(
 	schema: S,
 	newSchema?: {

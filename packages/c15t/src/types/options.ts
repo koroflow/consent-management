@@ -6,14 +6,14 @@
  * analytics, geo-targeting, plugins, logging, and other advanced features.
  */
 
-import type { Dialect, Kysely, MysqlPool, PostgresPool } from 'kysely';
+import type {} from 'kysely';
 import type { Logger } from '../utils/logger';
-import type { AdapterInstance, C15TContext, C15TPlugin } from './index';
+import type { C15TContext, C15TPlugin } from './index';
 import type { AuthMiddleware } from '~/api/call';
-import type { KyselyDatabaseType } from '~/adapters/kysely-adapter/types';
-import type { Database } from 'better-sqlite3';
-import type { FieldAttribute } from '~/db/fields';
+import type { FieldAttribute } from '~/db/core/fields';
 import type { DatabaseHook } from '~/db/hooks/types';
+import type { DatabaseConfiguration } from './database-config';
+import type { ModelName } from '~/db';
 
 /**
  * Analytics destination configuration
@@ -103,39 +103,7 @@ export interface C15TOptions {
 	/**
 	 * Database configuration
 	 */
-	database?:
-		| PostgresPool
-		| MysqlPool
-		| Database
-		| Dialect
-		| AdapterInstance
-		| {
-				dialect: Dialect;
-				type: KyselyDatabaseType;
-				/**
-				 * casing for table names
-				 *
-				 * @default "camel"
-				 */
-				casing?: 'snake' | 'camel';
-		  }
-		| {
-				/**
-				 * Kysely instance
-				 */
-				// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-				db: Kysely<any>;
-				/**
-				 * Database type between postgres, mysql and sqlite
-				 */
-				type: KyselyDatabaseType;
-				/**
-				 * casing for table names
-				 *
-				 * @default "camel"
-				 */
-				casing?: 'snake' | 'camel';
-		  };
+	database?: DatabaseConfiguration;
 
 	/**
 	 * Enable CORS support
@@ -279,7 +247,7 @@ export interface C15TOptions {
 		 * Function to generate IDs
 		 * Custom ID generation for consent records and other entities
 		 */
-		generateId?: (options: { model: string; size?: number }) => string;
+		generateId?: (options: { model: ModelName; size?: number }) => string;
 
 		/**
 		 * Support for cross-subdomain cookies

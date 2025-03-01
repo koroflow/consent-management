@@ -13,7 +13,7 @@
  *
  * @module migration/get-migrations
  */
-import type { FieldType } from '~/db/fields';
+import type { FieldType } from '~/db/core/fields';
 import { createLogger } from '../../utils/logger';
 import type { C15TOptions } from '~/types';
 import { createKyselyAdapter } from '../../adapters/kysely-adapter/dialect';

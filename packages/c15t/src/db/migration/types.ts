@@ -8,7 +8,7 @@ import type {
 	AlterTableColumnAlteringBuilder,
 	CreateTableBuilder,
 } from 'kysely';
-import type { FieldAttribute } from '~/db/fields';
+import type { FieldAttribute } from '~/db/core/fields';
 
 /**
  * Type representing a table to be created during migration

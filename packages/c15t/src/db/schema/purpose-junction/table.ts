@@ -1,5 +1,4 @@
-import type { FieldAttribute } from '~/db/fields';
-import type { C15TDBSchema } from '~/db/get-tables';
+import type { FieldAttribute } from '~/db/core/fields';
 import type { C15TOptions } from '~/types';
 
 /**
@@ -23,7 +22,7 @@ import type { C15TOptions } from '~/types';
 export function getPurposeJunctionTable(
 	options: C15TOptions,
 	junctionFields?: Record<string, FieldAttribute>
-): C15TDBSchema['purposeJunction'] {
+) {
 	return {
 		/**
 		 * The name of the junction table in the database, configurable through options

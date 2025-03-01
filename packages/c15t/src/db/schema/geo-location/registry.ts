@@ -93,7 +93,7 @@ export function geoLocationRegistry({ adapter, ...ctx }: RegistryContext) {
 			}
 
 			const locations = await adapter.findMany<GeoLocation>({
-				model: 'geoLocation',
+				model: 'consentGeoLocation',
 				where: whereConditions,
 				sortBy: {
 					field: 'countryName',
@@ -115,7 +115,7 @@ export function geoLocationRegistry({ adapter, ...ctx }: RegistryContext) {
 		 */
 		findGeoLocationById: async (locationId: string) => {
 			const location = await adapter.findOne<GeoLocation>({
-				model: 'geoLocation',
+				model: 'consentGeoLocation',
 				where: [
 					{
 						field: 'id',
@@ -135,7 +135,7 @@ export function geoLocationRegistry({ adapter, ...ctx }: RegistryContext) {
 		 */
 		findGeoLocationsByCountry: async (countryCode: string) => {
 			const locations = await adapter.findMany<GeoLocation>({
-				model: 'geoLocation',
+				model: 'consentGeoLocation',
 				where: [
 					{
 						field: 'countryCode',

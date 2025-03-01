@@ -49,13 +49,12 @@ export function purposeRegistry({ adapter, ...ctx }: RegistryContext) {
 		) => {
 			const createdPurpose = await createWithHooks({
 				data: {
+					id: purpose.id || '',
 					createdAt: new Date(),
 					updatedAt: new Date(),
-					// isActive: new Date(),
 					...purpose,
 				},
 				model: 'purpose',
-				customFn: undefined,
 				context,
 			});
 
@@ -65,7 +64,7 @@ export function purposeRegistry({ adapter, ...ctx }: RegistryContext) {
 				);
 			}
 
-			return createdPurpose as Purpose;
+			return createdPurpose;
 		},
 
 		/**
@@ -134,7 +133,7 @@ export function purposeRegistry({ adapter, ...ctx }: RegistryContext) {
 			data: Partial<Purpose>,
 			context?: GenericEndpointContext
 		) => {
-			const purpose = await updateWithHooks({
+			const purpose = await updateWithHooks<Purpose>({
 				data: {
 					...data,
 					updatedAt: new Date(),
@@ -146,7 +145,6 @@ export function purposeRegistry({ adapter, ...ctx }: RegistryContext) {
 					},
 				],
 				model: 'purpose',
-				customFn: undefined,
 				context,
 			});
 			return purpose ? parsePurposeOutput(ctx.options, purpose) : null;

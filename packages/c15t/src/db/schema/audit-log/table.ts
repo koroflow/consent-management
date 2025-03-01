@@ -1,5 +1,4 @@
-import type { FieldAttribute } from '~/db/fields';
-import type { C15TDBSchema } from '~/db/get-tables';
+import type { FieldAttribute } from '~/db/core/fields';
 import type { C15TOptions } from '~/types';
 
 /**
@@ -23,7 +22,7 @@ import type { C15TOptions } from '~/types';
 export function getAuditLogTable(
 	options: C15TOptions,
 	auditLogFields?: Record<string, FieldAttribute>
-): C15TDBSchema['auditLog'] {
+) {
 	return {
 		/**
 		 * The name of the audit log table in the database, configurable through options

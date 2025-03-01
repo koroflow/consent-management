@@ -15,7 +15,7 @@ import type {
 	LiteralString,
 	DeepPartial,
 } from './index';
-import type { FieldAttribute } from '~/db/fields';
+import type { FieldAttribute } from '~/db/core/fields';
 import type { Migration } from 'kysely';
 
 /**

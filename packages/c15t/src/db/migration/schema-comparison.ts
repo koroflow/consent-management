@@ -18,9 +18,9 @@
  * @module migration/schema-comparison
  */
 import type { C15TOptions } from '~/types';
-import type { FieldAttribute } from '~/db/fields';
+import type { FieldAttribute } from '~/db/core/fields';
 import { createLogger } from '../../utils/logger';
-import { getSchema } from '../get-schema';
+import { getSchema } from '../core/get-schema';
 import type { TableToCreate, ColumnsToAdd } from './types';
 import { matchType } from './type-mapping';
 import type { KyselyDatabaseType } from '../../adapters/kysely-adapter/types';
