@@ -1,7 +1,7 @@
 import type { Where, GenericEndpointContext, RegistryContext } from '~/types';
 import type { Purpose } from './schema';
 import { getWithHooks } from '~/db/hooks';
-import { type TableFields, validateEntityOutput } from '../definition';
+import { validateEntityOutput } from '../definition';
 
 /**
  * Creates and returns a set of consent purpose-related adapter methods to interact with the database.
@@ -65,7 +65,7 @@ export function purposeRegistry({ adapter, ...ctx }: RegistryContext) {
 				);
 			}
 
-			return createdPurpose;
+			return validateEntityOutput('purpose', createdPurpose, ctx.options);
 		},
 
 		/**
@@ -136,8 +136,6 @@ export function purposeRegistry({ adapter, ...ctx }: RegistryContext) {
 			data: Partial<Purpose>,
 			context?: GenericEndpointContext
 		) => {
-			type s = TableFields<'purpose'>['code'];
-
 			const purpose = await updateWithHooks({
 				data: {
 					...data,

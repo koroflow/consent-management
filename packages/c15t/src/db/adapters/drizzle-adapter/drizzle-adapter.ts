@@ -1,4 +1,5 @@
 //@ts-nocheck
+
 import {
 	and,
 	asc,
@@ -15,6 +16,7 @@ import { C15TError } from '~/error';
 import type { Adapter, C15TOptions, Where } from '~/types';
 import { generateId } from '~/utils';
 import { applyDefaultValue } from '../utils';
+import type { EntityName } from '~/db/core/types';
 
 export interface DB {
 	[key: string]: any;
@@ -42,7 +44,7 @@ const createTransform = (
 				'Drizzle adapter failed to initialize. Schema not found. Please provide a schema object in the adapter options object.'
 			);
 		}
-		const model = getEntityName(EntityName);
+		const model = getEntityName(entityName);
 		const schemaModel = schema[model];
 		if (!schemaModel) {
 			throw new C15TError(
@@ -65,7 +67,9 @@ const createTransform = (
 		model: T
 	) {
 		const schemaModel = getSchema(model);
-		if (!where) return [];
+		if (!where) {
+			return [];
+		}
 		if (where.length === 1) {
 			const w = where[0];
 			if (!w) {
@@ -126,8 +130,12 @@ const createTransform = (
 
 		const clause: SQL<unknown>[] = [];
 
-		if (andGroup.length) clause.push(andClause!);
-		if (orGroup.length) clause.push(orClause!);
+		if (andGroup.length) {
+			clause.push(andClause!);
+		}
+		if (orGroup.length) {
+			clause.push(orClause!);
+		}
 		return clause;
 	}
 

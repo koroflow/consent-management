@@ -155,7 +155,15 @@ export function getType(field: Field, dbType: KyselyDatabaseType = 'sqlite') {
 		return 'text';
 	}
 	if (type === 'string[]' || type === 'number[]') {
-		return 'jsonb';
+		switch (dbType) {
+			case 'postgres':
+				return 'jsonb';
+			case 'mysql':
+			case 'mssql':
+				return 'json';
+			default:
+				return 'text';
+		}
 	}
 	if (Array.isArray(type)) {
 		return 'text';

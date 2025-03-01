@@ -617,6 +617,7 @@ export const kyselyAdapter =
 				);
 				return transformOutput(result, model) as unknown as Result | null;
 			},
+			// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: excessive complexity is necessary for kysely
 			async updateMany<
 				Model extends EntityName,
 				Result extends TableFields<Model>,
@@ -659,12 +660,47 @@ export const kyselyAdapter =
 						return eb.or(conditions);
 					});
 				}
-				const res = await query.execute();
+				await query.execute();
 
-				// This is just a placeholder to match the interface
-				// Real implementations would need to fetch the updated records
-				return [] as unknown as Result[];
+				// After update is complete, fetch the updated records using the same where conditions
+				// Safe cast for table name
+				let selectQuery = db
+					.selectFrom(tableName as unknown as keyof Database)
+					.selectAll();
+
+				if (and) {
+					selectQuery = selectQuery.where((eb) => {
+						const conditions = and.map((expr) =>
+							expr(eb)
+						) as OperandExpression<SqlBool>[];
+						return eb.and(conditions);
+					});
+				}
+				if (or) {
+					selectQuery = selectQuery.where((eb) => {
+						const conditions = or.map((expr) =>
+							expr(eb)
+						) as OperandExpression<SqlBool>[];
+						return eb.or(conditions);
+					});
+				}
+
+				const fetchedResults = await selectQuery.execute();
+
+				// Transform the results using the same pattern as findMany
+				if (!fetchedResults || fetchedResults.length === 0) {
+					return [] as unknown as Result[];
+				}
+
+				return fetchedResults.map(
+					(record) =>
+						transformOutput(
+							record as Record<string, unknown>,
+							model
+						) as unknown as Result
+				);
 			},
+			// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: excessive complexity is necessary for kysely
 			async count<Model extends EntityName>(data: {
 				model: Model;
 				where?: Where<Model>;

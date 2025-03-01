@@ -50,6 +50,14 @@ export function processFields<T extends EntityName>(
 						onDelete: typedField.references.onDelete,
 					},
 				};
+			} else {
+				// Log warning and remove invalid reference if table not found
+				// biome-ignore lint/suspicious/noConsole: <explanation>
+				console.warn(
+					`Warning: Referenced table '${EntityName}' not found for field '${fieldName}'. The reference will be removed to prevent inconsistent state.`
+				);
+				const { references, ...fieldWithoutRef } = typedField;
+				actualFields[fieldName] = fieldWithoutRef;
 			}
 		}
 	}
