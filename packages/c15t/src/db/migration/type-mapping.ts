@@ -7,7 +7,7 @@
  * @module migration/type-mapping
  */
 import type { KyselyDatabaseType } from '../../adapters/kysely-adapter/types';
-import type { FieldAttribute, FieldType } from '~/db/core/fields';
+import type { Field, FieldType } from '~/db/core/fields';
 
 /**
  * Type mappings for PostgreSQL
@@ -81,7 +81,7 @@ const map = {
  * @param field - Field attributes
  * @returns The appropriate MySQL type for the string field
  */
-export function getMySqlStringType(field: FieldAttribute): string {
+export function getMySqlStringType(field: Field): string {
 	if (field.unique) {
 		return 'varchar(255)';
 	}
@@ -122,10 +122,7 @@ export function matchType(
  * @param dbType - Database type
  * @returns The appropriate database-specific type
  */
-export function getType(
-	field: FieldAttribute,
-	dbType: KyselyDatabaseType = 'sqlite'
-) {
+export function getType(field: Field, dbType: KyselyDatabaseType = 'sqlite') {
 	const type = field.type;
 	const typeMap = {
 		string: {

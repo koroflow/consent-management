@@ -16,7 +16,7 @@ export {
 
 // Field-related exports
 export type {
-	FieldAttribute,
+	Field,
 	FieldType,
 } from './core/fields';
 

@@ -1,6 +1,6 @@
 // packages/c15t/src/db/schema/parser.ts
 
-import type { FieldAttribute } from '../core/fields';
+import type { Field } from '../core/fields';
 import type { C15TOptions, C15TPluginSchema } from '~/types';
 import { APIError } from 'better-call';
 
@@ -10,7 +10,7 @@ import { APIError } from 'better-call';
 export function parseOutputData<T extends Record<string, unknown>>(
 	data: T,
 	schema: {
-		fields: Record<string, FieldAttribute>;
+		fields: Record<string, Field>;
 	}
 ) {
 	const fields = schema.fields;
@@ -36,7 +36,7 @@ export function parseOutputData<T extends Record<string, unknown>>(
  * Gets all fields for a table, including any from plugins and options
  */
 export function getAllFields(options: C15TOptions, table: string) {
-	let schema: Record<string, FieldAttribute> = {
+	let schema: Record<string, Field> = {
 		...(table === 'user' && options.user?.additionalFields
 			? options.user.additionalFields
 			: {}),
@@ -63,7 +63,7 @@ export function getAllFields(options: C15TOptions, table: string) {
 export function parseInputData<T extends Record<string, unknown>>(
 	data: T,
 	schema: {
-		fields: Record<string, FieldAttribute>;
+		fields: Record<string, Field>;
 		action?: 'create' | 'update';
 	}
 ) {
@@ -80,12 +80,26 @@ export function parseInputData<T extends Record<string, unknown>>(
 				}
 				continue;
 			}
-			if (fields[key]?.validator?.input && data[key] !== undefined) {
+			// Check if validator exists and is an object with input property (old style)
+			if (
+				fields[key]?.validator &&
+				typeof fields[key]?.validator === 'object' &&
+				// biome-ignore lint/correctness/noUnsafeOptionalChaining: <explanation>
+				'input' in fields[key]?.validator &&
+				fields[key]?.validator.input &&
+				data[key] !== undefined
+			) {
 				parsedData[key] = fields[key]?.validator?.input.parse(data[key]);
 				continue;
 			}
 			if (fields[key]?.transform?.input && data[key] !== undefined) {
-				const inputValue = data[key] as string | number | boolean | null;
+				const inputValue = data[key] as
+					| string
+					| number
+					| boolean
+					| Date
+					| string[]
+					| number[];
 				parsedData[key] = fields[key]?.transform?.input(inputValue);
 				continue;
 			}

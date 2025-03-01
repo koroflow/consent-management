@@ -1,4 +1,4 @@
-import type { FieldAttribute } from '~/db/core/fields';
+import type { Field } from '~/db/core/fields';
 
 /**
  * Represents a complete table definition within the schema
@@ -7,7 +7,7 @@ import type { FieldAttribute } from '~/db/core/fields';
  * @property order - Priority order for table creation (lower numbers are created first)
  */
 export interface TableSchemaDefinition {
-	fields: Record<string, FieldAttribute>;
+	fields: Record<string, Field>;
 	order: number;
 }
 
@@ -23,6 +23,6 @@ export type SchemaDefinition = Record<string, TableSchemaDefinition>;
  */
 export interface TableDefinition {
 	modelName?: string;
-	fields?: Record<string, FieldAttribute>;
+	fields?: Record<string, Field>;
 	order?: number;
 }

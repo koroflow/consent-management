@@ -1,4 +1,4 @@
-import type { FieldAttribute } from '~/db/core/fields';
+import type { Field } from '~/db/core/fields';
 import type { C15TOptions } from '~/types';
 import { domainSchema } from './schema';
 
@@ -22,7 +22,7 @@ import { domainSchema } from './schema';
  */
 export function getDomainTable(
 	options: C15TOptions,
-	domainFields?: Record<string, FieldAttribute>
+	domainFields?: Record<string, Field>
 ) {
 	return {
 		/**

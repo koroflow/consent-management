@@ -1,137 +1,258 @@
-import type { FieldType, FieldAttribute, Primitive } from './field-types';
+import type { FieldType, Field, Primitive } from './field-types';
 
 /**
  * Infers the JavaScript type from a field type.
  * Maps database field types to their corresponding TypeScript types.
  *
- * @template T - The field type to infer from
+ * @template TFieldType - The field type to infer from
+ *
+ * @example
+ * ```typescript
+ * // Infer string type
+ * type NameType = InferValueType<'string'>;  // string
+ *
+ * // Infer array types
+ * type TagsType = InferValueType<'string[]'>;  // string[]
+ * ```
+ *
+ * @remarks
+ * This is a conditional type that recursively handles:
+ * - Basic scalar types (string, number, boolean, date)
+ * - Array types with string notation ('string[]')
+ * - Array types with array notation (string[])
  */
-export type InferValueType<T extends FieldType> = T extends 'string'
-	? string
-	: T extends 'number'
-		? number
-		: T extends 'boolean'
-			? boolean
-			: T extends 'date'
-				? Date
-				: T extends `${infer BaseType}[]`
-					? BaseType extends 'string'
-						? string[]
-						: BaseType extends 'number'
-							? number[]
-							: never
-					: T extends (infer ArrayType)[]
-						? ArrayType
-						: never;
+export type InferValueType<TFieldType extends FieldType> =
+	TFieldType extends 'string'
+		? string
+		: TFieldType extends 'number'
+			? number
+			: TFieldType extends 'boolean'
+				? boolean
+				: TFieldType extends 'date'
+					? Date
+					: TFieldType extends `${infer BaseType}[]`
+						? BaseType extends 'string'
+							? string[]
+							: BaseType extends 'number'
+								? number[]
+								: never
+						: TFieldType extends (infer ArrayType)[]
+							? ArrayType
+							: never;
 
 /**
  * Infers the output type for a single field.
- * Takes into account whether the field is required and returned.
+ * Takes into account whether the field is required and returned in API responses.
  *
- * @template T - The field attribute definition
+ * @template TField - The field definition
+ *
+ * @example
+ * ```typescript
+ * // A required string field
+ * const nameField: Field<'string'> = {
+ *   type: 'string',
+ *   required: true
+ * };
+ * type NameOutput = InferFieldOutput<typeof nameField>;  // string
+ *
+ * // An optional number field
+ * const ageField: Field<'number'> = {
+ *   type: 'number',
+ *   required: false
+ * };
+ * type AgeOutput = InferFieldOutput<typeof ageField>;  // number | null | undefined
+ * ```
+ *
+ * @remarks
+ * If a field has `returned: false`, this will be `never` indicating
+ * the field should not appear in API responses.
  */
-export type InferFieldOutput<T extends FieldAttribute> =
-	T['returned'] extends false
+export type InferFieldOutput<TField extends Field> =
+	TField['returned'] extends false
 		? never
-		: T['required'] extends false
-			? InferValueType<T['type']> | null | undefined
-			: InferValueType<T['type']>;
+		: TField['required'] extends false
+			? InferValueType<TField['type']> | null | undefined
+			: InferValueType<TField['type']>;
 
 /**
  * Infers the input type for a single field.
  * Determines the expected type when creating or updating records.
  *
- * @template T - The field attribute definition
+ * @template TField - The field definition
+ *
+ * @example
+ * ```typescript
+ * // A required input field
+ * const emailField: Field<'string'> = {
+ *   type: 'string',
+ *   required: true,
+ *   input: true
+ * };
+ * type EmailInput = InferFieldInput<typeof emailField>;  // string
+ *
+ * // A non-input field (system-generated)
+ * const createdAtField: Field<'date'> = {
+ *   type: 'date',
+ *   required: true,
+ *   input: false
+ * };
+ * type CreatedAtInput = InferFieldInput<typeof createdAtField>;  // never
+ * ```
+ *
+ * @remarks
+ * If a field has `input: false`, this will be `never` indicating
+ * the field should not be provided in API requests.
  */
-export type InferFieldInput<T extends FieldAttribute> = T['input'] extends false
-	? never
-	: T['required'] extends true
-		? InferValueType<T['type']>
-		: InferValueType<T['type']> | null | undefined;
+export type InferFieldInput<TField extends Field> =
+	TField['input'] extends false
+		? never
+		: TField['required'] extends true
+			? InferValueType<TField['type']>
+			: InferValueType<TField['type']> | null | undefined;
 
 /**
- * Type-safe property mapping helper
- * Maps properties of a field to specific output types
+ * Type-safe property mapping helper for field outputs.
+ * Maps properties of a record type to their corresponding output types.
+ *
+ * @template TSchema - The record type containing field definitions
+ * @template TKey - The keys of TSchema to map
+ *
+ * @internal
+ * This is an internal helper type used by InferFieldsOutput
  */
-type MapToFieldOutputType<T, K extends keyof T & string> = {
-	[P in K]: T[P] extends FieldAttribute ? InferFieldOutput<T[P]> : never;
+type MapToFieldOutputType<TSchema, TKey extends keyof TSchema & string> = {
+	[Property in TKey]: TSchema[Property] extends Field
+		? InferFieldOutput<TSchema[Property]>
+		: never;
 };
 
 /**
- * Type-safe property mapping helper
- * Maps properties of a field to specific input types
+ * Type-safe property mapping helper for field inputs.
+ * Maps properties of a record type to their corresponding input types.
+ *
+ * @template TSchema - The record type containing field definitions
+ * @template TKey - The keys of TSchema to map
+ *
+ * @internal
+ * This is an internal helper type used by InferFieldsInput
  */
-type MapToFieldInputType<T, K extends keyof T & string> = {
-	[P in K]: T[P] extends FieldAttribute ? InferFieldInput<T[P]> : never;
+type MapToFieldInputType<TSchema, TKey extends keyof TSchema & string> = {
+	[Property in TKey]: TSchema[Property] extends Field
+		? InferFieldInput<TSchema[Property]>
+		: never;
 };
 
 /**
- * Type helper to extract required keys from fields
+ * Type helper to extract required keys from fields that should be returned.
+ * Identifies fields that are both required and returned in API responses.
+ *
+ * @template TSchema - The record type containing field definitions
+ *
+ * @internal
+ * Used to determine which fields must be present in output types
  */
-type RequiredKeys<T> = {
-	[K in keyof T]: T[K] extends FieldAttribute
-		? T[K]['required'] extends true
-			? T[K]['returned'] extends false
+type RequiredKeys<TSchema> = {
+	[Key in keyof TSchema]: TSchema[Key] extends Field
+		? TSchema[Key]['required'] extends true
+			? TSchema[Key]['returned'] extends false
 				? never
-				: K
+				: Key
 			: never
 		: never;
-}[keyof T];
+}[keyof TSchema];
 
 /**
- * Type helper to extract optional keys from fields
+ * Type helper to extract optional keys from fields that should be returned.
+ * Identifies fields that are optional but should be returned in API responses.
+ *
+ * @template TSchema - The record type containing field definitions
+ *
+ * @internal
+ * Used to determine which fields may be present in output types
  */
-type OptionalKeys<T> = {
-	[K in keyof T]: T[K] extends FieldAttribute
-		? T[K]['required'] extends true
+type OptionalKeys<TSchema> = {
+	[Key in keyof TSchema]: TSchema[Key] extends Field
+		? TSchema[Key]['required'] extends true
 			? never
-			: T[K]['returned'] extends false
+			: TSchema[Key]['returned'] extends false
 				? never
-				: K
+				: Key
 		: never;
-}[keyof T];
+}[keyof TSchema];
 
 /**
- * Type helper to extract input required keys from fields
+ * Type helper to extract required keys from fields that accept input.
+ * Identifies fields that are both required and accept user input.
+ *
+ * @template TSchema - The record type containing field definitions
+ *
+ * @internal
+ * Used to determine which fields must be provided in create operations
  */
-type RequiredInputKeys<T> = {
-	[K in keyof T]: T[K] extends FieldAttribute
-		? T[K]['required'] extends true
-			? T[K]['input'] extends false
+type RequiredInputKeys<TSchema> = {
+	[Key in keyof TSchema]: TSchema[Key] extends Field
+		? TSchema[Key]['required'] extends true
+			? TSchema[Key]['input'] extends false
 				? never
-				: K
+				: Key
 			: never
 		: never;
-}[keyof T];
+}[keyof TSchema];
 
 /**
- * Type helper to extract optional input keys from fields
+ * Type helper to extract optional keys from fields that accept input.
+ * Identifies fields that are optional and accept user input.
+ *
+ * @template TSchema - The record type containing field definitions
+ *
+ * @internal
+ * Used to determine which fields may be provided in create operations
  */
-type OptionalInputKeys<T> = {
-	[K in keyof T]: T[K] extends FieldAttribute
-		? T[K]['required'] extends true
+type OptionalInputKeys<TSchema> = {
+	[Key in keyof TSchema]: TSchema[Key] extends Field
+		? TSchema[Key]['required'] extends true
 			? never
-			: T[K]['input'] extends false
+			: TSchema[Key]['input'] extends false
 				? never
-				: K
+				: Key
 		: never;
-}[keyof T];
+}[keyof TSchema];
 
 /**
  * Infers the output type shape for a set of fields.
  * Handles required/optional status and returned fields.
  * Used to determine the shape of data when retrieving records.
  *
- * @template Field - The field definitions to infer from
+ * @template TSchema - The field definitions to infer from
+ *
+ * @example
+ * ```typescript
+ * // Define a schema
+ * const userSchema = {
+ *   id: stringField({ required: true }),
+ *   name: stringField({ required: true }),
+ *   email: stringField({ required: true }),
+ *   age: numberField({ required: false }),
+ *   password: stringField({ required: true, returned: false })
+ * };
+ *
+ * // Infer the output type (for API responses)
+ * type UserOutput = InferFieldsOutput<typeof userSchema>;
+ * // Result: { id: string; name: string; email: string; age?: number | null | undefined }
+ * // Note: 'password' is excluded because returned: false
+ * ```
+ *
+ * @remarks
+ * This creates a type with:
+ * - Required properties for fields marked required and returned
+ * - Optional properties for fields marked optional and returned
+ * - Excludes fields marked with returned: false
  */
-export type InferFieldsOutput<Field> = Field extends Record<
-	string,
-	FieldAttribute
->
+export type InferFieldsOutput<TSchema> = TSchema extends Record<string, Field>
 	? {
-			[K in RequiredKeys<Field> & string]: InferFieldOutput<Field[K]>;
+			[Key in RequiredKeys<TSchema> & string]: InferFieldOutput<TSchema[Key]>;
 		} & {
-			[K in OptionalKeys<Field> & string]?: InferFieldOutput<Field[K]>;
+			[Key in OptionalKeys<TSchema> & string]?: InferFieldOutput<TSchema[Key]>;
 		}
 	: Record<string, never>;
 
@@ -140,16 +261,40 @@ export type InferFieldsOutput<Field> = Field extends Record<
  * Handles required/optional status and input fields.
  * Used to determine the shape of data expected when creating records.
  *
- * @template Field - The field definitions to infer from
+ * @template TSchema - The field definitions to infer from
+ *
+ * @example
+ * ```typescript
+ * // Define a schema
+ * const userSchema = {
+ *   id: stringField({ required: true, input: false }), // Auto-generated
+ *   name: stringField({ required: true }),
+ *   email: stringField({ required: true }),
+ *   age: numberField({ required: false }),
+ *   createdAt: dateField({ required: true, input: false })
+ * };
+ *
+ * // Infer the input type (for create operations)
+ * type UserInput = InferFieldsInput<typeof userSchema>;
+ * // Result: { name: string; email: string; age?: number | null | undefined }
+ * // Note: 'id' and 'createdAt' are excluded because input: false
+ * ```
+ *
+ * @remarks
+ * This creates a type with:
+ * - Required properties for fields marked required and input
+ * - Optional properties for fields marked optional and input
+ * - Excludes fields marked with input: false
  */
-export type InferFieldsInput<Field> = Field extends Record<
-	string,
-	FieldAttribute
->
+export type InferFieldsInput<TSchema> = TSchema extends Record<string, Field>
 	? {
-			[K in RequiredInputKeys<Field> & string]: InferFieldInput<Field[K]>;
+			[Key in RequiredInputKeys<TSchema> & string]: InferFieldInput<
+				TSchema[Key]
+			>;
 		} & {
-			[K in OptionalInputKeys<Field> & string]?: InferFieldInput<Field[K]>;
+			[Key in OptionalInputKeys<TSchema> & string]?: InferFieldInput<
+				TSchema[Key]
+			>;
 		}
 	: Record<string, never>;
 
@@ -158,31 +303,58 @@ export type InferFieldsInput<Field> = Field extends Record<
  * Similar to InferFieldsInput but with different handling of optional fields,
  * making it more suitable for client-side form validation and submission.
  *
- * @template Field - The field definitions to infer from
+ * @template TSchema - The field definitions to infer from
+ *
+ * @remarks
+ * This is used primarily for generating client-side TypeScript interfaces
+ * for form handling and validation.
  */
-export type InferFieldsInputClient<Field> = Field extends Record<
+export type InferFieldsInputClient<TSchema> = TSchema extends Record<
 	string,
-	FieldAttribute
+	Field
 >
 	? {
-			[K in RequiredInputKeys<Field> & string]: InferFieldInput<Field[K]>;
+			[Key in RequiredInputKeys<TSchema> & string]: InferFieldInput<
+				TSchema[Key]
+			>;
 		} & {
-			[K in OptionalInputKeys<Field> & string]?: InferFieldInput<Field[K]>;
+			[Key in OptionalInputKeys<TSchema> & string]?: InferFieldInput<
+				TSchema[Key]
+			>;
 		}
 	: Record<string, never>;
 
 /**
- * Type helper for transform function parameters based on field type
- * Ensures transform functions receive the correct type
+ * Type helper for transform function parameters based on field type.
+ * Ensures transform functions receive the correct input type.
+ *
+ * @template TFieldType - The field type that determines the input parameter type
+ *
+ * @example
+ * ```typescript
+ * const stringTransform: TransformInputFn<'string'> = (value) => value.trim();
+ * // value is typed as string
+ *
+ * const numberTransform: TransformInputFn<'number'> = (value) => Math.abs(value);
+ * // value is typed as number
+ * ```
  */
-export type TransformInputFn<T extends FieldType> = (
-	value: InferValueType<T>
+export type TransformInputFn<TFieldType extends FieldType> = (
+	value: InferValueType<TFieldType>
 ) => Primitive | Promise<Primitive>;
 
 /**
- * Type helper for transform function output based on field type
- * Ensures transform functions return the correct type
+ * Type helper for transform function output based on field type.
+ * Ensures transform functions return the correct output type.
+ *
+ * @template TFieldType - The field type that determines the input parameter type
+ *
+ * @example
+ * ```typescript
+ * const dateTransform: TransformOutputFn<'date'> = (value) => value.toISOString();
+ * // value is typed as Date
+ * ```
  */
-export type TransformOutputFn<T extends FieldType> = (
-	value: InferValueType<T>
+export type TransformOutputFn<TFieldType extends FieldType> = (
+	value: InferValueType<TFieldType>
 ) => Primitive | Promise<Primitive>;

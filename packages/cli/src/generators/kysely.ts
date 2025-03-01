@@ -11,7 +11,7 @@ export const generateMigrations: SchemaGenerator = async ({
 		code: migrations,
 		fileName:
 			file ||
-			`./better-auth_migrations/${new Date()
+			`./c15t_migrations/${new Date()
 				.toISOString()
 				.replace(/:/g, "-")}.sql`,
 	};

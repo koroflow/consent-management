@@ -1,4 +1,4 @@
-import type { FieldAttribute } from '~/db/core/fields';
+import type { Field } from '~/db/core/fields';
 import type { C15TOptions } from '~/types';
 import { purposeSchema } from './schema';
 
@@ -22,7 +22,7 @@ import { purposeSchema } from './schema';
  */
 export function getPurposeTable(
 	options: C15TOptions,
-	purposeFields?: Record<string, FieldAttribute>
+	purposeFields?: Record<string, Field>
 ) {
 	return {
 		/**

@@ -8,14 +8,14 @@ import type {
 	AlterTableColumnAlteringBuilder,
 	CreateTableBuilder,
 } from 'kysely';
-import type { FieldAttribute } from '~/db/core/fields';
+import type { Field } from '~/db/core/fields';
 
 /**
  * Type representing a table to be created during migration
  */
 export interface TableToCreate {
 	table: string;
-	fields: Record<string, FieldAttribute>;
+	fields: Record<string, Field>;
 	order: number;
 }
 
@@ -24,7 +24,7 @@ export interface TableToCreate {
  */
 export interface ColumnsToAdd {
 	table: string;
-	fields: Record<string, FieldAttribute>;
+	fields: Record<string, Field>;
 	order: number;
 }
 

@@ -1,4 +1,4 @@
-import type { FieldAttribute } from '~/db/core/fields';
+import type { Field } from '~/db/core/fields';
 import type { C15TOptions } from '~/types';
 import { consentPolicySchema } from './schema';
 
@@ -22,7 +22,7 @@ import { consentPolicySchema } from './schema';
  */
 export function getConsentPolicyTable(
 	options: C15TOptions,
-	policyFields?: Record<string, FieldAttribute>
+	policyFields?: Record<string, Field>
 ) {
 	return {
 		/**

@@ -4,7 +4,7 @@ import { getConsentTables } from '../../db';
 import { C15TError } from '~/error';
 import type { Adapter, C15TOptions, Where } from '~/types';
 import { generateId } from '~/utils';
-import { withApplyDefault } from '../utils';
+import { applyDefaultValue } from '../utils';
 
 export interface PrismaConfig {
 	/**
@@ -84,7 +84,7 @@ const createTransform = (config: PrismaConfig, options: C15TOptions) => {
 				) {
 					continue;
 				}
-				transformedData[fields[field].fieldName || field] = withApplyDefault(
+				transformedData[fields[field].fieldName || field] = applyDefaultValue(
 					value,
 					fields[field],
 					action

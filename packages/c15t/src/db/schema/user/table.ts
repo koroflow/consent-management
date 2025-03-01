@@ -1,4 +1,4 @@
-import type { FieldAttribute } from '~/db/core/fields';
+import type { Field } from '~/db/core/fields';
 import type { C15TOptions } from '~/types';
 import { userSchema } from '.';
 
@@ -22,7 +22,7 @@ import { userSchema } from '.';
  */
 export function getUserTable(
 	options: C15TOptions,
-	userFields?: Record<string, FieldAttribute>
+	userFields?: Record<string, Field>
 ) {
 	return {
 		/**

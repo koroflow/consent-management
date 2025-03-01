@@ -1,55 +1,135 @@
+import type { InferFieldsInput, InferFieldsOutput } from './field-inference';
 import type { C15TOptions } from '~/types';
-import type { InferFieldsOutput, InferFieldsInput } from './field-inference';
+import type { Field } from './field-types';
 
 /**
- * Infers field types from plugin definitions.
- * Allows extraction of field types from plugins registered in C15TOptions.
+ * Infers field types from plugin definitions in C15T options.
+ * Extracts and combines field definitions from enabled plugins.
  *
- * @template Options - The C15T configuration options
- * @template Key - The schema key to extract fields from
- * @template Format - Whether to use input or output format
+ * @template TOptions - The C15T options configuration type
+ * @template TSchemaKey - Key for accessing the specific entity schema within plugins
+ * @template TFormat - Format to return ('output' or 'input')
+ *
+ * @example
+ * ```typescript
+ * // Configuration with plugins defining consent fields
+ * interface MyOptions extends C15TOptions {
+ *   auth: {
+ *     plugins: {
+ *       consent: {
+ *         enabled: true,
+ *         userFields: {
+ *           acceptedTerms: {
+ *             type: 'boolean',
+ *             required: true
+ *           }
+ *         }
+ *       }
+ *     }
+ *   }
+ * }
+ *
+ * // Infer the output types for user fields from plugins
+ * type UserPluginFields = InferFieldsFromPlugins<MyOptions, 'userFields', 'output'>;
+ * // Results in { acceptedTerms: boolean }
+ * ```
+ *
+ * @remarks
+ * This type helper allows plugins to extend entity schemas with their own fields.
+ * It walks through all enabled plugins, extracts fields for the specified entity type,
+ * and combines them into a single type.
  */
 export type InferFieldsFromPlugins<
-	Options extends C15TOptions,
-	Key extends string,
-	Format extends 'output' | 'input' = 'output',
-> = Options['plugins'] extends Array<infer T>
-	? T extends {
-			schema: {
-				[key in Key]: {
-					fields: infer Field;
-				};
-			};
-		}
-		? Format extends 'output'
-			? InferFieldsOutput<Field>
-			: InferFieldsInput<Field>
-		: Record<string, never>
-	: Record<string, never>;
+	TOptions extends C15TOptions,
+	TSchemaKey extends string,
+	TFormat extends 'output' | 'input' = 'output',
+> = InferFieldsFromObjectPath<
+	TOptions,
+	[string, 'plugins', string, TSchemaKey],
+	TFormat
+>;
 
 /**
- * Infers field types from C15T options for specific modules.
- * Used to extract additional field definitions from various C15T configuration sections.
+ * Infers field types from C15T options for a specific module.
+ * Used to extract additional fields defined in options.
  *
- * @template Options - The C15T configuration options
- * @template Key - The specific module configuration to extract from
- * @template Format - Whether to use input or output format
+ * @template TOptions - The C15T options configuration type
+ * @template TSchemaKey - Key for accessing the specific entity schema
+ * @template TFormat - Format to return ('output' or 'input')
+ *
+ * @example
+ * ```typescript
+ * // Configuration with additional user fields
+ * interface MyOptions extends C15TOptions {
+ *   auth: {
+ *     userFields: {
+ *       profile: {
+ *         type: 'string',
+ *         required: false
+ *       }
+ *     }
+ *   }
+ * }
+ *
+ * // Infer the output types for user fields from options
+ * type UserAdditionalFields = InferFieldsFromOptions<MyOptions, 'auth', 'userFields', 'output'>;
+ * // Results in { profile?: string | null | undefined }
+ * ```
+ *
+ * @remarks
+ * TSchemaKey can be one of:
+ * - Single string key like 'userFields' to access TOptions[T]['userFields']
+ * - Array of strings for a nested path like ['auth', 'userFields']
+ *
+ * This type helper extracts custom fields defined directly in the options object,
+ * rather than those defined in plugins.
  */
 export type InferFieldsFromOptions<
-	Options extends C15TOptions,
-	Key extends
-		| 'consent'
-		| 'purpose'
-		| 'record'
-		| 'consentGeoLocation'
-		| 'withdrawal'
-		| 'auditLog'
-		| 'user',
-	Format extends 'output' | 'input' = 'output',
-> = Options[Key] extends {
-	additionalFields: infer Field;
-}
-	? Format extends 'output'
-		? InferFieldsOutput<Field>
-		: InferFieldsInput<Field>
+	TOptions extends C15TOptions,
+	TModuleKey extends keyof TOptions & string,
+	TSchemaKey extends string,
+	TFormat extends 'output' | 'input' = 'output',
+> = InferFieldsFromObjectPath<TOptions, [TModuleKey, TSchemaKey], TFormat>;
+
+// Internal helper type
+type InferFieldsFromObjectPath<
+	TOptions,
+	TPath extends (string | number)[],
+	TFormat extends 'output' | 'input',
+> = TFormat extends 'output'
+	? InferFieldsOutput<GetFieldsFromPath<TOptions, TPath>>
+	: InferFieldsInput<GetFieldsFromPath<TOptions, TPath>>;
+
+// Internal helper type for accessing nested paths
+type GetFieldsFromPath<
+	TOptions,
+	TPath extends (string | number)[],
+> = TPath extends [infer TFirst, ...infer TRest]
+	? TFirst extends keyof TOptions
+		? TRest extends (string | number)[]
+			? TRest['length'] extends 0
+				? TOptions[TFirst] extends Record<string, Field>
+					? TOptions[TFirst]
+					: never
+				: GetFieldsFromPath<TOptions[TFirst], TRest>
+			: never
+		: TFirst extends string
+			? TOptions extends Record<string, unknown>
+				? TRest extends (string | number)[]
+					? TRest['length'] extends 0
+						? {
+								[K in keyof TOptions]: K extends TFirst
+									? TOptions[K] extends Record<string, Field>
+										? TOptions[K]
+										: never
+									: never;
+							}[keyof TOptions & TFirst]
+						: {
+								[K in keyof TOptions]: K extends TFirst
+									? GetFieldsFromPath<TOptions[K], TRest>
+									: never;
+							}[keyof TOptions & TFirst]
+					: never
+				: never
+			: never
 	: Record<string, never>;

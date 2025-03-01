@@ -10,7 +10,7 @@ import type {} from 'kysely';
 import type { Logger } from '../utils/logger';
 import type { C15TContext, C15TPlugin } from './index';
 import type { AuthMiddleware } from '~/api/call';
-import type { FieldAttribute } from '~/db/core/fields';
+import type { Field } from '~/db/core/fields';
 import type { DatabaseHook } from '~/db/hooks/types';
 import type { DatabaseConfiguration } from './database-config';
 import type { ModelName } from '~/db/core/types';
@@ -324,7 +324,7 @@ export interface C15TOptions {
 		/**
 		 * Additional fields for the user table
 		 */
-		additionalFields?: Record<string, FieldAttribute>;
+		additionalFields?: Record<string, Field>;
 	};
 
 	/**
@@ -355,7 +355,7 @@ export interface C15TOptions {
 		/**
 		 * Additional fields for the consent purpose table
 		 */
-		additionalFields?: Record<string, FieldAttribute>;
+		additionalFields?: Record<string, Field>;
 	};
 
 	/**
@@ -385,7 +385,7 @@ export interface C15TOptions {
 		/**
 		 * Additional fields for the consent policy table
 		 */
-		additionalFields?: Record<string, FieldAttribute>;
+		additionalFields?: Record<string, Field>;
 	};
 
 	/**
@@ -415,7 +415,7 @@ export interface C15TOptions {
 		/**
 		 * Additional fields for the domain table
 		 */
-		additionalFields?: Record<string, FieldAttribute>;
+		additionalFields?: Record<string, Field>;
 	};
 
 	/**
@@ -443,7 +443,7 @@ export interface C15TOptions {
 		/**
 		 * Additional fields for the geo location table
 		 */
-		additionalFields?: Record<string, FieldAttribute>;
+		additionalFields?: Record<string, Field>;
 	};
 
 	/**
@@ -532,7 +532,7 @@ export interface C15TOptions {
 		/**
 		 * Additional fields for the consent table
 		 */
-		additionalFields?: Record<string, FieldAttribute>;
+		additionalFields?: Record<string, Field>;
 	};
 
 	/**
@@ -557,7 +557,7 @@ export interface C15TOptions {
 		/**
 		 * Additional fields for the consent purpose junction table
 		 */
-		additionalFields?: Record<string, FieldAttribute>;
+		additionalFields?: Record<string, Field>;
 	};
 
 	/**
@@ -586,7 +586,7 @@ export interface C15TOptions {
 		/**
 		 * Additional fields for the consent record table
 		 */
-		additionalFields?: Record<string, FieldAttribute>;
+		additionalFields?: Record<string, Field>;
 	};
 
 	/**
@@ -611,7 +611,7 @@ export interface C15TOptions {
 		/**
 		 * Additional fields for the consent geo location table
 		 */
-		additionalFields?: Record<string, FieldAttribute>;
+		additionalFields?: Record<string, Field>;
 	};
 
 	/**
@@ -640,7 +640,7 @@ export interface C15TOptions {
 		/**
 		 * Additional fields for the consent withdrawal table
 		 */
-		additionalFields?: Record<string, FieldAttribute>;
+		additionalFields?: Record<string, Field>;
 	};
 
 	/**
@@ -672,6 +672,6 @@ export interface C15TOptions {
 		/**
 		 * Additional fields for the consent audit log table
 		 */
-		additionalFields?: Record<string, FieldAttribute>;
+		additionalFields?: Record<string, Field>;
 	};
 }

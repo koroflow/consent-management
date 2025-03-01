@@ -1,4 +1,4 @@
-import type { FieldAttribute } from '~/db/core/fields';
+import type { Field } from '~/db/core/fields';
 import type { C15TDBSchema } from '~/db/schema/definition';
 import type { ModelName } from '~/db/core/types';
 
@@ -17,7 +17,7 @@ export function processFields<T extends ModelName>(
 	fields: C15TDBSchema[T]['fields'],
 	tables: C15TDBSchema
 ) {
-	const actualFields: Record<string, FieldAttribute> = {};
+	const actualFields: Record<string, Field> = {};
 
 	// Process each field in the fields collection
 	for (const [fieldKey, field] of Object.entries(fields)) {
@@ -29,8 +29,8 @@ export function processFields<T extends ModelName>(
 		// Use the specified fieldName or the key if fieldName is not provided
 		const fieldName = field.fieldName || fieldKey;
 
-		// Cast field to FieldAttribute to ensure it has the right type
-		const typedField = field as unknown as FieldAttribute;
+		// Cast field to Field to ensure it has the right type
+		const typedField = field as unknown as Field;
 		actualFields[fieldName] = typedField;
 
 		// Handle references to other tables - first check if the field has a references property
@@ -44,7 +44,8 @@ export function processFields<T extends ModelName>(
 				actualFields[fieldName] = {
 					...typedField,
 					references: {
-						model: refTable.modelName || typedField.references.model,
+						model: refTable.modelName,
+						entity: refTable.modelName,
 						field: typedField.references.field,
 						onDelete: typedField.references.onDelete,
 					},

@@ -15,7 +15,7 @@ import type {
 	LiteralString,
 	DeepPartial,
 } from './index';
-import type { FieldAttribute } from '~/db/core/fields';
+import type { Field } from '~/db/core/fields';
 import type { Migration } from 'kysely';
 
 /**
@@ -246,7 +246,7 @@ export type InferPluginErrorCodes<O extends C15TOptions> =
 export type C15TPluginSchema = {
 	[table in string]: {
 		fields: {
-			[field in string]: FieldAttribute;
+			[field in string]: Field;
 		};
 		disableMigration?: boolean;
 		modelName?: string;

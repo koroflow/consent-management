@@ -307,6 +307,7 @@ export const getServerConsent = (
 		}
 	} catch (e) {
 		// If parsing fails, return no consent
+		// biome-ignore lint/suspicious/noConsole: <explanation>
 		console.error('Failed to parse consent cookie:', e);
 	}
 

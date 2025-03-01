@@ -1,4 +1,4 @@
-import type { FieldAttribute } from '~/db/core/fields';
+import type { Field } from '~/db/core/fields';
 import type { C15TOptions } from '~/types';
 import { recordSchema } from '.';
 
@@ -22,7 +22,7 @@ import { recordSchema } from '.';
  */
 export function getRecordTable(
 	options: C15TOptions,
-	recordFields?: Record<string, FieldAttribute>
+	recordFields?: Record<string, Field>
 ) {
 	return {
 		/**

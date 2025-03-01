@@ -1,5 +1,5 @@
 import type { C15TDBSchema } from '../schema/definition';
-import type { FieldAttribute } from './fields';
+import type { Field } from './fields';
 
 /**
  * Plugin-provided schema type with proper typing
@@ -7,7 +7,7 @@ import type { FieldAttribute } from './fields';
 export type PluginSchema = Record<
 	string,
 	{
-		fields: Record<string, FieldAttribute>;
+		fields: Record<string, Field>;
 		modelName?: string;
 	}
 >;

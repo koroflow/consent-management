@@ -14,7 +14,7 @@ import { getConsentTables } from '../../db';
 import { C15TError } from '~/error';
 import type { Adapter, C15TOptions, Where } from '~/types';
 import { generateId } from '~/utils';
-import { withApplyDefault } from '../utils';
+import { applyDefaultValue } from '../utils';
 
 export interface DB {
 	[key: string]: any;
@@ -155,7 +155,7 @@ const createTransform = (
 				if (value === undefined && !fields[field].defaultValue) {
 					continue;
 				}
-				transformedData[fields[field].fieldName || field] = withApplyDefault(
+				transformedData[fields[field].fieldName || field] = applyDefaultValue(
 					value,
 					fields[field],
 					action

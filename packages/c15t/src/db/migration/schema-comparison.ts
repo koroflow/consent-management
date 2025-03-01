@@ -18,7 +18,7 @@
  * @module migration/schema-comparison
  */
 import type { C15TOptions } from '~/types';
-import type { FieldAttribute } from '~/db/core/fields';
+import type { Field } from '~/db/core/fields';
 import { createLogger } from '../../utils/logger';
 import { getSchema } from '../core/get-schema';
 import type { TableToCreate, ColumnsToAdd } from './types';
@@ -95,7 +95,7 @@ export function analyzeSchemaChanges(
  */
 function handleNewTable(
 	tableName: string,
-	value: { fields: Record<string, FieldAttribute>; order: number },
+	value: { fields: Record<string, Field>; order: number },
 	toBeCreated: TableToCreate[]
 ): void {
 	const tIndex = toBeCreated.findIndex((t) => t.table === tableName);
@@ -163,14 +163,14 @@ function handleNewTable(
  */
 function handleExistingTable(
 	tableName: string,
-	value: { fields: Record<string, FieldAttribute>; order: number },
+	value: { fields: Record<string, Field>; order: number },
 	table: TableMetadata,
 	toBeAdded: ColumnsToAdd[],
 	dbType: KyselyDatabaseType,
 	logger: ReturnType<typeof createLogger>
 ): void {
 	// Collection of fields that need to be added to the existing table
-	const toBeAddedFields: Record<string, FieldAttribute> = {};
+	const toBeAddedFields: Record<string, Field> = {};
 
 	// Iterate through each field in the expected schema for this table
 	for (const [fieldName, field] of Object.entries(value.fields)) {

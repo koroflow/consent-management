@@ -1,4 +1,4 @@
-import type { FieldAttribute } from '~/db/core/fields';
+import type { Field } from '~/db/core/fields';
 import type { C15TOptions } from '~/types';
 import { consentSchema } from './schema';
 
@@ -23,7 +23,7 @@ import { consentSchema } from './schema';
 // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: needed for readability
 export function getConsentTable(
 	options: C15TOptions,
-	consentFields?: Record<string, FieldAttribute>
+	consentFields?: Record<string, Field>
 ) {
 	return {
 		/**

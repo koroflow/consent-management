@@ -1,4 +1,4 @@
-import type { FieldAttribute } from '~/db/core/fields';
+import type { Field } from '~/db/core/fields';
 import type { C15TOptions } from '~/types';
 import { withdrawalSchema } from './schema';
 
@@ -22,7 +22,7 @@ import { withdrawalSchema } from './schema';
  */
 export function getWithdrawalTable(
 	options: C15TOptions,
-	withdrawalFields?: Record<string, FieldAttribute>
+	withdrawalFields?: Record<string, Field>
 ) {
 	return {
 		/**
@@ -136,29 +136,30 @@ export function getWithdrawalTable(
 		 * Add unique constraint to ensure a consent can only be withdrawn once
 		 * (If this constraint is not desired, it can be disabled in options)
 		 */
-		// uniqueConstraints:
-		// 	options.withdrawal?.preventMultipleWithdrawals !== false
-		// 		? [
-		// 				{
-		// 					name: 'unique_consent_withdrawal',
-		// 					fields: ['consentId'],
-		// 				},
-		// 			]
-		// 		: [],
+		uniqueConstraints:
+			//@ts-expect-error
+			options.withdrawal?.preventMultipleWithdrawals !== false
+				? [
+						{
+							name: 'unique_consent_withdrawal',
+							fields: ['consentId'],
+						},
+					]
+				: [],
 
 		/**
 		 * Add indexes for better query performance
 		 */
-		// indexes: [
-		// 	{
-		// 		name: 'user_id_index',
-		// 		fields: ['userId'],
-		// 	},
-		// 	{
-		// 		name: 'created_at_index',
-		// 		fields: ['createdAt'],
-		// 	},
-		// ],
+		indexes: [
+			{
+				name: 'user_id_index',
+				fields: ['userId'],
+			},
+			{
+				name: 'created_at_index',
+				fields: ['createdAt'],
+			},
+		],
 
 		/**
 		 * Execution order during migrations (lower numbers run first)

@@ -7,9 +7,9 @@ import type {
 	TableOutput,
 } from '~/db/core/types';
 import type { TableFields } from '~/db/schema/definition';
-import type { FieldAttribute } from '~/db/core/fields';
+import type { Field, Primitive } from '~/db/core/fields';
 import { generateId } from '~/utils';
-import { withApplyDefault } from '../utils';
+import { applyDefaultValue } from '../utils';
 
 export interface MemoryDB {
 	[key: string]: Record<string, unknown>[];
@@ -42,7 +42,7 @@ const createTransform = (options: C15TOptions) => {
 		}
 		const modelFields = schema[model]?.fields;
 		const f = modelFields
-			? (modelFields as Record<string, FieldAttribute>)[field as string]
+			? (modelFields as Record<string, Field>)[field as string]
 			: undefined;
 		return f?.fieldName || (field as string);
 	}
@@ -68,14 +68,14 @@ const createTransform = (options: C15TOptions) => {
 			for (const field in fields) {
 				if (Object.prototype.hasOwnProperty.call(fields, field)) {
 					const value = data[field as keyof typeof data];
-					const fieldInfo = (fields as Record<string, FieldAttribute>)[field];
+					const fieldInfo = (fields as Record<string, Field>)[field];
 					if (value === undefined && !fieldInfo?.defaultValue) {
 						continue;
 					}
 					const fieldName = fieldInfo?.fieldName || field;
-					transformedData[fieldName] = withApplyDefault(
-						value,
-						fieldInfo as FieldAttribute,
+					transformedData[fieldName] = applyDefaultValue(
+						value as Primitive,
+						fieldInfo as Field,
 						action
 					);
 				}
@@ -102,7 +102,7 @@ const createTransform = (options: C15TOptions) => {
 				if (select.length && !select.includes(key)) {
 					continue;
 				}
-				const field = (tableSchema as Record<string, FieldAttribute>)[key];
+				const field = (tableSchema as Record<string, Field>)[key];
 				if (field) {
 					transformedData[key] = data[field.fieldName || key];
 				}

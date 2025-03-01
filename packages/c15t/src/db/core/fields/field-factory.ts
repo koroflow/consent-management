@@ -1,102 +1,341 @@
-import type {
-	FieldType,
-	FieldAttribute,
-	FieldAttributeConfig,
-} from './field-types';
-import type { TransformInputFn, TransformOutputFn } from './field-inference';
+import type { FieldType, Field, FieldConfig, Primitive } from './field-types';
+import type { InferValueType } from './field-inference';
 
 /**
- * Improved transformation type for better type safety
- */
-export type TypedTransform<T extends FieldType> = {
-	input?: TransformInputFn<T>;
-	output?: TransformOutputFn<T>;
-};
-
-/**
- * Config type with type-safe transformation functions
- */
-export type TypedFieldConfig<T extends FieldType> = Omit<
-	FieldAttributeConfig<T>,
-	'transform'
-> & {
-	transform?: TypedTransform<T>;
-};
-
-/**
- * Type for number field specific options
- */
-export type NumberFieldOptions = {
-	bigint?: boolean;
-};
-
-/**
- * Type for string field specific options
- */
-export type StringFieldOptions = {
-	sortable?: boolean;
-};
-
-/**
- * Creates a field attribute configuration with the specified type and options.
- * This is a helper function for creating field definitions with proper typing.
+ * Defines transform functions for field input and output operations.
+ * Provides properly typed transform functions based on the field type.
  *
- * @template T - The field type
- * @template C - The configuration options
- * @param type - The data type for this field
- * @param config - Configuration options for this field
- * @returns A complete field attribute definition
+ * @template TFieldType - The field type that determines the transform function signatures
  *
  * @example
  * ```typescript
- * const nameField = createFieldAttribute('string', { required: true, unique: true });
- * const ageField = createFieldAttribute('number', { required: false });
+ * // Define transform functions for a string field
+ * const nameTransformers: FieldTransformers<'string'> = {
+ *   input: (value) => value.trim(),
+ *   output: (value) => value.toUpperCase()
+ * };
  * ```
  */
-export const createFieldAttribute = <
-	T extends FieldType,
-	C extends TypedFieldConfig<T> &
-		(T extends 'number' ? NumberFieldOptions : unknown) &
-		(T extends 'string' ? StringFieldOptions : unknown),
->(
-	type: T,
-	config?: C
-): FieldAttribute<T> => {
-	return {
-		type,
-		...config,
-	} as FieldAttribute<T>;
+export type FieldTransformers<TFieldType extends FieldType> = {
+	/**
+	 * Transform function for field input.
+	 * Applied when data is being saved to the database.
+	 */
+	input?: (value: InferValueType<TFieldType>) => Primitive | Promise<Primitive>;
+	/**
+	 * Transform function for field output.
+	 * Applied when data is being retrieved from the database.
+	 */
+	output?: (
+		value: InferValueType<TFieldType>
+	) => Primitive | Promise<Primitive>;
 };
 
 /**
- * Type-safe field creation functions for specific field types
- * These provide better autocompletion and type validation based on field type
+ * Extends the base field configuration with type-aware transform objects.
+ *
+ * @template TFieldType - The field type that determines the configuration
+ *
+ * @example
+ * ```typescript
+ * // Configuration for a string field with transforms
+ * const emailConfig: TypedFieldOptions<'string'> = {
+ *   required: true,
+ *   transform: {
+ *     input: (value) => value.toLowerCase().trim(),
+ *     output: (value) => value
+ *   },
+ *   validator: (value) => value.includes('@') ? null : 'Invalid email'
+ * };
+ * ```
  */
+export type TypedFieldOptions<TFieldType extends FieldType> = Omit<
+	FieldConfig<TFieldType>,
+	'transform'
+> & {
+	transform?: FieldTransformers<TFieldType>;
+};
 
-export const stringField = <
-	C extends TypedFieldConfig<'string'> & StringFieldOptions,
->(
-	config?: C
-): FieldAttribute<'string'> => createFieldAttribute('string', config);
+/**
+ * Additional configuration properties that can be passed to createField.
+ * This includes type-specific field options and any other valid field properties.
+ */
+export interface AdditionalFieldOptions {
+	[key: string]: unknown;
+}
 
-export const numberField = <
-	C extends TypedFieldConfig<'number'> & NumberFieldOptions,
->(
-	config?: C
-): FieldAttribute<'number'> => createFieldAttribute('number', config);
+/**
+ * Configuration options specific to number fields.
+ * Provides additional validation options for number fields.
+ *
+ * @example
+ * ```typescript
+ * // Define a number field with min/max constraints
+ * const ageField = numberField({
+ *   required: true,
+ *   min: 0,
+ *   max: 120
+ * });
+ * ```
+ */
+export type NumberFieldOptions = {
+	/**
+	 * Minimum allowed value for the number field.
+	 */
+	min?: number;
+	/**
+	 * Maximum allowed value for the number field.
+	 */
+	max?: number;
+};
 
-export const booleanField = <C extends TypedFieldConfig<'boolean'>>(
-	config?: C
-): FieldAttribute<'boolean'> => createFieldAttribute('boolean', config);
+/**
+ * Configuration options specific to string fields.
+ * Provides additional validation options for string fields.
+ *
+ * @example
+ * ```typescript
+ * // Define a string field with length constraints
+ * const usernameField = stringField({
+ *   required: true,
+ *   minLength: 3,
+ *   maxLength: 20
+ * });
+ * ```
+ */
+export type StringFieldOptions = {
+	/**
+	 * Minimum allowed length for the string field.
+	 */
+	minLength?: number;
+	/**
+	 * Maximum allowed length for the string field.
+	 */
+	maxLength?: number;
+	/**
+	 * Regular expression pattern that the string must match.
+	 */
+	pattern?: string;
+};
 
-export const dateField = <C extends TypedFieldConfig<'date'>>(
-	config?: C
-): FieldAttribute<'date'> => createFieldAttribute('date', config);
+/**
+ * Creates a field attribute with the specified configuration.
+ * This is the core function for defining schema fields with type safety.
+ *
+ * @template TFieldType - The field type to create
+ * @template TConfig - The configuration type for the field
+ *
+ * @param type - The field type to create
+ * @param config - Configuration options for the field
+ * @returns A fully configured field definition
+ *
+ * @example
+ * ```typescript
+ * // Create a basic string field
+ * const nameField = createField('string', {
+ *   required: true
+ * });
+ *
+ * // Create a number field with transforms
+ * const ageField = createField('number', {
+ *   required: false,
+ *   transform: {
+ *     input: (value) => Math.floor(value)
+ *   }
+ * });
+ * ```
+ */
+export function createField<
+	TFieldType extends FieldType,
+	TConfig extends TypedFieldOptions<TFieldType> & AdditionalFieldOptions,
+>(type: TFieldType, config: TConfig = {} as TConfig): Field<TFieldType> {
+	const { transform, ...rest } = config;
 
-export const stringArrayField = <C extends TypedFieldConfig<'string[]'>>(
-	config?: C
-): FieldAttribute<'string[]'> => createFieldAttribute('string[]', config);
+	return {
+		type,
+		required: true,
+		returned: true,
+		input: true,
+		bigint: false,
+		sortable: true,
+		...rest,
+		...(transform
+			? {
+					transform: {
+						...transform,
+					},
+				}
+			: {}),
+	};
+}
 
-export const numberArrayField = <C extends TypedFieldConfig<'number[]'>>(
-	config?: C
-): FieldAttribute<'number[]'> => createFieldAttribute('number[]', config);
+/**
+ * Creates a string field with the specified configuration.
+ * Convenience wrapper around createField with string type.
+ *
+ * @template TConfig - The configuration type for the field
+ *
+ * @param config - Configuration options for the field including string-specific options
+ * @returns A fully configured string field definition
+ *
+ * @example
+ * ```typescript
+ * // Create a required string field
+ * const nameField = stringField({ required: true });
+ *
+ * // Create a string field with validation
+ * const emailField = stringField({
+ *   required: true,
+ *   pattern: '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$',
+ *   transform: {
+ *     input: (value) => value.toLowerCase().trim()
+ *   },
+ *   validator: (value) => value.includes('@') ? null : 'Invalid email'
+ * });
+ * ```
+ */
+export function stringField<
+	TConfig extends TypedFieldOptions<'string'> & StringFieldOptions,
+>(config: TConfig = {} as TConfig): Field<'string'> {
+	return createField('string', config);
+}
+
+/**
+ * Creates a number field with the specified configuration.
+ * Convenience wrapper around createField with number type.
+ *
+ * @template TConfig - The configuration type for the field
+ *
+ * @param config - Configuration options for the field including number-specific options
+ * @returns A fully configured number field definition
+ *
+ * @example
+ * ```typescript
+ * // Create a required number field
+ * const scoreField = numberField({ required: true });
+ *
+ * // Create a number field with validation
+ * const ageField = numberField({
+ *   required: true,
+ *   min: 0,
+ *   max: 120,
+ *   validator: (value) => value >= 18 ? null : 'Must be at least 18'
+ * });
+ * ```
+ */
+export function numberField<
+	TConfig extends TypedFieldOptions<'number'> & NumberFieldOptions,
+>(config: TConfig = {} as TConfig): Field<'number'> {
+	return createField('number', config);
+}
+
+/**
+ * Creates a boolean field with the specified configuration.
+ * Convenience wrapper around createField with boolean type.
+ *
+ * @template TConfig - The configuration type for the field
+ *
+ * @param config - Configuration options for the field
+ * @returns A fully configured boolean field definition
+ *
+ * @example
+ * ```typescript
+ * // Create a required boolean field
+ * const isActiveField = booleanField({ required: true });
+ *
+ * // Create a boolean field with default value
+ * const isVerifiedField = booleanField({
+ *   required: true,
+ *   defaultValue: false
+ * });
+ * ```
+ */
+export function booleanField<TConfig extends TypedFieldOptions<'boolean'>>(
+	config: TConfig = {} as TConfig
+): Field<'boolean'> {
+	return createField('boolean', config);
+}
+
+/**
+ * Creates a date field with the specified configuration.
+ * Convenience wrapper around createField with date type.
+ *
+ * @template TConfig - The configuration type for the field
+ *
+ * @param config - Configuration options for the field
+ * @returns A fully configured date field definition
+ *
+ * @example
+ * ```typescript
+ * // Create a required date field
+ * const createdAtField = dateField({ required: true });
+ *
+ * // Create a date field with transform and default value
+ * const lastLoginField = dateField({
+ *   required: false,
+ *   defaultValue: () => new Date(),
+ *   transform: {
+ *     output: (value) => value.toISOString()
+ *   }
+ * });
+ * ```
+ */
+export function dateField<TConfig extends TypedFieldOptions<'date'>>(
+	config: TConfig = {} as TConfig
+): Field<'date'> {
+	return createField('date', config);
+}
+
+/**
+ * Creates a string array field with the specified configuration.
+ * Convenience wrapper around createField with string[] type.
+ *
+ * @template TConfig - The configuration type for the field
+ *
+ * @param config - Configuration options for the field
+ * @returns A fully configured string array field definition
+ *
+ * @example
+ * ```typescript
+ * // Create a required string array field
+ * const tagsField = stringArrayField({ required: true });
+ *
+ * // Create a string array field with default value
+ * const categoriesField = stringArrayField({
+ *   required: true,
+ *   defaultValue: ['general']
+ * });
+ * ```
+ */
+export function stringArrayField<TConfig extends TypedFieldOptions<'string[]'>>(
+	config: TConfig = {} as TConfig
+): Field<'string[]'> {
+	return createField('string[]', config);
+}
+
+/**
+ * Creates a number array field with the specified configuration.
+ * Convenience wrapper around createField with number[] type.
+ *
+ * @template TConfig - The configuration type for the field
+ *
+ * @param config - Configuration options for the field
+ * @returns A fully configured number array field definition
+ *
+ * @example
+ * ```typescript
+ * // Create a required number array field
+ * const scoresField = numberArrayField({ required: true });
+ *
+ * // Create a number array field with default value
+ * const ratingsField = numberArrayField({
+ *   required: true,
+ *   defaultValue: [0, 0, 0]
+ * });
+ * ```
+ */
+export function numberArrayField<TConfig extends TypedFieldOptions<'number[]'>>(
+	config: TConfig = {} as TConfig
+): Field<'number[]'> {
+	return createField('number[]', config);
+}

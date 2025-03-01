@@ -1,4 +1,4 @@
-import type { FieldAttribute } from '~/db/core/fields';
+import type { Field } from '~/db/core/fields';
 import type { C15TOptions } from '~/types';
 import { purposeJunctionSchema } from './schema';
 
@@ -22,7 +22,7 @@ import { purposeJunctionSchema } from './schema';
  */
 export function getPurposeJunctionTable(
 	options: C15TOptions,
-	junctionFields?: Record<string, FieldAttribute>
+	junctionFields?: Record<string, Field>
 ) {
 	return {
 		/**

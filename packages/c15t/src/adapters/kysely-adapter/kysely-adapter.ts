@@ -5,7 +5,7 @@ import type {
 import { getConsentTables } from '../../db';
 import type { Adapter, C15TOptions, Where } from '../../types';
 import { generateId } from '../../utils';
-import { withApplyDefault } from '../utils';
+import { applyDefaultValue } from '../utils';
 import type { Database, KyselyDatabaseType } from './types';
 import type {
 	ExpressionBuilder,
@@ -25,7 +25,7 @@ import type {
 } from '~/db/core/types';
 import type { TableReference } from 'node_modules/kysely/dist/esm/parser/table-parser';
 import type { TableFields } from '~/db/schema/definition';
-import type { FieldAttribute } from '~/db/core/fields';
+import type { Field, Primitive } from '~/db/core/fields';
 import type { InsertExpression } from 'node_modules/kysely/dist/esm/parser/insert-values-parser';
 
 // Define an intermediate interface for Kysely field references
@@ -84,7 +84,7 @@ const createTransform = (
 		}
 		const modelFields = schema[model]?.fields;
 		const f = modelFields
-			? (modelFields as Record<string, FieldAttribute>)[field as string]
+			? (modelFields as Record<string, Field>)[field as string]
 			: undefined;
 		if (!f) {
 			// biome-ignore lint/suspicious/noConsoleLog: <explanation>
@@ -106,7 +106,7 @@ const createTransform = (
 		const { type = 'sqlite' } = config || {};
 		const modelFields = schema[model]?.fields;
 		const f = modelFields
-			? (modelFields as Record<string, FieldAttribute>)[field as string]
+			? (modelFields as Record<string, Field>)[field as string]
 			: undefined;
 		if (
 			f?.type === 'boolean' &&
@@ -131,7 +131,7 @@ const createTransform = (
 
 		const modelFields = schema[model]?.fields;
 		const f = modelFields
-			? (modelFields as Record<string, FieldAttribute>)[field as string]
+			? (modelFields as Record<string, Field>)[field as string]
 			: undefined;
 		if (
 			f?.type === 'boolean' &&
@@ -177,11 +177,11 @@ const createTransform = (
 			for (const field in fields) {
 				if (Object.prototype.hasOwnProperty.call(fields, field)) {
 					const value = data[field as keyof typeof data];
-					const fieldInfo = (fields as Record<string, FieldAttribute>)[field];
+					const fieldInfo = (fields as Record<string, Field>)[field];
 					const fieldName = fieldInfo?.fieldName || field;
 					if (fieldInfo) {
-						transformedData[fieldName] = withApplyDefault(
-							transformValueToDB(value, model, field),
+						transformedData[fieldName] = applyDefaultValue(
+							transformValueToDB(value, model, field) as Primitive,
 							fieldInfo,
 							action
 						);
@@ -212,7 +212,7 @@ const createTransform = (
 				if (select.length && !select.includes(key)) {
 					continue;
 				}
-				const field = (tableSchema as Record<string, FieldAttribute>)[key];
+				const field = (tableSchema as Record<string, Field>)[key];
 				if (field) {
 					transformedData[key] = transformValueFromDB(
 						data[field.fieldName || key],

@@ -143,12 +143,6 @@ export const c15t = <O extends C15TOptions>(options: O) => {
 
 		// Make sure context has a valid baseURL before calling router
 		if (!context.baseURL) {
-			// Log the warning but return the endpoints anyway to prevent 404s
-			// This allows clients to access endpoints even if the baseURL isn't set yet
-			context.logger.warn(
-				'WARNING: baseURL not initialized, using default endpoint paths'
-			);
-
 			try {
 				// Set a default baseURL temporarily to get endpoints
 				context.baseURL = '/api/c15t';

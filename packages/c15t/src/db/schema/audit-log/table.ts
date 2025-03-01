@@ -1,4 +1,4 @@
-import type { FieldAttribute } from '~/db/core/fields';
+import type { Field } from '~/db/core/fields';
 import type { C15TOptions } from '~/types';
 import { auditLogSchema } from './schema';
 
@@ -22,7 +22,7 @@ import { auditLogSchema } from './schema';
  */
 export function getAuditLogTable(
 	options: C15TOptions,
-	auditLogFields?: Record<string, FieldAttribute>
+	auditLogFields?: Record<string, Field>
 ) {
 	return {
 		/**

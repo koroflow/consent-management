@@ -1,4 +1,4 @@
-import type { FieldAttribute } from '~/db/core/fields';
+import type { Field } from '~/db/core/fields';
 import type { C15TOptions } from '~/types';
 import { geoLocationSchema } from './schema';
 
@@ -22,7 +22,7 @@ import { geoLocationSchema } from './schema';
  */
 export function getGeoLocationTable(
 	options: C15TOptions,
-	geoLocationFields?: Record<string, FieldAttribute>
+	geoLocationFields?: Record<string, Field>
 ) {
 	return {
 		/**
