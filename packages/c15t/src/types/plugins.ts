@@ -15,7 +15,7 @@ import type {
 	LiteralString,
 	DeepPartial,
 } from './index';
-import type { FieldAttribute } from '~/db';
+import type { FieldAttribute } from '~/db/fields';
 import type { Migration } from 'kysely';
 
 /**
@@ -80,19 +80,6 @@ export interface PluginHook {
 	 */
 	handler: (context: PluginHookContext) => Promise<void> | void;
 }
-
-/**
- * Schema type for plugin extensions
- *
- * This can include additional types, validation schemas, or other
- * schema-related extensions provided by plugins.
- */
-export type PluginSchema = Record<string, unknown>;
-
-/**
- * Type for plugin-specific server-side functionality
- */
-export type PluginServerExtension = Record<string, unknown>;
 
 /**
  * c15t Plugin Definition
@@ -215,17 +202,6 @@ export interface C15TPlugin {
 	 */
 	$ERROR_CODES?: Record<string, string>;
 }
-
-/**
- * Type utility to extract options type from a plugin
- *
- * @template T - Plugin type
- */
-export type InferPluginOptions<T extends C15TPlugin> = T extends {
-	options: infer O;
-}
-	? O
-	: Record<string, never>;
 
 /**
  * Infer plugin types from configuration options

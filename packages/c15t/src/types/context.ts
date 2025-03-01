@@ -46,10 +46,6 @@ export interface C15TContext {
 	 */
 	trustedOrigins: string[];
 
-	/**
-	 * Secondary storage adapter (if configured)
-	 */
-	secondaryStorage?: Storage;
 	adapter: Adapter;
 	internalAdapter: ReturnType<typeof createInternalAdapter>;
 

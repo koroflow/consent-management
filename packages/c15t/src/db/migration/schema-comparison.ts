@@ -18,7 +18,7 @@
  * @module migration/schema-comparison
  */
 import type { C15TOptions } from '~/types';
-import type { FieldAttribute } from '../index';
+import type { FieldAttribute } from '~/db/fields';
 import { createLogger } from '../../utils/logger';
 import { getSchema } from '../get-schema';
 import type { TableToCreate, ColumnsToAdd } from './types';

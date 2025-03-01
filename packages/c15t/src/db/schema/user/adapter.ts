@@ -1,0 +1,176 @@
+import type { C15TOptions, Adapter, GenericEndpointContext } from '~/types';
+import { parseUserOutput, type User } from './schema';
+import type { CreateWithHooks, UpdateWithHooks } from '~/db/hooks/types';
+
+/**
+ * Creates and returns a set of user-related adapter methods to interact with the database.
+ *
+ * These methods provide a consistent interface for creating, finding, updating, and deleting
+ * user records while applying hooks and enforcing data validation rules.
+ *
+ * @param adapter - The database adapter used for direct database operations
+ * @param createWithHooks - Function to create records with before/after hooks
+ * @param updateWithHooks - Function to update records with before/after hooks
+ * @param options - Configuration options for the C15T system
+ * @returns An object containing type-safe user operations
+ *
+ * @example
+ * ```typescript
+ * const userAdapter = createUserAdapter(
+ *   databaseAdapter,
+ *   createWithHooks,
+ *   updateWithHooks,
+ *   c15tOptions
+ * );
+ *
+ * // Create a new user
+ * const user = await userAdapter.createUser({
+ *   externalId: 'external-123',
+ *   identityProvider: 'auth0'
+ * });
+ * ```
+ */
+export function createUserAdapter(
+	adapter: Adapter,
+	createWithHooks: CreateWithHooks,
+	updateWithHooks: UpdateWithHooks,
+	options: C15TOptions
+) {
+	return {
+		/**
+		 * Creates a new user record in the database.
+		 *
+		 * Automatically sets creation and update timestamps and applies any
+		 * configured hooks during the creation process.
+		 *
+		 * @param user - User data to create (without id and timestamps)
+		 * @param context - Optional endpoint context for hooks
+		 * @returns The created user with all fields populated
+		 *
+		 * @throws May throw an error if hooks prevent creation or if database operations fail
+		 */
+		createUser: async (
+			user: Omit<User, 'id' | 'createdAt' | 'updatedAt'> & Partial<User>,
+			context?: GenericEndpointContext
+		) => {
+			const createdUser = await createWithHooks(
+				{
+					createdAt: new Date(),
+					updatedAt: new Date(),
+					...user,
+				},
+				'user',
+				undefined,
+				context
+			);
+			return createdUser as User;
+		},
+
+		/**
+		 * Finds a user by their unique ID.
+		 *
+		 * Returns the user with processed output fields according to the schema configuration.
+		 *
+		 * @param userId - The unique identifier of the user
+		 * @returns The user object if found, null otherwise
+		 */
+		findUserById: async (userId: string) => {
+			const user = await adapter.findOne<User>({
+				model: 'user',
+				where: [
+					{
+						field: 'id',
+						value: userId,
+					},
+				],
+			});
+			return user ? parseUserOutput(options, user) : null;
+		},
+
+		/**
+		 * Finds a user by their external ID.
+		 *
+		 * This is useful when integrating with external authentication systems
+		 * where users are identified by a provider-specific ID.
+		 *
+		 * @param externalId - The external identifier of the user
+		 * @returns The user object if found, null otherwise
+		 */
+		findUserByExternalId: async (externalId: string) => {
+			const user = await adapter.findOne<User>({
+				model: 'user',
+				where: [
+					{
+						field: 'externalId',
+						value: externalId,
+					},
+				],
+			});
+			return user ? parseUserOutput(options, user) : null;
+		},
+
+		/**
+		 * Updates an existing user record by ID.
+		 *
+		 * Applies any configured hooks during the update process and
+		 * processes the output according to schema configuration.
+		 *
+		 * @param userId - The unique identifier of the user to update
+		 * @param data - The fields to update on the user record
+		 * @param context - Optional endpoint context for hooks
+		 * @returns The updated user if successful, null if user not found or hooks prevented update
+		 */
+		updateUser: async (
+			userId: string,
+			data: Partial<User> & Record<string, unknown>,
+			context?: GenericEndpointContext
+		) => {
+			const user = await updateWithHooks<User>(
+				data,
+				[
+					{
+						field: 'id',
+						value: userId,
+					},
+				],
+				'user',
+				undefined,
+				context
+			);
+			return user ? parseUserOutput(options, user) : null;
+		},
+
+		/**
+		 * Deletes a user and all associated consents from the database.
+		 *
+		 * This is a cascading operation that first removes all consents associated
+		 * with the user, then removes the user record itself.
+		 *
+		 * @param userId - The unique identifier of the user to delete
+		 * @returns A promise that resolves when the deletion is complete
+		 */
+		deleteUser: async (userId: string) => {
+			// Delete all consents associated with the user
+			await adapter.deleteMany({
+				model: 'consent',
+				where: [
+					{
+						field: 'userId',
+						value: userId,
+					},
+				],
+			});
+
+			// Delete the user
+			await adapter.delete({
+				model: 'user',
+				where: [
+					{
+						field: 'id',
+						value: userId,
+					},
+				],
+			});
+		},
+	};
+}

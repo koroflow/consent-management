@@ -347,56 +347,56 @@ export const getServerConsent = (
 export const setServerConsent = (
 	c15t: C15TInstance,
 	context: ServerC15TContext,
-	preferences: Record<string, boolean>,
-	options?: CookieOptions
+	preferences: Record<string, boolean>
+	// options?: CookieOptions
 ): ConsentResult => {
 	// Get cookie name from context or use default
 	const cookieName = context.cookieName || 'c15t-consent';
 
-	// Default cookie options
-	const cookieOptions: CookieOptions = {
-		path: '/',
-		httpOnly: false, // Allow JavaScript access
-		secure: process.env.NODE_ENV === 'production',
-		sameSite: 'lax',
-		maxAge: 365 * 24 * 60 * 60, // 1 year
-		...options,
-	};
+	// // Default cookie options
+	// const cookieOptions: CookieOptions = {
+	// 	path: '/',
+	// 	httpOnly: false, // Allow JavaScript access
+	// 	secure: process.env.NODE_ENV === 'production',
+	// 	sameSite: 'lax',
+	// 	maxAge: 365 * 24 * 60 * 60, // 1 year
+	// 	// ...options,
+	// };
 
 	// Convert preferences to JSON string
 	const consentValue = encodeURIComponent(JSON.stringify(preferences));
 
-	// Set the cookie
-	if (context.cookies?.set) {
-		context.cookies.set(cookieName, consentValue, cookieOptions);
-	} else if (context.headers?.set) {
-		// Build a cookie string
-		let cookieStr = `${cookieName}=${consentValue}`;
+	// // Set the cookie
+	// if (context.cookies?.set) {
+	// 	context.cookies.set(cookieName, consentValue, cookieOptions);
+	// } else if (context.headers?.set) {
+	// 	// Build a cookie string
+	// 	let cookieStr = `${cookieName}=${consentValue}`;
 
-		if (cookieOptions.path) {
-			cookieStr += `; Path=${cookieOptions.path}`;
-		}
-		if (cookieOptions.domain) {
-			cookieStr += `; Domain=${cookieOptions.domain}`;
-		}
-		if (cookieOptions.maxAge) {
-			cookieStr += `; Max-Age=${cookieOptions.maxAge}`;
-		}
-		if (cookieOptions.expires) {
-			cookieStr += `; Expires=${cookieOptions.expires.toUTCString()}`;
-		}
-		if (cookieOptions.secure) {
-			cookieStr += '; Secure';
-		}
-		if (cookieOptions.httpOnly) {
-			cookieStr += '; HttpOnly';
-		}
-		if (cookieOptions.sameSite) {
-			cookieStr += `; SameSite=${cookieOptions.sameSite}`;
-		}
+	// 	if (cookieOptions.path) {
+	// 		cookieStr += `; Path=${cookieOptions.path}`;
+	// 	}
+	// 	if (cookieOptions.domain) {
+	// 		cookieStr += `; Domain=${cookieOptions.domain}`;
+	// 	}
+	// 	if (cookieOptions.maxAge) {
+	// 		cookieStr += `; Max-Age=${cookieOptions.maxAge}`;
+	// 	}
+	// 	if (cookieOptions.expires) {
+	// 		cookieStr += `; Expires=${cookieOptions.expires.toUTCString()}`;
+	// 	}
+	// 	if (cookieOptions.secure) {
+	// 		cookieStr += '; Secure';
+	// 	}
+	// 	if (cookieOptions.httpOnly) {
+	// 		cookieStr += '; HttpOnly';
+	// 	}
+	// 	if (cookieOptions.sameSite) {
+	// 		cookieStr += `; SameSite=${cookieOptions.sameSite}`;
+	// 	}
 
-		context.headers.set('Set-Cookie', cookieStr);
-	}
+	// 	context.headers.set('Set-Cookie', cookieStr);
+	// }
 
 	// Return the preferences
 	return {

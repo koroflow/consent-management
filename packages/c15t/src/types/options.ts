@@ -8,17 +8,12 @@
 
 import type { Dialect, Kysely, MysqlPool, PostgresPool } from 'kysely';
 import type { Logger } from '../utils/logger';
-import type {
-	AdapterInstance,
-	C15TContext,
-	C15TPlugin,
-	Consent,
-	GenericEndpointContext,
-} from './index';
+import type { AdapterInstance, C15TContext, C15TPlugin } from './index';
 import type { AuthMiddleware } from '~/api/call';
 import type { KyselyDatabaseType } from '~/adapters/kysely-adapter/types';
 import type { Database } from 'better-sqlite3';
-import type { FieldAttribute } from '~/db';
+import type { FieldAttribute } from '~/db/fields';
+import type { CreateWithHooks, UpdateWithHooks } from '~/db/hooks/types';
 
 /**
  * Analytics destination configuration
@@ -33,39 +28,6 @@ export interface AnalyticsDestination {
 	 * Configuration options specific to this analytics destination
 	 */
 	options: Record<string, unknown>;
-}
-
-/**
- * Cookie configuration options
- */
-export interface CookieOptions {
-	/**
-	 * Domain for the cookie
-	 */
-	domain?: string;
-
-	/**
-	 * Path for the cookie
-	 * @default "/"
-	 */
-	path?: string;
-
-	/**
-	 * Maximum age of the cookie in seconds
-	 */
-	maxAge?: number;
-
-	/**
-	 * SameSite attribute
-	 * @default "lax"
-	 */
-	sameSite?: 'strict' | 'lax' | 'none';
-
-	/**
-	 * Secure attribute
-	 * @default true in production
-	 */
-	secure?: boolean;
 }
 
 /**
@@ -125,12 +87,6 @@ export interface C15TOptions {
 	 * @example "/api/c15t"
 	 */
 	basePath?: string;
-
-	/**
-	 * Secondary storage for distributed environments (optional)
-	 * Used as a fallback if primary storage fails and for data redundancy
-	 */
-	secondaryStorage?: Storage;
 
 	/**
 	 * Application name shown in consent dialogs
@@ -245,7 +201,7 @@ export interface C15TOptions {
 		 * Destinations for analytics data
 		 * Each destination has a type and configuration options
 		 */
-		destinations?: Array<AnalyticsDestination>;
+		destinations?: AnalyticsDestination[];
 	};
 
 	/**
@@ -288,56 +244,8 @@ export interface C15TOptions {
 		 * User hooks
 		 */
 		consent?: {
-			create?: {
-				/**
-				 * Hook that is called before a consent is created.
-				 * if the hook returns false, the consent will not be created.
-				 * If the hook returns an object, it'll be used instead of the original data
-				 */
-				before?: (
-					consent: Consent,
-					context?: GenericEndpointContext
-				) => Promise<
-					| boolean
-					| undefined
-					| {
-							// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-							data: Partial<Consent> & Record<string, any>;
-					  }
-				>;
-				/**
-				 * Hook that is called after a consent is created.
-				 */
-				after?: (
-					user: Consent,
-					context?: GenericEndpointContext
-				) => Promise<void>;
-			};
-			update?: {
-				/**
-				 * Hook that is called before a consent is updated.
-				 * if the hook returns false, the consent will not be updated.
-				 * If the hook returns an object, it'll be used instead of the original data
-				 */
-				before?: (
-					user: Partial<Consent>,
-					context?: GenericEndpointContext
-				) => Promise<
-					| boolean
-					| undefined
-					| {
-							// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-							data: Partial<Consent & Record<string, any>>;
-					  }
-				>;
-				/**
-				 * Hook that is called after a user is updated.
-				 */
-				after?: (
-					user: Consent,
-					context?: GenericEndpointContext
-				) => Promise<void>;
-			};
+			create?: CreateWithHooks;
+			update?: UpdateWithHooks;
 		};
 	};
 	/*

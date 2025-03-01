@@ -9,11 +9,3 @@ export type FilterActions<T> = {
 		? K
 		: never]: T[K];
 };
-
-/**
- * Infer the return type of an API function
- *
- * This type utility extracts the return type of a function,
- * useful for API type inference.
- */
-export type InferAPI<T> = T extends (...args: unknown[]) => infer R ? R : never;

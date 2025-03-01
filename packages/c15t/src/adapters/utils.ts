@@ -1,4 +1,4 @@
-import type { FieldAttribute } from '../db';
+import type { FieldAttribute } from '~/db/fields';
 
 export function withApplyDefault(
 	value: any,
@@ -8,13 +8,11 @@ export function withApplyDefault(
 	if (action === 'update') {
 		return value;
 	}
-	if (value === undefined || value === null) {
-		if (field.defaultValue) {
-			if (typeof field.defaultValue === 'function') {
-				return field.defaultValue();
-			}
-			return field.defaultValue;
+	if ((value === undefined || value === null) && field.defaultValue) {
+		if (typeof field.defaultValue === 'function') {
+			return field.defaultValue();
 		}
+		return field.defaultValue;
 	}
 	return value;
 }
