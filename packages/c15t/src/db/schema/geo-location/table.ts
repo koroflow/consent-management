@@ -1,5 +1,6 @@
 import type { FieldAttribute } from '~/db/core/fields';
 import type { C15TOptions } from '~/types';
+import { geoLocationSchema } from './schema';
 
 /**
  * Generates the database table configuration for the geo-location entity.
@@ -28,6 +29,11 @@ export function getGeoLocationTable(
 		 * The name of the geo-location table in the database, configurable through options
 		 */
 		modelName: options.geoLocation?.modelName || 'geoLocation',
+
+		/**
+		 * The schema for the geo-location table
+		 */
+		schema: geoLocationSchema,
 
 		/**
 		 * Field definitions for the geo-location table
@@ -78,16 +84,16 @@ export function getGeoLocationTable(
 				required: false,
 				fieldName:
 					options.geoLocation?.fields?.regulatoryZones || 'regulatoryZones',
-				// transformer: {
-				// 	input: (value: string[]) => JSON.stringify(value),
-				// 	output: (value: string) => {
-				// 		try {
-				// 			return JSON.parse(value);
-				// 		} catch (e) {
-				// 			return [];
-				// 		}
-				// 	},
-				// },
+				transformer: {
+					input: (value: string[]) => JSON.stringify(value),
+					output: (value: string) => {
+						try {
+							return JSON.parse(value);
+						} catch (e) {
+							return [];
+						}
+					},
+				},
 			},
 
 			/**
@@ -111,20 +117,20 @@ export function getGeoLocationTable(
 		/**
 		 * Add indexes for better query performance
 		 */
-		// indexes: [
-		// 	{
-		// 		name: 'country_code_index',
-		// 		fields: ['countryCode'],
-		// 	},
-		// 	{
-		// 		name: 'region_code_index',
-		// 		fields: ['regionCode'],
-		// 	},
-		// 	{
-		// 		name: 'created_at_index',
-		// 		fields: ['createdAt'],
-		// 	},
-		// ],
+		indexes: [
+			{
+				name: 'country_code_index',
+				fields: ['countryCode'],
+			},
+			{
+				name: 'region_code_index',
+				fields: ['regionCode'],
+			},
+			{
+				name: 'created_at_index',
+				fields: ['createdAt'],
+			},
+		],
 
 		/**
 		 * Execution order during migrations (lower numbers run first)

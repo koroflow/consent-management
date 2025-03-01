@@ -1,7 +1,8 @@
 import type { Where, GenericEndpointContext } from '~/types';
-import { type AuditLog, parseAuditLogOutput } from './schema';
+import type { AuditLog } from './schema';
 import { getWithHooks } from '~/db/hooks';
 import type { RegistryContext } from '~/types/context';
+import { validateTableOutput } from '../definition';
 
 /**
  * Creates and returns a set of consent audit log adapter methods to interact with the database.
@@ -85,7 +86,7 @@ export function auditLogRegistry({ adapter, ...ctx }: RegistryContext) {
 			limit?: number,
 			offset?: number
 		) => {
-			const whereConditions: Where[] = [];
+			const whereConditions: Where<'auditLog'> = [];
 
 			if (entityType) {
 				whereConditions.push({
@@ -108,7 +109,7 @@ export function auditLogRegistry({ adapter, ...ctx }: RegistryContext) {
 				});
 			}
 
-			const logs = await adapter.findMany<AuditLog>({
+			const logs = await adapter.findMany({
 				model: 'auditLog',
 				where: whereConditions,
 				sortBy: {
@@ -119,7 +120,9 @@ export function auditLogRegistry({ adapter, ...ctx }: RegistryContext) {
 				offset,
 			});
 
-			return logs.map((log) => parseAuditLogOutput(ctx.options, log));
+			return logs.map((log) =>
+				validateTableOutput('auditLog', log, ctx.options)
+			);
 		},
 
 		/**
@@ -130,7 +133,7 @@ export function auditLogRegistry({ adapter, ...ctx }: RegistryContext) {
 		 * @returns The audit log entry if found, null otherwise
 		 */
 		findAuditLogById: async (auditLogId: string) => {
-			const log = await adapter.findOne<AuditLog>({
+			const log = await adapter.findOne({
 				model: 'auditLog',
 				where: [
 					{
@@ -139,7 +142,7 @@ export function auditLogRegistry({ adapter, ...ctx }: RegistryContext) {
 					},
 				],
 			});
-			return log ? parseAuditLogOutput(ctx.options, log) : null;
+			return log ? validateTableOutput('auditLog', log, ctx.options) : null;
 		},
 
 		/**
@@ -156,7 +159,7 @@ export function auditLogRegistry({ adapter, ...ctx }: RegistryContext) {
 			entityId: string,
 			limit?: number
 		) => {
-			const logs = await adapter.findMany<AuditLog>({
+			const logs = await adapter.findMany({
 				model: 'auditLog',
 				where: [
 					{
@@ -174,7 +177,9 @@ export function auditLogRegistry({ adapter, ...ctx }: RegistryContext) {
 				},
 				limit,
 			});
-			return logs.map((log) => parseAuditLogOutput(ctx.options, log));
+			return logs.map((log) =>
+				validateTableOutput('auditLog', log, ctx.options)
+			);
 		},
 
 		/**
@@ -191,7 +196,7 @@ export function auditLogRegistry({ adapter, ...ctx }: RegistryContext) {
 			entityId?: string,
 			actionType?: string
 		) => {
-			const whereConditions: Where[] = [];
+			const whereConditions: Where<'auditLog'> = [];
 
 			if (entityType) {
 				whereConditions.push({

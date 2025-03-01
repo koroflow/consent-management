@@ -1,17 +1,17 @@
 import { getConsentTables } from '..';
 import type { C15TOptions } from '~/types';
 import type { FieldAttribute } from '~/db/core/fields';
+import type { ModelName } from '~/db/core/types';
+
+interface SchemaEntry {
+	fields: Record<string, FieldAttribute>;
+	order: number;
+}
 
 // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: its okay
 export function getSchema(config: C15TOptions) {
 	const tables = getConsentTables(config);
-	const schema: Record<
-		string,
-		{
-			fields: Record<string, FieldAttribute>;
-			order: number;
-		}
-	> = {};
+	const schema: Record<string, SchemaEntry> = {};
 
 	for (const [key, table] of Object.entries(tables)) {
 		if (!table) {
@@ -28,19 +28,22 @@ export function getSchema(config: C15TOptions) {
 			}
 
 			const fieldName = field.fieldName || fieldKey;
-			actualFields[fieldName] = field;
+			// Cast field to FieldAttribute to ensure it has the right type
+			const typedField = field as unknown as FieldAttribute;
+			actualFields[fieldName] = typedField;
 
-			// Handle references
-			if (field.references) {
-				const refTable = tables[field.references.model];
+			// Handle references - first check if the field has a references property
+			if (typedField && 'references' in typedField && typedField.references) {
+				const modelName = typedField.references.model as ModelName;
+				const refTable = tables[modelName];
 				if (refTable) {
 					// Create a new object for references to avoid modifying the original
 					actualFields[fieldName] = {
-						...field,
+						...typedField,
 						references: {
-							model: refTable.modelName,
-							field: field.references.field,
-							onDelete: field.references.onDelete,
+							model: refTable.modelName || typedField.references.model,
+							field: typedField.references.field,
+							onDelete: typedField.references.onDelete,
 						},
 					};
 				}
@@ -49,18 +52,21 @@ export function getSchema(config: C15TOptions) {
 
 		// Update or create schema entry
 		const modelName = table.modelName || key;
-		if (schema[modelName]) {
+		if (modelName in schema) {
+			const existingEntry = schema[modelName];
+			//@ts-expect-error
 			schema[modelName] = {
-				...schema[modelName],
+				...existingEntry,
 				fields: {
-					...schema[modelName].fields,
+					//@ts-expect-error
+					...existingEntry.fields,
 					...actualFields,
 				},
 			};
 		} else {
 			schema[modelName] = {
 				fields: actualFields,
-				order: table.order || Number.POSITIVE_INFINITY,
+				order: table.order ?? Number.POSITIVE_INFINITY,
 			};
 		}
 	}

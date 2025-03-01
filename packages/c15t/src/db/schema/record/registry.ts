@@ -1,6 +1,7 @@
 import type { Where, GenericEndpointContext, RegistryContext } from '~/types';
-import { type inferRecord as Record, parseRecordOutput } from './schema';
+import type { inferRecord as Record } from './schema';
 import { getWithHooks } from '~/db/hooks';
+import { validateTableOutput } from '../definition';
 
 /**
  * Creates and returns a set of consent record-related adapter methods to interact with the database.
@@ -80,7 +81,7 @@ export function recordRegistry({ adapter, ...ctx }: RegistryContext) {
 			actionType?: string,
 			limit?: number
 		) => {
-			const whereConditions: Where[] = [];
+			const whereConditions: Where<'record'> = [];
 
 			if (userId) {
 				whereConditions.push({
@@ -103,7 +104,7 @@ export function recordRegistry({ adapter, ...ctx }: RegistryContext) {
 				});
 			}
 
-			const records = await adapter.findMany<Record>({
+			const records = await adapter.findMany({
 				model: 'record',
 				where: whereConditions,
 				sortBy: {
@@ -113,7 +114,9 @@ export function recordRegistry({ adapter, ...ctx }: RegistryContext) {
 				limit,
 			});
 
-			return records.map((record) => parseRecordOutput(ctx.options, record));
+			return records.map((record) =>
+				validateTableOutput('record', record, ctx.options)
+			);
 		},
 
 		/**
@@ -124,7 +127,7 @@ export function recordRegistry({ adapter, ...ctx }: RegistryContext) {
 		 * @returns The consent record object if found, null otherwise
 		 */
 		findRecordById: async (recordId: string) => {
-			const record = await adapter.findOne<Record>({
+			const record = await adapter.findOne({
 				model: 'record',
 				where: [
 					{
@@ -133,7 +136,7 @@ export function recordRegistry({ adapter, ...ctx }: RegistryContext) {
 					},
 				],
 			});
-			return record ? parseRecordOutput(ctx.options, record) : null;
+			return record ? validateTableOutput('record', record, ctx.options) : null;
 		},
 
 		/**
@@ -145,7 +148,7 @@ export function recordRegistry({ adapter, ...ctx }: RegistryContext) {
 		 * @returns Array of consent records associated with the user
 		 */
 		findRecordsByUserId: async (userId: string, limit?: number) => {
-			const records = await adapter.findMany<Record>({
+			const records = await adapter.findMany({
 				model: 'record',
 				where: [
 					{
@@ -159,7 +162,9 @@ export function recordRegistry({ adapter, ...ctx }: RegistryContext) {
 				},
 				limit,
 			});
-			return records.map((record) => parseRecordOutput(ctx.options, record));
+			return records.map((record) =>
+				validateTableOutput('record', record, ctx.options)
+			);
 		},
 
 		/**
@@ -171,7 +176,7 @@ export function recordRegistry({ adapter, ...ctx }: RegistryContext) {
 		 * @returns Array of consent records associated with the consent
 		 */
 		findRecordsByConsentId: async (consentId: string, limit?: number) => {
-			const records = await adapter.findMany<Record>({
+			const records = await adapter.findMany({
 				model: 'record',
 				where: [
 					{
@@ -185,7 +190,9 @@ export function recordRegistry({ adapter, ...ctx }: RegistryContext) {
 				},
 				limit,
 			});
-			return records.map((record) => parseRecordOutput(ctx.options, record));
+			return records.map((record) =>
+				validateTableOutput('record', record, ctx.options)
+			);
 		},
 	};
 }

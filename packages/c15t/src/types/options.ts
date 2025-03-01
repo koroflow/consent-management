@@ -13,7 +13,7 @@ import type { AuthMiddleware } from '~/api/call';
 import type { FieldAttribute } from '~/db/core/fields';
 import type { DatabaseHook } from '~/db/hooks/types';
 import type { DatabaseConfiguration } from './database-config';
-import type { ModelName } from '~/db';
+import type { ModelName } from '~/db/core/types';
 
 /**
  * Analytics destination configuration

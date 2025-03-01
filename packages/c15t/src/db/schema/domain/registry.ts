@@ -1,6 +1,7 @@
 import type { Where, GenericEndpointContext, RegistryContext } from '~/types';
-import { type Domain, parseDomainOutput } from './schema';
+import type { Domain } from './schema';
 import { getWithHooks } from '~/db/hooks';
+import { validateTableOutput } from '../definition';
 
 /**
  * Creates and returns a set of domain-related adapter methods to interact with the database.
@@ -71,7 +72,7 @@ export function domainRegistry({ adapter, ...ctx }: RegistryContext) {
 		 * @returns Array of domains matching the criteria
 		 */
 		findDomains: async (includeInactive = false) => {
-			const whereConditions: Where[] = [];
+			const whereConditions: Where<'domain'> = [];
 
 			if (!includeInactive) {
 				whereConditions.push({
@@ -80,7 +81,7 @@ export function domainRegistry({ adapter, ...ctx }: RegistryContext) {
 				});
 			}
 
-			const domains = await adapter.findMany<Domain>({
+			const domains = await adapter.findMany({
 				model: 'domain',
 				where: whereConditions,
 				sortBy: {
@@ -89,7 +90,9 @@ export function domainRegistry({ adapter, ...ctx }: RegistryContext) {
 				},
 			});
 
-			return domains.map((domain) => parseDomainOutput(ctx.options, domain));
+			return domains.map((domain) =>
+				validateTableOutput('domain', domain, ctx.options)
+			);
 		},
 
 		/**
@@ -100,7 +103,7 @@ export function domainRegistry({ adapter, ...ctx }: RegistryContext) {
 		 * @returns The domain object if found, null otherwise
 		 */
 		findDomainById: async (domainId: string) => {
-			const domain = await adapter.findOne<Domain>({
+			const domain = await adapter.findOne({
 				model: 'domain',
 				where: [
 					{
@@ -109,7 +112,7 @@ export function domainRegistry({ adapter, ...ctx }: RegistryContext) {
 					},
 				],
 			});
-			return domain ? parseDomainOutput(ctx.options, domain) : null;
+			return domain ? validateTableOutput('domain', domain, ctx.options) : null;
 		},
 
 		/**
@@ -120,7 +123,7 @@ export function domainRegistry({ adapter, ...ctx }: RegistryContext) {
 		 * @returns The domain object if found, null otherwise
 		 */
 		findDomainByName: async (name: string) => {
-			const domain = await adapter.findOne<Domain>({
+			const domain = await adapter.findOne({
 				model: 'domain',
 				where: [
 					{
@@ -129,7 +132,7 @@ export function domainRegistry({ adapter, ...ctx }: RegistryContext) {
 					},
 				],
 			});
-			return domain ? parseDomainOutput(ctx.options, domain) : null;
+			return domain ? validateTableOutput('domain', domain, ctx.options) : null;
 		},
 
 		/**
@@ -162,7 +165,9 @@ export function domainRegistry({ adapter, ...ctx }: RegistryContext) {
 				customFn: undefined,
 				context,
 			});
-			return domain ? parseDomainOutput(ctx.options, domain as Domain) : null;
+			return domain
+				? validateTableOutput('domain', domain as Domain, ctx.options)
+				: null;
 		},
 
 		/**
@@ -173,7 +178,7 @@ export function domainRegistry({ adapter, ...ctx }: RegistryContext) {
 		 * @returns True if the domain exists and is active, false otherwise
 		 */
 		verifyDomain: async (domainName: string) => {
-			const domain = await adapter.findOne<Domain>({
+			const domain = await adapter.findOne({
 				model: 'domain',
 				where: [
 					{

@@ -118,7 +118,7 @@ const createTransform = (config: PrismaConfig, options: C15TOptions) => {
 			}
 			return transformedData as any;
 		},
-		convertWhereClause(model: string, where?: Where[]) {
+		convertWhereClause<T extends ModelName>(model: T, where?: Where<T>[]) {
 			if (!where) return {};
 			if (where.length === 1) {
 				const w = where[0];

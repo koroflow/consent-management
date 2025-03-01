@@ -4,7 +4,7 @@ import type {
 	HookContext,
 	UpdateWithHooksProps,
 } from './types';
-import { createWithHooks } from './create-hooks';
+import { createWithHook } from './create-hooks';
 import { updateWithHooks } from './update-hooks';
 import { updateManyWithHooks } from './update-many-hooks';
 
@@ -32,24 +32,24 @@ import { updateManyWithHooks } from './update-many-hooks';
 export function getWithHooks(adapter: Adapter, ctx: HookContext) {
 	return {
 		createWithHooks: <
-			InputT extends Record<string, unknown>,
-			OutputT extends Record<string, unknown> = InputT,
+			T extends Record<string, unknown>,
+			R extends Record<string, unknown> = T,
 		>(
-			props: CreateWithHooksProps<InputT>
-		) => createWithHooks<InputT, OutputT>(adapter, ctx, props),
+			props: CreateWithHooksProps<T>
+		) => createWithHook<T, R>(adapter, ctx, props),
 
 		updateWithHooks: <
-			InputT extends Record<string, unknown>,
-			OutputT extends Record<string, unknown> = InputT,
+			T extends Record<string, unknown>,
+			R extends Record<string, unknown> = T,
 		>(
-			props: UpdateWithHooksProps<InputT, OutputT>
-		) => updateWithHooks<InputT, OutputT>(adapter, ctx, props),
+			props: UpdateWithHooksProps<T, R>
+		) => updateWithHooks<T, R>(adapter, ctx, props),
 
 		updateManyWithHooks: <
-			InputT extends Record<string, unknown>,
-			OutputT extends Record<string, unknown> = InputT,
+			T extends Record<string, unknown>,
+			R extends Record<string, unknown> = T,
 		>(
-			props: UpdateWithHooksProps<InputT, OutputT[]>
-		) => updateManyWithHooks<InputT, OutputT>(adapter, ctx, props),
+			props: UpdateWithHooksProps<T, R[]>
+		) => updateManyWithHooks<T, R>(adapter, ctx, props),
 	};
 }

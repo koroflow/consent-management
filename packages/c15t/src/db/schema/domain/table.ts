@@ -1,5 +1,6 @@
 import type { FieldAttribute } from '~/db/core/fields';
 import type { C15TOptions } from '~/types';
+import { domainSchema } from './schema';
 
 /**
  * Generates the database table configuration for the domain entity.
@@ -28,6 +29,11 @@ export function getDomainTable(
 		 * The name of the domain table in the database, configurable through options
 		 */
 		modelName: options.domain?.modelName || 'domain',
+
+		/**
+		 * The schema for the domain table
+		 */
+		schema: domainSchema,
 
 		/**
 		 * Field definitions for the domain table

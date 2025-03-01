@@ -1,6 +1,4 @@
 import { z } from 'zod';
-import { getAllFields, parseInputData, parseOutputData } from '~/db/schema';
-import type { C15TOptions } from '~/types';
 
 /**
  * Zod schema for validating consent audit log entities.
@@ -46,52 +44,3 @@ export const auditLogSchema = z.object({
  * that are part of the audit log entity.
  */
 export type AuditLog = z.infer<typeof auditLogSchema>;
-
-/**
- * Processes consent audit log data from the database for client-side consumption.
- *
- * Applies output transformations, filters out fields that shouldn't be returned,
- * and ensures the response conforms to configured schema rules.
- *
- * @param options - The C15T configuration options
- * @param auditLog - The raw audit log data from the database
- * @returns Processed audit log data safe for client consumption
- *
- * @example
- * ```typescript
- * const rawLog = await adapter.findOne({ model: 'auditLog', where: [...] });
- * const processedLog = parseAuditLogOutput(options, rawLog);
- * ```
- */
-export function parseAuditLogOutput(options: C15TOptions, auditLog: AuditLog) {
-	const schema = getAllFields(options, 'auditLog');
-	return parseOutputData(auditLog, { fields: schema });
-}
-
-/**
- * Processes input data for consent audit log creation.
- *
- * Applies input validations, transforms input values, sets default values,
- * and enforces required fields based on the action type (create/update).
- *
- * @param options - The C15T configuration options
- * @param auditLog - The input audit log data to be processed
- * @param action - Whether this is for creating a new log entry or updating an existing one
- * @returns Processed input data ready for database operations
- *
- * @throws {APIError} If required fields are missing for log creation
- *
- * @example
- * ```typescript
- * // For creating a new audit log entry
- * const validLogData = parseAuditLogInput(options, inputData, 'create');
- * ```
- */
-export function parseAuditLogInput(
-	options: C15TOptions,
-	auditLog?: Record<string, unknown>,
-	action?: 'create' | 'update'
-) {
-	const schema = getAllFields(options, 'auditLog');
-	return parseInputData(auditLog || {}, { fields: schema, action });
-}

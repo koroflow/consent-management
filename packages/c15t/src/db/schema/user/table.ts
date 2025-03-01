@@ -1,5 +1,6 @@
 import type { FieldAttribute } from '~/db/core/fields';
 import type { C15TOptions } from '~/types';
+import { userSchema } from '.';
 
 /**
  * Generates the database table configuration for the user entity.
@@ -28,6 +29,11 @@ export function getUserTable(
 		 * The name of the user table in the database, configurable through options
 		 */
 		modelName: options.user?.modelName || 'user',
+
+		/**
+		 * The schema for the user table
+		 */
+		schema: userSchema,
 
 		/**
 		 * Field definitions for the user table

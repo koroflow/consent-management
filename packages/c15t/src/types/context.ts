@@ -1,9 +1,10 @@
 import type { EndpointContext, InputContext } from 'better-call';
 import type { Adapter, C15TOptions } from './index';
 import type { createLogger } from '~/utils';
-import type { getConsentTables, ModelName } from '~/db';
+import type { getConsentTables } from '~/db';
 import type { DatabaseHook } from '~/db/hooks/types';
 import type { createRegistry } from '~/db/create-registry';
+import type { ModelName } from '~/db/core/types';
 
 // biome-ignore lint/suspicious/noExplicitAny: <explanation>
 export type HookEndpointContext = EndpointContext<string, any> &

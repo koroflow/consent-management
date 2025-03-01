@@ -1,7 +1,7 @@
 import type { Kysely } from 'kysely';
 import type { Pool as PostgresPool } from 'pg';
 import type { Pool as MysqlPool } from 'mysql2/promise';
-import type { ModelTypeMap } from '~/db';
+import type { ModelTypeMap } from '~/db/core/types';
 
 /**
  * A type for table names in the database
@@ -37,27 +37,3 @@ export type KyselyDialectConfig =
  * Type for a Kysely instance
  */
 export type KyselyInstance<T = Database> = Kysely<T>;
-
-/**
- * Schema definition for a table field
- */
-export interface SchemaField {
-	fieldName?: string;
-	type?: string;
-	defaultValue?: unknown;
-}
-
-/**
- * Schema definition for a table
- */
-export interface TableSchema {
-	modelName?: string;
-	fields?: Record<string, SchemaField>;
-}
-
-/**
- * Schema definition for all tables
- */
-export interface Schema {
-	[tableName: string]: TableSchema;
-}

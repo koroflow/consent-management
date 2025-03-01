@@ -1,6 +1,7 @@
 import type { Where, GenericEndpointContext, RegistryContext } from '~/types';
-import { type Purpose, parsePurposeOutput } from './schema';
+import type { Purpose } from './schema';
 import { getWithHooks } from '~/db/hooks';
+import { type TableFields, validateTableOutput } from '../definition';
 
 /**
  * Creates and returns a set of consent purpose-related adapter methods to interact with the database.
@@ -75,7 +76,7 @@ export function purposeRegistry({ adapter, ...ctx }: RegistryContext) {
 		 * @returns Array of consent purposes matching the criteria
 		 */
 		findPurposes: async (includeInactive?: boolean) => {
-			const whereConditions: Where[] = [];
+			const whereConditions: Where<'purpose'> = [];
 
 			if (!includeInactive) {
 				whereConditions.push({
@@ -84,7 +85,7 @@ export function purposeRegistry({ adapter, ...ctx }: RegistryContext) {
 				});
 			}
 
-			const purposes = await adapter.findMany<Purpose>({
+			const purposes = await adapter.findMany({
 				model: 'purpose',
 				where: whereConditions,
 				sortBy: {
@@ -94,7 +95,7 @@ export function purposeRegistry({ adapter, ...ctx }: RegistryContext) {
 			});
 
 			return purposes.map((purpose) =>
-				parsePurposeOutput(ctx.options, purpose)
+				validateTableOutput('purpose', purpose, ctx.options)
 			);
 		},
 
@@ -106,7 +107,7 @@ export function purposeRegistry({ adapter, ...ctx }: RegistryContext) {
 		 * @returns The purpose object if found, null otherwise
 		 */
 		findPurposeById: async (purposeId: string) => {
-			const purpose = await adapter.findOne<Purpose>({
+			const purpose = await adapter.findOne({
 				model: 'purpose',
 				where: [
 					{
@@ -115,7 +116,9 @@ export function purposeRegistry({ adapter, ...ctx }: RegistryContext) {
 					},
 				],
 			});
-			return purpose ? parsePurposeOutput(ctx.options, purpose) : null;
+			return purpose
+				? validateTableOutput('purpose', purpose, ctx.options)
+				: null;
 		},
 
 		/**
@@ -133,7 +136,9 @@ export function purposeRegistry({ adapter, ...ctx }: RegistryContext) {
 			data: Partial<Purpose>,
 			context?: GenericEndpointContext
 		) => {
-			const purpose = await updateWithHooks<Purpose>({
+			type s = TableFields<'purpose'>['code'];
+
+			const purpose = await updateWithHooks({
 				data: {
 					...data,
 					updatedAt: new Date(),
@@ -147,7 +152,9 @@ export function purposeRegistry({ adapter, ...ctx }: RegistryContext) {
 				model: 'purpose',
 				context,
 			});
-			return purpose ? parsePurposeOutput(ctx.options, purpose) : null;
+			return purpose
+				? validateTableOutput('purpose', purpose, ctx.options)
+				: null;
 		},
 	};
 }

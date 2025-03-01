@@ -1,5 +1,6 @@
 import type { FieldAttribute } from '~/db/core/fields';
 import type { C15TOptions } from '~/types';
+import { consentPolicySchema } from './schema';
 
 /**
  * Generates the database table configuration for the consent policy entity.
@@ -28,6 +29,11 @@ export function getConsentPolicyTable(
 		 * The name of the policy table in the database, configurable through options
 		 */
 		modelName: options.consentPolicy?.modelName || 'consentPolicy',
+
+		/**
+		 * The schema for the consent policy table
+		 */
+		schema: consentPolicySchema,
 
 		/**
 		 * Field definitions for the consent policy table

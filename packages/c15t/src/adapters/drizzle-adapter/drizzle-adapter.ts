@@ -60,7 +60,10 @@ const createTransform = (
 				: model;
 	};
 
-	function convertWhereClause(where: Where[], model: string) {
+	function convertWhereClause<T extends ModelName>(
+		where: Where<T>[],
+		model: T
+	) {
 		const schemaModel = getSchema(model);
 		if (!where) return [];
 		if (where.length === 1) {
@@ -191,7 +194,7 @@ const createTransform = (
 			model: string,
 			builder: any,
 			data: Record<string, any>,
-			where?: Where[]
+			where?: Where<string>[]
 		) => {
 			if (config.provider !== 'mysql') {
 				const c = await builder.returning();

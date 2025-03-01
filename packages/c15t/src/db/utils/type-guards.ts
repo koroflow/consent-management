@@ -1,4 +1,4 @@
-import type { CoreTableName } from '../schema/types';
+import type { CoreTableName } from '../core/types';
 
 /**
  * Type guard to check if a table name is a core table

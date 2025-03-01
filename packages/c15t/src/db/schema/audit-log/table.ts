@@ -1,5 +1,6 @@
 import type { FieldAttribute } from '~/db/core/fields';
 import type { C15TOptions } from '~/types';
+import { auditLogSchema } from './schema';
 
 /**
  * Generates the database table configuration for the consent audit log entity.
@@ -28,6 +29,11 @@ export function getAuditLogTable(
 		 * The name of the audit log table in the database, configurable through options
 		 */
 		modelName: options.auditLog?.modelName || 'auditLog',
+
+		/**
+		 * The schema for the audit log table
+		 */
+		schema: auditLogSchema,
 
 		/**
 		 * Field definitions for the consent audit log table

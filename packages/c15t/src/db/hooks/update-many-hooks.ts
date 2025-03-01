@@ -5,7 +5,7 @@ import type {
 	UpdateWithHooksProps,
 } from './types';
 import { processHooks, processAfterHooksForMany } from './utils';
-import type { ModelName } from '..';
+import type { ModelName } from '~/db/core/types';
 
 /**
  * Execute custom function if provided

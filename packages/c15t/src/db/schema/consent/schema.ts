@@ -1,6 +1,4 @@
 import { z } from 'zod';
-import { getAllFields, parseInputData, parseOutputData } from '~/db/schema';
-import type { C15TOptions } from '~/types';
 
 /**
  * Zod schema for validating consent entities.
@@ -48,56 +46,3 @@ export const consentSchema = z.object({
  * that are part of the consent entity.
  */
 export type Consent = z.infer<typeof consentSchema>;
-
-/**
- * Processes consent data from the database for client-side consumption.
- *
- * Applies output transformations, filters out fields that shouldn't be returned,
- * and ensures the response conforms to configured schema rules.
- *
- * @param options - The C15T configuration options
- * @param consent - The raw consent data from the database
- * @returns Processed consent data safe for client consumption
- *
- * @example
- * ```typescript
- * const rawConsent = await adapter.findOne({ model: 'consent', where: [...] });
- * const processedConsent = parseConsentOutput(options, rawConsent);
- * // processedConsent will have any restricted fields removed based on configuration
- * ```
- */
-export function parseConsentOutput(options: C15TOptions, consent: Consent) {
-	const schema = getAllFields(options, 'consent');
-	return parseOutputData(consent, { fields: schema });
-}
-
-/**
- * Processes input data for consent creation or updates.
- *
- * Applies input validations, transforms input values, sets default values,
- * and enforces required fields based on the action type (create/update).
- *
- * @param options - The C15T configuration options
- * @param consent - The input consent data to be processed
- * @param action - Whether this is for creating a new consent or updating an existing one
- * @returns Processed input data ready for database operations
- *
- * @throws {APIError} If required fields are missing for consent creation
- *
- * @example
- * ```typescript
- * // For creating a new consent
- * const validConsentData = parseConsentInput(options, inputData, 'create');
- *
- * // For updating an existing consent
- * const validUpdateData = parseConsentInput(options, partialData, 'update');
- * ```
- */
-export function parseConsentInput(
-	options: C15TOptions,
-	consent?: Record<string, unknown>,
-	action?: 'create' | 'update'
-) {
-	const schema = getAllFields(options, 'consent');
-	return parseInputData(consent || {}, { fields: schema, action });
-}

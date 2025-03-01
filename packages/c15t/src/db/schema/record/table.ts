@@ -1,5 +1,6 @@
 import type { FieldAttribute } from '~/db/core/fields';
 import type { C15TOptions } from '~/types';
+import { recordSchema } from '.';
 
 /**
  * Generates the database table configuration for the consent record entity.
@@ -28,6 +29,11 @@ export function getRecordTable(
 		 * The name of the consent record table in the database, configurable through options
 		 */
 		modelName: options.record?.modelName || 'record',
+
+		/**
+		 * The schema for the consent record table
+		 */
+		schema: recordSchema,
 
 		/**
 		 * Field definitions for the consent record table

@@ -10,6 +10,7 @@ import {
 	purposeJunctionRegistry,
 	withdrawalRegistry,
 	geoLocationRegistry,
+	consentGeoLocationRegistry,
 } from './schema/index';
 
 export const createRegistry = (ctx: RegistryContext) => {
@@ -18,6 +19,7 @@ export const createRegistry = (ctx: RegistryContext) => {
 		...consentRegistry(ctx),
 		...domainRegistry(ctx),
 		...geoLocationRegistry(ctx),
+		...consentGeoLocationRegistry(ctx),
 		...purposeJunctionRegistry(ctx),
 		...purposeRegistry(ctx),
 		...recordRegistry(ctx),

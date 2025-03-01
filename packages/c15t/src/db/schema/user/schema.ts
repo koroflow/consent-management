@@ -1,7 +1,4 @@
 import { z } from 'zod';
-import { getAllFields, parseInputData, parseOutputData } from '~/db/schema';
-
-import type { C15TOptions } from '~/types';
 
 /**
  * Zod schema for validating user entities.
@@ -33,62 +30,6 @@ export const userSchema = z.object({
 	createdAt: z.date().default(() => new Date()),
 	updatedAt: z.date().default(() => new Date()),
 });
-
-/**
- * Processes user data from the database for client-side consumption.
- *
- * Applies output transformations, filters out fields that shouldn't be returned,
- * and ensures the response conforms to configured schema rules.
- *
- * @param options - The C15T configuration options
- * @param user - The raw user data from the database
- * @returns Processed user data safe for client consumption
- *
- * @example
- * ```typescript
- * const rawUser = await adapter.findOne({ model: 'user', where: [...] });
- * const processedUser = parseUserOutput(options, rawUser);
- * // processedUser will have sensitive fields removed based on configuration
- * ```
- */
-export function parseUserOutput(
-	options: C15TOptions,
-	user: z.infer<typeof userSchema>
-) {
-	const schema = getAllFields(options, 'user');
-	return parseOutputData(user, { fields: schema });
-}
-
-/**
- * Processes input data for user creation or updates.
- *
- * Applies input validations, transforms input values, sets default values,
- * and enforces required fields based on the action type (create/update).
- *
- * @param options - The C15T configuration options
- * @param user - The input user data to be processed
- * @param action - Whether this is for creating a new user or updating an existing one
- * @returns Processed input data ready for database operations
- *
- * @throws {APIError} If required fields are missing for user creation
- *
- * @example
- * ```typescript
- * // For creating a new user
- * const validUserData = parseUserInput(options, inputData, 'create');
- *
- * // For updating an existing user
- * const validUpdateData = parseUserInput(options, partialData, 'update');
- * ```
- */
-export function parseUserInput(
-	options: C15TOptions,
-	user?: Record<string, unknown>,
-	action?: 'create' | 'update'
-) {
-	const schema = getAllFields(options, 'user');
-	return parseInputData(user || {}, { fields: schema, action });
-}
 
 /**
  * Type definition for User

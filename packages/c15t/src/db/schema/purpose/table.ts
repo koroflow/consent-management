@@ -1,5 +1,6 @@
 import type { FieldAttribute } from '~/db/core/fields';
 import type { C15TOptions } from '~/types';
+import { purposeSchema } from './schema';
 
 /**
  * Generates the database table configuration for the consent purpose entity.
@@ -28,6 +29,11 @@ export function getPurposeTable(
 		 * The name of the purpose table in the database, configurable through options
 		 */
 		modelName: options.purpose?.modelName || 'purpose',
+
+		/**
+		 * The schema for the purpose table
+		 */
+		schema: purposeSchema,
 
 		/**
 		 * Field definitions for the consent purpose table

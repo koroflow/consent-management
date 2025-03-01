@@ -1,6 +1,4 @@
 import { z } from 'zod';
-import { getAllFields, parseInputData, parseOutputData } from '~/db/schema';
-import type { C15TOptions } from '~/types';
 
 /**
  * Zod schema for validating consent record entities.
@@ -41,55 +39,6 @@ export const recordSchema = z.object({
  * that are part of the consent record entity.
  */
 export type inferRecord = z.infer<typeof recordSchema>;
-
-/**
- * Processes consent record data from the database for client-side consumption.
- *
- * Applies output transformations, filters out fields that shouldn't be returned,
- * and ensures the response conforms to configured schema rules.
- *
- * @param options - The C15T configuration options
- * @param record - The raw consent record data from the database
- * @returns Processed consent record data safe for client consumption
- *
- * @example
- * ```typescript
- * const rawRecord = await adapter.findOne({ model: 'record', where: [...] });
- * const processedRecord = parseRecordOutput(options, rawRecord);
- * ```
- */
-export function parseRecordOutput(options: C15TOptions, record: inferRecord) {
-	const schema = getAllFields(options, 'record');
-	return parseOutputData(record, { fields: schema });
-}
-
-/**
- * Processes input data for consent record creation.
- *
- * Applies input validations, transforms input values, sets default values,
- * and enforces required fields based on the action type (create/update).
- *
- * @param options - The C15T configuration options
- * @param record - The input consent record data to be processed
- * @param action - Whether this is for creating a new record or updating an existing one
- * @returns Processed input data ready for database operations
- *
- * @throws {APIError} If required fields are missing for record creation
- *
- * @example
- * ```typescript
- * // For creating a new consent record
- * const validRecordData = parseRecordInput(options, inputData, 'create');
- * ```
- */
-export function parseRecordInput(
-	options: C15TOptions,
-	record?: Record<string, unknown>,
-	action?: 'create' | 'update'
-) {
-	const schema = getAllFields(options, 'record');
-	return parseInputData(record || {}, { fields: schema, action });
-}
 
 export const recordTypeEnum = z.enum([
 	'form_submission',

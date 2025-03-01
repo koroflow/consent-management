@@ -1,29 +1,6 @@
-import type { C15TDBSchema } from '../schema/index';
+import type { C15TDBSchema } from '../schema/definition';
 import type { FieldAttribute, FieldType } from './fields';
 import type { InferValueType } from './fields/field-inference';
-
-/**
- * Schema definition for a database table
- */
-export interface TableSchema {
-	/**
-	 * The name of the table in the database
-	 */
-	modelName: string;
-	/**
-	 * The fields of the table
-	 */
-	fields: Record<string, FieldAttribute>;
-	/**
-	 * Whether to disable migrations for this table
-	 * @default false
-	 */
-	disableMigrations?: boolean;
-	/**
-	 * The order of the table
-	 */
-	order?: number;
-}
 
 /**
  * Plugin-provided schema type with proper typing
@@ -52,17 +29,26 @@ export type ModelFromFields<Fields extends Record<string, FieldAttribute>> = {
 	[K in keyof Fields]: ExtractFieldType<Fields[K]>;
 };
 
-/**
- * Maps schema model names to their TypeScript types
- */
 export type ModelTypeMap = {
-	[K in keyof C15TDBSchema]: ModelFromFields<C15TDBSchema[K]['fields']>;
+	[K in keyof C15TDBSchema]: C15TDBSchema[K];
 };
 
 /**
  * All valid model names
  */
-export type ModelName = keyof ModelTypeMap;
+export type ModelName = keyof C15TDBSchema;
+
+/**
+ * Input type for table operations, allowing partial fields and additional properties
+ */
+export type TableInput<T extends ModelName> = Partial<ModelTypeMap[T]> &
+	Record<string, unknown>;
+
+/**
+ * Output type for table operations returned from the database
+ */
+export type TableOutput<T extends ModelName> = ModelTypeMap[T] &
+	Record<string, unknown>;
 
 /**
  * Get the field type for a specific table and field

@@ -1,6 +1,6 @@
-import type { SchemaDefinition, TableDefinition } from './types';
+import type { SchemaDefinition } from './types';
 import { processFields } from './process-fields';
-import type { ModelName } from '~/db';
+import type { C15TDBSchema } from '../../schema/definition';
 
 /**
  * Processes table definitions into a structured schema
@@ -12,7 +12,7 @@ import type { ModelName } from '~/db';
  * @returns A structured schema definition
  */
 export function processTablesIntoSchema(
-	tables: Record<ModelName, TableDefinition | undefined>
+	tables: C15TDBSchema
 ): SchemaDefinition {
 	const schema: SchemaDefinition = {};
 

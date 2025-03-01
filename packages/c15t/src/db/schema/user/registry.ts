@@ -1,6 +1,7 @@
 import type { GenericEndpointContext, RegistryContext } from '~/types';
-import { parseUserOutput, type User } from './schema';
+import type { User } from './schema';
 import { getWithHooks } from '~/db/hooks';
+import { validateTableOutput } from '../definition';
 
 /**
  * Creates and returns a set of user-related adapter methods to interact with the database.
@@ -58,7 +59,9 @@ export function userRegistry({ adapter, ...ctx }: RegistryContext) {
 				customFn: undefined,
 				context,
 			});
-			return createdUser as User;
+			return createdUser
+				? validateTableOutput('user', createdUser, ctx.options)
+				: null;
 		},
 
 		/**
@@ -70,7 +73,7 @@ export function userRegistry({ adapter, ...ctx }: RegistryContext) {
 		 * @returns The user object if found, null otherwise
 		 */
 		findUserById: async (userId: string) => {
-			const user = await adapter.findOne<User>({
+			const user = await adapter.findOne({
 				model: 'user',
 				where: [
 					{
@@ -79,7 +82,7 @@ export function userRegistry({ adapter, ...ctx }: RegistryContext) {
 					},
 				],
 			});
-			return user ? parseUserOutput(ctx.options, user) : null;
+			return user ? validateTableOutput('user', user, ctx.options) : null;
 		},
 
 		/**
@@ -92,7 +95,7 @@ export function userRegistry({ adapter, ...ctx }: RegistryContext) {
 		 * @returns The user object if found, null otherwise
 		 */
 		findUserByExternalId: async (externalId: string) => {
-			const user = await adapter.findOne<User>({
+			const user = await adapter.findOne({
 				model: 'user',
 				where: [
 					{
@@ -101,7 +104,7 @@ export function userRegistry({ adapter, ...ctx }: RegistryContext) {
 					},
 				],
 			});
-			return user ? parseUserOutput(ctx.options, user) : null;
+			return user ? validateTableOutput('user', user, ctx.options) : null;
 		},
 
 		/**
@@ -120,7 +123,7 @@ export function userRegistry({ adapter, ...ctx }: RegistryContext) {
 			data: Partial<User> & Record<string, unknown>,
 			context?: GenericEndpointContext
 		) => {
-			const user = await updateWithHooks<User>({
+			const user = await updateWithHooks({
 				data: {
 					...data,
 					updatedAt: new Date(),
@@ -135,7 +138,7 @@ export function userRegistry({ adapter, ...ctx }: RegistryContext) {
 				customFn: undefined,
 				context,
 			});
-			return user ? parseUserOutput(ctx.options, user) : null;
+			return user ? validateTableOutput('user', user, ctx.options) : null;
 		},
 
 		/**

@@ -1,13 +1,13 @@
 import type { Adapter } from '~/types';
 import type { HookContext, UpdateWithHooksProps } from './types';
 import { processHooks } from './utils';
-import type { ModelName } from '..';
+import type { ModelName } from '../core/types';
 
 /**
  * Updates a record with hooks applied before and after update
  *
- * @template InputT - Type of the data being updated
- * @template OutputT - Type of the data returned after update
+ * @template T - Type of the data being updated
+ * @template R - Type of the data returned after update
  * @param adapter - The database adapter to use
  * @param ctx - Context containing hooks and options
  * @param props - Properties for the update operation
@@ -48,11 +48,11 @@ export async function updateWithHooks<
 	}
 
 	if (!updated) {
-		updated = await adapter.update<R>({
+		updated = (await adapter.update({
 			model: model as ModelName,
 			update: transformedData,
 			where,
-		});
+		})) as R | null;
 	}
 
 	// Process after hooks

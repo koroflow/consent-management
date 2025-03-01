@@ -1,5 +1,6 @@
 import type { FieldAttribute } from '~/db/core/fields';
 import type { C15TOptions } from '~/types';
+import { consentSchema } from './schema';
 
 /**
  * Generates the database table configuration for the consent entity.
@@ -29,6 +30,11 @@ export function getConsentTable(
 		 * The name of the consent table in the database, configurable through options
 		 */
 		modelName: options.consent?.modelName || 'consent',
+
+		/**
+		 * The schema for the consent table
+		 */
+		schema: consentSchema,
 
 		/**
 		 * Field definitions for the consent table

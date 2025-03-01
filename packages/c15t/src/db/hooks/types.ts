@@ -1,5 +1,5 @@
 import type { C15TOptions, GenericEndpointContext, Where } from '~/types';
-import type { ModelName, ModelTypeMap } from '../schema/index';
+import type { ModelName, ModelTypeMap } from '../core/types';
 
 /**
  * Defines hook execution phases
@@ -83,7 +83,7 @@ export interface CreateWithHooksProps<
 	T extends Record<string, unknown> = Record<string, unknown>,
 > {
 	data: T;
-	model: string;
+	model: ModelName;
 	customFn?: CustomOperationFunction<T>;
 	context?: GenericEndpointContext;
 }
@@ -96,8 +96,8 @@ export interface UpdateWithHooksProps<
 	R = T,
 > {
 	data: Partial<T>;
-	where: Where[];
-	model: string;
+	where: Where<ModelName>;
+	model: ModelName;
 	customFn?: CustomOperationFunction<Partial<T>, R>;
 	context?: GenericEndpointContext;
 }

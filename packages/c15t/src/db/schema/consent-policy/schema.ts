@@ -1,6 +1,4 @@
 import { z } from 'zod';
-import { getAllFields, parseInputData, parseOutputData } from '~/db/schema';
-import type { C15TOptions } from '~/types';
 
 /**
  * Zod schema for validating consent policy entities.
@@ -37,62 +35,6 @@ export const consentPolicySchema = z.object({
 	isActive: z.boolean().default(true),
 	createdAt: z.date().default(() => new Date()),
 });
-
-/**
- * Processes consent policy data from the database for client-side consumption.
- *
- * Applies output transformations, filters out fields that shouldn't be returned,
- * and ensures the response conforms to configured schema rules.
- *
- * @param options - The C15T configuration options
- * @param policy - The raw policy data from the database
- * @returns Processed policy data safe for client consumption
- *
- * @example
- * ```typescript
- * const rawPolicy = await adapter.findOne({ model: 'consentPolicy', where: [...] });
- * const processedPolicy = parseConsentPolicyOutput(options, rawPolicy);
- * // processedPolicy will have any restricted fields removed based on configuration
- * ```
- */
-export function parseConsentPolicyOutput(
-	options: C15TOptions,
-	policy: ConsentPolicy
-) {
-	const schema = getAllFields(options, 'consentPolicy');
-	return parseOutputData(policy, { fields: schema });
-}
-
-/**
- * Processes input data for consent policy creation or updates.
- *
- * Applies input validations, transforms input values, sets default values,
- * and enforces required fields based on the action type (create/update).
- *
- * @param options - The C15T configuration options
- * @param policy - The input policy data to be processed
- * @param action - Whether this is for creating a new policy or updating an existing one
- * @returns Processed input data ready for database operations
- *
- * @throws {APIError} If required fields are missing for policy creation
- *
- * @example
- * ```typescript
- * // For creating a new policy
- * const validPolicyData = parseConsentPolicyInput(options, inputData, 'create');
- *
- * // For updating an existing policy
- * const validUpdateData = parseConsentPolicyInput(options, partialData, 'update');
- * ```
- */
-export function parseConsentPolicyInput(
-	options: C15TOptions,
-	policy?: Record<string, unknown>,
-	action?: 'create' | 'update'
-) {
-	const schema = getAllFields(options, 'consentPolicy');
-	return parseInputData(policy || {}, { fields: schema, action });
-}
 
 /**
  * Type definition for ConsentPolicy

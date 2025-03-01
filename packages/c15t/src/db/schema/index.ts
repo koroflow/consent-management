@@ -10,6 +10,7 @@
 export * from './audit-log';
 export * from './consent';
 export * from './consent-geo-location';
+export * from './geo-location';
 export * from './consent-policy';
 export * from './domain';
 export * from './purpose';
@@ -26,13 +27,3 @@ export {
 	getAllFields,
 	mergeSchema,
 } from './parser';
-export type {
-	TableSchema,
-	ModelName,
-	ModelTypeMap,
-	CoreTableName,
-	PluginTableName,
-	ExtractFieldType,
-	ModelFromFields,
-	TableFieldType,
-} from './types';

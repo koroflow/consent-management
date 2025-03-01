@@ -1,6 +1,7 @@
 import type { GenericEndpointContext, RegistryContext, Where } from '~/types';
-import { type GeoLocation, parseGeoLocationOutput } from './schema';
+import type { GeoLocation } from './schema';
 import { getWithHooks } from '~/db/hooks/with-hooks-factory';
+import { validateTableOutput } from '../definition';
 
 /**
  * Creates and returns a set of geo-location-related adapter methods to interact with the database.
@@ -51,7 +52,7 @@ export function geoLocationRegistry({ adapter, ...ctx }: RegistryContext) {
 					createdAt: new Date(),
 					...location,
 				},
-				model: 'geoLocation',
+				model: 'consentGeoLocation',
 				customFn: undefined,
 				context,
 			});
@@ -76,7 +77,7 @@ export function geoLocationRegistry({ adapter, ...ctx }: RegistryContext) {
 			countryCode?: string;
 			regionCode?: string;
 		}) => {
-			const whereConditions: Where[] = [];
+			const whereConditions: Where<'geoLocation'> = [];
 
 			if (filter?.countryCode) {
 				whereConditions.push({
@@ -92,8 +93,8 @@ export function geoLocationRegistry({ adapter, ...ctx }: RegistryContext) {
 				});
 			}
 
-			const locations = await adapter.findMany<GeoLocation>({
-				model: 'consentGeoLocation',
+			const locations = await adapter.findMany({
+				model: 'geoLocation',
 				where: whereConditions,
 				sortBy: {
 					field: 'countryName',
@@ -101,8 +102,8 @@ export function geoLocationRegistry({ adapter, ...ctx }: RegistryContext) {
 				},
 			});
 
-			return locations.map((location: GeoLocation) =>
-				parseGeoLocationOutput(ctx.options, location)
+			return locations.map((location) =>
+				validateTableOutput('consentGeoLocation', location, ctx.options)
 			);
 		},
 
@@ -114,8 +115,8 @@ export function geoLocationRegistry({ adapter, ...ctx }: RegistryContext) {
 		 * @returns The geo-location object if found, null otherwise
 		 */
 		findGeoLocationById: async (locationId: string) => {
-			const location = await adapter.findOne<GeoLocation>({
-				model: 'consentGeoLocation',
+			const location = await adapter.findOne({
+				model: 'geoLocation',
 				where: [
 					{
 						field: 'id',
@@ -123,7 +124,9 @@ export function geoLocationRegistry({ adapter, ...ctx }: RegistryContext) {
 					},
 				],
 			});
-			return location ? parseGeoLocationOutput(ctx.options, location) : null;
+			return location
+				? validateTableOutput('consentGeoLocation', location, ctx.options)
+				: null;
 		},
 
 		/**
@@ -134,8 +137,8 @@ export function geoLocationRegistry({ adapter, ...ctx }: RegistryContext) {
 		 * @returns Array of geo-location records for the specified country
 		 */
 		findGeoLocationsByCountry: async (countryCode: string) => {
-			const locations = await adapter.findMany<GeoLocation>({
-				model: 'consentGeoLocation',
+			const locations = await adapter.findMany({
+				model: 'geoLocation',
 				where: [
 					{
 						field: 'countryCode',
@@ -148,8 +151,8 @@ export function geoLocationRegistry({ adapter, ...ctx }: RegistryContext) {
 				},
 			});
 
-			return locations.map((location: GeoLocation) =>
-				parseGeoLocationOutput(ctx.options, location)
+			return locations.map((location) =>
+				validateTableOutput('consentGeoLocation', location, ctx.options)
 			);
 		},
 	};

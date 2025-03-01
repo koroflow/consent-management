@@ -1,9 +1,7 @@
 import type { GenericEndpointContext, RegistryContext } from '~/types';
-import {
-	type ConsentGeoLocation,
-	parseConsentGeoLocationOutput,
-} from './schema';
+import type { ConsentGeoLocation } from './schema';
 import { getWithHooks } from '~/db/hooks';
+import { validateTableOutput } from '../definition';
 
 /**
  * Creates and returns a set of consent geo-location-related adapter methods to interact with the database.
@@ -33,7 +31,10 @@ import { getWithHooks } from '~/db/hooks';
  * });
  * ```
  */
-export function geoLocationRegistry({ adapter, ...ctx }: RegistryContext) {
+export function consentGeoLocationRegistry({
+	adapter,
+	...ctx
+}: RegistryContext) {
 	const { createWithHooks } = getWithHooks(adapter, ctx);
 
 	return {
@@ -79,7 +80,7 @@ export function geoLocationRegistry({ adapter, ...ctx }: RegistryContext) {
 		 * @returns Array of geo-location records associated with the consent
 		 */
 		findConsentGeoLocationsByConsentId: async (consentId: string) => {
-			const geoLocations = await adapter.findMany<ConsentGeoLocation>({
+			const geoLocations = await adapter.findMany({
 				model: 'consentGeoLocation',
 				where: [
 					{
@@ -94,7 +95,7 @@ export function geoLocationRegistry({ adapter, ...ctx }: RegistryContext) {
 			});
 
 			return geoLocations.map((geoLocation) =>
-				parseConsentGeoLocationOutput(ctx.options, geoLocation)
+				validateTableOutput('consentGeoLocation', geoLocation, ctx.options)
 			);
 		},
 
@@ -106,7 +107,7 @@ export function geoLocationRegistry({ adapter, ...ctx }: RegistryContext) {
 		 * @returns The geo-location object if found, null otherwise
 		 */
 		findConsentGeoLocationById: async (geoLocationId: string) => {
-			const geoLocation = await adapter.findOne<ConsentGeoLocation>({
+			const geoLocation = await adapter.findOne({
 				model: 'consentGeoLocation',
 				where: [
 					{
@@ -116,7 +117,7 @@ export function geoLocationRegistry({ adapter, ...ctx }: RegistryContext) {
 				],
 			});
 			return geoLocation
-				? parseConsentGeoLocationOutput(ctx.options, geoLocation)
+				? validateTableOutput('consentGeoLocation', geoLocation, ctx.options)
 				: null;
 		},
 	};

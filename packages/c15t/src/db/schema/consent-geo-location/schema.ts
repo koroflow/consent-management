@@ -1,6 +1,4 @@
 import { z } from 'zod';
-import { getAllFields, parseInputData, parseOutputData } from '~/db/schema';
-import type { C15TOptions } from '~/types';
 
 /**
  * Zod schema for validating consent geo-location entities.
@@ -38,58 +36,6 @@ export const consentGeoLocationSchema = z.object({
 	timezone: z.string().optional(),
 	createdAt: z.date().default(() => new Date()),
 });
-
-/**
- * Processes consent geo-location data from the database for client-side consumption.
- *
- * Applies output transformations, filters out fields that shouldn't be returned,
- * and ensures the response conforms to configured schema rules.
- *
- * @param options - The C15T configuration options
- * @param geoLocation - The raw geo-location data from the database
- * @returns Processed geo-location data safe for client consumption
- *
- * @example
- * ```typescript
- * const rawGeoLocation = await adapter.findOne({ model: 'consentGeoLocation', where: [...] });
- * const processedGeoLocation = parseConsentGeoLocationOutput(options, rawGeoLocation);
- * ```
- */
-export function parseConsentGeoLocationOutput(
-	options: C15TOptions,
-	geoLocation: ConsentGeoLocation
-) {
-	const schema = getAllFields(options, 'consentGeoLocation');
-	return parseOutputData(geoLocation, { fields: schema });
-}
-
-/**
- * Processes input data for consent geo-location creation.
- *
- * Applies input validations, transforms input values, sets default values,
- * and enforces required fields based on the action type (create/update).
- *
- * @param options - The C15T configuration options
- * @param geoLocation - The input geo-location data to be processed
- * @param action - Whether this is for creating a new geo-location or updating an existing one
- * @returns Processed input data ready for database operations
- *
- * @throws {APIError} If required fields are missing for geo-location creation
- *
- * @example
- * ```typescript
- * // For creating a new geo-location record
- * const validGeoLocationData = parseConsentGeoLocationInput(options, inputData, 'create');
- * ```
- */
-export function parseConsentGeoLocationInput(
-	options: C15TOptions,
-	geoLocation?: Record<string, unknown>,
-	action?: 'create' | 'update'
-) {
-	const schema = getAllFields(options, 'consentGeoLocation');
-	return parseInputData(geoLocation || {}, { fields: schema, action });
-}
 
 /**
  * Type definition for ConsentGeoLocation

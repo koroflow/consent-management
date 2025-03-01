@@ -1,7 +1,6 @@
 import type { GenericEndpointContext } from '~/types';
 import type { DatabaseHook, HookOperation, HookPhase } from './types';
-import type { ModelName, ModelFromFields } from '../schema/types';
-import type { FieldAttribute } from '../core/fields';
+import type { ModelName } from '../core/types';
 
 /**
  * Helper to process a single hook result
@@ -38,7 +37,7 @@ export function handleHookResult<T extends Record<string, unknown>>(
 // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: this is a complex function but it's ok
 export async function processHooks<T extends Record<string, unknown>>(
 	data: T,
-	model: string,
+	model: ModelName,
 	operation: HookOperation,
 	phase: HookPhase,
 	hooks: DatabaseHook[],
@@ -48,7 +47,7 @@ export async function processHooks<T extends Record<string, unknown>>(
 
 	for (const hookSet of hooks) {
 		// Skip if no hooks for this model
-		const modelHooks = hookSet[model as ModelName];
+		const modelHooks = hookSet[model];
 		if (!modelHooks) {
 			continue;
 		}
@@ -66,10 +65,7 @@ export async function processHooks<T extends Record<string, unknown>>(
 		}
 
 		if (phase === 'before') {
-			const result = await hookFn(
-				currentData as ModelFromFields<Record<string, FieldAttribute>>,
-				context
-			);
+			const result = await hookFn(currentData as any, context);
 
 			if (result && typeof result === 'object' && 'kind' in result) {
 				switch (result.kind) {
@@ -91,10 +87,7 @@ export async function processHooks<T extends Record<string, unknown>>(
 			}
 		} else {
 			// For 'after' hooks, just execute the hook
-			await hookFn(
-				currentData as ModelFromFields<Record<string, FieldAttribute>>,
-				context
-			);
+			await hookFn(currentData as any, context);
 		}
 	}
 
@@ -108,7 +101,7 @@ export async function processAfterHooksForMany<
 	T extends Record<string, unknown>,
 >(
 	records: T[],
-	model: string,
+	model: ModelName,
 	hooks: DatabaseHook[],
 	context?: GenericEndpointContext
 ): Promise<void> {

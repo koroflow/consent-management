@@ -1,6 +1,4 @@
 import { z } from 'zod';
-import { getAllFields, parseInputData, parseOutputData } from '~/db/schema';
-import type { C15TOptions } from '~/types';
 
 /**
  * Zod schema for validating domain entities.
@@ -34,62 +32,6 @@ export const domainSchema = z.object({
 	createdAt: z.date().default(() => new Date()),
 	updatedAt: z.date().optional(),
 });
-
-/**
- * Processes domain data from the database for client-side consumption.
- *
- * Applies output transformations, filters out fields that shouldn't be returned,
- * and ensures the response conforms to configured schema rules.
- *
- * @param options - The C15T configuration options
- * @param domain - The raw domain data from the database
- * @returns Processed domain data safe for client consumption
- *
- * @example
- * ```typescript
- * const rawDomain = await adapter.findOne({ model: 'domain', where: [...] });
- * const processedDomain = parseDomainOutput(options, rawDomain);
- * // processedDomain will have any restricted fields removed based on configuration
- * ```
- */
-export function parseDomainOutput(
-	options: C15TOptions,
-	domain: z.infer<typeof domainSchema>
-) {
-	const schema = getAllFields(options, 'domain');
-	return parseOutputData(domain, { fields: schema });
-}
-
-/**
- * Processes input data for domain creation or updates.
- *
- * Applies input validations, transforms input values, sets default values,
- * and enforces required fields based on the action type (create/update).
- *
- * @param options - The C15T configuration options
- * @param domain - The input domain data to be processed
- * @param action - Whether this is for creating a new domain or updating an existing one
- * @returns Processed input data ready for database operations
- *
- * @throws {APIError} If required fields are missing for domain creation
- *
- * @example
- * ```typescript
- * // For creating a new domain
- * const validDomainData = parseDomainInput(options, inputData, 'create');
- *
- * // For updating an existing domain
- * const validUpdateData = parseDomainInput(options, partialData, 'update');
- * ```
- */
-export function parseDomainInput(
-	options: C15TOptions,
-	domain?: Record<string, unknown>,
-	action?: 'create' | 'update'
-) {
-	const schema = getAllFields(options, 'domain');
-	return parseInputData(domain || {}, { fields: schema, action });
-}
 
 /**
  * Type definition for Domain

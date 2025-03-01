@@ -1,7 +1,8 @@
 import type { RegistryContext, Where } from '~/types';
 import type { GenericEndpointContext } from '~/types';
-import { type Withdrawal, parseWithdrawalOutput } from './schema';
+import type { Withdrawal } from './schema';
 import { getWithHooks } from '~/db/hooks';
+import { validateTableOutput } from '../definition';
 
 /**
  * Creates and returns a set of consent withdrawal adapter methods to interact with the database.
@@ -62,7 +63,7 @@ export function withdrawalRegistry({ adapter, ...ctx }: RegistryContext) {
 				);
 			}
 
-			return createdWithdrawal as Withdrawal;
+			return validateTableOutput('withdrawal', createdWithdrawal, ctx.options);
 		},
 
 		/**
@@ -79,7 +80,7 @@ export function withdrawalRegistry({ adapter, ...ctx }: RegistryContext) {
 			consentId?: string,
 			limit?: number
 		) => {
-			const whereConditions: Where[] = [];
+			const whereConditions: Where<'withdrawal'> = [];
 
 			if (userId) {
 				whereConditions.push({
@@ -95,7 +96,7 @@ export function withdrawalRegistry({ adapter, ...ctx }: RegistryContext) {
 				});
 			}
 
-			const withdrawals = await adapter.findMany<Withdrawal>({
+			const withdrawals = await adapter.findMany({
 				model: 'withdrawal',
 				where: whereConditions,
 				sortBy: {
@@ -106,7 +107,7 @@ export function withdrawalRegistry({ adapter, ...ctx }: RegistryContext) {
 			});
 
 			return withdrawals.map((withdrawal) =>
-				parseWithdrawalOutput(ctx.options, withdrawal)
+				validateTableOutput('withdrawal', withdrawal, ctx.options)
 			);
 		},
 
@@ -118,7 +119,7 @@ export function withdrawalRegistry({ adapter, ...ctx }: RegistryContext) {
 		 * @returns The withdrawal object if found, null otherwise
 		 */
 		findWithdrawalById: async (withdrawalId: string) => {
-			const withdrawal = await adapter.findOne<Withdrawal>({
+			const withdrawal = await adapter.findOne({
 				model: 'withdrawal',
 				where: [
 					{
@@ -127,7 +128,9 @@ export function withdrawalRegistry({ adapter, ...ctx }: RegistryContext) {
 					},
 				],
 			});
-			return withdrawal ? parseWithdrawalOutput(ctx.options, withdrawal) : null;
+			return withdrawal
+				? validateTableOutput('withdrawal', withdrawal, ctx.options)
+				: null;
 		},
 
 		/**
@@ -139,7 +142,7 @@ export function withdrawalRegistry({ adapter, ...ctx }: RegistryContext) {
 		 * @returns Array of withdrawal records associated with the user
 		 */
 		findWithdrawalsByUserId: async (userId: string, limit?: number) => {
-			const withdrawals = await adapter.findMany<Withdrawal>({
+			const withdrawals = await adapter.findMany({
 				model: 'withdrawal',
 				where: [
 					{
@@ -154,7 +157,7 @@ export function withdrawalRegistry({ adapter, ...ctx }: RegistryContext) {
 				limit,
 			});
 			return withdrawals.map((withdrawal) =>
-				parseWithdrawalOutput(ctx.options, withdrawal)
+				validateTableOutput('withdrawal', withdrawal, ctx.options)
 			);
 		},
 
@@ -167,7 +170,7 @@ export function withdrawalRegistry({ adapter, ...ctx }: RegistryContext) {
 		 * @returns The withdrawal record if found, null otherwise
 		 */
 		findWithdrawalByConsentId: async (consentId: string) => {
-			const withdrawal = await adapter.findOne<Withdrawal>({
+			const withdrawal = await adapter.findOne({
 				model: 'withdrawal',
 				where: [
 					{
@@ -180,7 +183,9 @@ export function withdrawalRegistry({ adapter, ...ctx }: RegistryContext) {
 				// 	direction: 'desc',
 				// },
 			});
-			return withdrawal ? parseWithdrawalOutput(ctx.options, withdrawal) : null;
+			return withdrawal
+				? validateTableOutput('withdrawal', withdrawal, ctx.options)
+				: null;
 		},
 	};
 }

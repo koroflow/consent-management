@@ -1,7 +1,8 @@
 import type { GenericEndpointContext, RegistryContext } from '~/types';
-import { type PurposeJunction, parsePurposeJunctionOutput } from './schema';
+import type { PurposeJunction } from './schema';
 
 import { getWithHooks } from '~/db/hooks';
+import { validateTableOutput } from '../definition';
 
 /**
  * Creates and returns a set of consent-purpose junction adapter methods to interact with the database.
@@ -43,15 +44,16 @@ export function purposeJunctionRegistry({ adapter, ...ctx }: RegistryContext) {
 		 * @throws May throw an error if hooks prevent creation or if database operations fail
 		 */
 		createPurposeJunction: async (
-			junction: Omit<PurposeJunction, 'id' | 'createdAt'> &
+			junction: Omit<PurposeJunction, 'id' | 'createdAt' | 'status'> &
 				Partial<PurposeJunction>,
 			context?: GenericEndpointContext
 		) => {
 			const createdJunction = await createWithHooks({
 				data: {
 					createdAt: new Date(),
-					// status: 'active',
+
 					...junction,
+					status: 'active',
 				},
 				model: 'purposeJunction',
 				customFn: undefined,
@@ -75,7 +77,7 @@ export function purposeJunctionRegistry({ adapter, ...ctx }: RegistryContext) {
 		 * @returns Array of junction records associated with the consent
 		 */
 		findPurposesByConsentId: async (consentId: string) => {
-			const junctions = await adapter.findMany<PurposeJunction>({
+			const junctions = await adapter.findMany({
 				model: 'purposeJunction',
 				where: [
 					{
@@ -90,7 +92,7 @@ export function purposeJunctionRegistry({ adapter, ...ctx }: RegistryContext) {
 			});
 
 			return junctions.map((junction) =>
-				parsePurposeJunctionOutput(ctx.options, junction)
+				validateTableOutput('purposeJunction', junction, ctx.options)
 			);
 		},
 
@@ -102,7 +104,7 @@ export function purposeJunctionRegistry({ adapter, ...ctx }: RegistryContext) {
 		 * @returns Array of junction records associated with the purpose
 		 */
 		findPurposesByPurposeId: async (purposeId: string) => {
-			const junctions = await adapter.findMany<PurposeJunction>({
+			const junctions = await adapter.findMany({
 				model: 'purposeJunction',
 				where: [
 					{
@@ -117,7 +119,7 @@ export function purposeJunctionRegistry({ adapter, ...ctx }: RegistryContext) {
 			});
 
 			return junctions.map((junction) =>
-				parsePurposeJunctionOutput(ctx.options, junction)
+				validateTableOutput('purposeJunction', junction, ctx.options)
 			);
 		},
 
@@ -136,7 +138,7 @@ export function purposeJunctionRegistry({ adapter, ...ctx }: RegistryContext) {
 			status: 'active' | 'withdrawn',
 			context?: GenericEndpointContext
 		) => {
-			const junction = await updateWithHooks<PurposeJunction>({
+			const junction = await updateWithHooks({
 				data: {
 					status,
 					updatedAt: new Date(),
@@ -152,7 +154,7 @@ export function purposeJunctionRegistry({ adapter, ...ctx }: RegistryContext) {
 				context,
 			});
 			return junction
-				? parsePurposeJunctionOutput(ctx.options, junction)
+				? validateTableOutput('purposeJunction', junction, ctx.options)
 				: null;
 		},
 

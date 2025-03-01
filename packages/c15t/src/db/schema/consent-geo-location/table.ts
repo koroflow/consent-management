@@ -1,5 +1,6 @@
 import type { FieldAttribute } from '~/db/core/fields';
 import type { C15TOptions } from '~/types';
+import { consentGeoLocationSchema } from './schema';
 
 /**
  * Generates the database table configuration for the consent geo-location entity.
@@ -28,6 +29,11 @@ export function getConsentGeoLocationTable(
 		 * The name of the geo-location table in the database, configurable through options
 		 */
 		modelName: options.consentGeoLocation?.modelName || 'consentGeoLocation',
+
+		/**
+		 * The schema for the consent geo-location table
+		 */
+		schema: consentGeoLocationSchema,
 
 		/**
 		 * Field definitions for the consent geo-location table

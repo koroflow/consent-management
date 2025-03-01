@@ -1,5 +1,6 @@
 import type { FieldAttribute } from '~/db/core/fields';
 import type { C15TOptions } from '~/types';
+import { withdrawalSchema } from './schema';
 
 /**
  * Generates the database table configuration for the consent withdrawal entity.
@@ -28,6 +29,11 @@ export function getWithdrawalTable(
 		 * The name of the withdrawal table in the database, configurable through options
 		 */
 		modelName: options.withdrawal?.modelName || 'withdrawal',
+
+		/**
+		 * The schema for the consent withdrawal table
+		 */
+		schema: withdrawalSchema,
 
 		/**
 		 * Field definitions for the consent withdrawal table

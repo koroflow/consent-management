@@ -1,6 +1,7 @@
 import type { Adapter } from '~/types';
 import type { CreateWithHooksProps, HookContext } from './types';
 import { processHooks } from './utils';
+import type { ModelName } from '../core/types';
 
 /**
  * Creates a record with hooks applied before and after creation
@@ -12,7 +13,7 @@ import { processHooks } from './utils';
  * @param props - Properties for the create operation
  * @returns The created record or null if a hook aborted the operation
  */
-export async function createWithHooks<
+export async function createWithHook<
 	T extends Record<string, unknown> = Record<string, unknown>,
 	R extends Record<string, unknown> = T,
 >(
@@ -38,6 +39,7 @@ export async function createWithHooks<
 
 	// Execute operation
 	let created: R | null = null;
+
 	if (customFn) {
 		created = (await customFn.fn(transformedData)) as R | null;
 		if (!customFn.executeMainFn && created) {
@@ -46,10 +48,10 @@ export async function createWithHooks<
 	}
 
 	if (!created) {
-		created = await adapter.create<R>({
-			model,
-			data: transformedData as unknown as R,
-		});
+		created = (await adapter.create({
+			model: model as ModelName,
+			data: transformedData,
+		})) as unknown as R;
 	}
 
 	// Process after hooks

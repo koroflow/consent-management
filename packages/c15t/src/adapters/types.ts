@@ -1,11 +1,12 @@
 import type { C15TOptions } from '~/types';
 import type { KyselyAdapterConfig } from './kysely-adapter';
-import type { ModelName, ModelTypeMap } from '~/db/core/types';
+import type { ModelName } from '../db/core/types';
+import type { C15TDBSchema, TableFields } from '../db/schema/definition';
 
 /**
- * Adapter where clause
+ * Generic Where clause type that's restricted to fields of a specific model
  */
-export type Where = {
+export type Where<T extends ModelName> = {
 	operator?:
 		| 'eq'
 		| 'ne'
@@ -17,9 +18,23 @@ export type Where = {
 		| 'contains'
 		| 'starts_with'
 		| 'ends_with'; //eq by default
-	value: string | number | boolean | string[] | number[] | Date | null;
-	field: keyof ModelTypeMap[ModelName];
+	value: Value;
+	field: keyof TableFields<T> | 'id'; // Restricted to actual field names of model T
 	connector?: 'AND' | 'OR'; //AND by default
+}[];
+
+export type Value =
+	| string
+	| number
+	| boolean
+	| string[]
+	| number[]
+	| Date
+	| null;
+
+export type Tables<T extends ModelName> = C15TDBSchema[T]['fields'] & {
+	type: 'string';
+	fieldName: string;
 };
 
 /**
@@ -27,46 +42,59 @@ export type Where = {
  */
 export type Adapter = {
 	id: string;
-	create: <T extends Record<string, unknown>, R = T>(data: {
-		model: ModelName;
-		data: T;
-		select?: string[];
-	}) => Promise<R>;
-	findOne: <T>(data: {
-		model: ModelName;
-		where: Where[];
-		select?: string[];
-	}) => Promise<T | null>;
-	findMany: <T>(data: {
-		model: ModelName;
-		where?: Where[];
+	create: <
+		Model extends ModelName,
+		Data extends Record<string, unknown>,
+		Result extends TableFields<Model>,
+	>(data: {
+		model: Model;
+		data: Data;
+		select?: Array<keyof Result>;
+	}) => Promise<Result>;
+	findOne: <Model extends ModelName, Result extends TableFields<Model>>(data: {
+		model: Model;
+		where: Where<Model>;
+		select?: Array<keyof Result>;
+	}) => Promise<Result | null>;
+	findMany: <Model extends ModelName, Result extends TableFields<Model>>(data: {
+		model: Model;
+		where?: Where<Model>;
 		limit?: number;
 		sortBy?: {
-			field: string;
+			field: keyof Result | 'id';
 			direction: 'asc' | 'desc';
 		};
 		offset?: number;
-	}) => Promise<T[]>;
-	count: (data: {
-		model: ModelName;
-		where?: Where[];
+	}) => Promise<Result[]>;
+	count: <Model extends ModelName>(data: {
+		model: Model;
+		where?: Where<Model>;
 	}) => Promise<number>;
 	/**
 	 * ⚠︎ Update may not return the updated data
 	 * if multiple where clauses are provided
 	 */
-	update: <T>(data: {
-		model: ModelName;
-		where: Where[];
-		update: Record<string, unknown>;
-	}) => Promise<T | null>;
-	updateMany: (data: {
-		model: ModelName;
-		where: Where[];
-		update: Record<string, unknown>;
+	update: <Model extends ModelName, Result extends TableFields<Model>>(data: {
+		model: Model;
+		where: Where<Model>;
+		update: Partial<TableFields<Model>>;
+	}) => Promise<Result | null>;
+	updateMany: <
+		Model extends ModelName,
+		Result extends TableFields<Model>,
+	>(data: {
+		model: Model;
+		where: Where<Model>;
+		update: Partial<TableFields<Model>>;
+	}) => Promise<Result[]>;
+	delete: <Model extends ModelName>(data: {
+		model: Model;
+		where: Where<Model>;
+	}) => Promise<void>;
+	deleteMany: <Model extends ModelName>(data: {
+		model: Model;
+		where: Where<Model>;
 	}) => Promise<number>;
-	delete: (data: { model: ModelName; where: Where[] }) => Promise<void>;
-	deleteMany: (data: { model: ModelName; where: Where[] }) => Promise<number>;
 	/**
 	 *
 	 * @param options

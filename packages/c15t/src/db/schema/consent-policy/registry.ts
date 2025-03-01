@@ -1,6 +1,7 @@
 import type { GenericEndpointContext, RegistryContext } from '~/types';
-import { parseConsentPolicyOutput, type ConsentPolicy } from './schema';
+import type { ConsentPolicy } from './schema';
 import { getWithHooks } from '~/db/hooks';
+import { validateTableOutput } from '../definition';
 
 /**
  * Creates and returns a set of consent policy-related adapter methods to interact with the database.
@@ -73,7 +74,7 @@ export function policyRegistry({ adapter, ...ctx }: RegistryContext) {
 		 * @returns Array of active consent policies sorted by effective date
 		 */
 		findActiveConsentPolicies: async () => {
-			const policies = await adapter.findMany<ConsentPolicy>({
+			const policies = await adapter.findMany({
 				model: 'consentPolicy',
 				where: [
 					{
@@ -88,7 +89,7 @@ export function policyRegistry({ adapter, ...ctx }: RegistryContext) {
 			});
 
 			return policies.map((policy) =>
-				parseConsentPolicyOutput(ctx.options, policy)
+				validateTableOutput('consentPolicy', policy, ctx.options)
 			);
 		},
 
@@ -100,7 +101,7 @@ export function policyRegistry({ adapter, ...ctx }: RegistryContext) {
 		 * @returns The policy object if found, null otherwise
 		 */
 		findConsentPolicyById: async (policyId: string) => {
-			const policy = await adapter.findOne<ConsentPolicy>({
+			const policy = await adapter.findOne({
 				model: 'consentPolicy',
 				where: [
 					{
@@ -109,7 +110,9 @@ export function policyRegistry({ adapter, ...ctx }: RegistryContext) {
 					},
 				],
 			});
-			return policy ? parseConsentPolicyOutput(ctx.options, policy) : null;
+			return policy
+				? validateTableOutput('consentPolicy', policy, ctx.options)
+				: null;
 		},
 
 		/**
@@ -120,7 +123,7 @@ export function policyRegistry({ adapter, ...ctx }: RegistryContext) {
 		 * @returns The policy object if found, null otherwise
 		 */
 		findConsentPolicyByVersion: async (version: string) => {
-			const policy = await adapter.findOne<ConsentPolicy>({
+			const policy = await adapter.findOne({
 				model: 'consentPolicy',
 				where: [
 					{
@@ -129,7 +132,9 @@ export function policyRegistry({ adapter, ...ctx }: RegistryContext) {
 					},
 				],
 			});
-			return policy ? parseConsentPolicyOutput(ctx.options, policy) : null;
+			return policy
+				? validateTableOutput('consentPolicy', policy, ctx.options)
+				: null;
 		},
 
 		/**
@@ -162,7 +167,9 @@ export function policyRegistry({ adapter, ...ctx }: RegistryContext) {
 				customFn: undefined,
 				context,
 			});
-			return policy ? parseConsentPolicyOutput(ctx.options, policy) : null;
+			return policy
+				? validateTableOutput('consentPolicy', policy, ctx.options)
+				: null;
 		},
 	};
 }

@@ -1,5 +1,6 @@
 import type { FieldAttribute } from '~/db/core/fields';
-import type { TableDefinition } from './types';
+import type { C15TDBSchema } from '~/db/schema/definition';
+import type { ModelName } from '~/db/core/types';
 
 /**
  * Processes field definitions for a table
@@ -12,10 +13,10 @@ import type { TableDefinition } from './types';
  * @param tables - All available tables for resolving references
  * @returns Processed field definitions
  */
-export function processFields(
-	fields: Record<string, FieldAttribute | undefined>,
-	tables: Record<string, TableDefinition | undefined>
-): Record<string, FieldAttribute> {
+export function processFields<T extends ModelName>(
+	fields: C15TDBSchema[T]['fields'],
+	tables: C15TDBSchema
+) {
 	const actualFields: Record<string, FieldAttribute> = {};
 
 	// Process each field in the fields collection
@@ -27,21 +28,25 @@ export function processFields(
 
 		// Use the specified fieldName or the key if fieldName is not provided
 		const fieldName = field.fieldName || fieldKey;
-		actualFields[fieldName] = field;
 
-		// Handle references to other tables
-		if (field.references) {
-			const refTable = tables[field.references.model];
+		// Cast field to FieldAttribute to ensure it has the right type
+		const typedField = field as unknown as FieldAttribute;
+		actualFields[fieldName] = typedField;
+
+		// Handle references to other tables - first check if the field has a references property
+		if (typedField && 'references' in typedField && typedField.references) {
+			const modelName = typedField.references.model as ModelName;
+			const refTable = tables[modelName];
 
 			// Only set up the reference if the referenced table exists
 			if (refTable) {
 				// Create a new object for references to avoid modifying the original
 				actualFields[fieldName] = {
-					...field,
+					...typedField,
 					references: {
-						model: refTable.modelName || field.references.model,
-						field: field.references.field,
-						onDelete: field.references.onDelete,
+						model: refTable.modelName || typedField.references.model,
+						field: typedField.references.field,
+						onDelete: typedField.references.onDelete,
 					},
 				};
 			}

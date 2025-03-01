@@ -1,5 +1,6 @@
 import type { FieldAttribute } from '~/db/core/fields';
 import type { C15TOptions } from '~/types';
+import { purposeJunctionSchema } from './schema';
 
 /**
  * Generates the database table configuration for the consent-purpose junction entity.
@@ -28,6 +29,11 @@ export function getPurposeJunctionTable(
 		 * The name of the junction table in the database, configurable through options
 		 */
 		modelName: options.purposeJunction?.modelName || 'purposeJunction',
+
+		/**
+		 * The schema for the purpose junction table
+		 */
+		schema: purposeJunctionSchema,
 
 		/**
 		 * Field definitions for the consent-purpose junction table
@@ -110,12 +116,12 @@ export function getPurposeJunctionTable(
 		/**
 		 * Add unique constraint to ensure a purpose can only be associated with a consent once
 		 */
-		// uniqueConstraints: [
-		// 	{
-		// 		name: 'unique_consent_purpose',
-		// 		fields: ['consentId', 'purposeId'],
-		// 	},
-		// ],
+		uniqueConstraints: [
+			{
+				name: 'unique_consent_purpose',
+				fields: ['consentId', 'purposeId'],
+			},
+		],
 
 		/**
 		 * Execution order during migrations (lower numbers run first)

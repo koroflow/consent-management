@@ -65,11 +65,11 @@ export function analyzeSchemaChanges(
 	for (const [key, value] of Object.entries(betterAuthSchema)) {
 		const table = tableMetadata.find((t: { name: string }) => t.name === key);
 		if (!table) {
-			handleNewTable(key, value, toBeCreated);
+			handleNewTable(key, value as any, toBeCreated);
 			continue;
 		}
 
-		handleExistingTable(key, value, table, toBeAdded, dbType, logger);
+		handleExistingTable(key, value as any, table, toBeAdded, dbType, logger);
 	}
 
 	return { toBeCreated, toBeAdded };
