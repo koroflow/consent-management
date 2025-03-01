@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import {} from '~/db/schema';
 
 /**
  * Zod schema for validating consent withdrawal entities.

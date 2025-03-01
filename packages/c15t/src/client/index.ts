@@ -1,9 +1,5 @@
-import type { Purpose } from '~/db/schema/purpose/schema';
-import type { c15tClientOptions, FetchOptions, ResponseContext } from '..';
-import type {
-	// ConsentChangeEvent,
-	// ConsentPreference,
-} from '~/types';
+import type { Purpose } from '~/db/schema/purpose';
+import type { c15tClientOptions, FetchOptions, ResponseContext } from './types';
 
 /**
  * Client for interacting with the c15t consent management API.

@@ -1,5 +1,4 @@
 import { createAuthEndpoint } from '../call';
-import type { C15TContext } from '~/types';
 
 /**
  * Status endpoint that returns information about the c15t instance.
@@ -43,17 +42,25 @@ export const status = createAuthEndpoint(
 		method: 'GET',
 	},
 	async (ctx) => {
-		// Cast context to proper type
-		const context = ctx.context as unknown as C15TContext;
+		const context = ctx.context;
 
+		if (!context || typeof context !== 'object') {
+			throw new Error('Invalid context object');
+		}
 		return {
 			status: 'ok',
 			version: context.version || '1.0.0',
 			timestamp: new Date().toISOString(),
 			consent: {
 				enabled: context.consentConfig?.enabled,
-				updateAge: context.consentConfig?.updateAge,
-				expiresIn: context.consentConfig?.expiresIn,
+				updateAge:
+					typeof context.consentConfig?.updateAge === 'number'
+						? context.consentConfig.updateAge
+						: 90,
+				expiresIn:
+					typeof context.consentConfig?.expiresIn === 'number'
+						? context.consentConfig.expiresIn
+						: 365,
 			},
 		};
 	}

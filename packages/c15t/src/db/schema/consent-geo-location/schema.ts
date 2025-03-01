@@ -27,7 +27,7 @@ import { z } from 'zod';
 export const consentGeoLocationSchema = z.object({
 	id: z.string(),
 	consentId: z.string(),
-	ip: z.string(),
+	ip: z.string().ip(),
 	country: z.string().optional(),
 	region: z.string().optional(),
 	city: z.string().optional(),

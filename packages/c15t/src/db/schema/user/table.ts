@@ -1,6 +1,6 @@
 import type { Field } from '~/db/core/fields';
 import type { C15TOptions } from '~/types';
-import { userSchema } from '.';
+import { userSchema } from './schema';
 
 /**
  * Generates the database table configuration for the user entity.

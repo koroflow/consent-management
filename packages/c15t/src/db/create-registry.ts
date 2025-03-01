@@ -25,6 +25,5 @@ export const createRegistry = (ctx: RegistryContext) => {
 		...recordRegistry(ctx),
 		...userRegistry(ctx),
 		...withdrawalRegistry(ctx),
-		...withdrawalRegistry(ctx),
 	};
 };

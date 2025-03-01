@@ -151,6 +151,13 @@ const createTransform = (options: C15TOptions) => {
 						);
 					}
 
+					if (operator === 'eq') {
+						return record[field] === value;
+					}
+					if (operator === 'ne') {
+						return record[field] !== value;
+					}
+
 					// Default case (equals)
 					return record[field] === value;
 				});
