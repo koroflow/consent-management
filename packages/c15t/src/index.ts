@@ -56,11 +56,6 @@ export type {
 //------------------------------------------------------------------------------
 
 /**
- * Analytics plugin for tracking user activity with consent
- */
-export * from './plugins/analytics';
-
-/**
  * Geo plugin for jurisdiction-based consent management
  */
 export * from './plugins/geo';
@@ -82,28 +77,3 @@ declare module './types/plugins' {
 		// Plugin type interfaces will be added here
 	}
 }
-
-//------------------------------------------------------------------------------
-// Framework Integrations (Commented out until implementation is complete)
-//------------------------------------------------------------------------------
-
-/*
-// Next.js integration components and utilities
-export {
-	createNextIntegration,
-	createNextMiddleware,
-	withConsent
-} from './integrations/next';
-
-// React integration components and hooks
-export {
-	createReactIntegration,
-	ConsentProvider,
-	useConsent
-} from './integrations/react';
-
-// Generic server integration
-export {
-	createServerIntegration
-} from './integrations/server';
-*/

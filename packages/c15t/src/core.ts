@@ -37,22 +37,12 @@ import type {
 	InferPluginErrorCodes,
 	InferPluginTypes,
 	C15TContext,
-	Expand,
+	C15TPlugin,
+	InferPluginContexts,
 } from './types';
 import { getBaseURL } from './utils/url';
 import type { FilterActions } from './types';
 import { BASE_ERROR_CODES } from './error/codes';
-
-/**
- * Utility type for adding JSDoc comments to types
- *
- * This type helps maintain documentation when extending types by
- * ensuring that both the original type and documentation are preserved.
- *
- * @template T - The original type
- * @template D - The documentation type
- */
-export type WithJsDoc<T, D> = Expand<T & D>;
 
 /**
  * Creates a c15t consent management system instance
@@ -61,7 +51,7 @@ export type WithJsDoc<T, D> = Expand<T & D>;
  * It initializes the consent management context, sets up request handling,
  * configures plugins, and exposes the necessary API endpoints.
  *
- * @template O - The specific C15TOptions type with plugin types
+ * @template PluginArray - The specific plugin types to use
  * @param options - Configuration options for the c15t instance
  * @returns A fully initialized c15t instance with request handler and API
  *
@@ -101,7 +91,12 @@ export type WithJsDoc<T, D> = Expand<T & D>;
  * });
  * ```
  */
-export const c15t = <O extends C15TOptions>(options: O) => {
+export const c15t = <
+	PluginArray extends C15TPlugin[] = C15TPlugin[],
+	OptionsType extends C15TOptions<PluginArray> = C15TOptions<PluginArray>,
+>(
+	options: OptionsType
+) => {
 	const C15TContextPromise = init(options);
 
 	const handler = async (request: Request): Promise<Response> => {
@@ -171,38 +166,31 @@ export const c15t = <O extends C15TOptions>(options: O) => {
 		handler,
 		// We're type-casting this for now since the API is loaded asynchronously
 		api: {} as FilterActions<ReturnType<typeof router>['endpoints']>,
-		options: options as O,
+		options,
 		$context: C15TContextPromise,
 		$Infer: {} as {
 			Consent: {
-				Context: C15TContext;
-				Record: InferPluginTypes<O>;
+				Context: C15TContext<InferPluginContexts<PluginArray>>;
+				Record: InferPluginTypes<C15TOptions<PluginArray>>;
 			};
-			Error: InferPluginErrorCodes<O> & typeof BASE_ERROR_CODES;
+			Error: InferPluginErrorCodes<C15TOptions<PluginArray>> &
+				typeof BASE_ERROR_CODES;
 		},
 		$ERROR_CODES: Object.assign(
 			{},
 			BASE_ERROR_CODES,
 			errorCodes || {}
-		) as InferPluginErrorCodes<O> & typeof BASE_ERROR_CODES,
+		) as InferPluginErrorCodes<C15TOptions<PluginArray>> &
+			typeof BASE_ERROR_CODES,
 	};
 };
 
 /**
- * Type definition for a c15t instance
+ * Type definition for a c15t instance with specific plugin types
  *
- * This type represents a fully initialized c15t consent management system
- * instance with all its methods and properties. It is the return type of
- * the `c15t()` factory function.
- *
- * The instance includes:
- * - A request handler compatible with Web Standard Request/Response
- * - Access to the configured API endpoints
- * - Original configuration options
- * - Error codes from the core system and plugins
- * - Access to the underlying consent context (for advanced usage)
+ * @template PluginArray - The specific plugin types used in this instance
  */
-export type C15TInstance = {
+export type C15TInstance<PluginArray extends C15TPlugin[] = C15TPlugin[]> = {
 	/**
 	 * Request handler for processing incoming consent-related requests
 	 *
@@ -224,14 +212,15 @@ export type C15TInstance = {
 	/**
 	 * Configuration options used to create the instance
 	 */
-	options: C15TOptions;
+	options: C15TOptions<PluginArray>;
 
 	/**
 	 * Error codes from the core system and all registered plugins
 	 *
 	 * These can be used for error handling and internationalization.
 	 */
-	$ERROR_CODES: typeof BASE_ERROR_CODES;
+	$ERROR_CODES: InferPluginErrorCodes<C15TOptions<PluginArray>> &
+		typeof BASE_ERROR_CODES;
 
 	/**
 	 * Promise that resolves to the fully initialized consent context
@@ -239,7 +228,7 @@ export type C15TInstance = {
 	 * This is mainly for advanced usage scenarios where direct access
 	 * to the context is required.
 	 */
-	$context: Promise<C15TContext>;
+	$context: Promise<C15TContext<InferPluginContexts<PluginArray>>>;
 
 	/**
 	 * Index signature for dynamic access to API handlers

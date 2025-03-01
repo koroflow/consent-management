@@ -15,7 +15,7 @@ export interface Logger {
 	log?: (
 		level: Exclude<LogLevel, 'success'>,
 		message: string,
-		...args: any[]
+		...args: unknown[]
 	) => void;
 }
 
@@ -82,7 +82,8 @@ export const createLogger = (
 	const LogFunc = (
 		level: LogLevel,
 		message: string,
-		args: any[] = []
+		args: unknown[] = []
+		// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: its ok
 	): void => {
 		if (!enabled || !shouldPublishLog(logLevel, level)) {
 			return;

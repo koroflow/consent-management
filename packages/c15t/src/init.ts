@@ -38,6 +38,7 @@ const DEFAULT_SECRET = 'c15t-default-secret-please-change-in-production';
  * It sets up storage adapters, initializes plugins, configures security settings,
  * and establishes the foundation for the consent management system.
  *
+ * @template P - The plugin types used in the configuration
  * @param options - Configuration options for the c15t instance
  * @returns A Promise resolving to the initialized consent context
  *
@@ -53,7 +54,7 @@ const DEFAULT_SECRET = 'c15t-default-secret-please-change-in-production';
  * // Now use the context to handle consent management
  * ```
  */
-export const init = async (options: C15TOptions) => {
+export const init = async <P extends C15TPlugin[]>(options: C15TOptions<P>) => {
 	// Initialize core components
 	const adapter = await getAdapter(options);
 	const logger = createLogger(options.logger);
@@ -74,7 +75,7 @@ export const init = async (options: C15TOptions) => {
 		secret,
 		baseURL: baseURL ? new URL(baseURL).origin : '',
 		basePath: options.basePath || '/api/c15t',
-		plugins: (options.plugins || []).concat(getInternalPlugins(options)),
+		plugins: [...(options.plugins || []), ...getInternalPlugins(options)],
 	};
 
 	// Create ID generator
@@ -107,6 +108,7 @@ export const init = async (options: C15TOptions) => {
 		logger,
 		generateId: generateIdFunc,
 		consentConfig: {
+			enabled: true,
 			expiresIn: finalOptions.consent?.expiresIn || 60 * 60 * 24 * 365,
 			updateAge: finalOptions.consent?.updateAge || 60 * 60 * 24,
 		},

@@ -1,7 +1,7 @@
 import type {
 	Database,
 	KyselyDatabaseType,
-} from '~/adapters/kysely-adapter/types';
+} from '~/db/adapters/kysely-adapter/types';
 import type { MigrationOperation, TableToCreate, ColumnsToAdd } from './types';
 import { getType } from './type-mapping';
 import { createLogger } from '~/utils/logger';

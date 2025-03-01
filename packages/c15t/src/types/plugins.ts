@@ -17,6 +17,7 @@ import type {
 } from './index';
 import type { Field } from '~/db/core/fields';
 import type { Migration } from 'kysely';
+import type { UnionToIntersection } from '@better-fetch/fetch';
 
 /**
  * Context object provided to plugin hooks
@@ -104,6 +105,7 @@ export interface PluginHook {
  */
 export interface C15TPlugin {
 	id: LiteralString;
+	type: string;
 	/**
 	 * The init function is called when the plugin is initialized.
 	 * You can return a new context or modify the existing context.
@@ -201,24 +203,49 @@ export interface C15TPlugin {
 	 * The error codes returned by the plugin
 	 */
 	$ERROR_CODES?: Record<string, string>;
+
+	/**
+	 * Type information for context extensions provided by this plugin
+	 * This will be used to properly type the context in hooks and methods
+	 */
+	$InferContext?: Record<string, unknown>;
 }
 
 /**
- * Infer plugin types from configuration options
- *
- * This type utility extracts the plugin types from a configuration object,
- * allowing TypeScript to understand the extensions provided by plugins.
+ * Improved type inference for plugin types
+ * This creates a union of all plugin $Infer types
  */
 export type InferPluginTypes<O extends C15TOptions> =
 	O['plugins'] extends Array<infer P>
 		? P extends C15TPlugin
-			? P extends { $InferServerPlugin: infer SP }
-				? SP extends Record<string, unknown>
-					? SP
+			? P extends { $Infer: infer PI }
+				? PI extends Record<string, unknown>
+					? PI
 					: Record<string, never>
 				: Record<string, never>
 			: Record<string, never>
 		: Record<string, never>;
+
+/**
+ * Helper to extract specific plugin type from options
+ */
+export type ExtractPluginType<
+	O extends C15TOptions,
+	T extends string,
+> = O['plugins'] extends Array<infer P>
+	? P extends C15TPlugin
+		? P extends { type: T }
+			? P
+			: never
+		: never
+	: never;
+
+/**
+ * Type-safe plugin factory function
+ */
+export type PluginFactory<T extends C15TPlugin> = (
+	options?: Omit<T, 'id' | 'type'> & { id?: string }
+) => T;
 
 /**
  * Infer plugin error codes from configuration options
@@ -252,3 +279,49 @@ export type C15TPluginSchema = {
 		entityName?: string;
 	};
 };
+
+// Example specific plugin types with discriminated unions
+export interface AnalyticsPlugin extends C15TPlugin {
+	type: 'analytics';
+	analyticsOptions?: {
+		trackingEvents: string[];
+		anonymizeData?: boolean;
+	};
+}
+
+export interface GeoPlugin extends C15TPlugin {
+	type: 'geo';
+	geoOptions?: {
+		defaultJurisdiction?: string;
+		ipLookupService?: string;
+	};
+}
+
+// Type guard functions
+export function isAnalyticsPlugin(
+	plugin: C15TPlugin
+): plugin is AnalyticsPlugin {
+	return plugin.type === 'analytics';
+}
+
+export function isGeoPlugin(plugin: C15TPlugin): plugin is GeoPlugin {
+	return plugin.type === 'geo';
+}
+
+/**
+ * Helper to extract plugin context types from plugin array
+ * Used to properly type the context passed to plugin hooks and methods
+ */
+export type InferPluginContexts<PluginArray extends C15TPlugin[]> =
+	UnionToIntersection<
+		PluginArray extends Array<infer SinglePlugin>
+			? SinglePlugin extends C15TPlugin
+				? SinglePlugin extends { $InferContext: infer ContextType }
+					? ContextType extends Record<string, unknown>
+						? ContextType
+						: Record<string, never>
+					: Record<string, never>
+				: Record<string, never>
+			: Record<string, never>
+	> &
+		Record<string, unknown>;

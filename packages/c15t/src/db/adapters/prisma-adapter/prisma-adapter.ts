@@ -1,6 +1,6 @@
 //@ts-nocheck
 
-import { getConsentTables } from '../../db';
+import { getConsentTables } from '../..';
 import { C15TError } from '~/error';
 import type { Adapter, C15TOptions, Where } from '~/types';
 import { generateId } from '~/utils';

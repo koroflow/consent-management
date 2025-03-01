@@ -1,18 +1,31 @@
-import { Kysely, MssqlDialect } from 'kysely';
 import {
 	type Dialect,
+	Kysely,
+	MssqlDialect,
 	MysqlDialect,
 	PostgresDialect,
 	SqliteDialect,
 } from 'kysely';
 import type { C15TOptions } from '~/types';
-import type { Database, KyselyDatabaseType } from './types';
 import type {
 	DatabaseConfiguration,
 	KyselyInstanceConfig,
 	DialectConfig,
-} from '~/types/database-config';
+	Database,
+	KyselyDatabaseType,
+} from './types';
 
+/**
+ * Determines the database type from a database configuration
+ *
+ * This function analyzes a database configuration object to determine
+ * which type of database it represents (SQLite, MySQL, PostgreSQL, MSSQL).
+ * It handles different configuration formats including direct dialect instances,
+ * connection pools, and raw database connections.
+ *
+ * @param db - The database configuration to analyze
+ * @returns The detected database type or null if unable to determine
+ */
 function getDatabaseType(
 	db: DatabaseConfiguration | undefined
 ): KyselyDatabaseType | null {
@@ -50,6 +63,20 @@ function getDatabaseType(
 	return null;
 }
 
+/**
+ * Creates a Kysely adapter from the provided configuration
+ *
+ * This function analyzes the database configuration in C15TOptions and creates
+ * an appropriate Kysely instance with the correct dialect. It handles several
+ * different configuration formats including:
+ * - Direct Kysely instances
+ * - Dialect configurations
+ * - Raw database connections (SQLite, MySQL, PostgreSQL)
+ * - Kysely dialect instances
+ *
+ * @param config - The C15T configuration options containing database settings
+ * @returns An object containing the initialized Kysely instance and database type
+ */
 export const createKyselyAdapter = async (
 	config: C15TOptions
 ): Promise<{

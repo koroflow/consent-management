@@ -6,7 +6,7 @@
  *
  * @module migration/type-mapping
  */
-import type { KyselyDatabaseType } from '../../adapters/kysely-adapter/types';
+import type { KyselyDatabaseType } from '../adapters/kysely-adapter/types';
 import type { Field, FieldType } from '~/db/core/fields';
 
 /**

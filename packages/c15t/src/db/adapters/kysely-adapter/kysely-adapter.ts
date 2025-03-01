@@ -2,9 +2,9 @@ import type {
 	BinaryOperatorExpression,
 	OperandValueExpressionOrList,
 } from 'node_modules/kysely/dist/esm/parser/binary-operation-parser';
-import { getConsentTables } from '../../db';
-import type { Adapter, C15TOptions, Where } from '../../types';
-import { generateId } from '../../utils';
+import { getConsentTables } from '../..';
+import type { Adapter, C15TOptions, Where } from '../../../types';
+import { generateId } from '../../../utils';
 import { applyDefaultValue } from '../utils';
 import type { Database, KyselyDatabaseType } from './types';
 import type {

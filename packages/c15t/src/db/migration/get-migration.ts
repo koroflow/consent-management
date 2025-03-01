@@ -16,8 +16,8 @@
 import type { FieldType } from '~/db/core/fields';
 import { createLogger } from '../../utils/logger';
 import type { C15TOptions } from '~/types';
-import { createKyselyAdapter } from '../../adapters/kysely-adapter/dialect';
-import type { KyselyDatabaseType } from '../../adapters/kysely-adapter/types';
+import { createKyselyAdapter } from '../adapters/kysely-adapter/dialect';
+import type { KyselyDatabaseType } from '../adapters/kysely-adapter/types';
 import { analyzeSchemaChanges } from './schema-comparison';
 import {
 	buildColumnAddMigrations,

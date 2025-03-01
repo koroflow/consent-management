@@ -5,76 +5,20 @@
  * It includes types for setting up storage, API endpoints, cookies, rate limiting,
  * analytics, geo-targeting, plugins, logging, and other advanced features.
  */
-
-import type {} from 'kysely';
 import type { Logger } from '../utils/logger';
 import type { C15TContext, C15TPlugin } from './index';
 import type { AuthMiddleware } from '~/api/call';
 import type { Field } from '~/db/core/fields';
 import type { DatabaseHook } from '~/db/hooks/types';
-import type { DatabaseConfiguration } from './database-config';
+import type { DatabaseConfiguration } from '~/db/adapters/kysely-adapter/types';
 import type { EntityName } from '~/db/core/types';
 
 /**
- * Analytics destination configuration
- */
-export interface AnalyticsDestination {
-	/**
-	 * Type of analytics destination (e.g., 'google-analytics', 'segment')
-	 */
-	type: string;
-
-	/**
-	 * Configuration options specific to this analytics destination
-	 */
-	options: Record<string, unknown>;
-}
-
-/**
- * Logger metadata type
- */
-export type LoggerMetadata = Record<
-	string,
-	string | number | boolean | null | undefined
->;
-
-/**
- * Custom logger implementation
- */
-export interface CustomLogger {
-	/**
-	 * Log debug level messages
-	 * @param message - Message to log
-	 * @param meta - Optional metadata to include
-	 */
-	debug: (message: string, meta?: LoggerMetadata) => void;
-
-	/**
-	 * Log info level messages
-	 * @param message - Message to log
-	 * @param meta - Optional metadata to include
-	 */
-	info: (message: string, meta?: LoggerMetadata) => void;
-
-	/**
-	 * Log warning level messages
-	 * @param message - Message to log
-	 * @param meta - Optional metadata to include
-	 */
-	warn: (message: string, meta?: LoggerMetadata) => void;
-
-	/**
-	 * Log error level messages
-	 * @param message - Message to log
-	 * @param meta - Optional metadata to include
-	 */
-	error: (message: string, meta?: LoggerMetadata) => void;
-}
-
-/**
  * Main configuration options for the c15t consent management system
+ *
+ * @template P - The array of plugin types that will be used with this configuration
  */
-export interface C15TOptions {
+export interface C15TOptions<P extends C15TPlugin[] = C15TPlugin[]> {
 	/**
 	 * The base URL for the API (optional if running in a browser)
 	 * @example "https://example.com"
@@ -155,24 +99,6 @@ export interface C15TOptions {
 	};
 
 	/**
-	 * Analytics configuration
-	 * Settings for tracking consent-related events
-	 */
-	analytics?: {
-		/**
-		 * Enable analytics
-		 * @default true
-		 */
-		enabled?: boolean;
-
-		/**
-		 * Destinations for analytics data
-		 * Each destination has a type and configuration options
-		 */
-		destinations?: AnalyticsDestination[];
-	};
-
-	/**
 	 * Geo-targeting configuration
 	 * Settings for location-based consent rules
 	 */
@@ -194,7 +120,7 @@ export interface C15TOptions {
 	 * Plugins to extend functionality
 	 * Array of plugin objects that add features to the consent system
 	 */
-	plugins?: C15TPlugin[];
+	plugins?: P;
 
 	/**
 	 * Logger configuration

@@ -133,12 +133,12 @@ export type EntityOutputFields<T extends keyof C15TDBSchema> = {
  * const validUserData = validateEntityInput('user', inputData, options);
  * ```
  */
-export function validateEntityInput<T extends keyof C15TDBSchema>(
-	tableName: T,
+export function validateEntityInput<ITableName extends keyof C15TDBSchema>(
+	tableName: ITableName,
 	data: Record<string, unknown>,
 	options: C15TOptions,
 	action: 'create' | 'update' = 'create'
-): EntityInputFields<T> {
+): EntityInputFields<ITableName> {
 	const tables = getConsentTables(options);
 	const table = tables[tableName];
 
@@ -153,7 +153,7 @@ export function validateEntityInput<T extends keyof C15TDBSchema>(
 	return parseInputData(data, {
 		fields: table.fields,
 		action,
-	}) as EntityInputFields<T>;
+	}) as EntityInputFields<ITableName>;
 }
 
 /**
@@ -170,11 +170,11 @@ export function validateEntityInput<T extends keyof C15TDBSchema>(
  * const validUserOutput = validateEntityOutput('user', outputData, options);
  * ```
  */
-export function validateEntityOutput<T extends keyof C15TDBSchema>(
-	tableName: T,
+export function validateEntityOutput<ITableName extends keyof C15TDBSchema>(
+	tableName: ITableName,
 	data: Record<string, unknown>,
 	options: C15TOptions
-): EntityOutputFields<T> {
+): EntityOutputFields<ITableName> {
 	const tables = getConsentTables(options);
 	const table = tables[tableName];
 
@@ -188,5 +188,5 @@ export function validateEntityOutput<T extends keyof C15TDBSchema>(
 	// Validate and return data
 	return parseOutputData(data, {
 		fields: table.fields,
-	}) as EntityOutputFields<T>;
+	}) as EntityOutputFields<ITableName>;
 }

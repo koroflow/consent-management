@@ -36,76 +36,37 @@ export interface RegistryContext extends BaseContext {
 }
 
 /**
- * Context interface for the consent system
- *
- * This is the main context object passed around throughout the system
- * and made available to plugins and endpoint handlers
+ * Base context type without plugin-specific extensions
  */
-export interface C15TContext extends BaseContext {
-	/**
-	 * Configuration options
-	 */
-	options: C15TOptions;
-
-	/**
-	 * Application name
-	 */
+export interface BaseC15TContext {
 	appName: string;
-
-	/**
-	 * Base URL for API endpoints
-	 */
-	baseURL: string;
-
-	/**
-	 * Trusted origins for CORS
-	 */
+	options: C15TOptions;
 	trustedOrigins: string[];
-
-	adapter: Adapter;
-
-	registry: ReturnType<typeof createRegistry>;
-
-	/**
-	 * Secret for signing cookies and tokens
-	 */
+	baseURL: string;
 	secret: string;
-
-	/**
-	 * Logger interface
-	 */
 	logger: ReturnType<typeof createLogger>;
-
-	/**
-	 * Consent configuration
-	 */
-	consentConfig: {
-		/**
-		 * Consent expiration time in seconds
-		 */
-		expiresIn: number;
-
-		/**
-		 * Time in seconds before refreshing consent data
-		 */
-		updateAge: number;
-
-		/**
-		 * Whether consent is enabled
-		 */
-		enabled?: boolean;
-	};
-
-	/**
-	 * Generate an ID for a model
-	 */
 	generateId: (options: { model: EntityName; size?: number }) => string;
-
-	// API methods
-	/**
-	 * API version
-	 */
-	version?: string;
-
+	consentConfig: {
+		enabled: boolean;
+		expiresIn: number;
+		updateAge: number;
+	};
+	adapter: Adapter;
+	registry: ReturnType<typeof createRegistry>;
 	tables: ReturnType<typeof getConsentTables>;
 }
+
+/**
+ * Extended context type with generic plugin extensions
+ */
+export type C15TContext<
+	TPluginContext extends Record<string, any> = Record<string, any>,
+> = BaseC15TContext & TPluginContext;
+
+/**
+ * Helper to extract context with a specific plugin's context type
+ */
+export type ContextWithPlugin<
+	TPluginName extends string,
+	TPluginContext extends Record<string, any>,
+> = C15TContext<Record<TPluginName, TPluginContext>>;

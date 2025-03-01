@@ -1,4 +1,3 @@
-// src/schema/consent.ts
 import {
 	pgTable,
 	serial,

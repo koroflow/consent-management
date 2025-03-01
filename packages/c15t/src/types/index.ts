@@ -1,4 +1,4 @@
-export type * from '../adapters/types';
+export type * from '../db/adapters/types';
 export type * from './api';
 export type * from './context';
 export type * from './helper';

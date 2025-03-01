@@ -1,7 +1,7 @@
 import type { C15TOptions } from '~/types';
 import type { KyselyAdapterConfig } from './kysely-adapter';
-import type { EntityName } from '../db/core/types';
-import type { C15TDBSchema, TableFields } from '../db/schema/definition';
+import type { EntityName } from '../core/types';
+import type { C15TDBSchema, TableFields } from '../schema/definition';
 
 /**
  * Generic Where clause type that's restricted to fields of a specific model

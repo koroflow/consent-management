@@ -10,7 +10,7 @@ import {
 	or,
 	type SQL,
 } from 'drizzle-orm';
-import { getConsentTables } from '../../db';
+import { getConsentTables } from '../..';
 import { C15TError } from '~/error';
 import type { Adapter, C15TOptions, Where } from '~/types';
 import { generateId } from '~/utils';

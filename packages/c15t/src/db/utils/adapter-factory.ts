@@ -1,9 +1,9 @@
 import { getConsentTables } from '~/db';
 import { C15TError } from '~/error';
 import type { C15TOptions } from '~/types';
-import { createKyselyAdapter } from '~/adapters/kysely-adapter/dialect';
-import { kyselyAdapter } from '~/adapters/kysely-adapter';
-import { memoryAdapter } from '~/adapters/memory-adapter';
+import { createKyselyAdapter } from '~/db/adapters/kysely-adapter/dialect';
+import { kyselyAdapter } from '~/db/adapters/kysely-adapter';
+import { memoryAdapter } from '~/db/adapters/memory-adapter';
 import { createLogger } from '~/utils/logger';
 
 /**

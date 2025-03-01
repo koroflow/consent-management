@@ -1,4 +1,4 @@
-import { getConsentTables } from '../../db';
+import { getConsentTables } from '../..';
 import type { Adapter, C15TOptions, Where } from '~/types';
 import type {
 	EntityName,
