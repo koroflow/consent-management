@@ -54,8 +54,8 @@ const createTransform = (config: PrismaConfig, options: C15TOptions) => {
 		}
 	}
 
-	function getModelName(model: string) {
-		return schema[model].modelName;
+	function getEntityName(model: string) {
+		return schema[model].entityName;
 	}
 
 	const useDatabaseGeneratedId = options?.advanced?.generateId === false;
@@ -118,7 +118,7 @@ const createTransform = (config: PrismaConfig, options: C15TOptions) => {
 			}
 			return transformedData as any;
 		},
-		convertWhereClause<T extends ModelName>(model: T, where?: Where<T>[]) {
+		convertWhereClause<T extends EntityName>(model: T, where?: Where<T>[]) {
 			if (!where) return {};
 			if (where.length === 1) {
 				const w = where[0];
@@ -168,7 +168,7 @@ const createTransform = (config: PrismaConfig, options: C15TOptions) => {
 				};
 			}, {});
 		},
-		getModelName,
+		getEntityName,
 		getField,
 	};
 };
@@ -181,7 +181,7 @@ export const prismaAdapter =
 			transformOutput,
 			convertWhereClause,
 			convertSelect,
-			getModelName,
+			getEntityName,
 			getField,
 		} = createTransform(config, options);
 		return {
@@ -189,12 +189,12 @@ export const prismaAdapter =
 			async create(data) {
 				const { model, data: values, select } = data;
 				const transformed = transformInput(values, model, 'create');
-				if (!db[getModelName(model)]) {
+				if (!db[getEntityName(model)]) {
 					throw new C15TError(
 						`Model ${model} does not exist in the database. If you haven't generated the Prisma client, you need to run 'npx prisma generate'`
 					);
 				}
-				const result = await db[getModelName(model)].create({
+				const result = await db[getEntityName(model)].create({
 					data: transformed,
 					select: convertSelect(select, model),
 				});
@@ -203,12 +203,12 @@ export const prismaAdapter =
 			async findOne(data) {
 				const { model, where, select } = data;
 				const whereClause = convertWhereClause(model, where);
-				if (!db[getModelName(model)]) {
+				if (!db[getEntityName(model)]) {
 					throw new C15TError(
 						`Model ${model} does not exist in the database. If you haven't generated the Prisma client, you need to run 'npx prisma generate'`
 					);
 				}
-				const result = await db[getModelName(model)].findFirst({
+				const result = await db[getEntityName(model)].findFirst({
 					where: whereClause,
 					select: convertSelect(select, model),
 				});
@@ -217,13 +217,13 @@ export const prismaAdapter =
 			async findMany(data) {
 				const { model, where, limit, offset, sortBy } = data;
 				const whereClause = convertWhereClause(model, where);
-				if (!db[getModelName(model)]) {
+				if (!db[getEntityName(model)]) {
 					throw new C15TError(
 						`Model ${model} does not exist in the database. If you haven't generated the Prisma client, you need to run 'npx prisma generate'`
 					);
 				}
 
-				const result = (await db[getModelName(model)].findMany({
+				const result = (await db[getEntityName(model)].findMany({
 					where: whereClause,
 					take: limit || 100,
 					skip: offset || 0,
@@ -241,26 +241,26 @@ export const prismaAdapter =
 			async count(data) {
 				const { model, where } = data;
 				const whereClause = convertWhereClause(model, where);
-				if (!db[getModelName(model)]) {
+				if (!db[getEntityName(model)]) {
 					throw new C15TError(
 						`Model ${model} does not exist in the database. If you haven't generated the Prisma client, you need to run 'npx prisma generate'`
 					);
 				}
-				const result = await db[getModelName(model)].count({
+				const result = await db[getEntityName(model)].count({
 					where: whereClause,
 				});
 				return result;
 			},
 			async update(data) {
 				const { model, where, update } = data;
-				if (!db[getModelName(model)]) {
+				if (!db[getEntityName(model)]) {
 					throw new C15TError(
 						`Model ${model} does not exist in the database. If you haven't generated the Prisma client, you need to run 'npx prisma generate'`
 					);
 				}
 				const whereClause = convertWhereClause(model, where);
 				const transformed = transformInput(update, model, 'update');
-				const result = await db[getModelName(model)].update({
+				const result = await db[getEntityName(model)].update({
 					where: whereClause,
 					data: transformed,
 				});
@@ -270,7 +270,7 @@ export const prismaAdapter =
 				const { model, where, update } = data;
 				const whereClause = convertWhereClause(model, where);
 				const transformed = transformInput(update, model, 'update');
-				const result = await db[getModelName(model)].updateMany({
+				const result = await db[getEntityName(model)].updateMany({
 					where: whereClause,
 					data: transformed,
 				});
@@ -280,7 +280,7 @@ export const prismaAdapter =
 				const { model, where } = data;
 				const whereClause = convertWhereClause(model, where);
 				try {
-					await db[getModelName(model)].delete({
+					await db[getEntityName(model)].delete({
 						where: whereClause,
 					});
 				} catch (e) {
@@ -290,7 +290,7 @@ export const prismaAdapter =
 			async deleteMany(data) {
 				const { model, where } = data;
 				const whereClause = convertWhereClause(model, where);
-				const result = await db[getModelName(model)].deleteMany({
+				const result = await db[getEntityName(model)].deleteMany({
 					where: whereClause,
 				});
 				return result ? (result.count as number) : 0;

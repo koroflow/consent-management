@@ -1,20 +1,45 @@
 import type { GenericEndpointContext } from '~/types';
 import type { DatabaseHook, HookOperation, HookPhase } from './types';
-import type { ModelName } from '../core/types';
+import type { EntityName } from '../core/types';
 
 /**
- * Process hooks for a given phase and operation
+ * Process hooks for a given phase and operation.
+ *
+ * @typeParam TEntityData - Type of the entity data being processed
+ *
+ * @param data - The data to process through hooks
+ * @param model - The entity type/model name
+ * @param operation - The operation being performed (create/update)
+ * @param phase - The hook execution phase (before/after)
+ * @param hooks - Array of hook sets to process
+ * @param context - Optional request context
+ * @returns The processed data, potentially transformed, or null if aborted
+ *
+ * @remarks
+ * This core utility function handles the execution of hooks for various
+ * database operations. It traverses all registered hooks for the specified
+ * entity, operation, and phase, applying transformations or aborting as needed.
+ *
+ * @example
+ * ```typescript
+ * const processedData = await processHooks(
+ *   { name: 'Alice' },
+ *   'user',
+ *   'create',
+ *   'before',
+ *   registeredHooks
+ * );
+ * ```
  */
-
 // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: this is a complex function but it's ok
-export async function processHooks<T extends Record<string, unknown>>(
-	data: T,
-	model: ModelName,
+export async function processHooks<TEntityData extends Record<string, unknown>>(
+	data: TEntityData,
+	model: EntityName,
 	operation: HookOperation,
 	phase: HookPhase,
 	hooks: DatabaseHook[],
 	context?: GenericEndpointContext
-): Promise<T | null> {
+): Promise<TEntityData | null> {
 	let currentData = { ...data };
 
 	for (const hookSet of hooks) {
@@ -67,13 +92,36 @@ export async function processHooks<T extends Record<string, unknown>>(
 }
 
 /**
- * Process hooks for multiple records
+ * Process hooks for multiple records.
+ *
+ * @typeParam TEntityData - Type of the entity data
+ *
+ * @param records - Array of records to process
+ * @param model - The entity type/model name
+ * @param hooks - Array of hook sets to process
+ * @param context - Optional request context
+ * @returns Promise that resolves when all hooks have been processed
+ *
+ * @remarks
+ * This utility function handles processing after-update hooks for a batch
+ * of records, ensuring each record goes through the appropriate hooks.
+ *
+ * @example
+ * ```typescript
+ * // Process 'after update' hooks for multiple users
+ * await processAfterHooksForMany(
+ *   updatedUsers,
+ *   'user',
+ *   registeredHooks,
+ *   { batchId: 'batch-123' }
+ * );
+ * ```
  */
 export async function processAfterHooksForMany<
-	T extends Record<string, unknown>,
+	TEntityData extends Record<string, unknown>,
 >(
-	records: T[],
-	model: ModelName,
+	records: TEntityData[],
+	model: EntityName,
 	hooks: DatabaseHook[],
 	context?: GenericEndpointContext
 ): Promise<void> {
@@ -82,6 +130,13 @@ export async function processAfterHooksForMany<
 	}
 
 	for (const record of records) {
-		await processHooks<T>(record, model, 'update', 'after', hooks, context);
+		await processHooks<TEntityData>(
+			record,
+			model,
+			'update',
+			'after',
+			hooks,
+			context
+		);
 	}
 }

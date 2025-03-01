@@ -1,7 +1,7 @@
 import type { Where, GenericEndpointContext, RegistryContext } from '~/types';
 import type { Domain } from './schema';
 import { getWithHooks } from '~/db/hooks';
-import { validateTableOutput } from '../definition';
+import { validateEntityOutput } from '../definition';
 
 /**
  * Creates and returns a set of domain-related adapter methods to interact with the database.
@@ -91,7 +91,7 @@ export function domainRegistry({ adapter, ...ctx }: RegistryContext) {
 			});
 
 			return domains.map((domain) =>
-				validateTableOutput('domain', domain, ctx.options)
+				validateEntityOutput('domain', domain, ctx.options)
 			);
 		},
 
@@ -112,7 +112,9 @@ export function domainRegistry({ adapter, ...ctx }: RegistryContext) {
 					},
 				],
 			});
-			return domain ? validateTableOutput('domain', domain, ctx.options) : null;
+			return domain
+				? validateEntityOutput('domain', domain, ctx.options)
+				: null;
 		},
 
 		/**
@@ -132,7 +134,9 @@ export function domainRegistry({ adapter, ...ctx }: RegistryContext) {
 					},
 				],
 			});
-			return domain ? validateTableOutput('domain', domain, ctx.options) : null;
+			return domain
+				? validateEntityOutput('domain', domain, ctx.options)
+				: null;
 		},
 
 		/**
@@ -166,7 +170,7 @@ export function domainRegistry({ adapter, ...ctx }: RegistryContext) {
 				context,
 			});
 			return domain
-				? validateTableOutput('domain', domain as Domain, ctx.options)
+				? validateEntityOutput('domain', domain as Domain, ctx.options)
 				: null;
 		},
 

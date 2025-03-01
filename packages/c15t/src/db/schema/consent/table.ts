@@ -29,7 +29,7 @@ export function getConsentTable(
 		/**
 		 * The name of the consent table in the database, configurable through options
 		 */
-		modelName: options.consent?.modelName || 'consent',
+		entityName: options.consent?.entityName || 'consent',
 
 		/**
 		 * The schema for the consent table
@@ -48,7 +48,7 @@ export function getConsentTable(
 				required: true,
 				fieldName: options.consent?.fields?.userId || 'userId',
 				references: {
-					model: options.user?.modelName || 'user',
+					model: options.user?.entityName || 'user',
 					field: 'id',
 				},
 			},
@@ -61,7 +61,7 @@ export function getConsentTable(
 				required: true,
 				fieldName: options.consent?.fields?.domainId || 'domainId',
 				references: {
-					model: options.domain?.modelName || 'domain',
+					model: options.domain?.entityName || 'domain',
 					field: 'id',
 				},
 			},
@@ -83,7 +83,7 @@ export function getConsentTable(
 				required: false,
 				fieldName: options.consent?.fields?.policyId || 'policyId',
 				references: {
-					model: options.consentPolicy?.modelName || 'consentPolicy',
+					model: options.consentPolicy?.entityName || 'consentPolicy',
 					field: 'id',
 				},
 			},

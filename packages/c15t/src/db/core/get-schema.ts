@@ -1,25 +1,58 @@
 import { getConsentTables } from '..';
 import type { C15TOptions } from '~/types';
 import type { Field } from '~/db/core/fields';
-import type { ModelName } from '~/db/core/types';
+import type { EntityName } from '~/db/core/types';
 
+/**
+ * A schema entry representing a processed entity definition.
+ * Contains fields and creation/sorting order information.
+ *
+ * @internal
+ * @interface SchemaEntry
+ * @property {Record<string, Field>} fields - Map of field names to their definitions
+ * @property {number} order - Order priority for entity creation (lower numbers first)
+ */
 interface SchemaEntry {
 	fields: Record<string, Field>;
 	order: number;
 }
 
+/**
+ * Processes entity definitions from configuration into a standardized schema format.
+ *
+ * This function takes raw configuration and builds a complete schema with properly
+ * structured field definitions, handling field name mapping, references between
+ * entities, and merging duplicate entity definitions.
+ *
+ * @param {C15TOptions} config - The application configuration
+ * @returns {Record<string, SchemaEntry>} A map of entity names to their schema entries
+ *
+ * @example
+ * ```typescript
+ * const schema = getSchema(config);
+ *
+ * // Access user entity definition
+ * const userFields = schema.user.fields;
+ *
+ * // Check field reference
+ * const emailField = userFields.email;
+ * if (emailField.references) {
+ *   console.log(`Email references ${emailField.references.entity}`);
+ * }
+ * ```
+ */
 // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: its okay
 export function getSchema(config: C15TOptions) {
-	const tables = getConsentTables(config);
+	const entities = getConsentTables(config);
 	const schema: Record<string, SchemaEntry> = {};
 
-	for (const [key, table] of Object.entries(tables)) {
-		if (!table) {
-			continue; // Skip if table is undefined
+	for (const [key, entity] of Object.entries(entities)) {
+		if (!entity) {
+			continue; // Skip if entity is undefined
 		}
 
-		const fields = table.fields || {}; // Default to empty object if fields is undefined
-		const actualFields: Record<string, Field> = {};
+		const fields = entity.fields || {}; // Default to empty object if fields is undefined
+		const processedFields: Record<string, Field> = {};
 
 		// Process each field
 		for (const [fieldKey, field] of Object.entries(fields)) {
@@ -30,19 +63,19 @@ export function getSchema(config: C15TOptions) {
 			const fieldName = field.fieldName || fieldKey;
 			// Cast field to Field to ensure it has the right type
 			const typedField = field as unknown as Field;
-			actualFields[fieldName] = typedField;
+			processedFields[fieldName] = typedField;
 
 			// Handle references - first check if the field has a references property
 			if (typedField && 'references' in typedField && typedField.references) {
-				const modelName = typedField.references.model as ModelName;
-				const refTable = tables[modelName];
-				if (refTable) {
+				const entityName = typedField.references.model as EntityName;
+				const referencedEntity = entities[entityName];
+				if (referencedEntity) {
 					// Create a new object for references to avoid modifying the original
-					actualFields[fieldName] = {
+					processedFields[fieldName] = {
 						...typedField,
 						references: {
-							model: refTable.modelName,
-							entity: refTable.modelName,
+							model: referencedEntity.entityName,
+							entity: referencedEntity.entityName,
 							field: typedField.references.field,
 							onDelete: typedField.references.onDelete,
 						},
@@ -52,22 +85,22 @@ export function getSchema(config: C15TOptions) {
 		}
 
 		// Update or create schema entry
-		const modelName = table.modelName || key;
-		if (modelName in schema) {
-			const existingEntry = schema[modelName];
-			//@ts-expect-error
-			schema[modelName] = {
+		const entityName = entity.entityName || key;
+		if (entityName in schema) {
+			const existingEntry = schema[entityName];
+
+			schema[entityName] = {
 				...existingEntry,
+				order: existingEntry?.order ?? Number.POSITIVE_INFINITY,
 				fields: {
-					//@ts-expect-error
-					...existingEntry.fields,
-					...actualFields,
+					...existingEntry?.fields,
+					...processedFields,
 				},
 			};
 		} else {
-			schema[modelName] = {
-				fields: actualFields,
-				order: table.order ?? Number.POSITIVE_INFINITY,
+			schema[entityName] = {
+				fields: processedFields,
+				order: entity.order ?? Number.POSITIVE_INFINITY,
 			};
 		}
 	}

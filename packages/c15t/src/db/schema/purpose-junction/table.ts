@@ -28,7 +28,7 @@ export function getPurposeJunctionTable(
 		/**
 		 * The name of the junction table in the database, configurable through options
 		 */
-		modelName: options.purposeJunction?.modelName || 'purposeJunction',
+		entityName: options.purposeJunction?.entityName || 'purposeJunction',
 
 		/**
 		 * The schema for the purpose junction table
@@ -47,7 +47,7 @@ export function getPurposeJunctionTable(
 				required: true,
 				fieldName: options.purposeJunction?.fields?.consentId || 'consentId',
 				references: {
-					model: options.consent?.modelName || 'consent',
+					model: options.consent?.entityName || 'consent',
 					field: 'id',
 				},
 			},
@@ -60,7 +60,7 @@ export function getPurposeJunctionTable(
 				required: true,
 				fieldName: options.purposeJunction?.fields?.purposeId || 'purposeId',
 				references: {
-					model: options.purpose?.modelName || 'purpose',
+					model: options.purpose?.entityName || 'purpose',
 					field: 'id',
 				},
 			},

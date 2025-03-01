@@ -28,7 +28,7 @@ export function getWithdrawalTable(
 		/**
 		 * The name of the withdrawal table in the database, configurable through options
 		 */
-		modelName: options.withdrawal?.modelName || 'withdrawal',
+		entityName: options.withdrawal?.entityName || 'withdrawal',
 
 		/**
 		 * The schema for the consent withdrawal table
@@ -47,7 +47,7 @@ export function getWithdrawalTable(
 				required: true,
 				fieldName: options.withdrawal?.fields?.consentId || 'consentId',
 				references: {
-					model: options.consent?.modelName || 'consent',
+					model: options.consent?.entityName || 'consent',
 					field: 'id',
 				},
 			},
@@ -60,7 +60,7 @@ export function getWithdrawalTable(
 				required: true,
 				fieldName: options.withdrawal?.fields?.userId || 'userId',
 				references: {
-					model: options.user?.modelName || 'user',
+					model: options.user?.entityName || 'user',
 					field: 'id',
 				},
 			},

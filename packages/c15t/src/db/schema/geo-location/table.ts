@@ -28,7 +28,7 @@ export function getGeoLocationTable(
 		/**
 		 * The name of the geo-location table in the database, configurable through options
 		 */
-		modelName: options.geoLocation?.modelName || 'geoLocation',
+		entityName: options.geoLocation?.entityName || 'geoLocation',
 
 		/**
 		 * The schema for the geo-location table

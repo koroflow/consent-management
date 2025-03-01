@@ -1,5 +1,3 @@
-// packages/c15t/src/db/schema/parser.ts
-
 import type { Field } from '../core/fields';
 import type { C15TOptions, C15TPluginSchema } from '~/types';
 import { APIError } from 'better-call';
@@ -81,15 +79,23 @@ export function parseInputData<T extends Record<string, unknown>>(
 				continue;
 			}
 			// Check if validator exists and is an object with input property (old style)
+			function isLegacyValidator(
+				validator: unknown
+			): validator is { input?: { parse: (value: unknown) => unknown } } {
+				return (
+					typeof validator === 'object' &&
+					validator !== null &&
+					'input' in validator
+				);
+			}
+
 			if (
 				fields[key]?.validator &&
-				typeof fields[key]?.validator === 'object' &&
-				// biome-ignore lint/correctness/noUnsafeOptionalChaining: <explanation>
-				'input' in fields[key]?.validator &&
+				isLegacyValidator(fields[key]?.validator) &&
 				fields[key]?.validator.input &&
 				data[key] !== undefined
 			) {
-				parsedData[key] = fields[key]?.validator?.input.parse(data[key]);
+				parsedData[key] = fields[key]?.validator.input.parse(data[key]);
 				continue;
 			}
 			if (fields[key]?.transform?.input && data[key] !== undefined) {
@@ -128,7 +134,7 @@ export function mergeSchema<S extends C15TPluginSchema>(
 	schema: S,
 	newSchema?: {
 		[K in keyof S]?: {
-			modelName?: string;
+			entityName?: string;
 			fields?: {
 				[P: string]: string;
 			};
@@ -140,9 +146,9 @@ export function mergeSchema<S extends C15TPluginSchema>(
 	}
 	// biome-ignore lint/nursery/useGuardForIn: <explanation>
 	for (const table in newSchema) {
-		const newModelName = newSchema[table]?.modelName;
-		if (newModelName && schema[table]) {
-			schema[table].modelName = newModelName;
+		const newEntityName = newSchema[table]?.entityName;
+		if (newEntityName && schema[table]) {
+			schema[table].entityName = newEntityName;
 		}
 		// biome-ignore lint/nursery/useGuardForIn: <explanation>
 		for (const field in schema[table]?.fields || {}) {

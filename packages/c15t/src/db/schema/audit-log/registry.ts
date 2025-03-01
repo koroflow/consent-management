@@ -2,7 +2,7 @@ import type { Where, GenericEndpointContext } from '~/types';
 import type { AuditLog } from './schema';
 import { getWithHooks } from '~/db/hooks';
 import type { RegistryContext } from '~/types/context';
-import { validateTableOutput } from '../definition';
+import { validateEntityOutput } from '../definition';
 
 /**
  * Creates and returns a set of consent audit log adapter methods to interact with the database.
@@ -121,7 +121,7 @@ export function auditLogRegistry({ adapter, ...ctx }: RegistryContext) {
 			});
 
 			return logs.map((log) =>
-				validateTableOutput('auditLog', log, ctx.options)
+				validateEntityOutput('auditLog', log, ctx.options)
 			);
 		},
 
@@ -142,7 +142,7 @@ export function auditLogRegistry({ adapter, ...ctx }: RegistryContext) {
 					},
 				],
 			});
-			return log ? validateTableOutput('auditLog', log, ctx.options) : null;
+			return log ? validateEntityOutput('auditLog', log, ctx.options) : null;
 		},
 
 		/**
@@ -178,7 +178,7 @@ export function auditLogRegistry({ adapter, ...ctx }: RegistryContext) {
 				limit,
 			});
 			return logs.map((log) =>
-				validateTableOutput('auditLog', log, ctx.options)
+				validateEntityOutput('auditLog', log, ctx.options)
 			);
 		},
 

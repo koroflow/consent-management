@@ -1,7 +1,7 @@
 import type { GenericEndpointContext, RegistryContext } from '~/types';
 import type { User } from './schema';
 import { getWithHooks } from '~/db/hooks';
-import { validateTableOutput } from '../definition';
+import { validateEntityOutput } from '../definition';
 
 /**
  * Creates and returns a set of user-related adapter methods to interact with the database.
@@ -60,7 +60,7 @@ export function userRegistry({ adapter, ...ctx }: RegistryContext) {
 				context,
 			});
 			return createdUser
-				? validateTableOutput('user', createdUser, ctx.options)
+				? validateEntityOutput('user', createdUser, ctx.options)
 				: null;
 		},
 
@@ -82,7 +82,7 @@ export function userRegistry({ adapter, ...ctx }: RegistryContext) {
 					},
 				],
 			});
-			return user ? validateTableOutput('user', user, ctx.options) : null;
+			return user ? validateEntityOutput('user', user, ctx.options) : null;
 		},
 
 		/**
@@ -104,7 +104,7 @@ export function userRegistry({ adapter, ...ctx }: RegistryContext) {
 					},
 				],
 			});
-			return user ? validateTableOutput('user', user, ctx.options) : null;
+			return user ? validateEntityOutput('user', user, ctx.options) : null;
 		},
 
 		/**
@@ -138,7 +138,7 @@ export function userRegistry({ adapter, ...ctx }: RegistryContext) {
 				customFn: undefined,
 				context,
 			});
-			return user ? validateTableOutput('user', user, ctx.options) : null;
+			return user ? validateEntityOutput('user', user, ctx.options) : null;
 		},
 
 		/**

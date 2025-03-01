@@ -28,7 +28,7 @@ export function getConsentGeoLocationTable(
 		/**
 		 * The name of the geo-location table in the database, configurable through options
 		 */
-		modelName: options.consentGeoLocation?.modelName || 'consentGeoLocation',
+		entityName: options.consentGeoLocation?.entityName || 'consentGeoLocation',
 
 		/**
 		 * The schema for the consent geo-location table
@@ -47,7 +47,7 @@ export function getConsentGeoLocationTable(
 				required: true,
 				fieldName: options.consentGeoLocation?.fields?.consentId || 'consentId',
 				references: {
-					model: options.consent?.modelName || 'consent',
+					model: options.consent?.entityName || 'consent',
 					field: 'id',
 				},
 			},

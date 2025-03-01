@@ -1,7 +1,7 @@
 import type { GenericEndpointContext, RegistryContext, Where } from '~/types';
 import type { GeoLocation } from './schema';
 import { getWithHooks } from '~/db/hooks/with-hooks-factory';
-import { validateTableOutput } from '../definition';
+import { validateEntityOutput } from '../definition';
 
 /**
  * Creates and returns a set of geo-location-related adapter methods to interact with the database.
@@ -103,7 +103,7 @@ export function geoLocationRegistry({ adapter, ...ctx }: RegistryContext) {
 			});
 
 			return locations.map((location) =>
-				validateTableOutput('consentGeoLocation', location, ctx.options)
+				validateEntityOutput('consentGeoLocation', location, ctx.options)
 			);
 		},
 
@@ -125,7 +125,7 @@ export function geoLocationRegistry({ adapter, ...ctx }: RegistryContext) {
 				],
 			});
 			return location
-				? validateTableOutput('consentGeoLocation', location, ctx.options)
+				? validateEntityOutput('consentGeoLocation', location, ctx.options)
 				: null;
 		},
 
@@ -152,7 +152,7 @@ export function geoLocationRegistry({ adapter, ...ctx }: RegistryContext) {
 			});
 
 			return locations.map((location) =>
-				validateTableOutput('consentGeoLocation', location, ctx.options)
+				validateEntityOutput('consentGeoLocation', location, ctx.options)
 			);
 		},
 	};

@@ -26,22 +26,22 @@ export function processTablesIntoSchema(
 		// Process the fields for this table
 		const actualFields = processFields(table.fields || {}, tables);
 
-		// Determine the model name (use the key if modelName is not specified)
-		const modelName = table.modelName || key;
+		// Determine the model name (use the key if EntityName is not specified)
+		const EntityName = table.entityName || key;
 
 		// Update existing schema entry or create a new one
-		if (schema[modelName]) {
+		if (schema[EntityName]) {
 			// Merge with existing schema entry if one exists
-			schema[modelName] = {
-				...schema[modelName],
+			schema[EntityName] = {
+				...schema[EntityName],
 				fields: {
-					...schema[modelName].fields,
+					...schema[EntityName].fields,
 					...actualFields,
 				},
 			};
 		} else {
 			// Create a new schema entry
-			schema[modelName] = {
+			schema[EntityName] = {
 				fields: actualFields,
 				order: table.order || Number.POSITIVE_INFINITY, // Default to lowest priority
 			};

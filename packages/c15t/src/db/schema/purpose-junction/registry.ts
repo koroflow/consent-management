@@ -2,7 +2,7 @@ import type { GenericEndpointContext, RegistryContext } from '~/types';
 import type { PurposeJunction } from './schema';
 
 import { getWithHooks } from '~/db/hooks';
-import { validateTableOutput } from '../definition';
+import { validateEntityOutput } from '../definition';
 
 /**
  * Creates and returns a set of consent-purpose junction adapter methods to interact with the database.
@@ -92,7 +92,7 @@ export function purposeJunctionRegistry({ adapter, ...ctx }: RegistryContext) {
 			});
 
 			return junctions.map((junction) =>
-				validateTableOutput('purposeJunction', junction, ctx.options)
+				validateEntityOutput('purposeJunction', junction, ctx.options)
 			);
 		},
 
@@ -119,7 +119,7 @@ export function purposeJunctionRegistry({ adapter, ...ctx }: RegistryContext) {
 			});
 
 			return junctions.map((junction) =>
-				validateTableOutput('purposeJunction', junction, ctx.options)
+				validateEntityOutput('purposeJunction', junction, ctx.options)
 			);
 		},
 
@@ -154,7 +154,7 @@ export function purposeJunctionRegistry({ adapter, ...ctx }: RegistryContext) {
 				context,
 			});
 			return junction
-				? validateTableOutput('purposeJunction', junction, ctx.options)
+				? validateEntityOutput('purposeJunction', junction, ctx.options)
 				: null;
 		},
 

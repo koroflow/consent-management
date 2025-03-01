@@ -1,5 +1,3 @@
-// packages/c15t/src/db/index.ts
-
 /**
  * Database Module - Main Entry Point
  *

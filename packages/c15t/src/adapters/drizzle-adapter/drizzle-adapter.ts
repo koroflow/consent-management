@@ -35,14 +35,14 @@ const createTransform = (
 		return f.fieldName || field;
 	}
 
-	function getSchema(modelName: string) {
+	function getSchema(entityName: string) {
 		const schema = config.schema || db._.fullSchema;
 		if (!schema) {
 			throw new C15TError(
 				'Drizzle adapter failed to initialize. Schema not found. Please provide a schema object in the adapter options object.'
 			);
 		}
-		const model = getModelName(modelName);
+		const model = getEntityName(EntityName);
 		const schemaModel = schema[model];
 		if (!schemaModel) {
 			throw new C15TError(
@@ -52,15 +52,15 @@ const createTransform = (
 		return schemaModel;
 	}
 
-	const getModelName = (model: string) => {
-		return schema[model].modelName !== model
-			? schema[model].modelName
+	const getEntityName = (model: string) => {
+		return schema[model].entityName !== model
+			? schema[model].entityName
 			: config.usePlural
 				? `${model}s`
 				: model;
 	};
 
-	function convertWhereClause<T extends ModelName>(
+	function convertWhereClause<T extends EntityName>(
 		where: Where<T>[],
 		model: T
 	) {
@@ -226,7 +226,7 @@ const createTransform = (
 			}
 		},
 		getField,
-		getModelName,
+		getEntityName,
 	};
 };
 
@@ -275,7 +275,7 @@ export const drizzleAdapter =
 			getSchema,
 			withReturning,
 			getField,
-			getModelName,
+			getEntityName,
 		} = createTransform(db, config, options);
 		return {
 			id: 'drizzle',
@@ -283,7 +283,7 @@ export const drizzleAdapter =
 				const { model, data: values } = data;
 				const transformed = transformInput(values, model, 'create');
 				const schemaModel = getSchema(model);
-				checkMissingFields(schemaModel, getModelName(model), transformed);
+				checkMissingFields(schemaModel, getEntityName(model), transformed);
 				const builder = db.insert(schemaModel).values(transformed);
 				const returned = await withReturning(model, builder, transformed);
 				return transformOutput(returned, model);

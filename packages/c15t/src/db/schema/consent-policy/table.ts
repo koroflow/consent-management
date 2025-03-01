@@ -28,7 +28,7 @@ export function getConsentPolicyTable(
 		/**
 		 * The name of the policy table in the database, configurable through options
 		 */
-		modelName: options.consentPolicy?.modelName || 'consentPolicy',
+		entityName: options.consentPolicy?.entityName || 'consentPolicy',
 
 		/**
 		 * The schema for the consent policy table

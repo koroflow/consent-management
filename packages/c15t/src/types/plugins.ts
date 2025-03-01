@@ -249,6 +249,6 @@ export type C15TPluginSchema = {
 			[field in string]: Field;
 		};
 		disableMigration?: boolean;
-		modelName?: string;
+		entityName?: string;
 	};
 };

@@ -28,7 +28,7 @@ export function getRecordTable(
 		/**
 		 * The name of the consent record table in the database, configurable through options
 		 */
-		modelName: options.record?.modelName || 'record',
+		entityName: options.record?.entityName || 'record',
 
 		/**
 		 * The schema for the consent record table
@@ -47,7 +47,7 @@ export function getRecordTable(
 				required: true,
 				fieldName: options.record?.fields?.userId || 'userId',
 				references: {
-					model: options.user?.modelName || 'user',
+					model: options.user?.entityName || 'user',
 					field: 'id',
 				},
 			},
@@ -61,7 +61,7 @@ export function getRecordTable(
 				required: false,
 				fieldName: options.record?.fields?.consentId || 'consentId',
 				references: {
-					model: options.consent?.modelName || 'consent',
+					model: options.consent?.entityName || 'consent',
 					field: 'id',
 				},
 			},

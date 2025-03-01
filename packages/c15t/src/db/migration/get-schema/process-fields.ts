@@ -1,6 +1,6 @@
 import type { Field } from '~/db/core/fields';
 import type { C15TDBSchema } from '~/db/schema/definition';
-import type { ModelName } from '~/db/core/types';
+import type { EntityName } from '~/db/core/types';
 
 /**
  * Processes field definitions for a table
@@ -13,7 +13,7 @@ import type { ModelName } from '~/db/core/types';
  * @param tables - All available tables for resolving references
  * @returns Processed field definitions
  */
-export function processFields<T extends ModelName>(
+export function processFields<T extends EntityName>(
 	fields: C15TDBSchema[T]['fields'],
 	tables: C15TDBSchema
 ) {
@@ -35,8 +35,8 @@ export function processFields<T extends ModelName>(
 
 		// Handle references to other tables - first check if the field has a references property
 		if (typedField && 'references' in typedField && typedField.references) {
-			const modelName = typedField.references.model as ModelName;
-			const refTable = tables[modelName];
+			const EntityName = typedField.references.model as EntityName;
+			const refTable = tables[EntityName];
 
 			// Only set up the reference if the referenced table exists
 			if (refTable) {
@@ -44,8 +44,8 @@ export function processFields<T extends ModelName>(
 				actualFields[fieldName] = {
 					...typedField,
 					references: {
-						model: refTable.modelName,
-						entity: refTable.modelName,
+						model: refTable.entityName,
+						entity: refTable.entityName,
 						field: typedField.references.field,
 						onDelete: typedField.references.onDelete,
 					},

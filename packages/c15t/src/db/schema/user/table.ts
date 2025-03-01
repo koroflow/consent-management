@@ -28,7 +28,7 @@ export function getUserTable(
 		/**
 		 * The name of the user table in the database, configurable through options
 		 */
-		modelName: options.user?.modelName || 'user',
+		entityName: options.user?.entityName || 'user',
 
 		/**
 		 * The schema for the user table

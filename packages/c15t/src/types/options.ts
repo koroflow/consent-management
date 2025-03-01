@@ -13,7 +13,7 @@ import type { AuthMiddleware } from '~/api/call';
 import type { Field } from '~/db/core/fields';
 import type { DatabaseHook } from '~/db/hooks/types';
 import type { DatabaseConfiguration } from './database-config';
-import type { ModelName } from '~/db/core/types';
+import type { EntityName } from '~/db/core/types';
 
 /**
  * Analytics destination configuration
@@ -247,7 +247,7 @@ export interface C15TOptions {
 		 * Function to generate IDs
 		 * Custom ID generation for consent records and other entities
 		 */
-		generateId?: (options: { model: ModelName; size?: number }) => string;
+		generateId?: (options: { model: EntityName; size?: number }) => string;
 
 		/**
 		 * Support for cross-subdomain cookies
@@ -307,7 +307,7 @@ export interface C15TOptions {
 		 * Custom model name for user table
 		 * @default "user"
 		 */
-		modelName?: string;
+		entityName?: string;
 		/**
 		 * Custom field names for user table
 		 */
@@ -335,7 +335,7 @@ export interface C15TOptions {
 		 * Custom model name for consent purpose table
 		 * @default "purpose"
 		 */
-		modelName?: string;
+		entityName?: string;
 		/**
 		 * Custom field names for consent purpose table
 		 */
@@ -366,7 +366,7 @@ export interface C15TOptions {
 		 * Custom model name for consent policy table
 		 * @default "consentPolicy"
 		 */
-		modelName?: string;
+		entityName?: string;
 		/**
 		 * Custom field names for consent policy table
 		 */
@@ -396,7 +396,7 @@ export interface C15TOptions {
 		 * Custom model name for domain table
 		 * @default "domain"
 		 */
-		modelName?: string;
+		entityName?: string;
 		/**
 		 * Custom field names for domain table
 		 */
@@ -426,7 +426,7 @@ export interface C15TOptions {
 		 * Custom model name for geo location table
 		 * @default "geoLocation"
 		 */
-		modelName?: string;
+		entityName?: string;
 		/**
 		 * Custom field names for geo location table
 		 */
@@ -509,7 +509,7 @@ export interface C15TOptions {
 		 * Custom model name for consent table
 		 * @default "consent"
 		 */
-		modelName?: string;
+		entityName?: string;
 
 		/**
 		 * Custom field names for consent table
@@ -543,7 +543,7 @@ export interface C15TOptions {
 		 * Custom model name for consent purpose junction table
 		 * @default "purposeJunction"
 		 */
-		modelName?: string;
+		entityName?: string;
 		/**
 		 * Custom field names for consent purpose junction table
 		 */
@@ -568,7 +568,7 @@ export interface C15TOptions {
 		 * Custom model name for consent record table
 		 * @default "record"
 		 */
-		modelName?: string;
+		entityName?: string;
 		/**
 		 * Custom field names for consent record table
 		 */
@@ -597,7 +597,7 @@ export interface C15TOptions {
 		 * Custom model name for consent geo location table
 		 * @default "consentGeoLocation"
 		 */
-		modelName?: string;
+		entityName?: string;
 		/**
 		 * Custom field names for consent geo location table
 		 */
@@ -622,7 +622,7 @@ export interface C15TOptions {
 		 * Custom model name for consent withdrawal table
 		 * @default "withdrawal"
 		 */
-		modelName?: string;
+		entityName?: string;
 		/**
 		 * Custom field names for consent withdrawal table
 		 */
@@ -651,7 +651,7 @@ export interface C15TOptions {
 		 * Custom model name for consent audit log table
 		 * @default "auditLog"
 		 */
-		modelName?: string;
+		entityName?: string;
 		/**
 		 * Custom field names for consent audit log table
 		 */

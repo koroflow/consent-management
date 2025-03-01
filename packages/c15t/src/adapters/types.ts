@@ -1,12 +1,12 @@
 import type { C15TOptions } from '~/types';
 import type { KyselyAdapterConfig } from './kysely-adapter';
-import type { ModelName } from '../db/core/types';
+import type { EntityName } from '../db/core/types';
 import type { C15TDBSchema, TableFields } from '../db/schema/definition';
 
 /**
  * Generic Where clause type that's restricted to fields of a specific model
  */
-export type Where<T extends ModelName> = {
+export type Where<T extends EntityName> = {
 	operator?:
 		| 'eq'
 		| 'ne'
@@ -32,7 +32,7 @@ export type Value =
 	| Date
 	| null;
 
-export type Tables<T extends ModelName> = C15TDBSchema[T]['fields'] & {
+export type Tables<T extends EntityName> = C15TDBSchema[T]['fields'] & {
 	type: 'string';
 	fieldName: string;
 };
@@ -43,7 +43,7 @@ export type Tables<T extends ModelName> = C15TDBSchema[T]['fields'] & {
 export type Adapter = {
 	id: string;
 	create: <
-		Model extends ModelName,
+		Model extends EntityName,
 		Data extends Record<string, unknown>,
 		Result extends TableFields<Model>,
 	>(data: {
@@ -51,12 +51,15 @@ export type Adapter = {
 		data: Data;
 		select?: Array<keyof Result>;
 	}) => Promise<Result>;
-	findOne: <Model extends ModelName, Result extends TableFields<Model>>(data: {
+	findOne: <Model extends EntityName, Result extends TableFields<Model>>(data: {
 		model: Model;
 		where: Where<Model>;
 		select?: Array<keyof Result>;
 	}) => Promise<Result | null>;
-	findMany: <Model extends ModelName, Result extends TableFields<Model>>(data: {
+	findMany: <
+		Model extends EntityName,
+		Result extends TableFields<Model>,
+	>(data: {
 		model: Model;
 		where?: Where<Model>;
 		limit?: number;
@@ -66,7 +69,7 @@ export type Adapter = {
 		};
 		offset?: number;
 	}) => Promise<Result[]>;
-	count: <Model extends ModelName>(data: {
+	count: <Model extends EntityName>(data: {
 		model: Model;
 		where?: Where<Model>;
 	}) => Promise<number>;
@@ -74,24 +77,24 @@ export type Adapter = {
 	 * ⚠︎ Update may not return the updated data
 	 * if multiple where clauses are provided
 	 */
-	update: <Model extends ModelName, Result extends TableFields<Model>>(data: {
+	update: <Model extends EntityName, Result extends TableFields<Model>>(data: {
 		model: Model;
 		where: Where<Model>;
 		update: Partial<TableFields<Model>>;
 	}) => Promise<Result | null>;
 	updateMany: <
-		Model extends ModelName,
+		Model extends EntityName,
 		Result extends TableFields<Model>,
 	>(data: {
 		model: Model;
 		where: Where<Model>;
 		update: Partial<TableFields<Model>>;
 	}) => Promise<Result[]>;
-	delete: <Model extends ModelName>(data: {
+	delete: <Model extends EntityName>(data: {
 		model: Model;
 		where: Where<Model>;
 	}) => Promise<void>;
-	deleteMany: <Model extends ModelName>(data: {
+	deleteMany: <Model extends EntityName>(data: {
 		model: Model;
 		where: Where<Model>;
 	}) => Promise<number>;

@@ -2,7 +2,7 @@ import type { Where, GenericEndpointContext, RegistryContext } from '~/types';
 import type { Consent } from './schema';
 import type {} from '~/db/hooks/types';
 import { getWithHooks } from '~/db/hooks';
-import { validateTableOutput } from '../definition';
+import { validateEntityOutput } from '../definition';
 
 /**
  * Creates and returns a set of consent-related adapter methods to interact with the database.
@@ -112,7 +112,7 @@ export function consentRegistry({ adapter, ...ctx }: RegistryContext) {
 			});
 
 			return consents.map((consent) =>
-				validateTableOutput('consent', consent, ctx.options)
+				validateEntityOutput('consent', consent, ctx.options)
 			);
 		},
 
@@ -134,7 +134,7 @@ export function consentRegistry({ adapter, ...ctx }: RegistryContext) {
 				],
 			});
 			return consent
-				? validateTableOutput('consent', consent, ctx.options)
+				? validateEntityOutput('consent', consent, ctx.options)
 				: null;
 		},
 
@@ -160,7 +160,7 @@ export function consentRegistry({ adapter, ...ctx }: RegistryContext) {
 				},
 			});
 			return consents.map((consent) =>
-				validateTableOutput('consent', consent, ctx.options)
+				validateEntityOutput('consent', consent, ctx.options)
 			);
 		},
 
@@ -194,7 +194,7 @@ export function consentRegistry({ adapter, ...ctx }: RegistryContext) {
 				context,
 			});
 			return consent
-				? validateTableOutput('consent', consent, ctx.options)
+				? validateEntityOutput('consent', consent, ctx.options)
 				: null;
 		},
 
@@ -234,7 +234,7 @@ export function consentRegistry({ adapter, ...ctx }: RegistryContext) {
 			});
 
 			return consent
-				? validateTableOutput('consent', consent, ctx.options)
+				? validateEntityOutput('consent', consent, ctx.options)
 				: null;
 		},
 

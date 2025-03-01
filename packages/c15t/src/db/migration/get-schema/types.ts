@@ -22,7 +22,7 @@ export type SchemaDefinition = Record<string, TableSchemaDefinition>;
  * Represents a table with its fields and metadata
  */
 export interface TableDefinition {
-	modelName?: string;
+	EntityName?: string;
 	fields?: Record<string, Field>;
 	order?: number;
 }

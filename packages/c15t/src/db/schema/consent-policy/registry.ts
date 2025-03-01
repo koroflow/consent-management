@@ -1,7 +1,7 @@
 import type { GenericEndpointContext, RegistryContext } from '~/types';
 import type { ConsentPolicy } from './schema';
 import { getWithHooks } from '~/db/hooks';
-import { validateTableOutput } from '../definition';
+import { validateEntityOutput } from '../definition';
 
 /**
  * Creates and returns a set of consent policy-related adapter methods to interact with the database.
@@ -89,7 +89,7 @@ export function policyRegistry({ adapter, ...ctx }: RegistryContext) {
 			});
 
 			return policies.map((policy) =>
-				validateTableOutput('consentPolicy', policy, ctx.options)
+				validateEntityOutput('consentPolicy', policy, ctx.options)
 			);
 		},
 
@@ -111,7 +111,7 @@ export function policyRegistry({ adapter, ...ctx }: RegistryContext) {
 				],
 			});
 			return policy
-				? validateTableOutput('consentPolicy', policy, ctx.options)
+				? validateEntityOutput('consentPolicy', policy, ctx.options)
 				: null;
 		},
 
@@ -133,7 +133,7 @@ export function policyRegistry({ adapter, ...ctx }: RegistryContext) {
 				],
 			});
 			return policy
-				? validateTableOutput('consentPolicy', policy, ctx.options)
+				? validateEntityOutput('consentPolicy', policy, ctx.options)
 				: null;
 		},
 
@@ -168,7 +168,7 @@ export function policyRegistry({ adapter, ...ctx }: RegistryContext) {
 				context,
 			});
 			return policy
-				? validateTableOutput('consentPolicy', policy, ctx.options)
+				? validateEntityOutput('consentPolicy', policy, ctx.options)
 				: null;
 		},
 	};

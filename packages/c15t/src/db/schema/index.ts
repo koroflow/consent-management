@@ -1,5 +1,3 @@
-// packages/c15t/src/db/schema/index.ts
-
 /**
  * Schema Module
  *

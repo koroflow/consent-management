@@ -30,7 +30,7 @@ export const getConsentTables = (options: C15TOptions) => {
 					...acc[key]?.fields,
 					...value.fields,
 				},
-				modelName: value.modelName || key,
+				entityName: value.entityName || key,
 			};
 		}
 		return acc;
@@ -90,10 +90,10 @@ export type TableFields<T extends keyof C15TDBSchema> =
  * @template T - The table name from C15TDBSchema
  * @example
  * ```typescript
- * type UserInputFields = TableInputFields<'user'>;
+ * type UserInputFields = EntityInputFields<'user'>;
  * ```
  */
-export type TableInputFields<T extends keyof C15TDBSchema> = {
+export type EntityInputFields<T extends keyof C15TDBSchema> = {
 	[K in keyof TableFields<T> as TableFields<T>[K] extends { input: false }
 		? never
 		: K]: TableFields<T>[K] extends { required: true }
@@ -107,10 +107,10 @@ export type TableInputFields<T extends keyof C15TDBSchema> = {
  * @template T - The table name from C15TDBSchema
  * @example
  * ```typescript
- * type UserOutputFields = TableOutputFields<'user'>;
+ * type UserOutputFields = EntityOutputFields<'user'>;
  * ```
  */
-export type TableOutputFields<T extends keyof C15TDBSchema> = {
+export type EntityOutputFields<T extends keyof C15TDBSchema> = {
 	[K in keyof TableFields<T> as TableFields<T>[K] extends { returned: false }
 		? never
 		: K]: TableFields<T>[K] extends { required: false }
@@ -130,15 +130,15 @@ export type TableOutputFields<T extends keyof C15TDBSchema> = {
  *
  * @example
  * ```typescript
- * const validUserData = validateTableInput('user', inputData, options);
+ * const validUserData = validateEntityInput('user', inputData, options);
  * ```
  */
-export function validateTableInput<T extends keyof C15TDBSchema>(
+export function validateEntityInput<T extends keyof C15TDBSchema>(
 	tableName: T,
 	data: Record<string, unknown>,
 	options: C15TOptions,
 	action: 'create' | 'update' = 'create'
-): TableInputFields<T> {
+): EntityInputFields<T> {
 	const tables = getConsentTables(options);
 	const table = tables[tableName];
 
@@ -153,7 +153,7 @@ export function validateTableInput<T extends keyof C15TDBSchema>(
 	return parseInputData(data, {
 		fields: table.fields,
 		action,
-	}) as TableInputFields<T>;
+	}) as EntityInputFields<T>;
 }
 
 /**
@@ -167,14 +167,14 @@ export function validateTableInput<T extends keyof C15TDBSchema>(
  *
  * @example
  * ```typescript
- * const validUserOutput = validateTableOutput('user', outputData, options);
+ * const validUserOutput = validateEntityOutput('user', outputData, options);
  * ```
  */
-export function validateTableOutput<T extends keyof C15TDBSchema>(
+export function validateEntityOutput<T extends keyof C15TDBSchema>(
 	tableName: T,
 	data: Record<string, unknown>,
 	options: C15TOptions
-): TableOutputFields<T> {
+): EntityOutputFields<T> {
 	const tables = getConsentTables(options);
 	const table = tables[tableName];
 
@@ -188,5 +188,5 @@ export function validateTableOutput<T extends keyof C15TDBSchema>(
 	// Validate and return data
 	return parseOutputData(data, {
 		fields: table.fields,
-	}) as TableOutputFields<T>;
+	}) as EntityOutputFields<T>;
 }

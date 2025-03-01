@@ -28,7 +28,7 @@ export function getAuditLogTable(
 		/**
 		 * The name of the audit log table in the database, configurable through options
 		 */
-		modelName: options.auditLog?.modelName || 'auditLog',
+		entityName: options.auditLog?.entityName || 'auditLog',
 
 		/**
 		 * The schema for the audit log table
@@ -75,7 +75,7 @@ export function getAuditLogTable(
 				required: false,
 				fieldName: options.auditLog?.fields?.userId || 'userId',
 				references: {
-					model: options.user?.modelName || 'user',
+					model: options.user?.entityName || 'user',
 					field: 'id',
 				},
 			},

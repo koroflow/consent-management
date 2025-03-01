@@ -2,7 +2,7 @@ import type { RegistryContext, Where } from '~/types';
 import type { GenericEndpointContext } from '~/types';
 import type { Withdrawal } from './schema';
 import { getWithHooks } from '~/db/hooks';
-import { validateTableOutput } from '../definition';
+import { validateEntityOutput } from '../definition';
 
 /**
  * Creates and returns a set of consent withdrawal adapter methods to interact with the database.
@@ -63,7 +63,7 @@ export function withdrawalRegistry({ adapter, ...ctx }: RegistryContext) {
 				);
 			}
 
-			return validateTableOutput('withdrawal', createdWithdrawal, ctx.options);
+			return validateEntityOutput('withdrawal', createdWithdrawal, ctx.options);
 		},
 
 		/**
@@ -107,7 +107,7 @@ export function withdrawalRegistry({ adapter, ...ctx }: RegistryContext) {
 			});
 
 			return withdrawals.map((withdrawal) =>
-				validateTableOutput('withdrawal', withdrawal, ctx.options)
+				validateEntityOutput('withdrawal', withdrawal, ctx.options)
 			);
 		},
 
@@ -129,7 +129,7 @@ export function withdrawalRegistry({ adapter, ...ctx }: RegistryContext) {
 				],
 			});
 			return withdrawal
-				? validateTableOutput('withdrawal', withdrawal, ctx.options)
+				? validateEntityOutput('withdrawal', withdrawal, ctx.options)
 				: null;
 		},
 
@@ -157,7 +157,7 @@ export function withdrawalRegistry({ adapter, ...ctx }: RegistryContext) {
 				limit,
 			});
 			return withdrawals.map((withdrawal) =>
-				validateTableOutput('withdrawal', withdrawal, ctx.options)
+				validateEntityOutput('withdrawal', withdrawal, ctx.options)
 			);
 		},
 
@@ -184,7 +184,7 @@ export function withdrawalRegistry({ adapter, ...ctx }: RegistryContext) {
 				// },
 			});
 			return withdrawal
-				? validateTableOutput('withdrawal', withdrawal, ctx.options)
+				? validateEntityOutput('withdrawal', withdrawal, ctx.options)
 				: null;
 		},
 	};

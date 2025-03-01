@@ -1,10 +1,10 @@
 import { getConsentTables } from '../../db';
 import type { Adapter, C15TOptions, Where } from '~/types';
 import type {
-	ModelName,
-	ModelTypeMap,
-	TableInput,
-	TableOutput,
+	EntityName,
+	EntityTypeMap,
+	EntityInput,
+	EntityOutput,
 } from '~/db/core/types';
 import type { TableFields } from '~/db/schema/definition';
 import type { Field, Primitive } from '~/db/core/fields';
@@ -16,8 +16,8 @@ export interface MemoryDB {
 }
 
 // Define a type for Where conditions similar to the Kysely adapter
-interface WhereCondition<T extends ModelName> {
-	field: keyof ModelTypeMap[T] | 'id';
+interface WhereCondition<T extends EntityName> {
+	field: keyof EntityTypeMap[T] | 'id';
 	value: unknown;
 	operator?:
 		| 'in'
@@ -33,9 +33,9 @@ interface WhereCondition<T extends ModelName> {
 const createTransform = (options: C15TOptions) => {
 	const schema = getConsentTables(options);
 
-	function getField<T extends ModelName>(
+	function getField<T extends EntityName>(
 		model: T,
-		field: keyof ModelTypeMap[T] | string
+		field: keyof EntityTypeMap[T] | string
 	): string {
 		if (field === 'id') {
 			return field;
@@ -48,8 +48,8 @@ const createTransform = (options: C15TOptions) => {
 	}
 
 	return {
-		transformInput<T extends ModelName>(
-			data: TableInput<T>,
+		transformInput<T extends EntityName>(
+			data: EntityInput<T>,
 			model: T,
 			action: 'update' | 'create'
 		): Record<string, unknown> {
@@ -83,11 +83,11 @@ const createTransform = (options: C15TOptions) => {
 			return transformedData;
 		},
 
-		transformOutput<T extends ModelName>(
+		transformOutput<T extends EntityName>(
 			data: Record<string, unknown> | null,
 			model: T,
 			select: string[] = []
-		): TableOutput<T> | null {
+		): EntityOutput<T> | null {
 			if (!data) return null;
 			const transformedData: Record<string, unknown> =
 				data.id || data._id
@@ -107,10 +107,10 @@ const createTransform = (options: C15TOptions) => {
 					transformedData[key] = data[field.fieldName || key];
 				}
 			}
-			return transformedData as TableOutput<T>;
+			return transformedData as EntityOutput<T>;
 		},
 
-		convertWhereClause<T extends ModelName>(
+		convertWhereClause<T extends EntityName>(
 			where: WhereCondition<T>[],
 			table: Record<string, unknown>[],
 			model: T
@@ -169,7 +169,7 @@ export const memoryAdapter =
 		return {
 			id: 'memory',
 			async create<
-				Model extends ModelName,
+				Model extends EntityName,
 				Data extends Record<string, unknown>,
 				Result extends TableFields<Model>,
 			>(data: {
@@ -179,7 +179,7 @@ export const memoryAdapter =
 			}): Promise<Result> {
 				const { model, data: values, select } = data;
 				const transformed = transformInput(
-					values as TableInput<Model>,
+					values as EntityInput<Model>,
 					model,
 					'create'
 				);
@@ -198,7 +198,7 @@ export const memoryAdapter =
 			},
 
 			async findOne<
-				Model extends ModelName,
+				Model extends EntityName,
 				Result extends TableFields<Model>,
 			>(data: {
 				model: Model;
@@ -221,7 +221,7 @@ export const memoryAdapter =
 			},
 
 			async findMany<
-				Model extends ModelName,
+				Model extends EntityName,
 				Result extends TableFields<Model>,
 			>(data: {
 				model: Model;
@@ -262,7 +262,7 @@ export const memoryAdapter =
 				return result.map((record) => transformOutput(record, model) as Result);
 			},
 
-			async count<Model extends ModelName>(data: {
+			async count<Model extends EntityName>(data: {
 				model: Model;
 				where?: Where<Model>;
 			}): Promise<number> {
@@ -282,7 +282,7 @@ export const memoryAdapter =
 			},
 
 			async update<
-				Model extends ModelName,
+				Model extends EntityName,
 				Result extends TableFields<Model>,
 			>(data: {
 				model: Model;
@@ -300,7 +300,7 @@ export const memoryAdapter =
 				for (const record of res) {
 					Object.assign(
 						record,
-						transformInput(values as TableInput<Model>, model, 'update')
+						transformInput(values as EntityInput<Model>, model, 'update')
 					);
 				}
 
@@ -308,7 +308,7 @@ export const memoryAdapter =
 			},
 
 			async updateMany<
-				Model extends ModelName,
+				Model extends EntityName,
 				Result extends TableFields<Model>,
 			>(data: {
 				model: Model;
@@ -326,14 +326,14 @@ export const memoryAdapter =
 				for (const record of res) {
 					Object.assign(
 						record,
-						transformInput(values as TableInput<Model>, model, 'update')
+						transformInput(values as EntityInput<Model>, model, 'update')
 					);
 				}
 
 				return res.map((record) => transformOutput(record, model) as Result);
 			},
 
-			async delete<Model extends ModelName>(data: {
+			async delete<Model extends EntityName>(data: {
 				model: Model;
 				where: Where<Model>;
 			}): Promise<void> {
@@ -347,7 +347,7 @@ export const memoryAdapter =
 				db[model] = table.filter((record) => !res.includes(record));
 			},
 
-			async deleteMany<Model extends ModelName>(data: {
+			async deleteMany<Model extends EntityName>(data: {
 				model: Model;
 				where: Where<Model>;
 			}): Promise<number> {

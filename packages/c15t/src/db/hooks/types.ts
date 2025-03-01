@@ -1,64 +1,103 @@
 import type { C15TOptions, GenericEndpointContext, Where } from '~/types';
-import type { ModelName, ModelTypeMap } from '../core/types';
+import type { EntityName, EntityTypeMap } from '../core/types';
 
 /**
- * Defines hook execution phases
+ * Defines execution phases when hooks can run in the database operation lifecycle.
  */
 export type HookPhase = 'before' | 'after';
 
 /**
- * Defines hook operation types
+ * Defines database operations that can have hooks attached.
  */
 export type HookOperation = 'create' | 'update';
 
 /**
- * Result types for hooks that can control flow
+ * Result types for hook execution that control the flow of operations.
+ *
+ * @typeParam TData - The data type being processed by the hook
+ *
+ * @remarks
+ * Hook functions can return different result types to control operation flow:
+ * - `{ kind: 'abort' }` - Abort the operation entirely
+ * - `{ kind: 'transform', data: TData }` - Transform the data and continue
+ * - `{ kind: 'continue' }` - Continue with unchanged data
+ *
+ * @example
+ * ```typescript
+ * // Abort if validation fails
+ * if (!isValid(data)) {
+ *   return { kind: 'abort' };
+ * }
+ * ```
  */
-export type HookResult<T> =
+export type HookResult<TData> =
 	| { kind: 'abort' }
-	| { kind: 'transform'; data: T }
+	| { kind: 'transform'; data: TData }
 	| { kind: 'continue' };
 
 /**
- * Hook function for specific model and operation
+ * Hook function for a specific entity type, providing before/after hooks
+ * for create and update operations.
+ *
+ * @typeParam TEntityName - The entity type this hook applies to
+ *
+ * @remarks
+ * ModelHook provides a structured way to define hooks for different
+ * database operations on a specific entity type.
+ *
+ * @example
+ * ```typescript
+ * const userHook: ModelHook<'user'> = {
+ *   create: {
+ *     before: (userData) => ({
+ *       kind: 'transform',
+ *       data: { ...userData, createdAt: new Date() }
+ *     })
+ *   }
+ * };
+ * ```
  */
-export interface ModelHook<M extends ModelName = ModelName> {
+export interface ModelHook<TEntityName extends EntityName = EntityName> {
 	create?: {
 		before?: (
-			data: ModelTypeMap[M],
+			data: EntityTypeMap[TEntityName],
 			context?: GenericEndpointContext
 		) =>
-			| Promise<HookResult<ModelTypeMap[M]> | undefined>
-			| HookResult<ModelTypeMap[M]>
+			| Promise<HookResult<EntityTypeMap[TEntityName]> | undefined>
+			| HookResult<EntityTypeMap[TEntityName]>
 			| undefined;
 		after?: (
-			data: ModelTypeMap[M],
+			data: EntityTypeMap[TEntityName],
 			context?: GenericEndpointContext
 		) => Promise<void> | void;
 	};
 	update?: {
 		before?: (
-			data: Partial<ModelTypeMap[M]>,
+			data: Partial<EntityTypeMap[TEntityName]>,
 			context?: GenericEndpointContext
 		) =>
-			| Promise<HookResult<Partial<ModelTypeMap[M]>> | undefined>
-			| HookResult<Partial<ModelTypeMap[M]>>
+			| Promise<HookResult<Partial<EntityTypeMap[TEntityName]>> | undefined>
+			| HookResult<Partial<EntityTypeMap[TEntityName]>>
 			| undefined;
 		after?: (
-			data: ModelTypeMap[M],
+			data: EntityTypeMap[TEntityName],
 			context?: GenericEndpointContext
 		) => Promise<void> | void;
 	};
 }
+
 /**
- * A collection of hooks for different models
+ * A collection of hooks for different entity types in the database.
+ *
+ * @remarks
+ * This is the primary way to register hooks in the system.
  */
 export type DatabaseHook = {
-	[M in ModelName]?: ModelHook<M>;
+	[TEntityName in EntityName]?: ModelHook<TEntityName>;
 };
 
 /**
- * Context containing options and hooks
+ * Context object containing application options and registered hooks.
  */
 export interface HookContext {
 	hooks: DatabaseHook[];
@@ -66,38 +105,59 @@ export interface HookContext {
 }
 
 /**
- * Custom function definition for database operations
+ * Interface for defining custom operation functions that can be used
+ * in place of or alongside standard database operations.
+ *
+ * @typeParam TInputData - The input data type for the operation
+ * @typeParam TOutputData - The output data type for the operation
+ *
+ * @remarks
+ * Custom functions allow for specialized behavior when standard
+ * CRUD operations aren't sufficient.
  */
 export interface CustomOperationFunction<
-	TInput extends Record<string, unknown> = Record<string, unknown>,
-	TOutput = TInput,
+	TInputData extends Record<string, unknown> = Record<string, unknown>,
+	TOutputData = TInputData,
 > {
-	fn: (data: TInput) => Promise<TOutput | null> | TOutput | null;
+	fn: (data: TOutputData) => Promise<TOutputData | null> | TOutputData | null;
 	executeMainFn?: boolean;
 }
 
 /**
- * Properties for creating a record with hooks
+ * Properties for creating a record with hooks.
+ *
+ * @typeParam TData - The data type being created
+ *
+ * @remarks
+ * This is the parameter object for the createWithHook function.
  */
 export interface CreateWithHooksProps<
-	T extends Record<string, unknown> = Record<string, unknown>,
+	TData extends Record<string, unknown> = Record<string, unknown>,
 > {
-	data: T;
-	model: ModelName;
-	customFn?: CustomOperationFunction<T>;
+	data: TData;
+	model: EntityName;
+	customFn?: CustomOperationFunction<TData>;
 	context?: GenericEndpointContext;
 }
 
 /**
- * Properties for updating records with hooks
+ * Properties for updating records with hooks.
+ *
+ * @typeParam TInputData - The input data type for the update
+ * @typeParam TOutputData - The expected output data type
+ * @typeParam TResultData - The final result data type
+ *
+ * @remarks
+ * This is the parameter object for updateWithHooks and updateManyWithHooks functions.
  */
 export interface UpdateWithHooksProps<
-	T extends Record<string, unknown> = Record<string, unknown>,
-	R = T,
+	TInputData extends Record<string, unknown> = Record<string, unknown>,
+	TOutputData = TInputData,
+	TResultData = TOutputData,
 > {
-	data: Partial<T>;
-	where: Where<ModelName>;
-	model: ModelName;
-	customFn?: CustomOperationFunction<Partial<T>, R>;
+	data: Partial<TInputData>;
+	where: Where<EntityName>;
+	model: EntityName;
+	customFn?: CustomOperationFunction<Partial<TInputData>, TResultData>;
 	context?: GenericEndpointContext;
 }

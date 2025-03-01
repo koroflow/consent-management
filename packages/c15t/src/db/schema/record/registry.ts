@@ -1,7 +1,7 @@
 import type { Where, GenericEndpointContext, RegistryContext } from '~/types';
 import type { inferRecord as Record } from './schema';
 import { getWithHooks } from '~/db/hooks';
-import { validateTableOutput } from '../definition';
+import { validateEntityOutput } from '../definition';
 
 /**
  * Creates and returns a set of consent record-related adapter methods to interact with the database.
@@ -115,7 +115,7 @@ export function recordRegistry({ adapter, ...ctx }: RegistryContext) {
 			});
 
 			return records.map((record) =>
-				validateTableOutput('record', record, ctx.options)
+				validateEntityOutput('record', record, ctx.options)
 			);
 		},
 
@@ -136,7 +136,9 @@ export function recordRegistry({ adapter, ...ctx }: RegistryContext) {
 					},
 				],
 			});
-			return record ? validateTableOutput('record', record, ctx.options) : null;
+			return record
+				? validateEntityOutput('record', record, ctx.options)
+				: null;
 		},
 
 		/**
@@ -163,7 +165,7 @@ export function recordRegistry({ adapter, ...ctx }: RegistryContext) {
 				limit,
 			});
 			return records.map((record) =>
-				validateTableOutput('record', record, ctx.options)
+				validateEntityOutput('record', record, ctx.options)
 			);
 		},
 
@@ -191,7 +193,7 @@ export function recordRegistry({ adapter, ...ctx }: RegistryContext) {
 				limit,
 			});
 			return records.map((record) =>
-				validateTableOutput('record', record, ctx.options)
+				validateEntityOutput('record', record, ctx.options)
 			);
 		},
 	};

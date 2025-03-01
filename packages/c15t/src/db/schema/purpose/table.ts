@@ -28,7 +28,7 @@ export function getPurposeTable(
 		/**
 		 * The name of the purpose table in the database, configurable through options
 		 */
-		modelName: options.purpose?.modelName || 'purpose',
+		entityName: options.purpose?.entityName || 'purpose',
 
 		/**
 		 * The schema for the purpose table

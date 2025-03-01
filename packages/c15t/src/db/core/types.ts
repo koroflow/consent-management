@@ -2,49 +2,98 @@ import type { C15TDBSchema } from '../schema/definition';
 import type { Field } from './fields';
 
 /**
- * Plugin-provided schema type with proper typing
+ * Plugin-provided schema type with proper typing.
+ * Defines the structure of schemas that plugins can provide to extend the system.
+ *
+ * @template TEntityKey - The entity key in the schema
  */
 export type PluginSchema = Record<
 	string,
 	{
 		fields: Record<string, Field>;
-		modelName?: string;
+		entityName?: string;
 	}
 >;
 
-export type ModelTypeMap = {
-	[K in keyof C15TDBSchema]: C15TDBSchema[K];
+/**
+ * Maps entity keys to their corresponding data structures.
+ * Provides type access to all entities defined in the database schema.
+ *
+ * @template TKey - Entity key in the database schema
+ */
+export type EntityTypeMap = {
+	[TKey in keyof C15TDBSchema]: C15TDBSchema[TKey];
 };
 
 /**
- * All valid model names
+ * All valid entity names in the database schema.
+ * This type represents the keys of all entities that can be used in queries.
  */
-export type ModelName = keyof C15TDBSchema;
+export type EntityName = keyof C15TDBSchema;
 
 /**
- * Input type for table operations, allowing partial fields and additional properties
+ * Input type for entity operations, allowing partial fields and additional properties.
+ * Used when creating or updating entity records.
+ *
+ * @template TEntity - The entity type being operated on
+ *
+ * @example
+ * ```typescript
+ * // Define input for creating a user
+ * const userInput: EntityInput<'user'> = {
+ *   name: 'John Doe',
+ *   email: 'john@example.com'
+ * };
+ * ```
  */
-export type TableInput<T extends ModelName> = Partial<ModelTypeMap[T]> &
+export type EntityInput<TEntity extends EntityName> = Partial<
+	EntityTypeMap[TEntity]
+> &
 	Record<string, unknown>;
 
 /**
- * Output type for table operations returned from the database
+ * Output type for entity operations returned from the database.
+ * Represents the full structure of an entity as returned from queries.
+ *
+ * @template TEntity - The entity type being returned
+ *
+ * @example
+ * ```typescript
+ * // Type for a user retrieved from the database
+ * const user: EntityOutput<'user'> = {
+ *   id: '123',
+ *   name: 'John Doe',
+ *   email: 'john@example.com',
+ *   createdAt: new Date()
+ * };
+ * ```
  */
-export type TableOutput<T extends ModelName> = ModelTypeMap[T] &
+export type EntityOutput<TEntity extends EntityName> = EntityTypeMap[TEntity] &
 	Record<string, unknown>;
 
 /**
- * Get the field type for a specific table and field
+ * Gets the field type for a specific entity and field.
+ * Useful for extracting the type of a particular field within an entity.
+ *
+ * @template TEntity - The entity containing the field
+ * @template TField - The field name to get the type of
+ *
+ * @example
+ * ```typescript
+ * // Get the type of the 'email' field in the 'user' entity
+ * type EmailType = EntityFieldType<'user', 'email'>; // string
+ * ```
  */
-export type TableFieldType<
-	T extends ModelName,
-	F extends keyof ModelTypeMap[T],
-> = ModelTypeMap[T][F];
+export type EntityFieldType<
+	TEntity extends EntityName,
+	TField extends keyof EntityTypeMap[TEntity],
+> = EntityTypeMap[TEntity][TField];
 
 /**
- * All core tables that are guaranteed to exist
+ * All core entities that are guaranteed to exist in the system.
+ * These are the built-in entities that form the foundation of the data model.
  */
-export type CoreTableName =
+export type CoreEntityName =
 	| 'user'
 	| 'consent'
 	| 'purpose'
@@ -57,6 +106,7 @@ export type CoreTableName =
 	| 'auditLog';
 
 /**
- * All plugin tables that may exist
+ * All plugin-provided entities that may exist in the system.
+ * These are dynamically added by plugins and extend the core data model.
  */
-export type PluginTableName = Exclude<ModelName, CoreTableName>;
+export type PluginEntityName = Exclude<EntityName, CoreEntityName>;

@@ -4,7 +4,7 @@ import type { createLogger } from '~/utils';
 import type { getConsentTables } from '~/db';
 import type { DatabaseHook } from '~/db/hooks/types';
 import type { createRegistry } from '~/db/create-registry';
-import type { ModelName } from '~/db/core/types';
+import type { EntityName } from '~/db/core/types';
 
 // biome-ignore lint/suspicious/noExplicitAny: <explanation>
 export type HookEndpointContext = EndpointContext<string, any> &
@@ -32,7 +32,7 @@ export interface BaseContext {
 export interface RegistryContext extends BaseContext {
 	adapter: Adapter;
 	hooks: DatabaseHook[];
-	generateId: (options: { model: ModelName; size?: number }) => string;
+	generateId: (options: { model: EntityName; size?: number }) => string;
 }
 
 /**
@@ -99,7 +99,7 @@ export interface C15TContext extends BaseContext {
 	/**
 	 * Generate an ID for a model
 	 */
-	generateId: (options: { model: ModelName; size?: number }) => string;
+	generateId: (options: { model: EntityName; size?: number }) => string;
 
 	// API methods
 	/**

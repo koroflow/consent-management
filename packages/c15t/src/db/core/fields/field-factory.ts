@@ -57,14 +57,6 @@ export type TypedFieldOptions<TFieldType extends FieldType> = Omit<
 };
 
 /**
- * Additional configuration properties that can be passed to createField.
- * This includes type-specific field options and any other valid field properties.
- */
-export interface AdditionalFieldOptions {
-	[key: string]: unknown;
-}
-
-/**
  * Configuration options specific to number fields.
  * Provides additional validation options for number fields.
  *
@@ -147,7 +139,7 @@ export type StringFieldOptions = {
  */
 export function createField<
 	TFieldType extends FieldType,
-	TConfig extends TypedFieldOptions<TFieldType> & AdditionalFieldOptions,
+	TConfig extends TypedFieldOptions<TFieldType> & Record<string, any>,
 >(type: TFieldType, config: TConfig = {} as TConfig): Field<TFieldType> {
 	const { transform, ...rest } = config;
 

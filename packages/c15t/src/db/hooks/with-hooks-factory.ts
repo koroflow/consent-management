@@ -9,47 +9,51 @@ import { updateWithHooks } from './update-hooks';
 import { updateManyWithHooks } from './update-many-hooks';
 
 /**
- * Creates a set of functions that apply hooks before and after database operations
- *
- * The hook system allows for transforming data, performing validation,
- * and executing side effects during database operations.
+ * Creates a set of functions that apply hooks before and after database operations.
  *
  * @param adapter - The database adapter to use for operations
  * @param ctx - Context object containing options and hooks
  * @returns Object with hook-enabled database operation functions
  *
+ * @remarks
+ * This factory function generates hook-enabled versions of common database operations
+ * (create, update, updateMany), allowing for consistent hook processing across
+ * the application.
+ *
  * @example
  * ```typescript
- * const { createWithHooks, updateWithHooks } = getWithHooks(adapter, {
+ * const { createWithHooks } = getWithHooks(adapter, {
  *   options: c15tOptions,
  *   hooks: c15tOptions.databaseHooks || []
  * });
  *
- * // Create a user with hooks
- * const user = await createWithHooks({ name: 'Alice' }, 'user');
+ * const user = await createWithHooks({
+ *   data: { name: 'Alice' },
+ *   model: 'user'
+ * });
  * ```
  */
 export function getWithHooks(adapter: Adapter, ctx: HookContext) {
 	return {
 		createWithHooks: <
-			T extends Record<string, unknown>,
-			R extends Record<string, unknown> = T,
+			TInputData extends Record<string, unknown>,
+			TOutputData extends Record<string, unknown> = TInputData,
 		>(
-			props: CreateWithHooksProps<T>
-		) => createWithHook<T, R>(adapter, ctx, props),
+			props: CreateWithHooksProps<TInputData>
+		) => createWithHook<TInputData, TOutputData>(adapter, ctx, props),
 
 		updateWithHooks: <
-			T extends Record<string, unknown>,
-			R extends Record<string, unknown> = T,
+			TInputData extends Record<string, unknown>,
+			TOutputData extends Record<string, unknown> = TInputData,
 		>(
-			props: UpdateWithHooksProps<T, R>
-		) => updateWithHooks<T, R>(adapter, ctx, props),
+			props: UpdateWithHooksProps<TInputData, TOutputData>
+		) => updateWithHooks<TInputData, TOutputData>(adapter, ctx, props),
 
 		updateManyWithHooks: <
-			T extends Record<string, unknown>,
-			R extends Record<string, unknown> = T,
+			TInputData extends Record<string, unknown>,
+			TOutputData extends Record<string, unknown> = TInputData,
 		>(
-			props: UpdateWithHooksProps<T, R[]>
-		) => updateManyWithHooks<T, R>(adapter, ctx, props),
+			props: UpdateWithHooksProps<TInputData, TOutputData>
+		) => updateManyWithHooks<TInputData, TOutputData>(adapter, ctx, props),
 	};
 }

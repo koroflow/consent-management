@@ -18,10 +18,10 @@ import type {
 	UpdateQueryBuilder,
 } from 'kysely';
 import type {
-	ModelName,
-	ModelTypeMap,
-	TableInput,
-	TableOutput,
+	EntityName,
+	EntityTypeMap,
+	EntityInput,
+	EntityOutput,
 } from '~/db/core/types';
 import type { TableReference } from 'node_modules/kysely/dist/esm/parser/table-parser';
 import type { TableFields } from '~/db/schema/definition';
@@ -37,8 +37,8 @@ type ExpressionFn = (
 ) => unknown;
 
 // Define a common interface for where conditions
-export interface WhereCondition<T extends ModelName> {
-	field: keyof ModelTypeMap[T] | 'id';
+export interface WhereCondition<T extends EntityName> {
+	field: keyof EntityTypeMap[T] | 'id';
 	value: unknown;
 	operator?:
 		| 'in'
@@ -75,9 +75,9 @@ const createTransform = (
 ) => {
 	const schema = getConsentTables(options);
 
-	function getField<T extends ModelName>(
+	function getField<T extends EntityName>(
 		model: T,
-		field: keyof ModelTypeMap[T] | string
+		field: keyof EntityTypeMap[T] | string
 	) {
 		if (field === 'id') {
 			return field;
@@ -95,10 +95,10 @@ const createTransform = (
 	}
 
 	// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: <explanation>
-	function transformValueToDB<T extends ModelName>(
+	function transformValueToDB<T extends EntityName>(
 		value: unknown,
 		model: T,
-		field: keyof ModelTypeMap[T] | string
+		field: keyof EntityTypeMap[T] | string
 	): unknown {
 		if (field === 'id') {
 			return value;
@@ -122,10 +122,10 @@ const createTransform = (
 		return value;
 	}
 
-	function transformValueFromDB<T extends ModelName>(
+	function transformValueFromDB<T extends EntityName>(
 		value: unknown,
 		model: T,
-		field: keyof ModelTypeMap[T] | string
+		field: keyof EntityTypeMap[T] | string
 	): unknown {
 		const { type = 'sqlite' } = config || {};
 
@@ -146,10 +146,10 @@ const createTransform = (
 		return value;
 	}
 
-	function getModelName<T extends ModelName>(
+	function getEntityName<T extends EntityName>(
 		model: T
 	): TableReference<Database> {
-		return schema[model].modelName as TableReference<Database>;
+		return schema[model].entityName as TableReference<Database>;
 	}
 
 	// Check if generateId option is explicitly set to false
@@ -158,8 +158,8 @@ const createTransform = (
 
 	return {
 		// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: <explanation>
-		transformInput<T extends ModelName>(
-			data: TableInput<T>,
+		transformInput<T extends EntityName>(
+			data: EntityInput<T>,
 			model: T,
 			action: 'create' | 'update'
 		): InsertExpression<Database, keyof Database> {
@@ -191,11 +191,11 @@ const createTransform = (
 			return transformedData as InsertExpression<Database, keyof Database>;
 		},
 		// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: <explanation>
-		transformOutput<T extends ModelName>(
+		transformOutput<T extends EntityName>(
 			data: Record<string, unknown> | null,
 			model: T,
 			select: string[] = []
-		): TableOutput<T> | null {
+		): EntityOutput<T> | null {
 			if (!data) {
 				return null;
 			}
@@ -221,9 +221,9 @@ const createTransform = (
 					);
 				}
 			}
-			return transformedData as TableOutput<T>;
+			return transformedData as EntityOutput<T>;
 		},
-		convertWhereClause<T extends ModelName>(
+		convertWhereClause<T extends EntityName>(
 			model: T,
 			whereConditions?: WhereCondition<T>[]
 		): {
@@ -313,8 +313,8 @@ const createTransform = (
 				or: conditions.or.length ? conditions.or : null,
 			};
 		},
-		async withReturning<T extends ModelName>(
-			values: TableInput<T>,
+		async withReturning<T extends EntityName>(
+			values: EntityInput<T>,
 			builder:
 				| InsertQueryBuilder<Database, keyof Database, keyof Database>
 				| UpdateQueryBuilder<
@@ -349,7 +349,7 @@ const createTransform = (
 				>;
 
 				res = (await db
-					.selectFrom(getModelName(model))
+					.selectFrom(getEntityName(model))
 					.selectAll()
 					.where((eb) =>
 						eb(
@@ -377,7 +377,7 @@ const createTransform = (
 			> | null;
 			return res;
 		},
-		getModelName,
+		getEntityName,
 		getField,
 	};
 };
@@ -390,13 +390,13 @@ export const kyselyAdapter =
 			withReturning,
 			transformOutput,
 			convertWhereClause,
-			getModelName,
+			getEntityName,
 			getField,
 		} = createTransform(db, opts, config);
 		return {
 			id: 'kysely',
 			async create<
-				Model extends ModelName,
+				Model extends EntityName,
 				Data extends Record<string, unknown>,
 				Result extends TableFields<Model>,
 			>(data: {
@@ -406,13 +406,13 @@ export const kyselyAdapter =
 			}): Promise<Result> {
 				const { model, data: values, select } = data;
 				const transformed = transformInput(
-					values as TableInput<Model>,
+					values as EntityInput<Model>,
 					model,
 					'create'
 				);
 
 				// Safe cast for table name
-				const tableName = getModelName(model);
+				const tableName = getEntityName(model);
 
 				// Use type assertion for builder to match Kysely's expectations
 				const builder = db
@@ -420,7 +420,7 @@ export const kyselyAdapter =
 					.values(transformed);
 
 				const result = await withReturning(
-					transformed as TableInput<Model>,
+					transformed as EntityInput<Model>,
 					builder as unknown as InsertQueryBuilder<
 						Database,
 						keyof Database,
@@ -436,7 +436,7 @@ export const kyselyAdapter =
 				) as unknown as Result;
 			},
 			async findOne<
-				Model extends ModelName,
+				Model extends EntityName,
 				Result extends TableFields<Model>,
 			>(data: {
 				model: Model;
@@ -451,7 +451,7 @@ export const kyselyAdapter =
 				const { and, or } = convertWhereClause(model, whereArray);
 
 				// Safe cast for table name
-				const tableName = getModelName(model);
+				const tableName = getEntityName(model);
 				let query = db
 					.selectFrom(tableName as unknown as keyof Database)
 					.selectAll();
@@ -484,7 +484,7 @@ export const kyselyAdapter =
 			},
 			// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: <explanation>
 			async findMany<
-				Model extends ModelName,
+				Model extends EntityName,
 				Result extends TableFields<Model>,
 			>(data: {
 				model: Model;
@@ -503,7 +503,7 @@ export const kyselyAdapter =
 				const { and, or } = convertWhereClause(model, whereArray);
 
 				// Safe cast for table name
-				const tableName = getModelName(model);
+				const tableName = getEntityName(model);
 				let query = db.selectFrom(tableName as unknown as keyof Database);
 
 				if (and) {
@@ -563,7 +563,7 @@ export const kyselyAdapter =
 				);
 			},
 			async update<
-				Model extends ModelName,
+				Model extends EntityName,
 				Result extends TableFields<Model>,
 			>(data: {
 				model: Model;
@@ -577,13 +577,13 @@ export const kyselyAdapter =
 					: [where]) as unknown as WhereCondition<Model>[];
 				const { and, or } = convertWhereClause(model, whereArray);
 				const transformedData = transformInput(
-					values as TableInput<Model>,
+					values as EntityInput<Model>,
 					model,
 					'update'
 				);
 
 				// Safe cast for table name
-				const tableName = getModelName(model);
+				const tableName = getEntityName(model);
 				let query = db
 					.updateTable(tableName as unknown as keyof Database)
 					.set(transformedData as Record<string, unknown>);
@@ -605,7 +605,7 @@ export const kyselyAdapter =
 					});
 				}
 				const result = await withReturning(
-					transformedData as TableInput<Model>,
+					transformedData as EntityInput<Model>,
 					query as unknown as UpdateQueryBuilder<
 						Database,
 						keyof Database,
@@ -618,7 +618,7 @@ export const kyselyAdapter =
 				return transformOutput(result, model) as unknown as Result | null;
 			},
 			async updateMany<
-				Model extends ModelName,
+				Model extends EntityName,
 				Result extends TableFields<Model>,
 			>(data: {
 				model: Model;
@@ -632,13 +632,13 @@ export const kyselyAdapter =
 					: [where]) as unknown as WhereCondition<Model>[];
 				const { and, or } = convertWhereClause(model, whereArray);
 				const transformedData = transformInput(
-					values as TableInput<Model>,
+					values as EntityInput<Model>,
 					model,
 					'update'
 				);
 
 				// Safe cast for table name
-				const tableName = getModelName(model);
+				const tableName = getEntityName(model);
 				let query = db
 					.updateTable(tableName as unknown as keyof Database)
 					.set(transformedData as Record<string, unknown>);
@@ -665,7 +665,7 @@ export const kyselyAdapter =
 				// Real implementations would need to fetch the updated records
 				return [] as unknown as Result[];
 			},
-			async count<Model extends ModelName>(data: {
+			async count<Model extends EntityName>(data: {
 				model: Model;
 				where?: Where<Model>;
 			}): Promise<number> {
@@ -679,7 +679,7 @@ export const kyselyAdapter =
 				const { and, or } = convertWhereClause(model, whereArray);
 
 				// Safe cast for table name
-				const tableName = getModelName(model);
+				const tableName = getEntityName(model);
 				let query = db
 					.selectFrom(tableName as unknown as keyof Database)
 					//@ts-expect-error
@@ -706,7 +706,7 @@ export const kyselyAdapter =
 				const count = (res[0] as Record<string, unknown>)?.count;
 				return typeof count === 'number' ? count : 0;
 			},
-			async delete<Model extends ModelName>(data: {
+			async delete<Model extends EntityName>(data: {
 				model: Model;
 				where: Where<Model>;
 			}): Promise<void> {
@@ -718,7 +718,7 @@ export const kyselyAdapter =
 				const { and, or } = convertWhereClause(model, whereArray);
 
 				// Safe cast for table name
-				const tableName = getModelName(model);
+				const tableName = getEntityName(model);
 				let query = db.deleteFrom(tableName as unknown as keyof Database);
 
 				if (and) {
@@ -740,7 +740,7 @@ export const kyselyAdapter =
 				}
 				await query.execute();
 			},
-			async deleteMany<Model extends ModelName>(data: {
+			async deleteMany<Model extends EntityName>(data: {
 				model: Model;
 				where: Where<Model>;
 			}): Promise<number> {
@@ -752,7 +752,7 @@ export const kyselyAdapter =
 				const { and, or } = convertWhereClause(model, whereArray);
 
 				// Safe cast for table name
-				const tableName = getModelName(model);
+				const tableName = getEntityName(model);
 				let query = db.deleteFrom(tableName as unknown as keyof Database);
 				if (and) {
 					query = query.where((eb) => {

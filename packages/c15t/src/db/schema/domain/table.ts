@@ -28,7 +28,7 @@ export function getDomainTable(
 		/**
 		 * The name of the domain table in the database, configurable through options
 		 */
-		modelName: options.domain?.modelName || 'domain',
+		entityName: options.domain?.entityName || 'domain',
 
 		/**
 		 * The schema for the domain table

@@ -24,7 +24,7 @@ import type { C15TOptions, C15TPlugin } from './types';
 import { getConsentTables } from './db';
 import { getAdapter } from './db/utils';
 import { createRegistry } from './db/create-registry';
-import type { ModelName } from './db/core/types';
+import type { EntityName } from './db/core/types';
 /**
  * Default secret used when no secret is provided
  * This should only be used in development environments
@@ -81,7 +81,7 @@ export const init = async (options: C15TOptions) => {
 	const generateIdFunc = ({
 		model,
 		size,
-	}: { model: ModelName; size?: number }) => {
+	}: { model: EntityName; size?: number }) => {
 		return (
 			finalOptions?.advanced?.generateId?.({ model, size }) ||
 			generateId(size || 21)
