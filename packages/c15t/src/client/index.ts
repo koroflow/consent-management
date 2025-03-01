@@ -1,8 +1,8 @@
+import type { Purpose } from '~/db/schema/purpose/schema';
 import type { c15tClientOptions, FetchOptions, ResponseContext } from '..';
 import type {
 	// ConsentChangeEvent,
 	// ConsentPreference,
-	ConsentPurpose,
 } from '~/types';
 
 /**
@@ -260,9 +260,9 @@ export class c15tClient {
 	 * @returns Response context containing the list of consent purposes if successful
 	 */
 	async listPurposes(
-		options?: FetchOptions<ConsentPurpose[]>
-	): Promise<ResponseContext<ConsentPurpose[]>> {
-		return this.fetcher<ConsentPurpose[]>('/list-purposes', {
+		options?: FetchOptions<Purpose[]>
+	): Promise<ResponseContext<Purpose[]>> {
+		return this.fetcher<Purpose[]>('/list-purposes', {
 			method: 'GET',
 			...options,
 		});

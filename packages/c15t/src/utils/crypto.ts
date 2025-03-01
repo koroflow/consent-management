@@ -41,7 +41,7 @@ export function createHMAC(
 	 * @param secret - The secret key as a string
 	 * @returns A Promise resolving to a CryptoKey
 	 */
-	async function getKey(secret: string): Promise<CryptoKey> {
+	async function getKey(secret: string) {
 		const secretBuffer = textEncoder.encode(secret);
 		return await crypto.subtle.importKey(
 			'raw',
@@ -59,7 +59,7 @@ export function createHMAC(
 	 * @returns The encoded string in the format specified by the encoding parameter
 	 * @throws Error if the encoding is not supported
 	 */
-	function encodeOutput(buffer: ArrayBuffer): string {
+	function encodeOutput(buffer: ArrayBuffer) {
 		const bytes = new Uint8Array(buffer);
 
 		if (encoding === 'hex') {
@@ -118,11 +118,7 @@ export function createHMAC(
 		 * @returns A Promise resolving to a boolean indicating whether the signature is valid
 		 * @throws Error if the encoding is not supported
 		 */
-		async verify(
-			secret: string,
-			data: string,
-			signature: string
-		): Promise<boolean> {
+		async verify(secret: string, data: string, signature: string) {
 			const key = await getKey(secret);
 			const dataBuffer = textEncoder.encode(data);
 

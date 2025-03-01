@@ -104,20 +104,20 @@ export const setConsent = createAuthEndpoint(
 			const params = validatedData.data;
 
 			// Access the internal adapter from the context
-			const internalAdapter = ctx.context?.internalAdapter;
+			const registry = ctx.context?.registry;
 
-			if (!internalAdapter) {
+			if (!registry) {
 				throw new APIError('INTERNAL_SERVER_ERROR', {
 					message: 'Internal adapter not available',
 				});
 			}
 
 			// Check if user exists, create if not
-			let userRecord = await internalAdapter.findUserById(params.userId);
+			let userRecord = await registry.findUserById(params.userId);
 
 			if (!userRecord) {
 				// Create new user record
-				userRecord = await internalAdapter.createUser({
+				userRecord = await registry.createUser({
 					id: params.userId,
 					externalId: params.userId, // Using userId as externalId for simplicity
 					isIdentified: true,
@@ -144,7 +144,7 @@ export const setConsent = createAuthEndpoint(
 			const ipAddress = ctx.request?.ip || null;
 
 			// Create new consent record with the internal adapter
-			const consentResult = await internalAdapter.createConsent({
+			const consentResult = await registry.createConsent({
 				userId: userRecord.id,
 				domainId: domainId,
 				preferences: { test: true },
@@ -155,7 +155,7 @@ export const setConsent = createAuthEndpoint(
 			});
 
 			// Create a consent record for audit purposes
-			await internalAdapter.createConsentRecord({
+			await registry.createRecord({
 				consentId: consentResult.id,
 				recordType: 'api_call',
 				recordTypeDetail: 'API creation',
@@ -171,7 +171,7 @@ export const setConsent = createAuthEndpoint(
 			});
 
 			// Log the action in the audit log
-			await internalAdapter.createConsentAuditLog({
+			await registry.createAuditLog({
 				action: 'create_consent',
 				userId: params.userId,
 				resourceType: 'consents',

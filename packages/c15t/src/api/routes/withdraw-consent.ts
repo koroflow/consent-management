@@ -2,7 +2,8 @@ import { createAuthEndpoint } from '../call';
 import { APIError } from 'better-call';
 import { z } from 'zod';
 import type { C15TContext } from '../../types';
-import type { Consent, User } from '../../types';
+import type { Consent } from '~/db/schema/consent/schema';
+import type { User } from '~/db/schema/user/schema';
 
 // Define the schemas for validating request body
 // We'll have three different schemas for the three identification methods
@@ -139,9 +140,9 @@ export const withdrawConsent = createAuthEndpoint(
 			}
 
 			// Access the internal adapter from the context
-			const internalAdapter = ctx.context?.internalAdapter;
+			const registry = ctx.context?.registry;
 
-			if (!internalAdapter) {
+			if (!registry) {
 				throw new APIError('INTERNAL_SERVER_ERROR', {
 					message: 'Internal adapter not available',
 				});
@@ -150,15 +151,13 @@ export const withdrawConsent = createAuthEndpoint(
 			const params = validatedData.data;
 
 			// Find the consent records to withdraw based on the identifier type
-			let consentRecordsToWithdraw: Consent[] = [];
+			let recordsToWithdraw: Consent[] = [];
 
 			if (params.identifierType === 'consentId') {
 				// Find by consent ID
-				const consentRecord = await internalAdapter.findConsent(
-					params.consentId
-				);
+				const record = await registry.findConsent(params.consentId);
 
-				if (!consentRecord) {
+				if (!record) {
 					throw new APIError('NOT_FOUND', {
 						message: 'Consent record not found',
 						details: {
@@ -167,7 +166,7 @@ export const withdrawConsent = createAuthEndpoint(
 					});
 				}
 
-				if (!consentRecord.consent.isActive) {
+				if (!record.consent.isActive) {
 					throw new APIError('CONFLICT', {
 						message: 'Consent has already been withdrawn',
 						details: {
@@ -176,7 +175,7 @@ export const withdrawConsent = createAuthEndpoint(
 					});
 				}
 
-				consentRecordsToWithdraw = [consentRecord.consent];
+				recordsToWithdraw = [record.consent];
 			} else if (
 				params.identifierType === 'userId' ||
 				params.identifierType === 'externalId'
@@ -188,11 +187,9 @@ export const withdrawConsent = createAuthEndpoint(
 				// Find user
 				let userRecord: User | null = null;
 				if (params.identifierType === 'userId') {
-					userRecord = await internalAdapter.findUserById(params.userId);
+					userRecord = await registry.findUserById(params.userId);
 				} else {
-					userRecord = await internalAdapter.findUserByExternalId(
-						params.externalId
-					);
+					userRecord = await registry.findUserByExternalId(params.externalId);
 				}
 
 				if (!userRecord) {
@@ -208,16 +205,14 @@ export const withdrawConsent = createAuthEndpoint(
 				}
 
 				// Find all active consents for this user and domain
-				const userConsents = await internalAdapter.findUserConsents(
-					userRecord.id
-				);
+				const userConsents = await registry.findUserConsents(userRecord.id);
 
 				// Filter for active consents with matching domain
-				consentRecordsToWithdraw = userConsents.filter(
+				recordsToWithdraw = userConsents.filter(
 					(consent) => consent.isActive && consent.domainId === domainId
 				);
 
-				if (consentRecordsToWithdraw.length === 0) {
+				if (recordsToWithdraw.length === 0) {
 					throw new APIError('NOT_FOUND', {
 						message: 'No active consent records found for this user and domain',
 						details: {
@@ -243,10 +238,10 @@ export const withdrawConsent = createAuthEndpoint(
 			const withdrawalResults = [];
 			const currentTime = new Date().toISOString();
 
-			for (const consentRecord of consentRecordsToWithdraw) {
+			for (const record of recordsToWithdraw) {
 				// Use the revokeConsent method from the internal adapter
-				const withdrawalResult = await internalAdapter.revokeConsent({
-					consentId: consentRecord.id,
+				const withdrawalResult = await registry.revokeConsent({
+					consentId: record.id,
 					reason: params.reason || '',
 					// method: 'API withdrawal',
 					actor: params.actor || 'system',
@@ -254,8 +249,8 @@ export const withdrawConsent = createAuthEndpoint(
 				});
 
 				// Add consent record for the withdrawal
-				await internalAdapter.createConsentRecord({
-					consentId: consentRecord.id,
+				await registry.createRecord({
+					consentId: record.id,
 					recordType: 'withdrawal',
 					recordTypeDetail: 'API withdrawal',
 					content: {
@@ -263,7 +258,7 @@ export const withdrawConsent = createAuthEndpoint(
 						method: params.method,
 						identifierType: params.identifierType,
 						// Store original preferences for audit purposes
-						preferences: consentRecord.preferences,
+						preferences: record.preferences,
 						withdrawnAt: currentTime,
 					},
 					ipAddress,
@@ -274,24 +269,24 @@ export const withdrawConsent = createAuthEndpoint(
 				});
 
 				// Log the action in the audit log
-				await internalAdapter.createConsentAuditLog({
+				await registry.createAuditLog({
 					action: 'withdraw_consent',
-					userId: consentRecord.userId,
+					userId: record.userId,
 					resourceType: 'consents',
-					resourceId: consentRecord.id,
+					resourceId: record.id,
 					actor: params.actor || 'system',
 					deviceInfo,
 					ipAddress,
 					changes: {
 						before: {
 							isActive: true,
-							preferences: consentRecord.preferences,
+							preferences: record.preferences,
 						},
 						after: {
 							isActive: false,
 							// Set all preferences to null (withdrawn)
 							preferences: Object.fromEntries(
-								Object.entries(consentRecord.preferences || {}).map(([key]) => [
+								Object.entries(record.preferences || {}).map(([key]) => [
 									key,
 									null, // Setting to null indicates withdrawal
 								])
@@ -302,10 +297,8 @@ export const withdrawConsent = createAuthEndpoint(
 				});
 
 				withdrawalResults.push({
-					id:
-						withdrawalResult?.withdrawal?.id ||
-						`withdrawal-${consentRecord.id}`,
-					consentId: consentRecord.id,
+					id: withdrawalResult?.withdrawal?.id || `withdrawal-${record.id}`,
+					consentId: record.id,
 					revokedAt: currentTime,
 				});
 			}

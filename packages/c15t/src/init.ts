@@ -21,7 +21,7 @@ import { generateId } from './utils/id';
 import { env, isProduction } from './utils/env';
 import type { C15TContext } from './types';
 import type { C15TOptions, C15TPlugin } from './types';
-import { createInternalAdapter, getAdapter, getConsentTables } from './db';
+import { createRegistry, getAdapter, getConsentTables } from './db';
 
 /**
  * Default secret used when no secret is provided
@@ -51,7 +51,7 @@ const DEFAULT_SECRET = 'c15t-default-secret-please-change-in-production';
  * // Now use the context to handle consent management
  * ```
  */
-export const init = async (options: C15TOptions): Promise<C15TContext> => {
+export const init = async (options: C15TOptions) => {
 	const adapter = await getAdapter(options);
 
 	const plugins = options.plugins || [];
@@ -103,10 +103,13 @@ export const init = async (options: C15TOptions): Promise<C15TContext> => {
 			updateAge: finalOptions.consent?.updateAge || 60 * 60 * 24, // 24 hours
 		},
 		adapter: adapter,
-		internalAdapter: createInternalAdapter(adapter, {
-			options,
-			hooks: options.databaseHooks ? [options.databaseHooks] : [],
-			generateId: generateIdFunc,
+		registry: createRegistry({
+			adapter,
+			ctx: {
+				options,
+				hooks: options.databaseHooks || [],
+				generateId: generateIdFunc,
+			},
 		}),
 		tables,
 	};

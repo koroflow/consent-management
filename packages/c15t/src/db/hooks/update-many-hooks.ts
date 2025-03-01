@@ -21,7 +21,7 @@ async function processBeforeHooks<T extends Record<string, unknown>>(
 	model: string,
 	hooks: DatabaseHook[],
 	context?: unknown
-): Promise<T | null> {
+) {
 	let currentData = data;
 
 	for (const hook of hooks || []) {
@@ -61,7 +61,7 @@ async function processAfterHooks<T extends Record<string, unknown>>(
 	model: string,
 	hooks: DatabaseHook[],
 	context?: unknown
-): Promise<void> {
+) {
 	for (const hook of hooks || []) {
 		const afterHook = hook[model as keyof typeof hook]?.update?.after;
 		if (afterHook) {
@@ -90,7 +90,7 @@ async function executeUpdate<T extends Record<string, unknown>>(
 	data: T,
 	where: Where[],
 	customFn?: CustomOperationFunction<T>
-): Promise<T[] | null> {
+) {
 	// Use custom function if provided
 	const customResult = customFn ? await customFn.fn(data) : null;
 
@@ -143,7 +143,7 @@ export async function updateManyWithHooks<T extends Record<string, unknown>>({
 	hooks,
 	customFn,
 	context,
-}: UpdateHookParams<T>): Promise<T[] | null> {
+}: UpdateHookParams<T>) {
 	// Process before hooks
 	const transformedData = await processBeforeHooks(data, model, hooks, context);
 	if (transformedData === null) {

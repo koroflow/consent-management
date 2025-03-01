@@ -10,17 +10,19 @@ export function parseOutputData<T extends Record<string, unknown>>(
 ) {
 	const fields = schema.fields;
 	const parsedData: Record<string, unknown> = {};
-	// biome-ignore lint/nursery/useGuardForIn: <explanation>
+
 	for (const key in data) {
-		const field = fields[key];
-		if (!field) {
+		if (Object.prototype.hasOwnProperty.call(data, key)) {
+			const field = fields[key];
+			if (!field) {
+				parsedData[key] = data[key];
+				continue;
+			}
+			if (field.returned === false) {
+				continue;
+			}
 			parsedData[key] = data[key];
-			continue;
 		}
-		if (field.returned === false) {
-			continue;
-		}
-		parsedData[key] = data[key];
 	}
 	return parsedData as T;
 }

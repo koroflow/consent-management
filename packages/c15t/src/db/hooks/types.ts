@@ -7,21 +7,16 @@ import type {
 
 export type Models =
 	| 'consent'
-	| 'consentPurpose'
-	| 'consentRecord'
+	| 'purpose'
+	| 'record'
 	| 'consentGeoLocation'
-	| 'consentWithdrawal'
-	| 'consentAuditLog'
+	| 'withdrawal'
+	| 'auditLog'
 	| 'consentPolicy'
-	| 'domain';
-
-/**
- * Models that can have hooks applied to them
- */
-export type HookableModels = Extract<
-	Models,
-	'user' | 'account' | 'session' | 'verification'
->;
+	| 'domain'
+	| 'user'
+	| 'geoLocation'
+	| 'purposeJunction';
 
 /**
  * Structure for hook functions
@@ -52,7 +47,7 @@ export interface ModelOperations<T> {
  * This ensures each hookable model has its own property
  */
 export type DatabaseHook = {
-	[M in HookableModels]?: ModelOperations<Record<string, unknown>>;
+	[M in Models]?: ModelOperations<Record<string, unknown>>;
 };
 
 /**
@@ -94,9 +89,9 @@ export interface CustomOperationFunction<T extends Record<string, unknown>> {
 /**
  * Parameters for hook-enabled operations
  */
-export interface HookOperationParams<T extends Record<string, unknown>> {
+export interface HookOperationParams {
 	adapter: Adapter;
-	model: HookableModels;
+	model: Models;
 	hooks: DatabaseHook[];
 	context?: GenericEndpointContext;
 }
@@ -105,7 +100,7 @@ export interface HookOperationParams<T extends Record<string, unknown>> {
  * Parameters for update operations with hooks
  */
 export interface UpdateHookParams<T extends Record<string, unknown>>
-	extends HookOperationParams<T> {
+	extends HookOperationParams {
 	data: T;
 	where: Where[];
 	customFn?: CustomOperationFunction<T>;
@@ -115,7 +110,7 @@ export interface UpdateHookParams<T extends Record<string, unknown>>
  * Parameters for create operations with hooks
  */
 export interface CreateHookParams<T extends Record<string, unknown>>
-	extends HookOperationParams<T> {
+	extends HookOperationParams {
 	data: T;
 	customFn?: CustomOperationFunction<T>;
 }

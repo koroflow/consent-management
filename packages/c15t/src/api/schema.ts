@@ -69,7 +69,7 @@ export const users = pgTable(
 );
 
 /**
- * consentPurposes - Defines the different purposes for which consent can be given
+ * purposes - Defines the different purposes for which consent can be given
  *
  * @property id - Internal auto-incrementing primary key
  * @property code - Unique code identifying the purpose (e.g., 'analytics', 'marketing')
@@ -82,7 +82,7 @@ export const users = pgTable(
  * @property createdAt - Timestamp with timezone when the purpose was created
  * @property updatedAt - Timestamp with timezone when the purpose was last updated
  */
-export const consentPurposes = pgTable('consent_purposes', {
+export const purposes = pgTable('consent_purposes', {
 	id: serial('id').primaryKey(),
 	code: varchar('code', { length: 50 }).notNull().unique(),
 	name: varchar('name', { length: 100 }).notNull(),
@@ -266,14 +266,14 @@ export const consents = pgTable(
 );
 
 /**
- * consentPurposeJunction - Maps specific purposes to consent records
+ * purposeJunction - Maps specific purposes to consent records
  *
  * @property id - Internal auto-incrementing primary key
  * @property consentId - Reference to the consent record
  * @property purposeId - Reference to the purpose
  * @property isAccepted - Flag indicating if this specific purpose was accepted
  */
-export const consentPurposeJunction = pgTable(
+export const purposeJunction = pgTable(
 	'consent_purpose_junction',
 	{
 		id: serial('id').primaryKey(),
@@ -282,12 +282,12 @@ export const consentPurposeJunction = pgTable(
 			.references(() => consents.id, { onDelete: 'cascade' }),
 		purposeId: serial('purpose_id')
 			.notNull()
-			.references(() => consentPurposes.id),
+			.references(() => purposes.id),
 		isAccepted: boolean('is_accepted').notNull(),
 	},
 	(table) => {
 		return {
-			consentPurposeIdx: index('consent_purpose_idx').on(
+			purposeIdx: index('consent_purpose_idx').on(
 				table.consentId,
 				table.purposeId
 			),
@@ -296,7 +296,7 @@ export const consentPurposeJunction = pgTable(
 );
 
 /**
- * consentRecords - Stores evidence and audit trail of consent actions
+ * records - Stores evidence and audit trail of consent actions
  *
  * @property id - Internal auto-incrementing primary key
  * @property consentId - Reference to the consent this record relates to
@@ -307,7 +307,7 @@ export const consentPurposeJunction = pgTable(
  * @property recordMetadata - Additional context about the record (UI version, device info)
  * @property createdAt - Timestamp with timezone when the record was created
  */
-export const consentRecords = pgTable(
+export const records = pgTable(
 	'consent_records',
 	{
 		id: serial('id').primaryKey(),
@@ -356,7 +356,7 @@ export const consentGeoLocations = pgTable('consent_geo_locations', {
 });
 
 /**
- * consentWithdrawals - Dedicated table for tracking consent withdrawals/revocations
+ * withdrawals - Dedicated table for tracking consent withdrawals/revocations
  *
  * @property id - Internal auto-incrementing primary key
  * @property consentId - Reference to the consent being withdrawn
@@ -367,7 +367,7 @@ export const consentGeoLocations = pgTable('consent_geo_locations', {
  * @property metadata - Additional context about the withdrawal (device info, etc.)
  * @property createdAt - Timestamp with timezone when the withdrawal record was created
  */
-export const consentWithdrawals = pgTable(
+export const withdrawals = pgTable(
 	'consent_withdrawals',
 	{
 		id: serial('id').primaryKey(),
@@ -394,7 +394,7 @@ export const consentWithdrawals = pgTable(
 );
 
 /**
- * consentAuditLogs - General-purpose audit logging for all consent operations
+ * auditLogs - General-purpose audit logging for all consent operations
  *
  * @property id - Internal auto-incrementing primary key
  * @property timestamp - Time with timezone when the audited action occurred
@@ -408,7 +408,7 @@ export const consentWithdrawals = pgTable(
  * @property ipAddress - IP address associated with the action (INET type)
  * @property createdAt - Timestamp with timezone when the audit log was created
  */
-export const consentAuditLogs = pgTable(
+export const auditLogs = pgTable(
 	'consent_audit_logs',
 	{
 		id: serial('id').primaryKey(),
@@ -445,10 +445,10 @@ export const consentAuditLogs = pgTable(
  *
  * - users ←→ consents: One-to-many (one user can have many consents)
  * - domains ←→ consents: One-to-many (one domain can have many consents)
- * - consents ←→ consentRecords: One-to-many (one consent can have many records)
- * - consents ←→ consentPurposeJunction: One-to-many
- * - consents ←→ consentWithdrawals: One-to-many (one consent can have many withdrawal records)
- * - consentPurposes ←→ consentPurposeJunction: One-to-many
+ * - consents ←→ records: One-to-many (one consent can have many records)
+ * - consents ←→ purposeJunction: One-to-many
+ * - consents ←→ withdrawals: One-to-many (one consent can have many withdrawal records)
+ * - purposes ←→ purposeJunction: One-to-many
  * - geoLocations ←→ consentGeoLocations: One-to-many
  * - consents ←→ consentGeoLocations: One-to-many
  * - domains: Self-referential for parent/child relationships
@@ -481,22 +481,19 @@ export const consentsRelations = relations(consents, ({ one, many }) => ({
 		fields: [consents.domainId],
 		references: [domains.id],
 	}),
-	records: many(consentRecords),
-	purposeJunctions: many(consentPurposeJunction),
+	records: many(records),
+	purposeJunctions: many(purposeJunction),
 	geoLocations: many(consentGeoLocations),
-	withdrawals: many(consentWithdrawals), // Add relation to withdrawals
+	withdrawals: many(withdrawals), // Add relation to withdrawals
 }));
 
-export const consentPurposesRelations = relations(
-	consentPurposes,
-	({ many }) => ({
-		consentJunctions: many(consentPurposeJunction),
-	})
-);
+export const purposesRelations = relations(purposes, ({ many }) => ({
+	consentJunctions: many(purposeJunction),
+}));
 
-export const consentRecordsRelations = relations(consentRecords, ({ one }) => ({
+export const recordsRelations = relations(records, ({ one }) => ({
 	consent: one(consents, {
-		fields: [consentRecords.consentId],
+		fields: [records.consentId],
 		references: [consents.id],
 	}),
 }));
@@ -515,26 +512,23 @@ export const consentGeoLocationsRelations = relations(
 	})
 );
 
-export const consentPurposeJunctionRelations = relations(
-	consentPurposeJunction,
+export const purposeJunctionRelations = relations(
+	purposeJunction,
 	({ one }) => ({
 		consent: one(consents, {
-			fields: [consentPurposeJunction.consentId],
+			fields: [purposeJunction.consentId],
 			references: [consents.id],
 		}),
-		purpose: one(consentPurposes, {
-			fields: [consentPurposeJunction.purposeId],
-			references: [consentPurposes.id],
+		purpose: one(purposes, {
+			fields: [purposeJunction.purposeId],
+			references: [purposes.id],
 		}),
 	})
 );
 
-export const consentWithdrawalsRelations = relations(
-	consentWithdrawals,
-	({ one }) => ({
-		consent: one(consents, {
-			fields: [consentWithdrawals.consentId],
-			references: [consents.id],
-		}),
-	})
-);
+export const withdrawalsRelations = relations(withdrawals, ({ one }) => ({
+	consent: one(consents, {
+		fields: [withdrawals.consentId],
+		references: [consents.id],
+	}),
+}));

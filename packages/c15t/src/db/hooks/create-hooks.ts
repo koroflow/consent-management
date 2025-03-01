@@ -21,7 +21,7 @@ async function processBeforeHooks<T extends Record<string, unknown>>(
 	model: string,
 	hooks: DatabaseHook[],
 	context?: GenericEndpointContext
-): Promise<T | null> {
+) {
 	let currentData = data;
 
 	for (const hook of hooks || []) {
@@ -62,7 +62,7 @@ async function executeCreate<T extends Record<string, unknown>>(
 	model: string,
 	data: T,
 	customFn?: CustomOperationFunction<T>
-): Promise<T | null> {
+) {
 	// Execute the custom function if provided
 	const customCreated = customFn ? await customFn.fn(data) : null;
 
@@ -91,7 +91,7 @@ async function processAfterHooks<T extends Record<string, unknown>>(
 	model: string,
 	hooks: DatabaseHook[],
 	context?: GenericEndpointContext
-): Promise<void> {
+) {
 	for (const hook of hooks || []) {
 		const afterHook = hook[model as keyof typeof hook]?.create?.after;
 		if (afterHook) {
@@ -119,7 +119,7 @@ export async function createWithHooks<T extends Record<string, unknown>>({
 	hooks,
 	customFn,
 	context,
-}: CreateHookParams<T>): Promise<T | null> {
+}: CreateHookParams<T>) {
 	// Process before hooks
 	const transformedData = await processBeforeHooks(data, model, hooks, context);
 	if (transformedData === null) {

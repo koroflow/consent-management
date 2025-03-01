@@ -1,5 +1,5 @@
 import type { FieldAttribute } from '~/db/fields';
-import type { C15TDbSchema } from '~/db/get-tables';
+import type { C15TDBSchema } from '~/db/get-tables';
 import type { C15TOptions } from '~/types';
 
 /**
@@ -23,7 +23,7 @@ import type { C15TOptions } from '~/types';
 export function getConsentPolicyTable(
 	options: C15TOptions,
 	policyFields?: Record<string, FieldAttribute>
-): C15TDbSchema['consentPolicy'] {
+): C15TDBSchema['consentPolicy'] {
 	return {
 		/**
 		 * The name of the policy table in the database, configurable through options

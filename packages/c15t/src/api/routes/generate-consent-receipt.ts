@@ -3,7 +3,7 @@ import { APIError } from 'better-call';
 import { z } from 'zod';
 import crypto from 'node:crypto';
 import type { C15TContext } from '../../types';
-import type { ConsentRecord } from '~/db/routes/consent-record/schema';
+import type { Record } from '~/db/schema/record/schema';
 
 // Define the schema for validating request parameters
 const generateConsentReceiptSchema = z.object({
@@ -174,16 +174,16 @@ export const generateConsentReceipt = createAuthEndpoint(
 			const params = validatedData.data;
 
 			// Access the internal adapter from the context
-			const internalAdapter = ctx.context?.internalAdapter;
+			const registry = ctx.context?.registry;
 
-			if (!internalAdapter) {
+			if (!registry) {
 				throw new APIError('INTERNAL_SERVER_ERROR', {
 					message: 'Internal adapter not available',
 				});
 			}
 
 			// Get the consent record with related information
-			const consentResult = await internalAdapter.findConsent(params.consentId);
+			const consentResult = await registry.findConsentById(params.consentId);
 
 			if (!consentResult || !consentResult.consent) {
 				throw new APIError('NOT_FOUND', {
@@ -192,7 +192,7 @@ export const generateConsentReceipt = createAuthEndpoint(
 				});
 			}
 
-			const consentRecord = consentResult.consent;
+			const record = consentResult.consent;
 			const userRecord = consentResult.user;
 
 			if (!userRecord) {
@@ -205,21 +205,21 @@ export const generateConsentReceipt = createAuthEndpoint(
 			// Get consent records related to this consent
 			// This would ideally be a method in the adapter to get records by consent ID
 			// For now, we'll use a simplified approach
-			let consentRecords: ConsentRecord[] = [];
+			let records: Record[] = [];
 
 			try {
 				// In a complete implementation, this would be a method like:
-				// consentRecords = await internalAdapter.findConsentRecordsByConsentId(params.consentId);
+				// records = await registry.findRecordsByConsentId(params.consentId);
 
 				// For now, we'll simulate a record
-				consentRecords = [
+				records = [
 					{
 						id: 'record1',
 						consentId: params.consentId,
-						recordType: 'form_submission',
+						// recordType: 'form_submission',
 						recordTypeDetail: 'web_form',
 						content: {},
-						ipAddress: consentRecord.ipAddress,
+						ipAddress: record.ipAddress,
 						recordMetadata: {
 							deviceInfo: 'User Agent from request headers',
 						},
@@ -228,27 +228,27 @@ export const generateConsentReceipt = createAuthEndpoint(
 				];
 			} catch (err) {
 				// If we can't get records, continue with an empty array
-				consentRecords = [];
+				records = [];
 			}
 
 			// Simulate domain information
 			// In a complete implementation, we would have a method to get domain by ID
 			const domain = {
-				id: consentRecord.domainId,
+				id: record.domainId,
 				domain:
-					typeof consentRecord.domainId === 'string'
-						? consentRecord.domainId.includes('.')
-							? consentRecord.domainId
-							: `example${consentRecord.domainId}.com`
+					typeof record.domainId === 'string'
+						? record.domainId.includes('.')
+							? record.domainId
+							: `example${record.domainId}.com`
 						: 'example.com',
-				name: `Domain for ${consentRecord.domainId}`,
+				name: `Domain for ${record.domainId}`,
 			};
 
 			// Generate a unique receipt ID
 			const receiptId = `CR${Date.now().toString().slice(-7)}${Math.floor(Math.random() * 1000)}`;
 
 			// Map consent preferences to services and purposes
-			const services = Object.entries(consentRecord.preferences || {}).map(
+			const services = Object.entries(record.preferences || {}).map(
 				([key, value]) => {
 					// Convert key to a more readable service name
 					const serviceName = key.charAt(0).toUpperCase() + key.slice(1);
@@ -261,8 +261,8 @@ export const generateConsentReceipt = createAuthEndpoint(
 								purposeDescription: `${value ? 'Enabled' : 'Disabled'} ${key} tracking and functionality`,
 								consentType: 'EXPLICIT',
 								purposeCategory: [serviceName],
-								termination: consentRecord.policyId
-									? `As specified in policy ${consentRecord.policyId}`
+								termination: record.policyId
+									? `As specified in policy ${record.policyId}`
 									: 'Until consent is withdrawn',
 								thirdPartyDisclosure: false,
 							},
@@ -274,23 +274,22 @@ export const generateConsentReceipt = createAuthEndpoint(
 			// Extract metadata from consent records
 			const metadata = {
 				deviceInfo:
-					consentRecords.length > 0 &&
-					consentRecords[0]?.recordMetadata?.deviceInfo
-						? consentRecords[0].recordMetadata.deviceInfo
+					records.length > 0 && records[0]?.recordMetadata?.deviceInfo
+						? records[0].recordMetadata.deviceInfo
 						: 'Not recorded',
-				ipAddress: consentRecord.ipAddress || 'Not recorded',
-				policyId: consentRecord.policyId,
-				...consentRecord.metadata,
+				ipAddress: record.ipAddress || 'Not recorded',
+				policyId: record.policyId,
+				...record.metadata,
 			};
 
 			// Create the receipt object
 			const receipt: ConsentReceipt = {
 				version: '1.0.0',
 				jurisdiction: 'GDPR', // Default to GDPR
-				consentTimestamp: consentRecord.givenAt,
+				consentTimestamp: record.givenAt,
 				collectionMethod:
-					consentRecords.length > 0 && consentRecords[0]?.recordTypeDetail
-						? consentRecords[0].recordTypeDetail
+					records.length > 0 && records[0]?.recordTypeDetail
+						? records[0].recordTypeDetail
 						: 'API',
 				consentReceiptID: receiptId,
 				publicKey: process.env.CONSENT_RECEIPT_PUBLIC_KEY || 'not-configured',

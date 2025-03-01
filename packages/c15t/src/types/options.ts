@@ -370,10 +370,10 @@ export interface C15TOptions {
 	/**
 	 * Consent purpose configuration
 	 */
-	consentPurpose?: {
+	purpose?: {
 		/**
 		 * Custom model name for consent purpose table
-		 * @default "consentPurpose"
+		 * @default "purpose"
 		 */
 		modelName?: string;
 		/**
@@ -578,10 +578,10 @@ export interface C15TOptions {
 	/**
 	 * Consent purpose junction configuration
 	 */
-	consentPurposeJunction?: {
+	purposeJunction?: {
 		/**
 		 * Custom model name for consent purpose junction table
-		 * @default "consentPurposeJunction"
+		 * @default "purposeJunction"
 		 */
 		modelName?: string;
 		/**
@@ -603,10 +603,10 @@ export interface C15TOptions {
 	/**
 	 * Consent record configuration
 	 */
-	consentRecord?: {
+	record?: {
 		/**
 		 * Custom model name for consent record table
-		 * @default "consentRecord"
+		 * @default "record"
 		 */
 		modelName?: string;
 		/**
@@ -657,10 +657,10 @@ export interface C15TOptions {
 	/**
 	 * Consent withdrawal configuration
 	 */
-	consentWithdrawal?: {
+	withdrawal?: {
 		/**
 		 * Custom model name for consent withdrawal table
-		 * @default "consentWithdrawal"
+		 * @default "withdrawal"
 		 */
 		modelName?: string;
 		/**
@@ -686,10 +686,10 @@ export interface C15TOptions {
 	/**
 	 * Consent audit log configuration
 	 */
-	consentAuditLog?: {
+	auditLog?: {
 		/**
 		 * Custom model name for consent audit log table
-		 * @default "consentAuditLog"
+		 * @default "auditLog"
 		 */
 		modelName?: string;
 		/**

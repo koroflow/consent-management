@@ -1,4 +1,9 @@
-import type { UpdateHookParams, HookResult, DatabaseHook } from './types';
+import type {
+	UpdateHookParams,
+	HookResult,
+	DatabaseHook,
+	CustomOperationFunction,
+} from './types';
 import type { Adapter, GenericEndpointContext, Where } from '~/types';
 
 /**
@@ -21,7 +26,7 @@ async function processBeforeHooks<T extends Record<string, unknown>>(
 	model: string,
 	hooks: DatabaseHook[],
 	context?: GenericEndpointContext
-): Promise<T | null> {
+) {
 	// Start with the original data
 	let currentData = data;
 
@@ -68,11 +73,8 @@ async function executeUpdate<T extends Record<string, unknown>>(
 	model: string,
 	data: T,
 	where: Where[],
-	customFn?: {
-		fn: (data: T) => Promise<T | null> | T | null;
-		executeMainFn?: boolean;
-	}
-): Promise<T | null> {
+	customFn?: CustomOperationFunction<T>
+) {
 	// Run custom function if provided
 	const customUpdated = customFn ? await customFn.fn(data) : null;
 
@@ -127,7 +129,7 @@ export async function updateWithHooks<T extends Record<string, unknown>>({
 	hooks,
 	customFn,
 	context,
-}: UpdateHookParams<T>): Promise<T | null> {
+}: UpdateHookParams<T>) {
 	// Step 1: Run 'before' hooks to transform/validate data
 	const transformedData = await processBeforeHooks(data, model, hooks, context);
 	// If a hook aborted the operation, exit early

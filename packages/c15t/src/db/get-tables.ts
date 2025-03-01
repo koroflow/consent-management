@@ -1,18 +1,22 @@
 import type { C15TOptions } from '~/types';
-import { getUserTable } from './schema/user/table';
-import type { FieldAttribute } from './fields';
-import { getConsentPurposeTable } from './schema/consent-purpose/table';
-import { getConsentPolicyTable } from './schema/consent-policy/table';
-import { getConsentGeoLocationTable } from './schema/consent-geo-location/table';
-import { getDomainTable } from './schema/domain/table';
-import { getConsentTable } from './schema/consent/table';
-import { getConsentPurposeJunctionTable } from './schema/consent-purpose-junction/table';
-import { getConsentRecordTable } from './schema/consent-record/table';
-import { getConsentWithdrawalTable } from './schema/consent-withdrawal/table';
-import { getConsentAuditLogTable } from './schema/consent-audit-log/table';
-import { getGeoLocationTable } from './schema/geo-location/table';
 
-export type C15TDbSchema = Record<
+import type { FieldAttribute } from './fields';
+
+import {
+	getUserTable,
+	getPurposeTable,
+	getConsentGeoLocationTable,
+	getConsentPolicyTable,
+	getDomainTable,
+	getConsentTable,
+	getPurposeJunctionTable,
+	getGeoLocationTable,
+	getRecordTable,
+	getWithdrawalTable,
+	getAuditLogTable,
+} from './schema/index';
+
+export type C15TDBSchema = Record<
 	string,
 	{
 		/**
@@ -38,7 +42,7 @@ export type C15TDbSchema = Record<
 /**
  * Get all consent-related tables
  */
-export const getConsentTables = (options: C15TOptions): C15TDbSchema => {
+export const getConsentTables = (options: C15TOptions): C15TDBSchema => {
 	const pluginSchema = options.plugins?.reduce(
 		(acc, plugin) => {
 			const schema = plugin.schema;
@@ -64,40 +68,34 @@ export const getConsentTables = (options: C15TOptions): C15TDbSchema => {
 
 	const {
 		user,
-		consentPurpose,
+		purpose,
 		consentPolicy,
 		domain,
 		geoLocation,
 		consent,
-		consentPurposeJunction,
-		consentRecord,
+		purposeJunction,
+		record,
 		consentGeoLocation,
-		consentWithdrawal,
-		consentAuditLog,
+		withdrawal,
+		auditLog,
 		...pluginTables
 	} = pluginSchema || {};
 
 	return {
 		user: getUserTable(options, user?.fields),
-		consentPurpose: getConsentPurposeTable(options, consentPurpose?.fields),
+		purpose: getPurposeTable(options, purpose?.fields),
 		consentPolicy: getConsentPolicyTable(options, consentPolicy?.fields),
 		domain: getDomainTable(options, domain?.fields),
 		consent: getConsentTable(options, consent?.fields),
-		consentPurposeJunction: getConsentPurposeJunctionTable(
-			options,
-			consentPurposeJunction?.fields
-		),
-		consentRecord: getConsentRecordTable(options, consentRecord?.fields),
+		purposeJunction: getPurposeJunctionTable(options, purposeJunction?.fields),
+		record: getRecordTable(options, record?.fields),
 		consentGeoLocation: getConsentGeoLocationTable(
 			options,
 			consentGeoLocation?.fields
 		),
-		consentWithdrawal: getConsentWithdrawalTable(
-			options,
-			consentWithdrawal?.fields
-		),
-		consentAuditLog: getConsentAuditLogTable(options, consentAuditLog?.fields),
+		withdrawal: getWithdrawalTable(options, withdrawal?.fields),
+		auditLog: getAuditLogTable(options, auditLog?.fields),
 		geoLocation: getGeoLocationTable(options, geoLocation?.fields),
 		...pluginTables,
-	} satisfies C15TDbSchema;
+	} satisfies C15TDBSchema;
 };

@@ -2,7 +2,7 @@ import { createAuthEndpoint } from '../call';
 import { APIError } from 'better-call';
 import { z } from 'zod';
 import type { C15TContext } from '../../types';
-import type { ConsentAuditLog } from '../../types';
+import type { AuditLog } from '~/db/schema/audit-log/schema';
 
 // Define the schema for validating request parameters
 const getConsentHistorySchema = z.object({
@@ -118,9 +118,9 @@ export const getConsentHistory = createAuthEndpoint(
 			}
 
 			// Access the internal adapter from the context
-			const internalAdapter = ctx.context?.internalAdapter;
+			const registry = ctx.context?.registry;
 
-			if (!internalAdapter) {
+			if (!registry) {
 				throw new APIError('INTERNAL_SERVER_ERROR', {
 					message: 'Internal adapter not available',
 				});
@@ -129,7 +129,7 @@ export const getConsentHistory = createAuthEndpoint(
 			const params = validatedData.data;
 
 			// Check if user exists
-			const userRecord = await internalAdapter.findUserById(params.userId);
+			const userRecord = await registry.findUserById(params.userId);
 
 			if (!userRecord) {
 				throw new APIError('NOT_FOUND', {
@@ -139,7 +139,7 @@ export const getConsentHistory = createAuthEndpoint(
 			}
 
 			// Get all consents for this user
-			let userConsents = await internalAdapter.findUserConsents(params.userId);
+			let userConsents = await registry.findUserConsents(params.userId);
 
 			// Apply domain filtering if requested
 			if (params.domain) {
@@ -166,33 +166,33 @@ export const getConsentHistory = createAuthEndpoint(
 			// Get audit logs for this user
 			// Note: The internal adapter may not have a direct method for this
 			// We'll need to simulate this functionality
-			const auditLogs: ConsentAuditLog[] = [];
+			const auditLogs: AuditLog[] = [];
 
 			// Process each consent to collect detailed information
 			const processedConsents = await Promise.all(
 				paginatedConsents.map(async (consent) => {
 					// Get withdrawal records for this consent
-					// const withdrawals: ConsentWithdrawal[] = [];
+					// const withdrawals: Withdrawal[] = [];
 
 					// // Get consent records (evidence) for this consent
-					// let records: ConsentRecord[] = [];
+					// let records: Record[] = [];
 
 					// try {
 					// 	// If the adapter has a method to get consent records, use it
-					// 	if (internalAdapter.getConsentRecords) {
-					// 		records = await internalAdapter.getConsentRecords(consent.id);
+					// 	if (registry.getRecords) {
+					// 		records = await registry.getRecords(consent.id);
 					// 	}
 
 					// 	// If the adapter has a method to get withdrawal records, use it
-					// 	if (internalAdapter.getConsentWithdrawals) {
-					// 		const withdrawalRecords = await internalAdapter.getConsentWithdrawals(consent.id);
+					// 	if (registry.getWithdrawals) {
+					// 		const withdrawalRecords = await registry.getWithdrawals(consent.id);
 					// 		withdrawals.push(...withdrawalRecords);
 					// 	}
 
 					// 	// If the adapter has a method to get audit logs for a consent, use it
-					// 	if (internalAdapter.getConsentAuditLogs) {
-					// 		const consentAuditLogs = await internalAdapter.getConsentAuditLogs(consent.id);
-					// 		auditLogs.push(...consentAuditLogs);
+					// 	if (registry.getAuditLogs) {
+					// 		const auditLogs = await registry.getAuditLogs(consent.id);
+					// 		auditLogs.push(...auditLogs);
 					// 	}
 					// } catch (error) {
 					// 	// Log error but continue processing

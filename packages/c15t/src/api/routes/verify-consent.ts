@@ -1,7 +1,8 @@
 import { createAuthEndpoint } from '../call';
 import { APIError } from 'better-call';
 import { z } from 'zod';
-import type { C15TContext, User } from '../../types';
+import type { C15TContext } from '../../types';
+import type { User } from '~/db/schema/user/schema';
 
 // Schema for the base verification criteria (at least domain is required)
 const baseVerificationSchema = z.object({
@@ -117,9 +118,9 @@ export const verifyConsent = createAuthEndpoint(
 			}
 
 			// Access the internal adapter from the context
-			const internalAdapter = ctx.context?.internalAdapter;
+			const registry = ctx.context?.registry;
 
-			if (!internalAdapter) {
+			if (!registry) {
 				throw new APIError('INTERNAL_SERVER_ERROR', {
 					message: 'Internal adapter not available',
 				});
@@ -137,7 +138,7 @@ export const verifyConsent = createAuthEndpoint(
 
 			// Try to find user by userId (most precise)
 			if (params.userId) {
-				userRecord = await internalAdapter.findUserById(params.userId);
+				userRecord = await registry.findUserById(params.userId);
 
 				if (userRecord) {
 					identifierUsed = 'userId';
@@ -146,9 +147,7 @@ export const verifyConsent = createAuthEndpoint(
 
 			// If not found and externalId provided, try that
 			if (!userRecord && params.externalId) {
-				userRecord = await internalAdapter.findUserByExternalId(
-					params.externalId
-				);
+				userRecord = await registry.findUserByExternalId(params.externalId);
 
 				if (userRecord) {
 					identifierUsed = 'externalId';
@@ -183,9 +182,7 @@ export const verifyConsent = createAuthEndpoint(
 			}
 
 			// Find active consents for this user
-			const userConsents = await internalAdapter.findUserConsents(
-				userRecord.id
-			);
+			const userConsents = await registry.findUserConsents(userRecord.id);
 
 			// Filter for active consents that match the domain
 			const activeConsents = userConsents.filter(
@@ -200,11 +197,10 @@ export const verifyConsent = createAuthEndpoint(
 			);
 
 			// Get the most recent active consent for this domain, if any
-			const consentRecord =
-				activeConsents.length > 0 ? activeConsents[0] : null;
+			const record = activeConsents.length > 0 ? activeConsents[0] : null;
 
 			// If no consent found, return negative verification
-			if (!consentRecord) {
+			if (!record) {
 				return {
 					success: true,
 					data: {
@@ -223,7 +219,7 @@ export const verifyConsent = createAuthEndpoint(
 			// Verify consent meets criteria if specified
 			let meetsPreferenceRequirements = true;
 			if (params.requiredPreferences) {
-				const preferences = consentRecord.preferences || {};
+				const preferences = record.preferences || {};
 
 				// Check if all required preferences are present and have the correct values
 				for (const [key, requiredValue] of Object.entries(
@@ -258,14 +254,12 @@ export const verifyConsent = createAuthEndpoint(
 			// Verify policy version if specified
 			// Note: In the adapter pattern, this might be called policyId instead of policyVersion
 			const matchesPolicyVersion = params.policyVersion
-				? consentRecord.policyId === params.policyVersion
+				? record.policyId === params.policyVersion
 				: true;
 
 			// Determine overall verification result
 			const verified =
-				consentRecord.isActive &&
-				meetsPreferenceRequirements &&
-				matchesPolicyVersion;
+				record.isActive && meetsPreferenceRequirements && matchesPolicyVersion;
 
 			// Return verification result
 			return {
@@ -273,14 +267,14 @@ export const verifyConsent = createAuthEndpoint(
 				data: {
 					verified,
 					consentDetails: {
-						id: consentRecord.id,
-						givenAt: consentRecord.givenAt,
-						policyVersion: consentRecord.policyId, // Note the field name change
-						preferences: consentRecord.preferences,
+						id: record.id,
+						givenAt: record.givenAt,
+						policyVersion: record.policyId, // Note the field name change
+						preferences: record.preferences,
 					},
 					identifiedBy: identifierUsed,
 					verificationResults: {
-						hasActiveConsent: consentRecord.isActive,
+						hasActiveConsent: record.isActive,
 						meetsPreferenceRequirements,
 						matchesPolicyVersion,
 					},

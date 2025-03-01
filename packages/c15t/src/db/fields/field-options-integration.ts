@@ -39,11 +39,11 @@ export type InferFieldsFromOptions<
 	Options extends C15TOptions,
 	Key extends
 		| 'consent'
-		| 'consentPurpose'
-		| 'consentRecord'
+		| 'purpose'
+		| 'record'
 		| 'consentGeoLocation'
-		| 'consentWithdrawal'
-		| 'consentAuditLog'
+		| 'withdrawal'
+		| 'auditLog'
 		| 'user',
 	Format extends 'output' | 'input' = 'output',
 > = Options[Key] extends {

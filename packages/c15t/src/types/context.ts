@@ -1,7 +1,7 @@
 import type { EndpointContext, InputContext } from 'better-call';
 import type { Adapter, C15TOptions } from './index';
 import type { createLogger } from '~/utils';
-import type { createInternalAdapter, getConsentTables } from '~/db';
+import type { createRegistry, getConsentTables } from '~/db';
 
 // biome-ignore lint/suspicious/noExplicitAny: <explanation>
 export type HookEndpointContext = EndpointContext<string, any> &
@@ -47,7 +47,7 @@ export interface C15TContext {
 	trustedOrigins: string[];
 
 	adapter: Adapter;
-	internalAdapter: ReturnType<typeof createInternalAdapter>;
+	registry: ReturnType<typeof createRegistry>;
 
 	/**
 	 * Secret for signing cookies and tokens

@@ -1,7 +1,9 @@
 import { createAuthEndpoint } from '../call';
 import { APIError } from 'better-call';
 import { z } from 'zod';
-import type { C15TContext, ConsentRecord, User } from '../../types';
+import type { C15TContext } from '../../types';
+import type { Record } from '~/db/schema/record/schema';
+import type { User } from '~/db/schema/user/schema';
 
 // Define schemas for the different identification methods
 const getByUserIdSchema = z.object({
@@ -62,7 +64,7 @@ const getConsentSchema = z.discriminatedUnion('identifierType', [
  *   "success": true,
  *   "data": {
  *     "hasActiveConsent": true,
- *     "consentRecords": [
+ *     "records": [
  *       {
  *         "id": 123,
  *         "userId": "550e8400-e29b-41d4-a716-446655440000",
@@ -86,7 +88,7 @@ const getConsentSchema = z.discriminatedUnion('identifierType', [
  * @returns {boolean} success - Whether the request was successful
  * @returns {Object} data - Details about the consent
  * @returns {boolean} data.hasActiveConsent - Whether the user has active consent
- * @returns {Array} data.consentRecords - Active consent records
+ * @returns {Array} data.records - Active consent records
  * @returns {string} data.identifiedBy - The method used to identify the user
  *
  * @throws {APIError} BAD_REQUEST - When request parameters are invalid
@@ -118,9 +120,9 @@ export const getConsent = createAuthEndpoint(
 			const domainId = params.domain ? params.domain : undefined;
 
 			// Access the internal adapter from the context
-			const internalAdapter = ctx.context?.internalAdapter;
+			const registry = ctx.context?.registry;
 
-			if (!internalAdapter) {
+			if (!registry) {
 				throw new APIError('INTERNAL_SERVER_ERROR', {
 					message: 'Internal adapter not available',
 				});
@@ -132,14 +134,14 @@ export const getConsent = createAuthEndpoint(
 			// biome-ignore lint/style/useDefaultSwitchClause: <explanation>
 			switch (params.identifierType) {
 				case 'userId': {
-					const userRecord = await internalAdapter.findUserById(params.userId);
+					const userRecord = await registry.findUserById(params.userId);
 					if (userRecord) {
 						users = [userRecord];
 					}
 					break;
 				}
 				case 'externalId': {
-					const externalUser = await internalAdapter.findUserByExternalId(
+					const externalUser = await registry.findUserByExternalId(
 						params.externalId
 					);
 					if (externalUser) {
@@ -171,21 +173,18 @@ export const getConsent = createAuthEndpoint(
 					success: true,
 					data: {
 						hasActiveConsent: false,
-						consentRecords: [],
+						records: [],
 						identifiedBy: params.identifierType,
 					},
 				};
 			}
 
 			// Get active consent records for these users
-			const consentResults: ConsentRecord[] = [];
+			const consentResults: Record[] = [];
 
 			for (const user of users) {
 				// Use the adapter to find user consents
-				const userConsents = await internalAdapter.findUserConsents(
-					user.id,
-					domainId
-				);
+				const userConsents = await registry.findUserConsents(user.id, domainId);
 
 				// Filter for active consents only (adapter already does this, but to be explicit)
 				const activeConsents = userConsents.filter(
@@ -209,7 +208,7 @@ export const getConsent = createAuthEndpoint(
 				success: true,
 				data: {
 					hasActiveConsent: consentResults.length > 0,
-					consentRecords: consentResults,
+					records: consentResults,
 					identifiedBy: params.identifierType,
 				},
 			};

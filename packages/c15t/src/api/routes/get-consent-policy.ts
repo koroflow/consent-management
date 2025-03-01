@@ -1,7 +1,9 @@
 import { createAuthEndpoint } from '../call';
 import { APIError } from 'better-call';
 import { z } from 'zod';
-import type { C15TContext, ConsentPolicy, ConsentDomain } from '../../types';
+import type { C15TContext } from '../../types';
+import type { ConsentPolicy } from '~/db/schema/consent-policy/schema';
+import type { Domain } from '~/db/schema/domain/schema';
 
 // Define the schema for the base parameters (domain is always required)
 const baseParamsSchema = z.object({
@@ -118,21 +120,21 @@ export const getConsentPolicy = createAuthEndpoint(
 			const params = validatedData.data;
 
 			// Access the internal adapter from the context
-			const internalAdapter = ctx.context?.internalAdapter;
+			const registry = ctx.context?.registry;
 
-			if (!internalAdapter) {
+			if (!registry) {
 				throw new APIError('INTERNAL_SERVER_ERROR', {
 					message: 'Internal adapter not available',
 				});
 			}
 
-			// Note: The internalAdapter doesn't have direct methods for domain and policy lookup yet
+			// Note: The registry doesn't have direct methods for domain and policy lookup yet
 			// In a complete implementation, we would add these methods to the adapter
 			// For now, we'll assume we have methods to get domains and policies
 
-			// Find domain - This would be provided by internalAdapter.findDomainByName or similar
+			// Find domain - This would be provided by registry.findDomainByName or similar
 			// For now, we'll simulate finding a domain
-			let domain: ConsentDomain | null = null;
+			let domain: Domain | null = null;
 			try {
 				// This is a placeholder - in a real implementation, we would use an internal adapter method
 				domain = {
@@ -162,7 +164,7 @@ export const getConsentPolicy = createAuthEndpoint(
 				});
 			}
 
-			// Find the policy - This would be provided by internalAdapter.findPolicyByDomain or similar
+			// Find the policy - This would be provided by registry.findPolicyByDomain or similar
 			// For now, we'll simulate finding a policy
 			let policy: ConsentPolicy | null = null;
 			try {
@@ -261,7 +263,7 @@ export const getConsentPolicy = createAuthEndpoint(
 
 				// Try to find user by userId
 				if (params.userId) {
-					userRecord = await internalAdapter.findUserById(params.userId);
+					userRecord = await registry.findUserById(params.userId);
 					if (userRecord) {
 						identifierUsed = 'userId';
 					}
@@ -269,9 +271,7 @@ export const getConsentPolicy = createAuthEndpoint(
 
 				// If not found and externalId provided, try that
 				if (!userRecord && params.externalId) {
-					userRecord = await internalAdapter.findUserByExternalId(
-						params.externalId
-					);
+					userRecord = await registry.findUserByExternalId(params.externalId);
 					if (userRecord) {
 						identifierUsed = 'externalId';
 					}
@@ -283,7 +283,7 @@ export const getConsentPolicy = createAuthEndpoint(
 				// If we found a user, get their consent status
 				if (userRecord) {
 					// Get user's active consents for this domain
-					const userConsents = await internalAdapter.findUserConsents(
+					const userConsents = await registry.findUserConsents(
 						userRecord.id,
 						domain.id
 					);
