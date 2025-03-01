@@ -1,6 +1,5 @@
-import type { Where, GenericEndpointContext } from '~/types';
-import { type Record, parseRecordOutput } from './schema';
-import type { InternalAdapterContext } from '~/db/create-registry';
+import type { Where, GenericEndpointContext, RegistryContext } from '~/types';
+import { type inferRecord as Record, parseRecordOutput } from './schema';
 import { getWithHooks } from '~/db/hooks';
 
 /**
@@ -29,7 +28,7 @@ import { getWithHooks } from '~/db/hooks';
  * });
  * ```
  */
-export function recordRegistry({ adapter, ctx }: InternalAdapterContext) {
+export function recordRegistry({ adapter, ...ctx }: RegistryContext) {
 	const { createWithHooks } = getWithHooks(adapter, ctx);
 	return {
 		/**

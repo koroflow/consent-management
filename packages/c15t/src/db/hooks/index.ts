@@ -10,7 +10,6 @@
 
 export { getWithHooks } from './with-hooks-factory';
 export type {
-	HookableModels,
 	HookContext,
 	CustomOperationFunction,
 	HookResult,

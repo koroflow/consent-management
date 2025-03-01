@@ -79,16 +79,16 @@ export function getGeoLocationTable(
 				required: false,
 				fieldName:
 					options.geoLocation?.fields?.regulatoryZones || 'regulatoryZones',
-				transformer: {
-					input: (value: string[]) => JSON.stringify(value),
-					output: (value: string) => {
-						try {
-							return JSON.parse(value);
-						} catch (e) {
-							return [];
-						}
-					},
-				},
+				// transformer: {
+				// 	input: (value: string[]) => JSON.stringify(value),
+				// 	output: (value: string) => {
+				// 		try {
+				// 			return JSON.parse(value);
+				// 		} catch (e) {
+				// 			return [];
+				// 		}
+				// 	},
+				// },
 			},
 
 			/**
@@ -112,20 +112,20 @@ export function getGeoLocationTable(
 		/**
 		 * Add indexes for better query performance
 		 */
-		indexes: [
-			{
-				name: 'country_code_index',
-				fields: ['countryCode'],
-			},
-			{
-				name: 'region_code_index',
-				fields: ['regionCode'],
-			},
-			{
-				name: 'created_at_index',
-				fields: ['createdAt'],
-			},
-		],
+		// indexes: [
+		// 	{
+		// 		name: 'country_code_index',
+		// 		fields: ['countryCode'],
+		// 	},
+		// 	{
+		// 		name: 'region_code_index',
+		// 		fields: ['regionCode'],
+		// 	},
+		// 	{
+		// 		name: 'created_at_index',
+		// 		fields: ['createdAt'],
+		// 	},
+		// ],
 
 		/**
 		 * Execution order during migrations (lower numbers run first)

@@ -19,7 +19,7 @@ import { createLogger } from './utils/logger';
 import { getBaseURL } from './utils/url';
 import { generateId } from './utils/id';
 import { env, isProduction } from './utils/env';
-import type { C15TContext } from './types';
+import type { C15TContext, RegistryContext } from './types/context';
 import type { C15TOptions, C15TPlugin } from './types';
 import { createRegistry, getAdapter, getConsentTables } from './db';
 
@@ -52,71 +52,69 @@ const DEFAULT_SECRET = 'c15t-default-secret-please-change-in-production';
  * ```
  */
 export const init = async (options: C15TOptions) => {
+	// Initialize core components
 	const adapter = await getAdapter(options);
-
-	const plugins = options.plugins || [];
-	const internalPlugins = getInternalPlugins(options);
 	const logger = createLogger(options.logger);
-
 	const baseURL = getBaseURL(options.baseURL, options.basePath);
-
-	// Set up secret
 	const secret =
 		options.secret || env.C15T_SECRET || env.CONSENT_SECRET || DEFAULT_SECRET;
 
+	// Secret warning
 	if (secret === DEFAULT_SECRET && isProduction) {
 		logger.error(
-			'You are using the default secret. Please set `C15T_SECRET` in your environment variables or pass `secret` in your config.'
+			'Using default secret in production. Set C15T_SECRET or pass secret in config.'
 		);
 	}
 
-	// Merge options with plugins
+	// Create normalized options
 	const finalOptions = {
 		...options,
 		secret,
 		baseURL: baseURL ? new URL(baseURL).origin : '',
 		basePath: options.basePath || '/api/c15t',
-		plugins: plugins.concat(internalPlugins),
+		plugins: (options.plugins || []).concat(getInternalPlugins(options)),
 	};
 
-	const tables = getConsentTables(options);
-
-	// Set up ID generation function
-	const generateIdFunc: C15TContext['generateId'] = ({ model, size }) => {
-		if (typeof finalOptions?.advanced?.generateId === 'function') {
-			return finalOptions.advanced.generateId({ model, size });
-		}
-		return generateId(size || 21);
+	// Create ID generator
+	const generateIdFunc = ({
+		model,
+		size,
+	}: { model: string; size?: number }) => {
+		return (
+			finalOptions?.advanced?.generateId?.({ model, size }) ||
+			generateId(size || 21)
+		);
 	};
 
-	// Create context
+	// Create registry context - just what registries need
+	const registryContext: RegistryContext = {
+		adapter,
+		options: finalOptions,
+		logger,
+		hooks: options.databaseHooks || [],
+		generateId: generateIdFunc,
+	};
+
+	// Create full application context
 	const ctx: C15TContext = {
 		appName: finalOptions.appName || 'c15t Consent Manager',
 		options: finalOptions,
 		trustedOrigins: getTrustedOrigins(finalOptions),
 		baseURL: baseURL || '',
 		secret,
-		logger: logger,
+		logger,
 		generateId: generateIdFunc,
 		consentConfig: {
-			expiresIn: finalOptions.consent?.expiresIn || 60 * 60 * 24 * 365, // 1 year
-			updateAge: finalOptions.consent?.updateAge || 60 * 60 * 24, // 24 hours
+			expiresIn: finalOptions.consent?.expiresIn || 60 * 60 * 24 * 365,
+			updateAge: finalOptions.consent?.updateAge || 60 * 60 * 24,
 		},
-		adapter: adapter,
-		registry: createRegistry({
-			adapter,
-			ctx: {
-				options,
-				hooks: options.databaseHooks || [],
-				generateId: generateIdFunc,
-			},
-		}),
-		tables,
+		adapter,
+		registry: createRegistry(registryContext),
+		tables: getConsentTables(options),
 	};
 
-	// Initialize plugins
-	const { context } = runPluginInit(ctx);
-	return context;
+	// Initialize plugins and return
+	return runPluginInit(ctx).context;
 };
 
 /**

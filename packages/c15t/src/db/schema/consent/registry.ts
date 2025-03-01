@@ -1,7 +1,6 @@
-import type { Where, GenericEndpointContext } from '~/types';
+import type { Where, GenericEndpointContext, RegistryContext } from '~/types';
 import { type Consent, parseConsentOutput } from './schema';
 import type {} from '~/db/hooks/types';
-import type { InternalAdapterContext } from '~/db/create-registry';
 import { getWithHooks } from '~/db/hooks';
 
 /**
@@ -31,7 +30,7 @@ import { getWithHooks } from '~/db/hooks';
  * });
  * ```
  */
-export function consentRegistry({ adapter, ctx }: InternalAdapterContext) {
+export function consentRegistry({ adapter, ...ctx }: RegistryContext) {
 	const { createWithHooks, updateWithHooks } = getWithHooks(adapter, ctx);
 
 	return {

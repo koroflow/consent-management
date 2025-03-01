@@ -1,9 +1,8 @@
-import type { GenericEndpointContext } from '~/types';
+import type { GenericEndpointContext, RegistryContext } from '~/types';
 import {
 	type ConsentGeoLocation,
 	parseConsentGeoLocationOutput,
 } from './schema';
-import type { InternalAdapterContext } from '~/db/create-registry';
 import { getWithHooks } from '~/db/hooks';
 
 /**
@@ -34,7 +33,7 @@ import { getWithHooks } from '~/db/hooks';
  * });
  * ```
  */
-export function geoLocationRegistry({ adapter, ctx }: InternalAdapterContext) {
+export function geoLocationRegistry({ adapter, ...ctx }: RegistryContext) {
 	const { createWithHooks } = getWithHooks(adapter, ctx);
 
 	return {

@@ -1,6 +1,5 @@
-import type { GenericEndpointContext } from '~/types';
+import type { GenericEndpointContext, RegistryContext } from '~/types';
 import { parseConsentPolicyOutput, type ConsentPolicy } from './schema';
-import type { InternalAdapterContext } from '~/db/create-registry';
 import { getWithHooks } from '~/db/hooks';
 
 /**
@@ -31,7 +30,7 @@ import { getWithHooks } from '~/db/hooks';
  * });
  * ```
  */
-export function policyRegistry({ adapter, ctx }: InternalAdapterContext) {
+export function policyRegistry({ adapter, ...ctx }: RegistryContext) {
 	const { createWithHooks, updateWithHooks } = getWithHooks(adapter, ctx);
 	return {
 		/**
@@ -148,7 +147,7 @@ export function policyRegistry({ adapter, ctx }: InternalAdapterContext) {
 			data: Partial<ConsentPolicy>,
 			context?: GenericEndpointContext
 		) => {
-			const policy = await updateWithHooks({
+			const policy = await updateWithHooks<ConsentPolicy>({
 				data,
 				where: [
 					{

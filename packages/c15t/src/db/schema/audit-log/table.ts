@@ -133,24 +133,24 @@ export function getAuditLogTable(
 		/**
 		 * Add indexes for better query performance
 		 */
-		indexes: [
-			{
-				name: 'entity_index',
-				fields: ['entityType', 'entityId'],
-			},
-			{
-				name: 'action_type_index',
-				fields: ['actionType'],
-			},
-			{
-				name: 'user_id_index',
-				fields: ['userId'],
-			},
-			{
-				name: 'created_at_index',
-				fields: ['createdAt'],
-			},
-		],
+		// indexes: [
+		// 	{
+		// 		name: 'entity_index',
+		// 		fields: ['entityType', 'entityId'],
+		// 	},
+		// 	{
+		// 		name: 'action_type_index',
+		// 		fields: ['actionType'],
+		// 	},
+		// 	{
+		// 		name: 'user_id_index',
+		// 		fields: ['userId'],
+		// 	},
+		// 	{
+		// 		name: 'created_at_index',
+		// 		fields: ['createdAt'],
+		// 	},
+		// ],
 
 		/**
 		 * Execution order during migrations (lower numbers run first)

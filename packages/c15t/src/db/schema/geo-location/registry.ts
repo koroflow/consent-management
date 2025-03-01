@@ -1,7 +1,6 @@
-import type { GenericEndpointContext, Where } from '~/types';
+import type { GenericEndpointContext, RegistryContext, Where } from '~/types';
 import { type GeoLocation, parseGeoLocationOutput } from './schema';
 import { getWithHooks } from '~/db/hooks/with-hooks-factory';
-import type { InternalAdapterContext } from '~/db/create-registry';
 
 /**
  * Creates and returns a set of geo-location-related adapter methods to interact with the database.
@@ -30,8 +29,8 @@ import type { InternalAdapterContext } from '~/db/create-registry';
  * });
  * ```
  */
-export function geoLocationRegistry({ adapter, ctx }: InternalAdapterContext) {
-	const { createWithHooks, updateWithHooks } = getWithHooks(adapter, ctx);
+export function geoLocationRegistry({ adapter, ...ctx }: RegistryContext) {
+	const { createWithHooks } = getWithHooks(adapter, ctx);
 	return {
 		/**
 		 * Creates a new geo-location record in the database.
@@ -102,7 +101,7 @@ export function geoLocationRegistry({ adapter, ctx }: InternalAdapterContext) {
 				},
 			});
 
-			return locations.map((location) =>
+			return locations.map((location: GeoLocation) =>
 				parseGeoLocationOutput(ctx.options, location)
 			);
 		},
@@ -149,7 +148,7 @@ export function geoLocationRegistry({ adapter, ctx }: InternalAdapterContext) {
 				},
 			});
 
-			return locations.map((location) =>
+			return locations.map((location: GeoLocation) =>
 				parseGeoLocationOutput(ctx.options, location)
 			);
 		},

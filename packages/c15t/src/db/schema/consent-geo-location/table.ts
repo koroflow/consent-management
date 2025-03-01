@@ -128,23 +128,23 @@ export function getConsentGeoLocationTable(
 			...options.consentGeoLocation?.additionalFields,
 		},
 
-		/**
-		 * Add indexes for better query performance
-		 */
-		indexes: [
-			{
-				name: 'consent_id_index',
-				fields: ['consentId'],
-			},
-			{
-				name: 'country_index',
-				fields: ['country'],
-			},
-			{
-				name: 'created_at_index',
-				fields: ['createdAt'],
-			},
-		],
+		// /**
+		//  * Add indexes for better query performance
+		//  */
+		// indexes: [
+		// 	{
+		// 		name: 'consent_id_index',
+		// 		fields: ['consentId'],
+		// 	},
+		// 	{
+		// 		name: 'country_index',
+		// 		fields: ['country'],
+		// 	},
+		// 	{
+		// 		name: 'created_at_index',
+		// 		fields: ['createdAt'],
+		// 	},
+		// ],
 
 		/**
 		 * Execution order during migrations (lower numbers run first)

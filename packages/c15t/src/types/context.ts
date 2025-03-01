@@ -2,6 +2,7 @@ import type { EndpointContext, InputContext } from 'better-call';
 import type { Adapter, C15TOptions } from './index';
 import type { createLogger } from '~/utils';
 import type { createRegistry, getConsentTables } from '~/db';
+import type { DatabaseHook } from '~/db/hooks/types';
 
 // biome-ignore lint/suspicious/noExplicitAny: <explanation>
 export type HookEndpointContext = EndpointContext<string, any> &
@@ -19,13 +20,26 @@ export type GenericEndpointContext = EndpointContext<string, any> & {
 	context: C15TContext;
 };
 
+// Base context interface - shared by all components
+export interface BaseContext {
+	options: C15TOptions;
+	logger: ReturnType<typeof createLogger>;
+}
+
+// Registry context specifically for adapters
+export interface RegistryContext extends BaseContext {
+	adapter: Adapter;
+	hooks: DatabaseHook[];
+	generateId: (options: { model: string; size?: number }) => string;
+}
+
 /**
  * Context interface for the consent system
  *
  * This is the main context object passed around throughout the system
  * and made available to plugins and endpoint handlers
  */
-export interface C15TContext {
+export interface C15TContext extends BaseContext {
 	/**
 	 * Configuration options
 	 */

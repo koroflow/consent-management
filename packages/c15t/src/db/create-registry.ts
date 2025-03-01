@@ -1,4 +1,4 @@
-import type { Adapter, C15TContext } from '~/types';
+import type { RegistryContext } from '~/types/context';
 
 import {
 	userRegistry,
@@ -12,27 +12,18 @@ import {
 	geoLocationRegistry,
 } from './schema/index';
 
-import type { HookContext } from './hooks/with-hooks-factory';
-
-export type InternalAdapterContext = {
-	adapter: Adapter;
-	ctx: HookContext & {
-		generateId: C15TContext['generateId'];
-	};
-};
-
-export const createRegistry = ({ adapter, ctx }: InternalAdapterContext) => {
+export const createRegistry = (ctx: RegistryContext) => {
 	return {
-		...auditLogRegistry({ adapter, ctx }),
-		...consentRegistry({ adapter, ctx }),
-		...domainRegistry({ adapter, ctx }),
-		...geoLocationRegistry({ adapter, ctx }),
-		...purposeJunctionRegistry({ adapter, ctx }),
-		...purposeRegistry({ adapter, ctx }),
-		...recordRegistry({ adapter, ctx }),
-		...userRegistry({ adapter, ctx }),
-		...withdrawalRegistry({ adapter, ctx }),
-		...withdrawalRegistry({ adapter, ctx }),
+		...auditLogRegistry(ctx),
+		...consentRegistry(ctx),
+		...domainRegistry(ctx),
+		...geoLocationRegistry(ctx),
+		...purposeJunctionRegistry(ctx),
+		...purposeRegistry(ctx),
+		...recordRegistry(ctx),
+		...userRegistry(ctx),
+		...withdrawalRegistry(ctx),
+		...withdrawalRegistry(ctx),
 	};
 };
 

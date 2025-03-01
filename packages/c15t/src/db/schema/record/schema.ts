@@ -40,7 +40,7 @@ export const recordSchema = z.object({
  * as defined by the recordSchema. It includes all fields
  * that are part of the consent record entity.
  */
-export type Record = z.infer<typeof recordSchema>;
+export type inferRecord = z.infer<typeof recordSchema>;
 
 /**
  * Processes consent record data from the database for client-side consumption.
@@ -58,7 +58,7 @@ export type Record = z.infer<typeof recordSchema>;
  * const processedRecord = parseRecordOutput(options, rawRecord);
  * ```
  */
-export function parseRecordOutput(options: C15TOptions, record: Record) {
+export function parseRecordOutput(options: C15TOptions, record: inferRecord) {
 	const schema = getAllFields(options, 'record');
 	return parseOutputData(record, { fields: schema });
 }

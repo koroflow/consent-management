@@ -21,7 +21,7 @@ export type Models =
 /**
  * Structure for hook functions
  */
-export type HookFunction<T, R = unknown> = (
+type HookFunction<T, R = unknown> = (
 	data: T,
 	context?: GenericEndpointContext
 ) => Promise<R> | R;
@@ -29,7 +29,7 @@ export type HookFunction<T, R = unknown> = (
 /**
  * Structure for operation hooks (before/after)
  */
-export interface OperationHooks<T> {
+interface OperationHooks<T> {
 	before?: HookFunction<T, HookResult<T>>;
 	after?: HookFunction<T>;
 }
@@ -37,7 +37,7 @@ export interface OperationHooks<T> {
 /**
  * Structure for model operations
  */
-export interface ModelOperations<T> {
+interface ModelOperations<T> {
 	create?: OperationHooks<T>;
 	update?: OperationHooks<T>;
 }
@@ -55,7 +55,7 @@ export type DatabaseHook = {
  */
 export interface HookContext {
 	options: C15TOptions;
-	hooks: DatabaseHook[];
+	hooks: DatabaseHook[] | undefined;
 }
 
 /**

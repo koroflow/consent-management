@@ -1,7 +1,7 @@
 import type { Where, GenericEndpointContext } from '~/types';
 import { type AuditLog, parseAuditLogOutput } from './schema';
 import { getWithHooks } from '~/db/hooks';
-import type { InternalAdapterContext } from '~/db/create-registry';
+import type { RegistryContext } from '~/types/context';
 
 /**
  * Creates and returns a set of consent audit log adapter methods to interact with the database.
@@ -30,7 +30,7 @@ import type { InternalAdapterContext } from '~/db/create-registry';
  * });
  * ```
  */
-export function auditLogRegistry({ adapter, ctx }: InternalAdapterContext) {
+export function auditLogRegistry({ adapter, ...ctx }: RegistryContext) {
 	const { createWithHooks } = getWithHooks(adapter, ctx);
 
 	return {

@@ -1,7 +1,6 @@
-import type { GenericEndpointContext } from '~/types';
+import type { GenericEndpointContext, RegistryContext } from '~/types';
 import { parseUserOutput, type User } from './schema';
 import { getWithHooks } from '~/db/hooks';
-import type { InternalAdapterContext } from '~/db/create-registry';
 
 /**
  * Creates and returns a set of user-related adapter methods to interact with the database.
@@ -29,7 +28,7 @@ import type { InternalAdapterContext } from '~/db/create-registry';
  * });
  * ```
  */
-export function userRegistry({ adapter, ctx }: InternalAdapterContext) {
+export function userRegistry({ adapter, ...ctx }: RegistryContext) {
 	const { createWithHooks, updateWithHooks } = getWithHooks(adapter, ctx);
 
 	return {

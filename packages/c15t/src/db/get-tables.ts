@@ -10,7 +10,7 @@ import {
 	getDomainTable,
 	getConsentTable,
 	getPurposeJunctionTable,
-	getGeoLocationTable,
+	// getGeoLocationTable,
 	getRecordTable,
 	getWithdrawalTable,
 	getAuditLogTable,
@@ -95,7 +95,7 @@ export const getConsentTables = (options: C15TOptions): C15TDBSchema => {
 		),
 		withdrawal: getWithdrawalTable(options, withdrawal?.fields),
 		auditLog: getAuditLogTable(options, auditLog?.fields),
-		geoLocation: getGeoLocationTable(options, geoLocation?.fields),
+		// geoLocation: getGeoLocationTable(options, geoLocation?.fields),
 		...pluginTables,
 	} satisfies C15TDBSchema;
 };

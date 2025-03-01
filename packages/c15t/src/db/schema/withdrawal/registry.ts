@@ -1,8 +1,7 @@
-import type { Where } from '~/types';
+import type { RegistryContext, Where } from '~/types';
 import type { GenericEndpointContext } from '~/types';
 import { type Withdrawal, parseWithdrawalOutput } from './schema';
 import { getWithHooks } from '~/db/hooks';
-import type { InternalAdapterContext } from '~/db/create-registry';
 
 /**
  * Creates and returns a set of consent withdrawal adapter methods to interact with the database.
@@ -30,8 +29,8 @@ import type { InternalAdapterContext } from '~/db/create-registry';
  * });
  * ```
  */
-export function withdrawalRegistry({ adapter, ctx }: InternalAdapterContext) {
-	const { createWithHooks, updateWithHooks } = getWithHooks(adapter, ctx);
+export function withdrawalRegistry({ adapter, ...ctx }: RegistryContext) {
+	const { createWithHooks } = getWithHooks(adapter, ctx);
 	return {
 		/**
 		 * Creates a new consent withdrawal record in the database.

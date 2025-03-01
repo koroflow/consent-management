@@ -1,7 +1,6 @@
-import type { GenericEndpointContext } from '~/types';
+import type { GenericEndpointContext, RegistryContext } from '~/types';
 import { type PurposeJunction, parsePurposeJunctionOutput } from './schema';
-import type {} from '~/db/hooks/types';
-import type { InternalAdapterContext } from '~/db/create-registry';
+
 import { getWithHooks } from '~/db/hooks';
 
 /**
@@ -30,10 +29,7 @@ import { getWithHooks } from '~/db/hooks';
  * });
  * ```
  */
-export function purposeJunctionRegistry({
-	adapter,
-	ctx,
-}: InternalAdapterContext) {
+export function purposeJunctionRegistry({ adapter, ...ctx }: RegistryContext) {
 	const { createWithHooks, updateWithHooks } = getWithHooks(adapter, ctx);
 	return {
 		/**
@@ -140,7 +136,10 @@ export function purposeJunctionRegistry({
 			status: 'active' | 'withdrawn',
 			context?: GenericEndpointContext
 		) => {
-			const junction = await updateWithHooks({
+			const junction = await updateWithHooks<
+				Partial<PurposeJunction>,
+				PurposeJunction
+			>({
 				data: {
 					status,
 					updatedAt: new Date(),

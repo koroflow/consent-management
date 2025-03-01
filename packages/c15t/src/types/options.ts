@@ -13,7 +13,7 @@ import type { AuthMiddleware } from '~/api/call';
 import type { KyselyDatabaseType } from '~/adapters/kysely-adapter/types';
 import type { Database } from 'better-sqlite3';
 import type { FieldAttribute } from '~/db/fields';
-import type { CreateWithHooks, UpdateWithHooks } from '~/db/hooks/types';
+import type { DatabaseHook } from '~/db/hooks/types';
 
 /**
  * Analytics destination configuration
@@ -239,15 +239,7 @@ export interface C15TOptions {
 	 * executed during lifecycle of core database
 	 * operations.
 	 */
-	databaseHooks?: {
-		/**
-		 * User hooks
-		 */
-		consent?: {
-			create?: CreateWithHooks;
-			update?: UpdateWithHooks;
-		};
-	};
+	databaseHooks?: DatabaseHook[];
 	/*
 	 * Advanced configuration options
 	 * Settings for specialized use cases

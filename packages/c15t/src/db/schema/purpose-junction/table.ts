@@ -111,12 +111,12 @@ export function getPurposeJunctionTable(
 		/**
 		 * Add unique constraint to ensure a purpose can only be associated with a consent once
 		 */
-		uniqueConstraints: [
-			{
-				name: 'unique_consent_purpose',
-				fields: ['consentId', 'purposeId'],
-			},
-		],
+		// uniqueConstraints: [
+		// 	{
+		// 		name: 'unique_consent_purpose',
+		// 		fields: ['consentId', 'purposeId'],
+		// 	},
+		// ],
 
 		/**
 		 * Execution order during migrations (lower numbers run first)
