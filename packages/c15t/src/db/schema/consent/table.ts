@@ -28,6 +28,7 @@ export function getConsentTable(
 	const userConfig = options.tables?.user;
 	const domainConfig = options.tables?.domain;
 	const policyConfig = options.tables?.consentPolicy;
+	const purposeConfig = options.tables?.purpose;
 
 	return {
 		/**
@@ -77,13 +78,18 @@ export function getConsentTable(
 			},
 
 			/**
-			 * Consent preferences in JSON format
-			 * Contains consent choices for each purpose
+			 * Array of purpose IDs that this consent applies to
+			 * Represents the many-to-many relationship between consent and purposes
 			 */
-			preferences: {
+			purposeIds: {
 				type: 'json',
 				required: true,
-				fieldName: consentConfig?.fields?.preferences || 'preferences',
+				fieldName: consentConfig?.fields?.purposeIds || 'purposeIds',
+				references: {
+					model: purposeConfig?.entityName || 'purpose',
+					field: 'id',
+					type: 'array', // Indicates this is an array of references
+				},
 			},
 
 			/**
@@ -118,12 +124,33 @@ export function getConsentTable(
 			},
 
 			/**
-			 * Region information for the consent
+			 * User agent information when consent was given
 			 */
-			region: {
+			userAgent: {
 				type: 'string',
 				required: false,
-				fieldName: consentConfig?.fields?.region || 'region',
+				fieldName: consentConfig?.fields?.userAgent || 'userAgent',
+			},
+
+			/**
+			 * Status of the consent (active, expired, withdrawn)
+			 * Default: 'active'
+			 */
+			status: {
+				type: 'string',
+				defaultValue: () => 'active',
+				required: true,
+				fieldName: consentConfig?.fields?.status || 'status',
+			},
+
+			/**
+			 * Reason for withdrawal, if consent was withdrawn
+			 */
+			withdrawalReason: {
+				type: 'string',
+				required: false,
+				fieldName:
+					consentConfig?.fields?.withdrawalReason || 'withdrawalReason',
 			},
 
 			/**

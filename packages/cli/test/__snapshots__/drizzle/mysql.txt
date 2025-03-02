@@ -51,16 +51,16 @@ export const consent = mysqlTable("consent", {
   id: varchar("id", { length: 36 }).primaryKey(),
   userId: varchar('user_id', { length: 36 }).notNull().references(()=> user.id, { onDelete: 'cascade' }),
   domainId: varchar('domain_id', { length: 36 }).notNull().references(()=> domain.id, { onDelete: 'cascade' }),
-  purposeIds: json('purpose_ids').notNull(),
+  purposeIds: json('purpose_ids').notNull().references(()=> purpose.id, { onDelete: 'cascade' }),
+  metadata: json('metadata'),
   policyId: varchar('policy_id', { length: 36 }).references(()=> consentPolicy.id, { onDelete: 'cascade' }),
-  status: text('status').notNull(),
-  withdrawalReason: text('withdrawal_reason'),
   ipAddress: text('ip_address'),
   userAgent: text('user_agent'),
-  metadata: json('metadata'),
-  createdAt: timestamp('created_at').notNull(),
-  updatedAt: timestamp('updated_at'),
-  expiresAt: timestamp('expires_at')
+  status: text('status').notNull(),
+  withdrawalReason: text('withdrawal_reason'),
+  givenAt: timestamp('given_at').notNull(),
+  validUntil: timestamp('valid_until'),
+  isActive: boolean('is_active').notNull()
 });
 
 export const purposeJunction = mysqlTable("purpose_junction", {

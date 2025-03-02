@@ -51,16 +51,16 @@ export const consent = pgTable("consent", {
   id: text("id").primaryKey(),
   userId: text('user_id').notNull().references(()=> user.id, { onDelete: 'cascade' }),
   domainId: text('domain_id').notNull().references(()=> domain.id, { onDelete: 'cascade' }),
-  purposeIds: json('purpose_ids').notNull(),
+  purposeIds: json('purpose_ids').notNull().references(()=> purpose.id, { onDelete: 'cascade' }),
+  metadata: json('metadata'),
   policyId: text('policy_id').references(()=> consentPolicy.id, { onDelete: 'cascade' }),
-  status: text('status').notNull(),
-  withdrawalReason: text('withdrawal_reason'),
   ipAddress: text('ip_address'),
   userAgent: text('user_agent'),
-  metadata: json('metadata'),
-  createdAt: timestamp('created_at').notNull(),
-  updatedAt: timestamp('updated_at'),
-  expiresAt: timestamp('expires_at')
+  status: text('status').notNull(),
+  withdrawalReason: text('withdrawal_reason'),
+  givenAt: timestamp('given_at').notNull(),
+  validUntil: timestamp('valid_until'),
+  isActive: boolean('is_active').notNull()
 });
 
 export const purposeJunction = pgTable("purpose_junction", {

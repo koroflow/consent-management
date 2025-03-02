@@ -97,7 +97,7 @@ export function consentRegistry({ adapter, ...ctx }: RegistryContext) {
 
 			if (purposeIds && purposeIds.length > 0) {
 				whereConditions.push({
-					field: 'preferences',
+					field: 'purposeIds',
 					operator: 'contains',
 					value: purposeIds,
 				});

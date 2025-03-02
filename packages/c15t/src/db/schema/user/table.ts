@@ -1,5 +1,5 @@
 import type { Field } from '~/db/core/fields';
-import { defaultIdGenerator, COMMON_TIMEZONES } from '~/db/core/fields';
+import { COMMON_TIMEZONES } from '~/db/core/fields';
 import type { C15TOptions } from '~/types';
 import { userSchema } from './schema';
 
@@ -41,12 +41,6 @@ export function getUserTable(
 		entityPrefix: userConfig?.entityPrefix || 'usr',
 
 		/**
-		 * ID generator function for this table
-		 * Uses the entityPrefix to generate IDs
-		 */
-		generateId: defaultIdGenerator,
-
-		/**
 		 * The schema for the user table
 		 */
 		schema: userSchema,
@@ -55,29 +49,6 @@ export function getUserTable(
 		 * Field definitions for the user table
 		 */
 		fields: {
-			/**
-			 * User's email address
-			 * Used for notifications and/or login
-			 */
-			email: {
-				type: 'string',
-				required: true,
-				unique: true,
-				fieldName: userConfig?.fields?.email || 'email',
-				transform: {
-					input: (value: string) => value.toLowerCase().trim(),
-				},
-			},
-
-			/**
-			 * User's display name
-			 */
-			name: {
-				type: 'string',
-				required: false,
-				fieldName: userConfig?.fields?.name || 'name',
-			},
-
 			/**
 			 * Whether the user has been identified/verified
 			 * Default: false

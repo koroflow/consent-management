@@ -33,9 +33,9 @@ export const consentSchema = z.object({
 	ipAddress: z.string().optional(),
 	userAgent: z.string().optional(),
 	metadata: z.record(z.unknown()).optional(),
-	createdAt: z.date().default(() => new Date()),
+	givenAt: z.date().default(() => new Date()),
 	updatedAt: z.date().optional(),
-	expiresAt: z.date().optional(),
+	validUntil: z.date().optional(),
 });
 
 /**

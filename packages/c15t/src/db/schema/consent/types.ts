@@ -26,13 +26,14 @@ export interface ConsentEntityConfig extends BaseEntityConfig {
 		id?: string;
 		userId?: string;
 		domainId?: string;
-		preferences?: string;
+		purposeIds?: string;
 		metadata?: string;
 		policyId?: string;
 		ipAddress?: string;
-		region?: string;
+		userAgent?: string;
+		status?: string;
+		withdrawalReason?: string;
 		givenAt?: string;
 		validUntil?: string;
-		isActive?: string;
 	};
 }

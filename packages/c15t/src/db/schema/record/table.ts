@@ -1,5 +1,4 @@
 import type { Field } from '~/db/core/fields';
-import { defaultIdGenerator } from '~/db/core/fields';
 import type { C15TOptions } from '~/types';
 import { recordSchema } from './schema';
 
@@ -41,12 +40,6 @@ export function getRecordTable(
 		 * Used to generate unique prefixed IDs for records
 		 */
 		entityPrefix: recordConfig?.entityPrefix || 'rec',
-
-		/**
-		 * ID generator function for this table
-		 * Uses the entityPrefix to generate IDs
-		 */
-		generateId: defaultIdGenerator,
 
 		/**
 		 * The schema for the consent record table

@@ -69,16 +69,16 @@ CREATE TABLE IF NOT EXISTS "consent" (
   "id" text NOT NULL PRIMARY KEY,
   "userId" text NOT NULL REFERENCES "user" ("id"),
   "domainId" text NOT NULL REFERENCES "domain" ("id"),
-  "purposeIds" text NOT NULL,
+  "purposeIds" text NOT NULL REFERENCES "purpose" ("id"),
+  "metadata" text -- stored as JSON,
   "policyId" text REFERENCES "consentPolicy" ("id"),
-  "status" text NOT NULL,
-  "withdrawalReason" text,
   "ipAddress" text,
   "userAgent" text,
-  "metadata" text -- stored as JSON,
-  "createdAt" date NOT NULL,
-  "updatedAt" date,
-  "expiresAt" date
+  "status" text NOT NULL,
+  "withdrawalReason" text,
+  "givenAt" date NOT NULL,
+  "validUntil" date,
+  "isActive" integer NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS "purposeJunction" (

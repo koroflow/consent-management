@@ -34,6 +34,7 @@ model Purpose {
   isActive         Boolean
   createdAt        DateTime
   updatedAt        DateTime
+  consents         Consent[]
   purposejunctions PurposeJunction[]
 }
 
@@ -71,16 +72,17 @@ model Consent {
   domainId            String
   domain              Domain                      @relation(fields: [domainId], references: [id], onDelete: Cascade)
   purposeIds          String @map("json_as_text")
+  purpose             Purpose                     @relation(fields: [purposeIds], references: [id], onDelete: Cascade)
+  metadata            String?
   policyId            String?
   consentpolicy       ConsentPolicy               @relation(fields: [policyId], references: [id], onDelete: Cascade)
-  status              String
-  withdrawalReason    String?
   ipAddress           String?
   userAgent           String?
-  metadata            String?
-  createdAt           DateTime
-  updatedAt           DateTime?
-  expiresAt           DateTime?
+  status              String
+  withdrawalReason    String?
+  givenAt             DateTime
+  validUntil          DateTime?
+  isActive            Boolean
   purposejunctions    PurposeJunction[]
   records             Record[]
   consentgeolocations ConsentGeoLocation[]
