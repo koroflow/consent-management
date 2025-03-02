@@ -1,15 +1,15 @@
 export function addSvelteKitEnvModules(aliases: Record<string, string>) {
-	aliases["$env/dynamic/private"] = createDataUriModule(
-		createDynamicEnvModule(),
+	aliases['$env/dynamic/private'] = createDataUriModule(
+		createDynamicEnvModule()
 	);
-	aliases["$env/dynamic/public"] = createDataUriModule(
-		createDynamicEnvModule(),
+	aliases['$env/dynamic/public'] = createDataUriModule(
+		createDynamicEnvModule()
 	);
-	aliases["$env/static/private"] = createDataUriModule(
-		createStaticEnvModule(filterPrivateEnv("PUBLIC_", "")),
+	aliases['$env/static/private'] = createDataUriModule(
+		createStaticEnvModule(filterPrivateEnv('PUBLIC_', ''))
 	);
-	aliases["$env/static/public"] = createDataUriModule(
-		createStaticEnvModule(filterPublicEnv("PUBLIC_", "")),
+	aliases['$env/static/public'] = createDataUriModule(
+		createStaticEnvModule(filterPublicEnv('PUBLIC_', ''))
 	);
 }
 
@@ -23,7 +23,7 @@ function createStaticEnvModule(env: Record<string, string>) {
 		.map((k) => `export const ${k} = ${JSON.stringify(env[k])};`);
 
 	return `
-  ${declarations.join("\n")}
+  ${declarations.join('\n')}
   // jiti dirty hack: .unknown
   `;
 }
@@ -40,8 +40,8 @@ export function filterPrivateEnv(publicPrefix: string, privatePrefix: string) {
 		Object.entries(process.env).filter(
 			([k]) =>
 				k.startsWith(privatePrefix) &&
-				(publicPrefix === "" || !k.startsWith(publicPrefix)),
-		),
+				(publicPrefix === '' || !k.startsWith(publicPrefix))
+		)
 	) as Record<string, string>;
 }
 
@@ -50,59 +50,59 @@ export function filterPublicEnv(publicPrefix: string, privatePrefix: string) {
 		Object.entries(process.env).filter(
 			([k]) =>
 				k.startsWith(publicPrefix) &&
-				(privatePrefix === "" || !k.startsWith(privatePrefix)),
-		),
+				(privatePrefix === '' || !k.startsWith(privatePrefix))
+		)
 	) as Record<string, string>;
 }
 
 const validIdentifier = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/;
 const reserved = new Set([
-	"do",
-	"if",
-	"in",
-	"for",
-	"let",
-	"new",
-	"try",
-	"var",
-	"case",
-	"else",
-	"enum",
-	"eval",
-	"null",
-	"this",
-	"true",
-	"void",
-	"with",
-	"await",
-	"break",
-	"catch",
-	"class",
-	"const",
-	"false",
-	"super",
-	"throw",
-	"while",
-	"yield",
-	"delete",
-	"export",
-	"import",
-	"public",
-	"return",
-	"static",
-	"switch",
-	"typeof",
-	"default",
-	"extends",
-	"finally",
-	"package",
-	"private",
-	"continue",
-	"debugger",
-	"function",
-	"arguments",
-	"interface",
-	"protected",
-	"implements",
-	"instanceof",
+	'do',
+	'if',
+	'in',
+	'for',
+	'let',
+	'new',
+	'try',
+	'var',
+	'case',
+	'else',
+	'enum',
+	'eval',
+	'null',
+	'this',
+	'true',
+	'void',
+	'with',
+	'await',
+	'break',
+	'catch',
+	'class',
+	'const',
+	'false',
+	'super',
+	'throw',
+	'while',
+	'yield',
+	'delete',
+	'export',
+	'import',
+	'public',
+	'return',
+	'static',
+	'switch',
+	'typeof',
+	'default',
+	'extends',
+	'finally',
+	'package',
+	'private',
+	'continue',
+	'debugger',
+	'function',
+	'arguments',
+	'interface',
+	'protected',
+	'implements',
+	'instanceof',
 ]);

@@ -49,27 +49,32 @@ export default defineConfig({
 	source: {
 		entry: {
 			index: ['./src/index.ts'],
-			migration: ['./src/db/migration/index.ts'],
+			'db/migration/index': ['./src/db/migration/index.ts'],
 			// core: ['./src/core/index.ts'],
 			// init: ['./src/init/index.ts'],
 			// cookies: ['./src/cookies/index.ts'],
-			types: ['./src/types/index.ts'],
-			utils: ['./src/utils/index.ts'],
-			client: ['./src/client/index.ts'],
+			'types/index': ['./src/types/index.ts'],
+			'utils/index': ['./src/utils/index.ts'],
+			'client/index': ['./src/client/index.ts'],
 			// plugins: ['./src/plugins/index.ts'],
-			'adapters/prisma': ['./src/db/adapters/prisma-adapter/index.ts'],
-			'adapters/drizzle': [
+			'db/adapters/prisma': ['./src/db/adapters/prisma-adapter/index.ts'],
+			'db/adapters/drizzle': [
 				'./src/db/adapters/drizzle-adapter/drizzle-adapter.ts',
 			],
-			'adapters/memory': ['./src/db/adapters/memory-adapter/memory-adapter.ts'],
+			'db/adapters/memory': [
+				'./src/db/adapters/memory-adapter/memory-adapter.ts',
+			],
+			'db/adapters/kysely': [
+				'./src/db/adapters/kysely-adapter/kysely-adapter.ts',
+			],
 			// 'plugins/analytics': ['./src/plugins/analytics.ts'],
 			// 'plugins/geo': ['./src/plugins/geo.ts'],
-			error: ['./src/error/index.ts'],
+			'error/index': ['./src/error/index.ts'],
 			'error/codes': ['./src/error/codes.ts'],
-			integrations: ['./src/integrations/index.ts'],
+			'integrations/index': ['./src/integrations/index.ts'],
 			'integrations/next': ['./src/integrations/next.ts'],
 			'integrations/react': ['./src/integrations/react.ts'],
-			db: ['./src/db/index.ts'],
+			'db/index': ['./src/db/index.ts'],
 		},
 	},
 	lib: [

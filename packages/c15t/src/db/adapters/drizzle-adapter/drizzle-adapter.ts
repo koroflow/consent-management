@@ -428,7 +428,7 @@ function checkMissingFields(
  * ```typescript
  * import { drizzle } from 'drizzle-orm/postgres-js';
  * import postgres from 'postgres';
- * import { drizzleAdapter } from '@c15t/adapters/drizzle';
+ * import { drizzleAdapter } from '@c15t/db/adapters/drizzle';
  * import * as schema from './schema';
  *
  * // Create a Postgres connection

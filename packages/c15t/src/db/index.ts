@@ -26,3 +26,7 @@ export {
 	stringArrayField,
 	numberArrayField,
 } from './core/fields';
+
+export { getMigrations } from './migration/index';
+
+export { getAdapter } from './utils/adapter-factory';

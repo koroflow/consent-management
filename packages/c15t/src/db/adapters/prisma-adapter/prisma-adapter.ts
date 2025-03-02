@@ -310,7 +310,7 @@ const createEntityTransformer = (
  * ```typescript
  * import { PrismaClient } from '@prisma/client';
  * import { c15t } from '@c15t/core';
- * import { prismaAdapter } from '@c15t/adapters/prisma';
+ * import { prismaAdapter } from '@c15t/db/adapters/prisma';
  *
  * // Create a Prisma client
  * const prisma = new PrismaClient();

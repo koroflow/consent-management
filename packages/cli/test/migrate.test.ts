@@ -1,15 +1,15 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { migrateAction } from "../src/commands/migrate";
-import * as config from "../src/utils/get-config";
-import { c15t } from "@c15t/new";
-import Database from "better-sqlite3";
-import type { C15TPlugin } from "@c15t/new/types";
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { migrateAction } from '../src/commands/migrate';
+import * as config from '../src/utils/get-config';
+import { c15t } from '@c15t/new';
+import Database from 'better-sqlite3';
+import type { C15TPlugin } from '@c15t/new/types';
 
-describe("migrate base auth instance", () => {
-	const db = new Database(":memory:");
+describe('migrate base auth instance', () => {
+	const db = new Database(':memory:');
 
 	const auth = c15t({
-		baseURL: "http://localhost:3000",
+		baseURL: 'http://localhost:3000',
 		database: db,
 		emailAndPassword: {
 			enabled: true,
@@ -17,20 +17,20 @@ describe("migrate base auth instance", () => {
 	});
 
 	beforeEach(() => {
-		vi.spyOn(process, "exit").mockImplementation((code) => {
+		vi.spyOn(process, 'exit').mockImplementation((code) => {
 			return code as never;
 		});
-		vi.spyOn(config, "getConfig").mockImplementation(async () => auth.options);
+		vi.spyOn(config, 'getConfig').mockImplementation(async () => auth.options);
 	});
 
 	afterEach(async () => {
 		vi.restoreAllMocks();
 	});
 
-	it("should migrate the database and sign-up a user", async () => {
+	it('should migrate the database and sign-up a user', async () => {
 		await migrateAction({
 			cwd: process.cwd(),
-			config: "test/auth.ts",
+			config: 'test/c15t.ts',
 			y: true,
 		});
 		// const signUpRes = await auth.api.signUpEmail({
@@ -44,51 +44,49 @@ describe("migrate base auth instance", () => {
 	});
 });
 
-describe("migrate auth instance with plugins", () => {
-	const db = new Database(":memory:");
+describe('migrate auth instance with plugins', () => {
+	const db = new Database(':memory:');
 	const testPlugin = {
-		id: "plugin",
+		id: 'plugin',
 		schema: {
 			plugin: {
 				fields: {
 					test: {
-						type: "string",
-						fieldName: "test",
+						type: 'string',
+						fieldName: 'test',
 					},
 				},
 			},
 		},
+		type: 'plugin',
 	} satisfies C15TPlugin;
 
 	const auth = c15t({
-		baseURL: "http://localhost:3000",
+		baseURL: 'http://localhost:3000',
 		database: db,
-		emailAndPassword: {
-			enabled: true,
-		},
 		plugins: [testPlugin],
 	});
 
 	beforeEach(() => {
-		vi.spyOn(process, "exit").mockImplementation((code) => {
+		vi.spyOn(process, 'exit').mockImplementation((code) => {
 			return code as never;
 		});
-		vi.spyOn(config, "getConfig").mockImplementation(async () => auth.options);
+		vi.spyOn(config, 'getConfig').mockImplementation(async () => auth.options);
 	});
 
 	afterEach(async () => {
 		vi.restoreAllMocks();
 	});
 
-	it("should migrate the database and sign-up a user", async () => {
+	it('should migrate the database and sign-up a user', async () => {
 		await migrateAction({
 			cwd: process.cwd(),
-			config: "test/auth.ts",
+			config: 'test/c15t.ts',
 			y: true,
 		});
 		const res = db
-			.prepare("INSERT INTO plugin (id, test) VALUES (?, ?)")
-			.run("1", "test");
+			.prepare('INSERT INTO plugin (id, test) VALUES (?, ?)')
+			.run('1', 'test');
 		expect(res.changes).toBe(1);
 	});
 });

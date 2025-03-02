@@ -9,21 +9,6 @@
 			"import": "./dist/index.js",
 			"require": "./dist/index.cjs"
 		},
-		"./core": {
-			"types": "./dist/core.d.ts",
-			"import": "./dist/core.js",
-			"require": "./dist/core.cjs"
-		},
-		"./init": {
-			"types": "./dist/init.d.ts",
-			"import": "./dist/init.js",
-			"require": "./dist/init.cjs"
-		},
-		"./cookies": {
-			"types": "./dist/cookies.d.ts",
-			"import": "./dist/cookies.js",
-			"require": "./dist/cookies.cjs"
-		},
 		"./types": {
 			"types": "./dist/types/index.d.ts",
 			"import": "./dist/types/index.js",
@@ -39,60 +24,55 @@
 			"import": "./dist/client/index.js",
 			"require": "./dist/client/index.cjs"
 		},
-		"./plugins": {
-			"types": "./dist/plugins/index.d.ts",
-			"import": "./dist/plugins/index.js",
-			"require": "./dist/plugins/index.cjs"
+		"./db": {
+			"types": "./dist/db/index.d.ts",
+			"import": "./dist/db/index.js",
+			"require": "./dist/db/index.cjs"
 		},
-		"./migration": {
-			"types": "./dist/migration/index.d.ts",
-			"import": "./dist/migration/index.js",
-			"require": "./dist/migration/index.cjs"
+		"./db/migration": {
+			"types": "./dist/db/migration/index.d.ts",
+			"import": "./dist/db/migration/index.js",
+			"require": "./dist/db/migration/index.cjs"
 		},
-		"./adapters/prisma": {
+		"./db/adapters/prisma": {
 			"import": {
-				"types": "./dist/adapters/prisma-adapter/index.d.ts",
-				"default": "./dist/adapters/prisma-adapter/index.mjs"
+				"types": "./dist/db/adapters/prisma-adapter/index.d.ts",
+				"import": "./dist/db/adapters/prisma.js"
 			},
 			"require": {
-				"types": "./dist/adapters/prisma-adapter/index.d.cts",
-				"default": "./dist/adapters/prisma-adapter/index.cjs"
+				"types": "./dist/db/adapters/prisma-adapter/index.d.ts",
+				"default": "./dist/db/adapters/prisma.cjs"
 			}
 		},
-		"./adapters/drizzle": {
+		"./db/adapters/drizzle": {
 			"import": {
-				"types": "./dist/adapters/drizzle-adapter/index.d.ts",
-				"default": "./dist/adapters/drizzle-adapter/index.mjs"
+				"types": "./dist/db/adapters/drizzle-adapter/index.d.ts",
+				"import": "./dist/db/adapters/drizzle.js"
 			},
 			"require": {
-				"types": "./dist/adapters/drizzle-adapter/index.d.cts",
-				"default": "./dist/adapters/drizzle-adapter/index.cjs"
+				"types": "./dist/db/adapters/drizzle-adapter/index.d.ts",
+				"default": "./dist/db/adapters/drizzle.cjs"
 			}
 		},
-		"./adapters/mongodb": {
+		"./db/adapters/kysely": {
 			"import": {
-				"types": "./dist/adapters/mongodb-adapter/index.d.ts",
-				"default": "./dist/adapters/mongodb-adapter/index.mjs"
+				"types": "./dist/db/adapters/kysely-adapter/index.d.ts",
+				"import": "./dist/db/adapters/kysely.js"
 			},
 			"require": {
-				"types": "./dist/adapters/mongodb-adapter/index.d.cts",
-				"default": "./dist/adapters/mongodb-adapter/index.cjs"
+				"types": "./dist/db/adapters/kysely-adapter/index.d.ts",
+				"default": "./dist/db/adapters/kysely.cjs"
 			}
 		},
-		"./adapters/memory": {
+		"./db/adapters/memory": {
 			"import": {
-				"types": "./dist/adapters/memory-adapter/index.d.ts",
-				"default": "./dist/adapters/memory-adapter/index.mjs"
+				"types": "./dist/db/adapters/memory-adapter/index.d.ts",
+				"import": "./dist/db/adapters/memory.js"
 			},
 			"require": {
-				"types": "./dist/adapters/memory-adapter/index.d.cts",
-				"default": "./dist/adapters/memory-adapter/index.cjs"
+				"types": "./dist/db/adapters/memory-adapter/index.d.ts",
+				"default": "./dist/db/adapters/memory.cjs"
 			}
-		},
-		"./plugins/analytics": {
-			"types": "./dist/plugins/analytics.d.ts",
-			"import": "./dist/plugins/analytics.js",
-			"require": "./dist/plugins/analytics.cjs"
 		},
 		"./plugins/geo": {
 			"types": "./dist/plugins/geo.d.ts",
@@ -124,16 +104,6 @@
 			"types": "./dist/integrations/react.d.ts",
 			"import": "./dist/integrations/react.js",
 			"require": "./dist/integrations/react.cjs"
-		},
-		"./integrations/server": {
-			"types": "./dist/integrations/server.d.ts",
-			"import": "./dist/integrations/server.js",
-			"require": "./dist/integrations/server.cjs"
-		},
-		"./db": {
-			"types": "./dist/db/index.d.ts",
-			"import": "./dist/db/index.js",
-			"require": "./dist/db/index.cjs"
 		}
 	},
 	"main": "./dist/index.cjs",
@@ -143,8 +113,8 @@
 		"build": "rslib build",
 		"check-types": "tsc --noEmit",
 		"fmt": "pnpm biome format --write .",
-		"lint": "pnpm biome lint ./src",
-		"knip": "knip"
+		"knip": "knip",
+		"lint": "pnpm biome lint ./src"
 	},
 	"dependencies": {
 		"@better-fetch/fetch": "^1.1.15",

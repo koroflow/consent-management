@@ -1,17 +1,17 @@
-import { Command } from "commander";
-import { getConfig } from "../utils/get-config";
-import { z } from "zod";
-import { existsSync } from "node:fs";
-import path from "node:path";
-import { logger } from "@c15t/new";
-import yoctoSpinner from "yocto-spinner";
-import prompts from "prompts";
-import fs from "node:fs/promises";
-import chalk from "chalk";
-import { getAdapter } from "@c15t/new/db";
-import { getGenerator } from "../generators";
+import { Command } from 'commander';
+import { getConfig } from '../utils/get-config';
+import { z } from 'zod';
+import { existsSync } from 'node:fs';
+import path from 'node:path';
+import { logger } from '@c15t/new';
+import yoctoSpinner from 'yocto-spinner';
+import prompts from 'prompts';
+import fs from 'node:fs/promises';
+import chalk from 'chalk';
+import { getAdapter } from '@c15t/new/db';
+import { getGenerator } from '../generators';
 
-export async function generateAction(opts: any) {
+export async function generateAction(opts: unknown) {
 	const options = z
 		.object({
 			cwd: z.string(),
@@ -32,7 +32,7 @@ export async function generateAction(opts: any) {
 	});
 	if (!config) {
 		logger.error(
-			"No configuration file found. Add a `auth.ts` file to your project or pass the path to the configuration file using the `--config` flag.",
+			'No configuration file found. Add a `c15t.ts` file to your project or pass the path to the configuration file using the `--config` flag.'
 		);
 		return;
 	}
@@ -42,7 +42,7 @@ export async function generateAction(opts: any) {
 		process.exit(1);
 	});
 
-	const spinner = yoctoSpinner({ text: "preparing schema..." }).start();
+	const spinner = yoctoSpinner({ text: 'preparing schema...' }).start();
 
 	const schema = await getGenerator({
 		adapter,
@@ -52,19 +52,19 @@ export async function generateAction(opts: any) {
 
 	spinner.stop();
 	if (!schema.code) {
-		logger.info("Your schema is already up to date.");
+		logger.info('Your schema is already up to date.');
 		process.exit(0);
 	}
 	if (schema.append || schema.overwrite) {
 		let confirm = options.y;
 		if (!confirm) {
 			const response = await prompts({
-				type: "confirm",
-				name: "confirm",
+				type: 'confirm',
+				name: 'confirm',
 				message: `The file ${
 					schema.fileName
 				} already exists. Do you want to ${chalk.yellow(
-					`${schema.overwrite ? "overwrite" : "append"}`,
+					`${schema.overwrite ? 'overwrite' : 'append'}`
 				)} the schema to the file?`,
 			});
 			confirm = response.confirm;
@@ -84,12 +84,12 @@ export async function generateAction(opts: any) {
 			}
 			logger.success(
 				`🚀 Schema was ${
-					schema.overwrite ? "overwritten" : "appended"
-				} successfully!`,
+					schema.overwrite ? 'overwritten' : 'appended'
+				} successfully!`
 			);
 			process.exit(0);
 		} else {
-			logger.error("Schema generation aborted.");
+			logger.error('Schema generation aborted.');
 			process.exit(1);
 		}
 	}
@@ -98,17 +98,17 @@ export async function generateAction(opts: any) {
 
 	if (!confirm) {
 		const response = await prompts({
-			type: "confirm",
-			name: "confirm",
+			type: 'confirm',
+			name: 'confirm',
 			message: `Do you want to generate the schema to ${chalk.yellow(
-				schema.fileName,
+				schema.fileName
 			)}?`,
 		});
 		confirm = response.confirm;
 	}
 
 	if (!confirm) {
-		logger.error("Schema generation aborted.");
+		logger.error('Schema generation aborted.');
 		process.exit(1);
 	}
 
@@ -122,22 +122,22 @@ export async function generateAction(opts: any) {
 	}
 	await fs.writeFile(
 		options.output || path.join(cwd, schema.fileName),
-		schema.code,
+		schema.code
 	);
 	logger.success('🚀 Schema was generated successfully!');
 	process.exit(0);
 }
 
-export const generate = new Command("generate")
+export const generate = new Command('generate')
 	.option(
-		"-c, --cwd <cwd>",
-		"the working directory. defaults to the current directory.",
-		process.cwd(),
+		'-c, --cwd <cwd>',
+		'the working directory. defaults to the current directory.',
+		process.cwd()
 	)
 	.option(
-		"--config <config>",
-		"the path to the configuration file. defaults to the first configuration file found.",
+		'--config <config>',
+		'the path to the configuration file. defaults to the first configuration file found.'
 	)
-	.option("--output <output>", "the file to output to the generated schema")
-	.option("-y, --y", "automatically answer yes to all prompts", false)
+	.option('--output <output>', 'the file to output to the generated schema')
+	.option('-y, --y', 'automatically answer yes to all prompts', false)
 	.action(generateAction);

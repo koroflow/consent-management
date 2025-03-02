@@ -248,4 +248,8 @@ export type DatabaseConfiguration =
 	| Dialect
 	| AdapterInstance
 	| DialectConfig
-	| KyselyInstanceConfig;
+	| KyselyInstanceConfig
+	| {
+			provider: string;
+			options: DatabaseConfiguration;
+	  };

@@ -1,20 +1,20 @@
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import { test } from "vitest";
-import fs from "node:fs/promises";
-import path from "node:path";
-import { getConfig } from "../src/utils/get-config";
+import { test } from 'vitest';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import { getConfig } from '../src/utils/get-config';
 
 interface TmpDirFixture {
 	tmpdir: string;
 }
 
 async function createTempDir() {
-	const tmpdir = path.join(process.cwd(), "test", "getConfig_test-");
+	const tmpdir = path.join(process.cwd(), 'test', 'getConfig_test-');
 	return await fs.mkdtemp(tmpdir);
 }
 
-// biome-ignore lint/suspicious/noExportsInTest: <explanation>
+// biome-ignore lint/suspicious/noExportsInTest: Used for test utilities
 export const tmpdirTest = test.extend<TmpDirFixture>({
 	tmpdir: async ({}, use) => {
 		const directory = await createTempDir();
@@ -25,11 +25,11 @@ export const tmpdirTest = test.extend<TmpDirFixture>({
 	},
 });
 
-let tmpDir = ".";
+let tmpDir = '.';
 
-describe("getConfig", async () => {
+describe('getConfig', async () => {
 	beforeEach(async () => {
-		const tmp = path.join(process.cwd(), "getConfig_test-");
+		const tmp = path.join(process.cwd(), 'getConfig_test-');
 		tmpDir = await fs.mkdtemp(tmp);
 	});
 
@@ -37,15 +37,15 @@ describe("getConfig", async () => {
 		await fs.rm(tmpDir, { recursive: true });
 	});
 
-	it("should resolve resolver type alias", async () => {
-		const authPath = path.join(tmpDir, "server", "auth");
-		const dbPath = path.join(tmpDir, "server", "db");
-		await fs.mkdir(authPath, { recursive: true });
+	it('should resolve resolver type alias', async () => {
+		const c15tPath = path.join(tmpDir, 'server', 'c15t');
+		const dbPath = path.join(tmpDir, 'server', 'db');
+		await fs.mkdir(c15tPath, { recursive: true });
 		await fs.mkdir(dbPath, { recursive: true });
 
 		//create dummy tsconfig.json
 		await fs.writeFile(
-			path.join(tmpDir, "tsconfig.json"),
+			path.join(tmpDir, 'tsconfig.json'),
 			`{
               "compilerOptions": {
                 /* Path Aliases */
@@ -54,53 +54,60 @@ describe("getConfig", async () => {
                   "@server/*": ["./server/*"]
                 }
               }
-					}`,
+					}`
 		);
 
-		//create dummy auth.ts
+		//create dummy c15t.ts
 		await fs.writeFile(
-			path.join(authPath, "auth.ts"),
-			`import {betterAuth} from "@c15t/new";
-			 import {prismaAdapter} from "@c15t/new/adapters/prisma";			
-			 import {db} from "@server/db/db";
+			path.join(c15tPath, 'c15t.ts'),
+			`import { c15t as c15tInstance } from '@c15t/new';
+			 import { prismaAdapter } from "@c15t/new/db/adapters/prisma";			
+			 import { db } from "@server/db/db";
 
-			 export const auth = betterAuth({
+			 export const c15t = c15tInstance({
 					database: prismaAdapter(db, {
-							provider: 'sqlite'
+							type: 'sqlite'
 					}),
+					appName: 'Test App',
+					basePath: '/api/c15t',
 					emailAndPassword: {
 						enabled: true,
 					}
-			 })`,
+			 })`
 		);
 
 		//create dummy db.ts
 		await fs.writeFile(
-			path.join(dbPath, "db.ts"),
-			`class PrismaClient {
-				constructor() {}
-			}
+			path.join(dbPath, 'db.ts'),
+			`import { PrismaClient } from '@prisma/client';
 			
-			export const db = new PrismaClient()`,
+			// Singleton PrismaClient instance for database access
+			const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
+			
+			export const db = globalForPrisma.prisma || new PrismaClient({
+				log: ['error', 'warn'],
+			});
+			
+			if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = db;`
 		);
 
 		const config = await getConfig({
 			cwd: tmpDir,
-			configPath: "server/auth/auth.ts",
+			configPath: 'server/c15t/c15t.ts',
 		});
 
 		expect(config).not.toBe(null);
 	});
 
-	it("should resolve direct alias", async () => {
-		const authPath = path.join(tmpDir, "server", "auth");
-		const dbPath = path.join(tmpDir, "server", "db");
-		await fs.mkdir(authPath, { recursive: true });
+	it('should resolve direct alias', async () => {
+		const c15tPath = path.join(tmpDir, 'server', 'c15t');
+		const dbPath = path.join(tmpDir, 'server', 'db');
+		await fs.mkdir(c15tPath, { recursive: true });
 		await fs.mkdir(dbPath, { recursive: true });
 
 		//create dummy tsconfig.json
 		await fs.writeFile(
-			path.join(tmpDir, "tsconfig.json"),
+			path.join(tmpDir, 'tsconfig.json'),
 			`{
               "compilerOptions": {
                 /* Path Aliases */
@@ -109,53 +116,60 @@ describe("getConfig", async () => {
                   "prismaDbClient": ["./server/db/db"]
                 }
               }
-					}`,
+					}`
 		);
 
-		//create dummy auth.ts
+		//create dummy c15t.ts
 		await fs.writeFile(
-			path.join(authPath, "auth.ts"),
-			`import {betterAuth} from "@c15t/new";
-			 import {prismaAdapter} from "@c15t/new/adapters/prisma";			
-			 import {db} from "prismaDbClient";
+			path.join(c15tPath, 'c15t.ts'),
+			`import { c15t as c15tInstance } from '@c15t/new';
+			 import { prismaAdapter } from "@c15t/new/db/adapters/prisma";			
+			 import { db } from "prismaDbClient";
 
-			 export const auth = betterAuth({
+			 export const c15t = c15tInstance({
 					database: prismaAdapter(db, {
-							provider: 'sqlite'
+							type: 'sqlite'
 					}),
+					appName: 'Test App',
+					basePath: '/api/c15t',
 					emailAndPassword: {
 						enabled: true,
 					}
-			 })`,
+			 })`
 		);
 
 		//create dummy db.ts
 		await fs.writeFile(
-			path.join(dbPath, "db.ts"),
-			`class PrismaClient {
-				constructor() {}
-			}
+			path.join(dbPath, 'db.ts'),
+			`import { PrismaClient } from '@prisma/client';
 			
-			export const db = new PrismaClient()`,
+			// Singleton PrismaClient instance for database access
+			const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
+			
+			export const db = globalForPrisma.prisma || new PrismaClient({
+				log: ['error', 'warn'],
+			});
+			
+			if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = db;`
 		);
 
 		const config = await getConfig({
 			cwd: tmpDir,
-			configPath: "server/auth/auth.ts",
+			configPath: 'server/c1t5/c15t.ts',
 		});
 
 		expect(config).not.toBe(null);
 	});
 
-	it("should resolve resolver type alias with relative path", async () => {
-		const authPath = path.join(tmpDir, "test", "server", "auth");
-		const dbPath = path.join(tmpDir, "test", "server", "db");
-		await fs.mkdir(authPath, { recursive: true });
+	it('should resolve resolver type alias with relative path', async () => {
+		const c15tPath = path.join(tmpDir, 'test', 'server', 'c15t');
+		const dbPath = path.join(tmpDir, 'test', 'server', 'db');
+		await fs.mkdir(c15tPath, { recursive: true });
 		await fs.mkdir(dbPath, { recursive: true });
 
 		//create dummy tsconfig.json
 		await fs.writeFile(
-			path.join(tmpDir, "tsconfig.json"),
+			path.join(tmpDir, 'tsconfig.json'),
 			`{
               "compilerOptions": {
                 /* Path Aliases */
@@ -164,53 +178,60 @@ describe("getConfig", async () => {
                   "@server/*": ["./server/*"]
                 }
               }
-					}`,
+					}`
 		);
 
-		//create dummy auth.ts
+		//create dummy c15t.ts
 		await fs.writeFile(
-			path.join(authPath, "auth.ts"),
-			`import {betterAuth} from "@c15t/new";
-			 import {prismaAdapter} from "@c15t/new/adapters/prisma";			
-			 import {db} from "@server/db/db";
+			path.join(c15tPath, 'c15t.ts'),
+			`import { c15t as c15tInstance } from '@c15t/new';
+			 import { prismaAdapter } from "@c15t/new/db/adapters/prisma";			
+			 import { db } from "@server/db/db";
 
-			 export const auth = betterAuth({
+			 export const c15t = c15tInstance({
 					database: prismaAdapter(db, {
-							provider: 'sqlite'
+							type: 'sqlite'
 					}),
+					appName: 'Test App',
+					basePath: '/api/c15t',
 					emailAndPassword: {
 						enabled: true,
 					}
-			 })`,
+			 })`
 		);
 
 		//create dummy db.ts
 		await fs.writeFile(
-			path.join(dbPath, "db.ts"),
-			`class PrismaClient {
-				constructor() {}
-			}
+			path.join(dbPath, 'db.ts'),
+			`import { PrismaClient } from '@prisma/client';
 			
-			export const db = new PrismaClient()`,
+			// Singleton PrismaClient instance for database access
+			const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
+			
+			export const db = globalForPrisma.prisma || new PrismaClient({
+				log: ['error', 'warn'],
+			});
+			
+			if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = db;`
 		);
 
 		const config = await getConfig({
 			cwd: tmpDir,
-			configPath: "test/server/auth/auth.ts",
+			configPath: 'test/server/c15t/c15t.ts',
 		});
 
 		expect(config).not.toBe(null);
 	});
 
-	it("should resolve direct alias with relative path", async () => {
-		const authPath = path.join(tmpDir, "test", "server", "auth");
-		const dbPath = path.join(tmpDir, "test", "server", "db");
-		await fs.mkdir(authPath, { recursive: true });
+	it('should resolve direct alias with relative path', async () => {
+		const c15tPath = path.join(tmpDir, 'test', 'server', 'c15t');
+		const dbPath = path.join(tmpDir, 'test', 'server', 'db');
+		await fs.mkdir(c15tPath, { recursive: true });
 		await fs.mkdir(dbPath, { recursive: true });
 
 		//create dummy tsconfig.json
 		await fs.writeFile(
-			path.join(tmpDir, "tsconfig.json"),
+			path.join(tmpDir, 'tsconfig.json'),
 			`{
               "compilerOptions": {
                 /* Path Aliases */
@@ -219,53 +240,60 @@ describe("getConfig", async () => {
                   "prismaDbClient": ["./server/db/db"]
                 }
               }
-					}`,
+					}`
 		);
 
-		//create dummy auth.ts
+		//create dummy c15t.ts
 		await fs.writeFile(
-			path.join(authPath, "auth.ts"),
-			`import {betterAuth} from "@c15t/new";
-			 import {prismaAdapter} from "@c15t/new/adapters/prisma";			
-			 import {db} from "prismaDbClient";
+			path.join(c15tPath, 'c15t.ts'),
+			`import { c15t as c15tInstance } from '@c15t/new';
+			 import { prismaAdapter } from "@c15t/new/db/adapters/prisma";			
+			 import { db } from "prismaDbClient";
 
-			 export const auth = betterAuth({
+			 export const c15t = c15tInstance({
 					database: prismaAdapter(db, {
-							provider: 'sqlite'
+							type: 'sqlite'
 					}),
+					appName: 'Test App',
+					basePath: '/api/c15t',
 					emailAndPassword: {
 						enabled: true,
 					}
-			 })`,
+			 })`
 		);
 
 		//create dummy db.ts
 		await fs.writeFile(
-			path.join(dbPath, "db.ts"),
-			`class PrismaClient {
-				constructor() {}
-			}
+			path.join(dbPath, 'db.ts'),
+			`import { PrismaClient } from '@prisma/client';
 			
-			export const db = new PrismaClient()`,
+			// Singleton PrismaClient instance for database access
+			const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
+			
+			export const db = globalForPrisma.prisma || new PrismaClient({
+				log: ['error', 'warn'],
+			});
+			
+			if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = db;`
 		);
 
 		const config = await getConfig({
 			cwd: tmpDir,
-			configPath: "test/server/auth/auth.ts",
+			configPath: 'test/server/c15t/c15t.ts',
 		});
 
 		expect(config).not.toBe(null);
 	});
 
-	it("should resolve with relative import", async () => {
-		const authPath = path.join(tmpDir, "test", "server", "auth");
-		const dbPath = path.join(tmpDir, "test", "server", "db");
-		await fs.mkdir(authPath, { recursive: true });
+	it('should resolve with relative import', async () => {
+		const c15tPath = path.join(tmpDir, 'test', 'server', 'c15t');
+		const dbPath = path.join(tmpDir, 'test', 'server', 'db');
+		await fs.mkdir(c15tPath, { recursive: true });
 		await fs.mkdir(dbPath, { recursive: true });
 
 		//create dummy tsconfig.json
 		await fs.writeFile(
-			path.join(tmpDir, "tsconfig.json"),
+			path.join(tmpDir, 'tsconfig.json'),
 			`{
               "compilerOptions": {
                 /* Path Aliases */
@@ -274,53 +302,60 @@ describe("getConfig", async () => {
                   "prismaDbClient": ["./server/db/db"]
                 }
               }
-					}`,
+					}`
 		);
 
-		//create dummy auth.ts
+		//create dummy c15t.ts
 		await fs.writeFile(
-			path.join(authPath, "auth.ts"),
-			`import {betterAuth} from "@c15t/new";
-			 import {prismaAdapter} from "@c15t/new/adapters/prisma";			
-			 import {db} from "../db/db";
+			path.join(c15tPath, 'c15t.ts'),
+			`import { c15t as c15tInstance } from '@c15t/new';
+			 import { prismaAdapter } from "@c15t/new/db/adapters/prisma";			
+			 import { db } from "../db/db";
 
-			 export const auth = betterAuth({
+			 export const c15t = c15tInstance({
 					database: prismaAdapter(db, {
-							provider: 'sqlite'
+							type: 'sqlite'
 					}),
+					appName: 'Test App',
+					basePath: '/api/c15t',
 					emailAndPassword: {
 						enabled: true,
 					}
-			 })`,
+			 })`
 		);
 
 		//create dummy db.ts
 		await fs.writeFile(
-			path.join(dbPath, "db.ts"),
-			`class PrismaClient {
-				constructor() {}
-			}
+			path.join(dbPath, 'db.ts'),
+			`import { PrismaClient } from '@prisma/client';
 			
-			export const db = new PrismaClient()`,
+			// Singleton PrismaClient instance for database access
+			const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
+			
+			export const db = globalForPrisma.prisma || new PrismaClient({
+				log: ['error', 'warn'],
+			});
+			
+			if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = db;`
 		);
 
 		const config = await getConfig({
 			cwd: tmpDir,
-			configPath: "test/server/auth/auth.ts",
+			configPath: 'test/server/c15t/c15t.ts',
 		});
 
 		expect(config).not.toBe(null);
 	});
 
-	it("should error with invalid alias", async () => {
-		const authPath = path.join(tmpDir, "server", "auth");
-		const dbPath = path.join(tmpDir, "server", "db");
-		await fs.mkdir(authPath, { recursive: true });
+	it('should error with invalid alias', async () => {
+		const c15tPath = path.join(tmpDir, 'server', 'c15t');
+		const dbPath = path.join(tmpDir, 'server', 'db');
+		await fs.mkdir(c15tPath, { recursive: true });
 		await fs.mkdir(dbPath, { recursive: true });
 
 		//create dummy tsconfig.json
 		await fs.writeFile(
-			path.join(tmpDir, "tsconfig.json"),
+			path.join(tmpDir, 'tsconfig.json'),
 			`{
               "compilerOptions": {
                 /* Path Aliases */
@@ -329,61 +364,70 @@ describe("getConfig", async () => {
                   "@server/*": ["./PathIsInvalid/*"]
                 }
               }
-					}`,
+					}`
 		);
 
-		//create dummy auth.ts
+		//create dummy c15t.ts
 		await fs.writeFile(
-			path.join(authPath, "auth.ts"),
-			`import {betterAuth} from "@c15t/new";
-			 import {prismaAdapter} from "@c15t/new/adapters/prisma";			
-			 import {db} from "@server/db/db";
+			path.join(c15tPath, 'c15t.ts'),
+			`import { c15t as c15tInstance } from '@c15t/new';
+			 import { prismaAdapter } from "@c15t/new/db/adapters/prisma";			
+			 import { db } from "@server/db/db";
 
-			 export const auth = betterAuth({
+			 export const c15t = c15tInstance({
 					database: prismaAdapter(db, {
-							provider: 'sqlite'
+							type: 'sqlite'
 					}),
+					appName: 'Test App',
+					basePath: '/api/c15t',
 					emailAndPassword: {
 						enabled: true,
 					}
-			 })`,
+			 })`
 		);
 
 		//create dummy db.ts
 		await fs.writeFile(
-			path.join(dbPath, "db.ts"),
-			`class PrismaClient {
-				constructor() {}
-			}
+			path.join(dbPath, 'db.ts'),
+			`import { PrismaClient } from '@prisma/client';
 			
-			export const db = new PrismaClient()`,
+			// Singleton PrismaClient instance for database access
+			const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
+			
+			export const db = globalForPrisma.prisma || new PrismaClient({
+				log: ['error', 'warn'],
+			});
+			
+			if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = db;`
 		);
 
 		await expect(() =>
-			getConfig({ cwd: tmpDir, configPath: "server/auth/auth.ts" }),
+			getConfig({ cwd: tmpDir, configPath: 'server/c15t/c15t.ts' })
 		).rejects.toThrowError();
 	});
 
-	it("should resolve js config", async () => {
-		const authPath = path.join(tmpDir, "server", "auth");
-		const dbPath = path.join(tmpDir, "server", "db");
-		await fs.mkdir(authPath, { recursive: true });
+	it('should resolve js config', async () => {
+		const c15tPath = path.join(tmpDir, 'server', 'c15t');
+		const dbPath = path.join(tmpDir, 'server', 'db');
+		await fs.mkdir(c15tPath, { recursive: true });
 		await fs.mkdir(dbPath, { recursive: true });
 
-		//create dummy auth.ts
+		//create dummy c15t.ts
 		await fs.writeFile(
-			path.join(authPath, "auth.js"),
-			`import  { betterAuth } from "@c15t/new";
+			path.join(c15tPath, 'c15t.js'),
+			`import { c15t as c15tInstance } from "@c15t/new";
 
-			 export const auth = betterAuth({
+			 export const c15t = c15tInstance({
+					appName: 'Test App',
+					basePath: '/api/c15t',
 					emailAndPassword: {
 						enabled: true,
 					}
-			 })`,
+			 })`
 		);
 		const config = await getConfig({
 			cwd: tmpDir,
-			configPath: "server/auth/auth.js",
+			configPath: 'server/c15t/c15t.js',
 		});
 		expect(config).toMatchObject({
 			emailAndPassword: { enabled: true },

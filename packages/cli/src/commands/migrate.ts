@@ -1,15 +1,15 @@
-import { Command } from "commander";
-import { z } from "zod";
-import { existsSync } from "node:fs";
-import path from "node:path";
-import yoctoSpinner from "yocto-spinner";
-import chalk from "chalk";
-import prompts from "prompts";
-import { logger } from "@c15t/new";
-import { getAdapter, getMigrations } from "@c15t/new/db";
-import { getConfig } from "../utils/get-config";
+import { Command } from 'commander';
+import { z } from 'zod';
+import { existsSync } from 'node:fs';
+import path from 'node:path';
+import yoctoSpinner from 'yocto-spinner';
+import chalk from 'chalk';
+import prompts from 'prompts';
+import { logger } from '@c15t/new';
+import { getAdapter, getMigrations } from '@c15t/new/db';
+import { getConfig } from '../utils/get-config';
 
-export async function migrateAction(opts: any) {
+export async function migrateAction(opts: unknown) {
 	const options = z
 		.object({
 			cwd: z.string(),
@@ -28,7 +28,7 @@ export async function migrateAction(opts: any) {
 	});
 	if (!config) {
 		logger.error(
-			"No configuration file found. Add a `auth.ts` file to your project or pass the path to the configuration file using the `--config` flag.",
+			'No configuration file found. Add a `c15t.ts` file to your project or pass the path to the configuration file using the `--config` flag.'
 		);
 		return;
 	}
@@ -37,21 +37,21 @@ export async function migrateAction(opts: any) {
 
 	if (!db) {
 		logger.error(
-			"Invalid database configuration. Make sure you're not using adapters. Migrate command only works with built-in Kysely adapter.",
+			"Invalid database configuration. Make sure you're not using adapters. Migrate command only works with built-in Kysely adapter."
 		);
 		process.exit(1);
 	}
 
-	if (db.id !== "kysely") {
-		if (db.id === "prisma") {
+	if (db.id !== 'kysely') {
+		if (db.id === 'prisma') {
 			logger.error(
-				"The migrate command only works with the built-in Kysely adapter. For Prisma, run `npx @c15t/cli generate` to create the schema, then use Prisma’s migrate or push to apply it.",
+				'The migrate command only works with the built-in Kysely adapter. For Prisma, run `npx @c15t/cli generate` to create the schema, then use Prisma’s migrate or push to apply it.'
 			);
 			process.exit(0);
 		}
-		if (db.id === "drizzle") {
+		if (db.id === 'drizzle') {
 			logger.error(
-				"The migrate command only works with the built-in Kysely adapter. For Drizzle, run `npx @c15t/cli generate` to create the schema, then use Drizzle’s migrate or push to apply it.",
+				'The migrate command only works with the built-in Kysely adapter. For Drizzle, run `npx @c15t/cli generate` to create the schema, then use Drizzle’s migrate or push to apply it.'
 			);
 			process.exit(0);
 		}
@@ -59,13 +59,13 @@ export async function migrateAction(opts: any) {
 		process.exit(1);
 	}
 
-	const spinner = yoctoSpinner({ text: "preparing migration..." }).start();
+	const spinner = yoctoSpinner({ text: 'preparing migration...' }).start();
 
 	const { toBeAdded, toBeCreated, runMigrations } = await getMigrations(config);
 
 	if (!toBeAdded.length && !toBeCreated.length) {
 		spinner.stop();
-		logger.info("🚀 No migrations needed.");
+		logger.info('🚀 No migrations needed.');
 		process.exit(0);
 	}
 
@@ -73,51 +73,53 @@ export async function migrateAction(opts: any) {
 	logger.info('🔑 The migration will affect the following:');
 
 	for (const table of [...toBeCreated, ...toBeAdded]) {
+		// biome-ignore lint/suspicious/noConsoleLog: its a cli tool
+		// biome-ignore lint/suspicious/noConsole: its a cli tool
 		console.log(
-			"->",
-			chalk.magenta(Object.keys(table.fields).join(", ")),
-			chalk.white("fields on"),
+			'->',
+			chalk.magenta(Object.keys(table.fields).join(', ')),
+			chalk.white('fields on'),
 			chalk.yellow(`${table.table}`),
-			chalk.white("table."),
+			chalk.white('table.')
 		);
 	}
 
 	let migrate = options.y;
 	if (!migrate) {
 		const response = await prompts({
-			type: "confirm",
-			name: "migrate",
-			message: "Are you sure you want to run these migrations?",
+			type: 'confirm',
+			name: 'migrate',
+			message: 'Are you sure you want to run these migrations?',
 			initial: false,
 		});
 		migrate = response.migrate;
 	}
 
 	if (!migrate) {
-		logger.info("Migration cancelled.");
+		logger.info('Migration cancelled.');
 		process.exit(0);
 	}
 
-	spinner?.start("migrating...");
+	spinner?.start('migrating...');
 	await runMigrations();
 	spinner.stop();
-	logger.info("🚀 migration was completed successfully!");
+	logger.info('🚀 migration was completed successfully!');
 	process.exit(0);
 }
 
-export const migrate = new Command("migrate")
+export const migrate = new Command('migrate')
 	.option(
-		"-c, --cwd <cwd>",
-		"the working directory. defaults to the current directory.",
-		process.cwd(),
+		'-c, --cwd <cwd>',
+		'the working directory. defaults to the current directory.',
+		process.cwd()
 	)
 	.option(
-		"--config <config>",
-		"the path to the configuration file. defaults to the first configuration file found.",
+		'--config <config>',
+		'the path to the configuration file. defaults to the first configuration file found.'
 	)
 	.option(
-		"-y, --y",
-		"automatically accept and run migrations without prompting",
-		false,
+		'-y, --y',
+		'automatically accept and run migrations without prompting',
+		false
 	)
 	.action(migrateAction);
