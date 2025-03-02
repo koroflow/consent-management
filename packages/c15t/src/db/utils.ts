@@ -1,5 +1,5 @@
 import { getConsentTables } from '.';
-import type { FieldAttribute } from '~/db/fields';
+import type { Field } from '~/db/core/fields';
 import { C15TError } from '~/error';
 import type { Adapter, C15TOptions } from '~/types';
 import { createKyselyAdapter } from './adapters/kysely-adapter/dialect';
@@ -35,7 +35,7 @@ export async function getAdapter(options: C15TOptions): Promise<Adapter> {
 }
 // biome-ignore lint/suspicious/noExplicitAny: <explanation>
 export function convertToDB<T extends Record<string, any>>(
-	fields: Record<string, FieldAttribute>,
+	fields: Record<string, Field>,
 	values: T
 ) {
 	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
@@ -58,7 +58,7 @@ export function convertToDB<T extends Record<string, any>>(
 
 // biome-ignore lint/suspicious/noExplicitAny: <explanation>
 export function convertFromDB<T extends Record<string, any>>(
-	fields: Record<string, FieldAttribute>,
+	fields: Record<string, Field>,
 	values: T | null
 ) {
 	if (!values) {

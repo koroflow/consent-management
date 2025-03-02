@@ -1,6 +1,7 @@
-import { getConsentTables, type FieldAttribute } from "@c15t/new/db";
+import { type Field, getConsentTables } from "@c15t/new/db";
 import { existsSync } from "node:fs";
 import type { SchemaGenerator } from "./types";
+;
 
 export function convertToSnakeCase(str: string) {
 	return str.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
@@ -35,7 +36,7 @@ export const generateDrizzleSchema: SchemaGenerator = async ({
 			? `${tables[table].modelName}s`
 			: tables[table].modelName;
 		const fields = tables[table].fields;
-		function getType(name: string, field: FieldAttribute) {
+		function getType(name: string, field: Field) {
 			name = convertToSnakeCase(name);
 			const type = field.type;
 			const typeMap = {

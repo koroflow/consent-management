@@ -120,11 +120,11 @@ export type InferFieldInput<TField extends Field> =
  * @internal
  * This is an internal helper type used by InferFieldsOutput
  */
-type MapToFieldOutputType<TSchema, TKey extends keyof TSchema & string> = {
-	[Property in TKey]: TSchema[Property] extends Field
-		? InferFieldOutput<TSchema[Property]>
-		: never;
-};
+// type MapToFieldOutputType<TSchema, TKey extends keyof TSchema & string> = {
+// 	[Property in TKey]: TSchema[Property] extends Field
+// 		? InferFieldOutput<TSchema[Property]>
+// 		: never;
+// };
 
 // /**
 //  * Type-safe property mapping helper for field inputs.

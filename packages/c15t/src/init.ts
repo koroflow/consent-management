@@ -173,10 +173,10 @@ function getInternalPlugins(options: C15TOptions): C15TPlugin[] {
 		// Add cross-subdomain cookie plugin
 	}
 
-	// Add analytics plugin if enabled
-	if (options.analytics?.enabled !== false) {
-		// Add analytics plugin
-	}
+	// // Add analytics plugin if enabled
+	// if (options.analytics?.enabled !== false) {
+	// 	// Add analytics plugin
+	// }
 
 	return plugins;
 }

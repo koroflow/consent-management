@@ -129,12 +129,11 @@ const createTransform = (
 		);
 
 		const clause: SQL<unknown>[] = [];
-
-		if (andGroup.length) {
-			clause.push(andClause!);
+		if (andGroup.length && andClause) {
+			clause.push(andClause);
 		}
-		if (orGroup.length) {
-			clause.push(orClause!);
+		if (orGroup.length && orClause) {
+			clause.push(orClause);
 		}
 		return clause;
 	}
@@ -159,15 +158,17 @@ const createTransform = (
 						};
 			const fields = schema[model].fields;
 			for (const field in fields) {
-				const value = data[field];
-				if (value === undefined && !fields[field].defaultValue) {
-					continue;
+				if (Object.prototype.hasOwnProperty.call(fields, field)) {
+					const value = data[field];
+					if (value === undefined && !fields[field].defaultValue) {
+						continue;
+					}
+					transformedData[fields[field].fieldName || field] = applyDefaultValue(
+						value,
+						fields[field],
+						action
+					);
 				}
-				transformedData[fields[field].fieldName || field] = applyDefaultValue(
-					value,
-					fields[field],
-					action
-				);
 			}
 			return transformedData;
 		},
@@ -176,15 +177,19 @@ const createTransform = (
 			model: string,
 			select: string[] = []
 		) {
-			if (!data) return null;
-			const transformedData: Record<string, any> =
-				data.id || data._id
-					? select.length === 0 || select.includes('id')
-						? {
-								id: data.id,
-							}
-						: {}
-					: {};
+			if (!data) {
+				return null;
+			}
+
+			let transformedData: Record<string, any> = {};
+
+			if (
+				(data.id || data._id) &&
+				(select.length === 0 || select.includes('id'))
+			) {
+				transformedData = { id: data.id };
+			}
+
 			const tableSchema = schema[model].fields;
 			for (const key in tableSchema) {
 				if (select.length && !select.includes(key)) {
@@ -208,9 +213,11 @@ const createTransform = (
 				const c = await builder.returning();
 				return c[0];
 			}
+
 			await builder.execute();
 			const schemaModel = getSchema(model);
 			const builderVal = builder.config?.values;
+
 			if (where?.length) {
 				const clause = convertWhereClause(where, model);
 				const res = await db
@@ -218,14 +225,18 @@ const createTransform = (
 					.from(schemaModel)
 					.where(...clause);
 				return res[0];
-			} else if (builderVal) {
+			}
+
+			if (builderVal) {
 				const tId = builderVal[0]?.id.value;
 				const res = await db
 					.select()
 					.from(schemaModel)
 					.where(eq(schemaModel.id, tId));
 				return res[0];
-			} else if (data.id) {
+			}
+
+			if (data.id) {
 				const res = await db
 					.select()
 					.from(schemaModel)
@@ -305,7 +316,9 @@ export const drizzleAdapter =
 					.from(schemaModel)
 					.where(...clause);
 
-				if (!res.length) return null;
+				if (!res.length) {
+					return null;
+				}
 				return transformOutput(res[0], model, select);
 			},
 			async findMany(data) {

@@ -8,6 +8,3 @@ export * from './next';
 
 // Export React integration
 export * from './react';
-
-// Export server integration
-export * from './server';
