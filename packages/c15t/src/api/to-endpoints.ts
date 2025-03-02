@@ -5,7 +5,7 @@ import {
 	type EndpointOptions,
 	type InputContext,
 } from 'better-call';
-import type { AuthEndpoint, AuthMiddleware } from './call';
+import type { C15TEndpoint, C15TMiddleware } from './call';
 import defu from 'defu';
 import type { HookEndpointContext, C15TContext } from '~/types';
 
@@ -18,7 +18,7 @@ type InternalContext = InputContext<string, any> &
 		};
 	};
 
-export function toAuthEndpoints<E extends Record<string, AuthEndpoint>>(
+export function toEndpoints<E extends Record<string, C15TEndpoint>>(
 	endpoints: E,
 	ctx: C15TContext | Promise<C15TContext>
 ) {
@@ -133,7 +133,7 @@ async function runBeforeHooks(
 	context: HookEndpointContext,
 	hooks: {
 		matcher: (context: HookEndpointContext) => boolean;
-		handler: AuthMiddleware;
+		handler: C15TMiddleware;
 	}[]
 ) {
 	let modifiedContext: {
@@ -173,7 +173,7 @@ async function runAfterHooks(
 	context: HookEndpointContext,
 	hooks: {
 		matcher: (context: HookEndpointContext) => boolean;
-		handler: AuthMiddleware;
+		handler: C15TMiddleware;
 	}[]
 ) {
 	for (const hook of hooks) {
@@ -195,12 +195,12 @@ async function runAfterHooks(
 					if (context.context.responseHeaders) {
 						if (key.toLowerCase() === 'set-cookie') {
 							context.context.responseHeaders.append(key, value);
-						} else if (key.toLowerCase() === 'set-cookie') {
-							context.context.responseHeaders.set(key, value);
 						} else {
-							context.context.responseHeaders = new Headers();
 							context.context.responseHeaders.set(key, value);
 						}
+					} else {
+						context.context.responseHeaders = new Headers();
+						context.context.responseHeaders.set(key, value);
 					}
 				});
 			}
@@ -219,11 +219,11 @@ function getHooks(C15TContext: C15TContext) {
 	const plugins = C15TContext.options.plugins || [];
 	const beforeHooks: {
 		matcher: (context: HookEndpointContext) => boolean;
-		handler: AuthMiddleware;
+		handler: C15TMiddleware;
 	}[] = [];
 	const afterHooks: {
 		matcher: (context: HookEndpointContext) => boolean;
-		handler: AuthMiddleware;
+		handler: C15TMiddleware;
 	}[] = [];
 	if (C15TContext.options.hooks?.before) {
 		beforeHooks.push({

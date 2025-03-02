@@ -15,7 +15,7 @@ export function parseOutputData<T extends Record<string, unknown>>(
 	const parsedData: Record<string, unknown> = {};
 
 	for (const key in data) {
-		if (Object.prototype.hasOwnProperty.call(data, key)) {
+		if (Object.hasOwn(data, key)) {
 			const field = fields[key];
 			if (!field) {
 				parsedData[key] = data[key];

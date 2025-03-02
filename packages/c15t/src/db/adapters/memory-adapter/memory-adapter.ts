@@ -66,7 +66,7 @@ const createTransform = (options: C15TOptions) => {
 
 			const fields = schema[model].fields;
 			for (const field in fields) {
-				if (Object.prototype.hasOwnProperty.call(fields, field)) {
+				if (Object.hasOwn(fields, field)) {
 					const value = data[field as keyof typeof data];
 					const fieldInfo = (fields as Record<string, Field>)[field];
 					if (value === undefined && !fieldInfo?.defaultValue) {

@@ -29,5 +29,5 @@ export const createAuthEndpoint = createEndpoint.create({
 	use: [optionsMiddleware],
 });
 
-export type AuthEndpoint = ReturnType<typeof createAuthEndpoint>;
-export type AuthMiddleware = ReturnType<typeof createAuthMiddleware>;
+export type C15TEndpoint = ReturnType<typeof createAuthEndpoint>;
+export type C15TMiddleware = ReturnType<typeof createAuthMiddleware>;

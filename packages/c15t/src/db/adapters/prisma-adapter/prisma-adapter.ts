@@ -77,18 +77,20 @@ const createTransform = (config: PrismaConfig, options: C15TOptions) => {
 						};
 			const fields = schema[model].fields;
 			for (const field in fields) {
-				const value = data[field];
-				if (
-					value === undefined &&
-					(!fields[field].defaultValue || action === 'update')
-				) {
-					continue;
+				if (Object.hasOwn(fields, field)) {
+					const value = data[field];
+					if (
+						value === undefined &&
+						(!fields[field].defaultValue || action === 'update')
+					) {
+						continue;
+					}
+					transformedData[fields[field].fieldName || field] = applyDefaultValue(
+						value,
+						fields[field],
+						action
+					);
 				}
-				transformedData[fields[field].fieldName || field] = applyDefaultValue(
-					value,
-					fields[field],
-					action
-				);
 			}
 			return transformedData;
 		},
@@ -97,15 +99,19 @@ const createTransform = (config: PrismaConfig, options: C15TOptions) => {
 			model: string,
 			select: string[] = []
 		) {
-			if (!data) return null;
-			const transformedData: Record<string, any> =
-				data.id || data._id
-					? select.length === 0 || select.includes('id')
-						? {
-								id: data.id,
-							}
-						: {}
-					: {};
+			if (!data) {
+				return null;
+			}
+
+			let transformedData: Record<string, any> = {};
+
+			if (
+				(data.id || data._id) &&
+				(select.length === 0 || select.includes('id'))
+			) {
+				transformedData = { id: data.id };
+			}
+
 			const tableSchema = schema[model].fields;
 			for (const key in tableSchema) {
 				if (select.length && !select.includes(key)) {
@@ -160,7 +166,9 @@ const createTransform = (config: PrismaConfig, options: C15TOptions) => {
 			};
 		},
 		convertSelect: (select?: string[], model?: string) => {
-			if (!select || !model) return undefined;
+			if (!select || !model) {
+				return undefined;
+			}
 			return select.reduce((prev, cur) => {
 				return {
 					...prev,
@@ -283,7 +291,7 @@ export const prismaAdapter =
 					await db[getEntityName(model)].delete({
 						where: whereClause,
 					});
-				} catch (e) {
+				} catch {
 					// If the record doesn't exist, we don't want to throw an error
 				}
 			},

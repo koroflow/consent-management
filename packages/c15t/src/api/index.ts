@@ -11,7 +11,7 @@ import { originCheckMiddleware } from './middlewares/origin-check';
 import { baseEndpoints } from './routes';
 import { ok } from './routes/ok';
 import { error } from './routes/error';
-import { toAuthEndpoints } from './to-auth-endpoints';
+import { toEndpoints } from './to-endpoints';
 import { logger } from '~/utils/logger';
 
 export function getEndpoints<C extends C15TContext, Option extends C15TOptions>(
@@ -71,7 +71,7 @@ export function getEndpoints<C extends C15TContext, Option extends C15TOptions>(
 		ok,
 		error,
 	};
-	const api = toAuthEndpoints(endpoints, ctx);
+	const api = toEndpoints(endpoints, ctx);
 	return {
 		api: api as typeof endpoints & PluginEndpoint,
 		middlewares,

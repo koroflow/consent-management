@@ -55,11 +55,15 @@ const createTransform = (
 	}
 
 	const getEntityName = (model: string) => {
-		return schema[model].entityName !== model
-			? schema[model].entityName
-			: config.usePlural
-				? `${model}s`
-				: model;
+		if (schema[model].entityName !== model) {
+			return schema[model].entityName;
+		}
+
+		if (config.usePlural) {
+			return `${model}s`;
+		}
+
+		return model;
 	};
 
 	function convertWhereClause<T extends EntityName>(
@@ -158,7 +162,7 @@ const createTransform = (
 						};
 			const fields = schema[model].fields;
 			for (const field in fields) {
-				if (Object.prototype.hasOwnProperty.call(fields, field)) {
+				if (Object.hasOwn(fields, field)) {
 					const value = data[field];
 					if (value === undefined && !fields[field].defaultValue) {
 						continue;

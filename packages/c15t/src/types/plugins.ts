@@ -6,7 +6,7 @@
  * geolocation, custom consent flows, and more.
  */
 import type { Endpoint } from 'better-call';
-import type { AuthMiddleware } from '~/api/call';
+import type { C15TMiddleware } from '~/api/call';
 
 import type {
 	C15TOptions,
@@ -147,11 +147,11 @@ export interface C15TPlugin {
 	hooks?: {
 		before?: {
 			matcher: (context: HookEndpointContext) => boolean;
-			handler: AuthMiddleware;
+			handler: C15TMiddleware;
 		}[];
 		after?: {
 			matcher: (context: HookEndpointContext) => boolean;
-			handler: AuthMiddleware;
+			handler: C15TMiddleware;
 		}[];
 	};
 	/**

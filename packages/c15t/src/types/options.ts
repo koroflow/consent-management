@@ -7,7 +7,7 @@
  */
 import type { Logger } from '../utils/logger';
 import type { C15TContext, C15TPlugin } from './index';
-import type { AuthMiddleware } from '~/api/call';
+import type { C15TMiddleware } from '~/api/call';
 import type { Field } from '~/db/core/fields';
 import type { DatabaseHook } from '~/db/hooks/types';
 import type { DatabaseConfiguration } from '~/db/adapters/kysely-adapter/types';
@@ -217,11 +217,11 @@ export interface C15TOptions<P extends C15TPlugin[] = C15TPlugin[]> {
 		/**
 		 * Before a request is processed
 		 */
-		before?: AuthMiddleware;
+		before?: C15TMiddleware;
 		/**
 		 * After a request is processed
 		 */
-		after?: AuthMiddleware;
+		after?: C15TMiddleware;
 	};
 
 	/**
