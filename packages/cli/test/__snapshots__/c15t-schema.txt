@@ -7,7 +7,8 @@ export const user = sqliteTable("user", {
   identityProvider: text('identity_provider'),
   lastIpAddress: text('last_ip_address'),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
-  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull()
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull(),
+  userTimezone: text('user_timezone')
 });
 
 export const purpose = sqliteTable("purpose", {
@@ -116,7 +117,8 @@ export const auditLog = sqliteTable("audit_log", {
   userAgent: text('user_agent'),
   changes: text('changes'),
   metadata: text('metadata'),
-  createdAt: integer('created_at', { mode: 'timestamp' }).notNull()
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
+  eventTimezone: text('event_timezone').notNull()
 });
 
 export const geoLocation = sqliteTable("geo_location", {

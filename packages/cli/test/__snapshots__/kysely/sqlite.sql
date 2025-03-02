@@ -15,7 +15,8 @@ CREATE TABLE IF NOT EXISTS "user" (
   "identityProvider" text,
   "lastIpAddress" text,
   "createdAt" date NOT NULL,
-  "updatedAt" date NOT NULL
+  "updatedAt" date NOT NULL,
+  "userTimezone" text
 );
 
 CREATE TABLE IF NOT EXISTS "purpose" (
@@ -74,7 +75,7 @@ CREATE TABLE IF NOT EXISTS "consent" (
   "withdrawalReason" text,
   "ipAddress" text,
   "userAgent" text,
-  "metadata" text,
+  "metadata" text -- stored as JSON,
   "createdAt" date NOT NULL,
   "updatedAt" date,
   "expiresAt" date
@@ -85,7 +86,7 @@ CREATE TABLE IF NOT EXISTS "purposeJunction" (
   "consentId" text NOT NULL REFERENCES "consent" ("id"),
   "purposeId" text NOT NULL REFERENCES "purpose" ("id"),
   "status" text NOT NULL,
-  "metadata" text,
+  "metadata" text -- stored as JSON,
   "createdAt" date NOT NULL,
   "updatedAt" date
 );
@@ -120,7 +121,7 @@ CREATE TABLE IF NOT EXISTS "withdrawal" (
   "withdrawalMethod" text NOT NULL,
   "ipAddress" text,
   "userAgent" text,
-  "metadata" text,
+  "metadata" text -- stored as JSON,
   "createdAt" date NOT NULL
 );
 
@@ -133,8 +134,9 @@ CREATE TABLE IF NOT EXISTS "auditLog" (
   "ipAddress" text,
   "userAgent" text,
   "changes" text,
-  "metadata" text,
-  "createdAt" date NOT NULL
+  "metadata" text -- stored as JSON,
+  "createdAt" date NOT NULL,
+  "eventTimezone" text NOT NULL
 );
 
 COMMIT;

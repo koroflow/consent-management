@@ -16,6 +16,7 @@ model User {
   lastIpAddress    String?
   createdAt        DateTime
   updatedAt        DateTime
+  userTimezone     String
   consents         Consent[]
   records          Record[]
   withdrawals      Withdrawal[]
@@ -53,7 +54,7 @@ model Domain {
   id             String    @id
   name           String
   description    String?
-  allowedOrigins String[]
+  allowedOrigins Json?
   isVerified     Boolean
   isActive       Boolean
   createdAt      DateTime
@@ -69,14 +70,14 @@ model Consent {
   user                User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
   domainId            String
   domain              Domain               @relation(fields: [domainId], references: [id], onDelete: Cascade)
-  purposeIds          String[]
+  purposeIds          Json
   policyId            String?
   consentpolicy       ConsentPolicy        @relation(fields: [policyId], references: [id], onDelete: Cascade)
   status              String
   withdrawalReason    String?
   ipAddress           String?
   userAgent           String?
-  metadata            String[]
+  metadata            Json?
   createdAt           DateTime
   updatedAt           DateTime?
   expiresAt           DateTime?
@@ -93,7 +94,7 @@ model PurposeJunction {
   purposeId String
   purpose   Purpose   @relation(fields: [purposeId], references: [id], onDelete: Cascade)
   status    String
-  metadata  String[]
+  metadata  Json?
   createdAt DateTime
   updatedAt DateTime?
 }
@@ -105,7 +106,7 @@ model Record {
   consentId  String?
   consent    Consent  @relation(fields: [consentId], references: [id], onDelete: Cascade)
   actionType String
-  details    String[]
+  details    Json?
   createdAt  DateTime
 }
 
@@ -133,22 +134,23 @@ model Withdrawal {
   withdrawalMethod String
   ipAddress        String?
   userAgent        String?
-  metadata         String[]
+  metadata         Json?
   createdAt        DateTime
 }
 
 model AuditLog {
-  id         String   @id
-  entityType String
-  entityId   String
-  actionType String
-  userId     String?
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  ipAddress  String?
-  userAgent  String?
-  changes    String[]
-  metadata   String[]
-  createdAt  DateTime
+  id            String   @id
+  entityType    String
+  entityId      String
+  actionType    String
+  userId        String?
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ipAddress     String?
+  userAgent     String?
+  changes       Json?
+  metadata      Json?
+  createdAt     DateTime
+  eventTimezone String
 }
 
 model GeoLocation {
@@ -157,6 +159,6 @@ model GeoLocation {
   countryName     String
   regionCode      String?
   regionName      String?
-  regulatoryZones String[]
+  regulatoryZones Json?
   createdAt       DateTime
 }

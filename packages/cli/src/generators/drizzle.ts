@@ -29,9 +29,11 @@ export const generateDrizzleSchema: SchemaGenerator = async ({
 	);
 	const bigint = databaseType !== 'sqlite' ? 'bigint' : '';
 	const text = databaseType === 'mysql' ? 'varchar, text' : 'text';
+	// Add JSON type import for MySQL and PostgreSQL
+	const jsonType = ['mysql', 'pg'].includes(databaseType || '') ? ', json' : '';
 	let code = `import { ${databaseType}Table, ${text}, ${int}${
 		hasBigint ? `, ${bigint}` : ''
-	}, ${timestampAndBoolean} } from "drizzle-orm/${databaseType}-core";`;
+	}, ${timestampAndBoolean}${jsonType} } from "drizzle-orm/${databaseType}-core";`;
 
 	const fileExist = existsSync(filePath);
 
@@ -90,6 +92,12 @@ export const generateDrizzleSchema: SchemaGenerator = async ({
 						sqlite: `integer('${snakeCaseName}', { mode: 'timestamp' })`,
 						pg: `timestamp('${snakeCaseName}')`,
 						mysql: `timestamp('${snakeCaseName}')`,
+					},
+					// Add JSON type support
+					json: {
+						sqlite: `text('${snakeCaseName}')`, // SQLite uses TEXT for JSON
+						pg: `json('${snakeCaseName}')`, // PostgreSQL native JSON
+						mysql: `json('${snakeCaseName}')`, // MySQL native JSON
 					},
 				} as const;
 

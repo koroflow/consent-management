@@ -1,4 +1,4 @@
-import { mysqlTable, varchar, text, int, timestamp, boolean } from "drizzle-orm/mysql-core";
+import { mysqlTable, varchar, text, int, timestamp, boolean, json } from "drizzle-orm/mysql-core";
 
 export const user = mysqlTable("user", {
   id: varchar("id", { length: 36 }).primaryKey(),
@@ -7,7 +7,8 @@ export const user = mysqlTable("user", {
   identityProvider: text('identity_provider'),
   lastIpAddress: text('last_ip_address'),
   createdAt: timestamp('created_at').notNull(),
-  updatedAt: timestamp('updated_at').notNull()
+  updatedAt: timestamp('updated_at').notNull(),
+  userTimezone: text('user_timezone')
 });
 
 export const purpose = mysqlTable("purpose", {
@@ -39,7 +40,7 @@ export const domain = mysqlTable("domain", {
   id: varchar("id", { length: 36 }).primaryKey(),
   name: varchar('name', { length: 255 }).notNull().unique(),
   description: text('description'),
-  allowedOrigins: text('allowed_origins'),
+  allowedOrigins: json('allowed_origins'),
   isVerified: boolean('is_verified').notNull(),
   isActive: boolean('is_active').notNull(),
   createdAt: timestamp('created_at').notNull(),
@@ -50,13 +51,13 @@ export const consent = mysqlTable("consent", {
   id: varchar("id", { length: 36 }).primaryKey(),
   userId: varchar('user_id', { length: 36 }).notNull().references(()=> user.id, { onDelete: 'cascade' }),
   domainId: varchar('domain_id', { length: 36 }).notNull().references(()=> domain.id, { onDelete: 'cascade' }),
-  purposeIds: text('purpose_ids').notNull(),
+  purposeIds: json('purpose_ids').notNull(),
   policyId: varchar('policy_id', { length: 36 }).references(()=> consentPolicy.id, { onDelete: 'cascade' }),
   status: text('status').notNull(),
   withdrawalReason: text('withdrawal_reason'),
   ipAddress: text('ip_address'),
   userAgent: text('user_agent'),
-  metadata: text('metadata'),
+  metadata: json('metadata'),
   createdAt: timestamp('created_at').notNull(),
   updatedAt: timestamp('updated_at'),
   expiresAt: timestamp('expires_at')
@@ -67,7 +68,7 @@ export const purposeJunction = mysqlTable("purpose_junction", {
   consentId: varchar('consent_id', { length: 36 }).notNull().references(()=> consent.id, { onDelete: 'cascade' }),
   purposeId: varchar('purpose_id', { length: 36 }).notNull().references(()=> purpose.id, { onDelete: 'cascade' }),
   status: text('status').notNull(),
-  metadata: text('metadata'),
+  metadata: json('metadata'),
   createdAt: timestamp('created_at').notNull(),
   updatedAt: timestamp('updated_at')
 });
@@ -77,7 +78,7 @@ export const record = mysqlTable("record", {
   userId: varchar('user_id', { length: 36 }).notNull().references(()=> user.id, { onDelete: 'cascade' }),
   consentId: varchar('consent_id', { length: 36 }).references(()=> consent.id, { onDelete: 'cascade' }),
   actionType: text('action_type').notNull(),
-  details: text('details'),
+  details: json('details'),
   createdAt: timestamp('created_at').notNull()
 });
 
@@ -102,7 +103,7 @@ export const withdrawal = mysqlTable("withdrawal", {
   withdrawalMethod: text('withdrawal_method').notNull(),
   ipAddress: text('ip_address'),
   userAgent: text('user_agent'),
-  metadata: text('metadata'),
+  metadata: json('metadata'),
   createdAt: timestamp('created_at').notNull()
 });
 
@@ -114,9 +115,10 @@ export const auditLog = mysqlTable("audit_log", {
   userId: varchar('user_id', { length: 36 }).references(()=> user.id, { onDelete: 'cascade' }),
   ipAddress: text('ip_address'),
   userAgent: text('user_agent'),
-  changes: text('changes'),
-  metadata: text('metadata'),
-  createdAt: timestamp('created_at').notNull()
+  changes: json('changes'),
+  metadata: json('metadata'),
+  createdAt: timestamp('created_at').notNull(),
+  eventTimezone: text('event_timezone').notNull()
 });
 
 export const geoLocation = mysqlTable("geo_location", {
@@ -125,6 +127,6 @@ export const geoLocation = mysqlTable("geo_location", {
   countryName: text('country_name').notNull(),
   regionCode: text('region_code'),
   regionName: text('region_name'),
-  regulatoryZones: text('regulatory_zones'),
+  regulatoryZones: json('regulatory_zones'),
   createdAt: timestamp('created_at').notNull()
 });

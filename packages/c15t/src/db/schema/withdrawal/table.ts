@@ -109,7 +109,7 @@ export function getWithdrawalTable(
 			 * Additional metadata about the withdrawal
 			 */
 			metadata: {
-				type: 'string[]',
+				type: 'json',
 				required: false,
 				fieldName: options.withdrawal?.fields?.metadata || 'metadata',
 			},

@@ -28,6 +28,7 @@ import type { TableFields } from '~/db/schema/definition';
 import type { Field, Primitive } from '~/db/core/fields';
 import type { InsertExpression } from 'node_modules/kysely/dist/esm/parser/insert-values-parser';
 import type { Adapter, Where } from '../types';
+import superjson from 'superjson';
 
 /**
  * Type alias for Kysely field references
@@ -205,6 +206,16 @@ const createEntityTransformer = (
 		if (f?.type === 'date' && value && value instanceof Date) {
 			return type === 'sqlite' ? value.toISOString() : value;
 		}
+		// Handle JSON field type
+		if (f?.type === 'json' && value !== null && value !== undefined) {
+			// For PostgreSQL and MySQL, we can use the native JSON types
+			if (type === 'postgres' || type === 'mysql') {
+				// The database handles the JSON as is
+				return value;
+			}
+			// For SQLite and other databases, stringify the JSON using SuperJSON
+			return superjson.stringify(value);
+		}
 		return value;
 	}
 
@@ -241,6 +252,31 @@ const createEntityTransformer = (
 		}
 		if (f?.type === 'date' && value) {
 			return new Date(value as string);
+		}
+		// Handle JSON field type
+		if (f?.type === 'json' && value !== null && value !== undefined) {
+			// For PostgreSQL and MySQL, the value might already be an object
+			if (
+				(type === 'postgres' || type === 'mysql') &&
+				typeof value === 'object'
+			) {
+				return value;
+			}
+			// For SQLite and other databases or string JSON from any database
+			if (typeof value === 'string') {
+				try {
+					// Use SuperJSON to parse the JSON string, preserving complex types
+					return superjson.parse(value as string);
+				} catch {
+					// If SuperJSON parsing fails, try standard JSON.parse as fallback
+					try {
+						return JSON.parse(value as string);
+					} catch {
+						// If all parsing fails, return the original value
+						return value;
+					}
+				}
+			}
 		}
 		return value;
 	}

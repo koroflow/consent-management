@@ -1,4 +1,4 @@
-import type { Field } from '~/db/core/fields';
+import { COMMON_TIMEZONES, type Field } from '~/db/core/fields';
 import type { C15TOptions } from '~/types';
 import { auditLogSchema } from './schema';
 
@@ -103,7 +103,7 @@ export function getAuditLogTable(
 			 * For updates, this typically contains before/after values
 			 */
 			changes: {
-				type: 'string[]',
+				type: 'json',
 				required: false,
 				fieldName: options.auditLog?.fields?.changes || 'changes',
 			},
@@ -112,7 +112,7 @@ export function getAuditLogTable(
 			 * Additional metadata about the action
 			 */
 			metadata: {
-				type: 'string[]',
+				type: 'json',
 				required: false,
 				fieldName: options.auditLog?.fields?.metadata || 'metadata',
 			},
@@ -126,6 +126,16 @@ export function getAuditLogTable(
 				defaultValue: () => new Date(),
 				required: true,
 				fieldName: options.auditLog?.fields?.createdAt || 'createdAt',
+			},
+
+			/**
+			 * Timezone where the audit event occurred
+			 */
+			eventTimezone: {
+				type: 'timezone',
+				required: true,
+				defaultValue: COMMON_TIMEZONES.UTC,
+				fieldName: options.auditLog?.fields?.eventTimezone || 'eventTimezone',
 			},
 
 			// Include additional fields from plugins

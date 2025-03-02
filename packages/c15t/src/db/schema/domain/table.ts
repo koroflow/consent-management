@@ -64,7 +64,7 @@ export function getDomainTable(
 			 * Stored as a JSON array of strings
 			 */
 			allowedOrigins: {
-				type: 'string[]',
+				type: 'json',
 				defaultValue: () => [],
 				required: false,
 				fieldName: options.domain?.fields?.allowedOrigins || 'allowedOrigins',

@@ -69,7 +69,7 @@ export function getConsentTable(
 			 * Array of consent purpose IDs that the user has consented to
 			 */
 			purposeIds: {
-				type: 'string[]',
+				type: 'json',
 				required: true,
 				fieldName: options.consent?.fields?.purposeIds || 'purposeIds',
 			},
@@ -130,7 +130,7 @@ export function getConsentTable(
 			 * Additional metadata about the consent (customizable)
 			 */
 			metadata: {
-				type: 'string[]',
+				type: 'json',
 				required: false,
 				fieldName: options.consent?.fields?.metadata || 'metadata',
 			},

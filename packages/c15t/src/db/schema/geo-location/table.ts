@@ -80,7 +80,7 @@ export function getGeoLocationTable(
 			 * Stored as a JSON string in the database
 			 */
 			regulatoryZones: {
-				type: 'string[]',
+				type: 'json',
 				required: false,
 				fieldName:
 					options.geoLocation?.fields?.regulatoryZones || 'regulatoryZones',

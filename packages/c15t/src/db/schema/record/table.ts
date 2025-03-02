@@ -81,7 +81,7 @@ export function getRecordTable(
 			 * May include IP address, user agent, reason for withdrawal, etc.
 			 */
 			details: {
-				type: 'string[]',
+				type: 'json',
 				required: false,
 				fieldName: options.record?.fields?.details || 'details',
 			},

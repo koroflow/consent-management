@@ -18,7 +18,14 @@ export type {
 	TransformOutputFn,
 } from './field-inference';
 
-export type { NumberFieldOptions, StringFieldOptions } from './field-factory';
+export type {
+	NumberFieldOptions,
+	StringFieldOptions,
+	JsonFieldOptions,
+	TimezoneFieldOptions,
+	DateFieldOptions,
+	CommonTimezone,
+} from './field-factory';
 
 export type {
 	InferFieldsFromPlugins,
@@ -32,6 +39,10 @@ export {
 	numberField,
 	booleanField,
 	dateField,
+	jsonField,
 	stringArrayField,
 	numberArrayField,
+	timezoneField,
+	COMMON_TIMEZONES,
+	DateTimeUtils,
 } from './field-factory';

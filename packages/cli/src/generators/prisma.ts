@@ -7,9 +7,6 @@ import fs from 'node:fs/promises';
 import type { SchemaGenerator } from './types';
 import { capitalizeFirstLetter } from '../utils/capitalize-first-letter';
 
-// Define regex pattern at module level for better performance
-const JSON_FIELD_NAME_PATTERN = /metadata|config|data|settings|options|preferences|attributes/i;
-
 export const generatePrismaSchema: SchemaGenerator = async ({
 	adapter,
 	options,
@@ -58,7 +55,7 @@ export const generatePrismaSchema: SchemaGenerator = async ({
 
 	const schema = produceSchema(schemaPrisma, (builder) => {
 		// Define the Prisma type mapping function
-		function getPrismaType(type, isOptional, isBigint, fieldName = '') {
+		function getPrismaType(type, isOptional, isBigint) {
 			// Detect JSON fields based on type only
 			const isJsonField = type === 'json' || type === 'jsonb';
 
@@ -129,14 +126,16 @@ export const generatePrismaSchema: SchemaGenerator = async ({
 							within: prismaModel?.properties,
 						});
 
-						if (existingField) continue;
+						if (existingField) {
+							continue;
+						}
 
 						// Add the field with proper type
 						builder
 							.model(modelName)
 							.field(
 								field,
-								getPrismaType(attr.type, !attr?.required, attr?.bigint || false, field)
+								getPrismaType(attr.type, !attr?.required, attr?.bigint || false)
 							);
 
 						// Add unique attribute if needed

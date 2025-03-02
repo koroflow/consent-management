@@ -1,4 +1,4 @@
-import { pgTable, text, integer, timestamp, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, integer, timestamp, boolean, json } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -7,7 +7,8 @@ export const user = pgTable("user", {
   identityProvider: text('identity_provider'),
   lastIpAddress: text('last_ip_address'),
   createdAt: timestamp('created_at').notNull(),
-  updatedAt: timestamp('updated_at').notNull()
+  updatedAt: timestamp('updated_at').notNull(),
+  userTimezone: text('user_timezone')
 });
 
 export const purpose = pgTable("purpose", {
@@ -39,7 +40,7 @@ export const domain = pgTable("domain", {
   id: text("id").primaryKey(),
   name: text('name').notNull().unique(),
   description: text('description'),
-  allowedOrigins: text('allowed_origins'),
+  allowedOrigins: json('allowed_origins'),
   isVerified: boolean('is_verified').notNull(),
   isActive: boolean('is_active').notNull(),
   createdAt: timestamp('created_at').notNull(),
@@ -50,13 +51,13 @@ export const consent = pgTable("consent", {
   id: text("id").primaryKey(),
   userId: text('user_id').notNull().references(()=> user.id, { onDelete: 'cascade' }),
   domainId: text('domain_id').notNull().references(()=> domain.id, { onDelete: 'cascade' }),
-  purposeIds: text('purpose_ids').notNull(),
+  purposeIds: json('purpose_ids').notNull(),
   policyId: text('policy_id').references(()=> consentPolicy.id, { onDelete: 'cascade' }),
   status: text('status').notNull(),
   withdrawalReason: text('withdrawal_reason'),
   ipAddress: text('ip_address'),
   userAgent: text('user_agent'),
-  metadata: text('metadata'),
+  metadata: json('metadata'),
   createdAt: timestamp('created_at').notNull(),
   updatedAt: timestamp('updated_at'),
   expiresAt: timestamp('expires_at')
@@ -67,7 +68,7 @@ export const purposeJunction = pgTable("purpose_junction", {
   consentId: text('consent_id').notNull().references(()=> consent.id, { onDelete: 'cascade' }),
   purposeId: text('purpose_id').notNull().references(()=> purpose.id, { onDelete: 'cascade' }),
   status: text('status').notNull(),
-  metadata: text('metadata'),
+  metadata: json('metadata'),
   createdAt: timestamp('created_at').notNull(),
   updatedAt: timestamp('updated_at')
 });
@@ -77,7 +78,7 @@ export const record = pgTable("record", {
   userId: text('user_id').notNull().references(()=> user.id, { onDelete: 'cascade' }),
   consentId: text('consent_id').references(()=> consent.id, { onDelete: 'cascade' }),
   actionType: text('action_type').notNull(),
-  details: text('details'),
+  details: json('details'),
   createdAt: timestamp('created_at').notNull()
 });
 
@@ -102,7 +103,7 @@ export const withdrawal = pgTable("withdrawal", {
   withdrawalMethod: text('withdrawal_method').notNull(),
   ipAddress: text('ip_address'),
   userAgent: text('user_agent'),
-  metadata: text('metadata'),
+  metadata: json('metadata'),
   createdAt: timestamp('created_at').notNull()
 });
 
@@ -114,9 +115,10 @@ export const auditLog = pgTable("audit_log", {
   userId: text('user_id').references(()=> user.id, { onDelete: 'cascade' }),
   ipAddress: text('ip_address'),
   userAgent: text('user_agent'),
-  changes: text('changes'),
-  metadata: text('metadata'),
-  createdAt: timestamp('created_at').notNull()
+  changes: json('changes'),
+  metadata: json('metadata'),
+  createdAt: timestamp('created_at').notNull(),
+  eventTimezone: text('event_timezone').notNull()
 });
 
 export const geoLocation = pgTable("geo_location", {
@@ -125,6 +127,6 @@ export const geoLocation = pgTable("geo_location", {
   countryName: text('country_name').notNull(),
   regionCode: text('region_code'),
   regionName: text('region_name'),
-  regulatoryZones: text('regulatory_zones'),
+  regulatoryZones: json('regulatory_zones'),
   createdAt: timestamp('created_at').notNull()
 });

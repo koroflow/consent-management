@@ -11,6 +11,8 @@ export type FieldType =
 	| 'number'
 	| 'boolean'
 	| 'date'
+	| 'timezone'
+	| 'json'
 	| 'string[]'
 	| 'number[]';
 
@@ -27,10 +29,24 @@ export type Primitive =
 	| number
 	| boolean
 	| Date
+	| object
+	| Record<string, unknown>
 	| string[]
 	| number[]
 	| null
 	| undefined;
+
+/**
+ * JSON value type that more accurately represents valid JSON data.
+ * Includes all possible JSON types according to the JSON specification.
+ */
+export type JsonValue =
+	| string
+	| number
+	| boolean
+	| null
+	| { [key: string]: JsonValue }
+	| JsonValue[];
 
 /**
  * Configuration options for a database field.
@@ -233,15 +249,19 @@ type InferValueType<TFieldType extends FieldType> = TFieldType extends 'string'
 			? boolean
 			: TFieldType extends 'date'
 				? Date
-				: TFieldType extends `${infer BaseType}[]`
-					? BaseType extends 'string'
-						? string[]
-						: BaseType extends 'number'
-							? number[]
-							: never
-					: TFieldType extends (infer ArrayType)[]
-						? ArrayType
-						: never;
+				: TFieldType extends 'timezone'
+					? string
+					: TFieldType extends 'json'
+						? JsonValue
+						: TFieldType extends `${infer BaseType}[]`
+							? BaseType extends 'string'
+								? string[]
+								: BaseType extends 'number'
+									? number[]
+									: never
+							: TFieldType extends (infer ArrayType)[]
+								? ArrayType
+								: never;
 
 /**
  * The complete definition of a database field.

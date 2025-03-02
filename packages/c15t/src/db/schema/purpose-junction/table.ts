@@ -80,7 +80,7 @@ export function getPurposeJunctionTable(
 			 * Additional metadata about this specific consent-purpose relationship
 			 */
 			metadata: {
-				type: 'string[]',
+				type: 'json',
 				required: false,
 				fieldName: options.purposeJunction?.fields?.metadata || 'metadata',
 			},

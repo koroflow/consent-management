@@ -43,6 +43,8 @@ const postgresMap = {
 	],
 	boolean: ['bool', 'boolean'],
 	date: ['timestamp', 'date'],
+	json: ['json', 'jsonb'],
+	timezone: ['text', 'character varying'], // Timezone stored as text in PostgreSQL
 };
 
 /**
@@ -62,6 +64,8 @@ const mysqlMap = {
 	],
 	boolean: ['boolean', 'tinyint'],
 	date: ['timestamp', 'datetime', 'date'],
+	json: ['json'],
+	timezone: ['varchar', 'text'], // Timezone stored as text in MySQL
 };
 
 /**
@@ -73,6 +77,8 @@ const sqliteMap = {
 	number: ['INTEGER', 'REAL'],
 	boolean: ['INTEGER', 'BOOLEAN'], // 0 or 1
 	date: ['DATE', 'INTEGER'],
+	json: ['TEXT'], // SQLite stores JSON as TEXT
+	timezone: ['TEXT'], // Timezone stored as text in SQLite
 };
 
 /**
@@ -84,6 +90,8 @@ const mssqlMap = {
 	number: ['int', 'bigint', 'smallint', 'decimal', 'float', 'double'],
 	boolean: ['bit', 'smallint'],
 	date: ['datetime', 'date'],
+	json: ['nvarchar(max)'], // MSSQL uses nvarchar for JSON
+	timezone: ['varchar', 'text'], // Timezone stored as text in MSSQL
 };
 
 /**

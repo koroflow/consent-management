@@ -1,4 +1,4 @@
-import type { Field } from '~/db/core/fields';
+import { COMMON_TIMEZONES, type Field } from '~/db/core/fields';
 import type { C15TOptions } from '~/types';
 import { userSchema } from './schema';
 
@@ -100,6 +100,16 @@ export function getUserTable(
 				defaultValue: () => new Date(),
 				required: true,
 				fieldName: options.user?.fields?.updatedAt || 'updatedAt',
+			},
+
+			/**
+			 * User's local timezone, stored as IANA timezone identifier
+			 */
+			userTimezone: {
+				type: 'timezone',
+				required: false,
+				defaultValue: COMMON_TIMEZONES.UTC,
+				fieldName: options.user?.fields?.userTimezone || 'userTimezone',
 			},
 
 			// Include additional fields from plugins

@@ -34,6 +34,10 @@ const BOOLEAN_FIELD_REGEX = /("is[A-Z][a-zA-Z0-9]*")\s+integer/g;
 const DATE_FIELD_REGEX = /("(?:created|updated|expires)At")\s+date/gi;
 const TEXT_FIELD_REGEX = /("(?:name|code|description|id)")\s+text/gi;
 
+// Regex pattern for potentially JSON fields (metadata, config, data, settings, etc.)
+const JSON_FIELD_REGEX =
+	/("(?:metadata|config|data|settings|options|preferences|attributes)")\s+text/gi;
+
 /**
  * Format SQL statements for better readability and robustness
  * @param sql The raw SQL string
@@ -93,7 +97,9 @@ function formatSQL(
 									// Convert date to timestamp
 									.replace(DATE_FIELD_REGEX, '$1 timestamp with time zone')
 									// PostgreSQL prefers text with explicit lengths for VARCHAR fields
-									.replace(TEXT_FIELD_REGEX, '$1 varchar(255)');
+									.replace(TEXT_FIELD_REGEX, '$1 varchar(255)')
+									// Convert potential JSON fields to JSONB
+									.replace(JSON_FIELD_REGEX, '$1 jsonb');
 							} else if (dbType === 'mysql') {
 								// MySQL booleans are TINYINT(1)
 								formattedCol = formattedCol
@@ -101,9 +107,19 @@ function formatSQL(
 									// Date/time fields in MySQL
 									.replace(DATE_FIELD_REGEX, '$1 DATETIME')
 									// MySQL prefers VARCHAR with length for text fields
-									.replace(TEXT_FIELD_REGEX, '$1 VARCHAR(255)');
+									.replace(TEXT_FIELD_REGEX, '$1 VARCHAR(255)')
+									// Convert potential JSON fields to JSON
+									.replace(JSON_FIELD_REGEX, '$1 JSON');
 							}
 							// SQLite is flexible with types, so we keep it as is
+							// But add JSON checks and comment for clarity
+							else if (dbType === 'sqlite') {
+								// Add comment for json fields to indicate special handling
+								formattedCol = formattedCol.replace(
+									JSON_FIELD_REGEX,
+									'$1 text -- stored as JSON'
+								);
+							}
 
 							return formattedCol;
 						})
@@ -119,7 +135,7 @@ function formatSQL(
 			if (trimmedStmt.startsWith('create index')) {
 				const indexMatch = statement.match(CREATE_INDEX_REGEX);
 				if (indexMatch) {
-					const [_, indexName, tableName] = indexMatch;
+					const [_, indexName] = indexMatch;
 					rollbackStatements.unshift(`DROP INDEX IF EXISTS "${indexName}"`);
 					return `CREATE INDEX IF NOT EXISTS "${indexName}" ${statement.substring(statement.toLowerCase().indexOf('on')).trim()};`;
 				}
@@ -193,18 +209,32 @@ export const generateMigrations: SchemaGenerator = async ({
 	const migrations = await compileMigrations();
 
 	// Determine database type from adapter or options
-	const databaseType =
-		adapter?.options?.provider ||
-		(options.database && 'options' in options.database
-			? (options.database.options as { provider: string })?.provider
-			: undefined) ||
-		'sqlite';
+	let databaseType = 'sqlite'; // Default to sqlite
 
-	// Check if we're in a test environment by examining the file path or NODE_ENV
+	// Try to get from adapter first
+	if (adapter?.options?.provider) {
+		databaseType = adapter.options.provider;
+	}
+	// If not found in adapter, try to get from options
+	else if (
+		options.database &&
+		'options' in options.database &&
+		options.database.options &&
+		typeof options.database.options === 'object' &&
+		'provider' in options.database.options
+	) {
+		databaseType = options.database.options.provider as string;
+	}
+
+	// Check if we're in a test environment or have a test timestamp
 	const isTest = process.env.NODE_ENV === 'test' || file?.includes('test');
-	const formatOptions = isTest
-		? { timestamp: '2023-01-01T00:00:00.000Z' }
-		: undefined;
+	// Check for test timestamp in options (allow custom property for tests)
+	const testTimestamp = (options as { _testTimestamp?: string })
+		?._testTimestamp;
+	const formatOptions = {
+		timestamp:
+			testTimestamp || (isTest ? '2023-01-01T00:00:00.000Z' : undefined),
+	};
 
 	// Format the SQL for better readability
 	const formattedMigrations = formatSQL(
