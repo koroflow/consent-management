@@ -182,11 +182,11 @@ export function validateEntityOutput<ITableName extends keyof C15TDBSchema>(
 		throw new Error(`Table ${tableName} not found`);
 	}
 
-	// Import the parseOutputData function to validate against schema
-	const { parseOutputData } = require('../schema');
+	// Import the parseEntityOutputData function to validate against schema
+	const { parseEntityOutputData } = require('../schema');
 
 	// Validate and return data
-	return parseOutputData(data, {
+	return parseEntityOutputData(data, {
 		fields: table.fields,
 	}) as EntityOutputFields<ITableName>;
 }

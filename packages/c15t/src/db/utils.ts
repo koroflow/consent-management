@@ -1,5 +1,4 @@
 import { getConsentTables } from '.';
-import type { Field } from '~/db/core/fields';
 import { C15TError } from '~/error';
 import type { Adapter, C15TOptions } from '~/types';
 import { createKyselyAdapter } from './adapters/kysely-adapter/dialect';
@@ -36,44 +35,4 @@ export async function getAdapter(options: C15TOptions): Promise<Adapter> {
 	return kyselyAdapter(kysely, {
 		type: databaseType || 'sqlite',
 	})(options);
-}
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-export function convertToDB<T extends Record<string, any>>(
-	fields: Record<string, Field>,
-	values: T
-) {
-	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-	const result: Record<string, any> = values.id
-		? {
-				id: values.id,
-			}
-		: {};
-	// biome-ignore lint/nursery/useGuardForIn: <explanation>
-	for (const key in fields) {
-		const field = fields[key];
-		const value = values[key];
-		if (value === undefined) {
-			continue;
-		}
-		result[field?.fieldName || key] = value;
-	}
-	return result as T;
-}
-
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-export function convertFromDB<T extends Record<string, any>>(
-	fields: Record<string, Field>,
-	values: T | null
-) {
-	if (!values) {
-		return null;
-	}
-	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-	const result: Record<string, any> = {
-		id: values.id,
-	};
-	for (const [key, value] of Object.entries(fields)) {
-		result[key] = values[value.fieldName || key];
-	}
-	return result as T;
 }

@@ -22,7 +22,7 @@ export interface DB {
 	[key: string]: unknown;
 }
 
-const createTransform = (
+const createEntityTransformer = (
 	db: DB,
 	config: DrizzleAdapterConfig,
 	options: C15TOptions
@@ -299,7 +299,7 @@ export const drizzleAdapter =
 			withReturning,
 			getField,
 			getEntityName,
-		} = createTransform(db, config, options);
+		} = createEntityTransformer(db, config, options);
 		return {
 			id: 'drizzle',
 			async create(data) {

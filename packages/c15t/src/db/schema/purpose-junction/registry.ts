@@ -178,8 +178,7 @@ export function purposeJunctionRegistry({ adapter, ...ctx }: RegistryContext) {
 				});
 				return true;
 			} catch (error) {
-				// biome-ignore lint/suspicious/noConsole: <explanation>
-				console.error('Error deleting consent-purpose junctions:', error);
+				ctx.logger.error('Error deleting consent-purpose junctions:', error);
 				return false;
 			}
 		},

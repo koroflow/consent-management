@@ -11,8 +11,10 @@ import type { Endpoint } from 'better-call';
  * This type utility extracts only the method properties from an object type,
  * useful for API type inference.
  */
-export type FilterActions<T> = {
-	[K in keyof T as K extends `_${string}` ? never : K]: T[K];
+export type FilterActions<TObject extends Record<string, unknown>> = {
+	[Key in keyof TObject]: TObject[Key] extends (...args: unknown[]) => unknown
+		? Key
+		: never;
 };
 
 /**

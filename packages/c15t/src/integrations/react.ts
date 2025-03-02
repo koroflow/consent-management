@@ -303,16 +303,20 @@ export function createConsentClient(
 	 * @param createState - Function that defines the initial state and actions
 	 * @returns A store API with getState, setState, and subscribe methods
 	 */
-	function createStore<T extends object>(
+	function createStore<TState extends object>(
 		createState: (
-			set: (partial: Partial<T> | ((state: T) => Partial<T>)) => void,
-			get: () => T
-		) => T
-	): StoreAPI<T> {
-		let state: T;
-		const listeners = new Set<(state: T) => void>();
+			set: (
+				partial: Partial<TState> | ((state: TState) => Partial<TState>)
+			) => void,
+			get: () => TState
+		) => TState
+	): StoreAPI<TState> {
+		let state: TState;
+		const listeners = new Set<(state: TState) => void>();
 
-		const setState = (partial: Partial<T> | ((state: T) => Partial<T>)) => {
+		const setState = (
+			partial: Partial<TState> | ((state: TState) => Partial<TState>)
+		) => {
 			const nextState =
 				typeof partial === 'function'
 					? { ...state, ...partial(state) }
@@ -327,7 +331,7 @@ export function createConsentClient(
 
 		const getState = () => state;
 
-		const subscribe = (listener: (state: T) => void) => {
+		const subscribe = (listener: (state: TState) => void) => {
 			listeners.add(listener);
 			return () => listeners.delete(listener);
 		};

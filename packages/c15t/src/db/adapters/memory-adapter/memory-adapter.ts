@@ -30,7 +30,7 @@ interface WhereCondition<T extends EntityName> {
 	connector?: 'AND' | 'OR';
 }
 
-const createTransform = (options: C15TOptions) => {
+const createEntityTransformer = (options: C15TOptions) => {
 	const schema = getConsentTables(options);
 
 	function getField<T extends EntityName>(
@@ -175,7 +175,7 @@ export const memoryAdapter =
 	(db: MemoryDB) =>
 	(options: C15TOptions): Adapter => {
 		const { transformInput, transformOutput, convertWhereClause, getField } =
-			createTransform(options);
+			createEntityTransformer(options);
 
 		return {
 			id: 'memory',

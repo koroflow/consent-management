@@ -92,21 +92,21 @@ export const createLogger = (
 
 		if (!options || typeof options.log !== 'function') {
 			if (level === 'error') {
-				// biome-ignore lint/suspicious/noConsole: its ok
+				// biome-ignore lint/suspicious/noConsole: Logger implementation
 				console.error(formattedMessage, ...args);
 			} else if (level === 'warn') {
-				// biome-ignore lint/suspicious/noConsole: its ok
+				// biome-ignore lint/suspicious/noConsole: Logger implementation
 				console.warn(formattedMessage, ...args);
 			} else if (level === 'info') {
-				// biome-ignore lint/suspicious/noConsole: its ok
-				// biome-ignore lint/suspicious/noConsoleLog: its ok
+				// biome-ignore lint/suspicious/noConsole: Logger implementation
+				// biome-ignore lint/suspicious/noConsoleLog: Logger implementation
 				console.log(formattedMessage, ...args);
 			} else if (level === 'debug') {
-				// biome-ignore lint/suspicious/noConsole: its ok
+				// biome-ignore lint/suspicious/noConsole: Logger implementation
 				console.debug(formattedMessage, ...args);
 			} else if (level === 'success') {
-				// biome-ignore lint/suspicious/noConsole: its ok
-				// biome-ignore lint/suspicious/noConsoleLog: its ok
+				// biome-ignore lint/suspicious/noConsole: Logger implementation
+				// biome-ignore lint/suspicious/noConsoleLog: Logger implementation
 				console.log(formattedMessage, ...args);
 			}
 			return;

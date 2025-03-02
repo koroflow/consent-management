@@ -215,17 +215,16 @@ export interface C15TPlugin {
  * Improved type inference for plugin types
  * This creates a union of all plugin $Infer types
  */
-export type InferPluginTypes<O extends C15TOptions> =
-	O['plugins'] extends Array<infer P>
-		? P extends C15TPlugin
-			? P extends { $Infer: infer PI }
-				? PI extends Record<string, unknown>
-					? PI
+export type ExtractPluginTypeDefinitions<TOptions extends C15TOptions> =
+	TOptions['plugins'] extends Array<infer Plugin>
+		? Plugin extends C15TPlugin
+			? Plugin extends { $Infer: infer PluginTypes }
+				? PluginTypes extends Record<string, unknown>
+					? PluginTypes
 					: Record<string, never>
 				: Record<string, never>
 			: Record<string, never>
 		: Record<string, never>;
-
 /**
  * Helper to extract specific plugin type from options
  */

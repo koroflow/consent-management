@@ -5,7 +5,7 @@ import { APIError } from 'better-call';
 /**
  * Parses and transforms output data according to schema field definitions
  */
-export function parseOutputData<T extends Record<string, unknown>>(
+export function parseEntityOutputData<T extends Record<string, unknown>>(
 	data: T,
 	schema: {
 		fields: Record<string, Field>;
@@ -67,60 +67,61 @@ export function parseInputData<T extends Record<string, unknown>>(
 	const action = schema.action || 'create';
 	const fields = schema.fields;
 	const parsedData: Record<string, unknown> = {};
-	// biome-ignore lint/nursery/useGuardForIn: <explanation>
 	for (const key in fields) {
-		if (key in data) {
-			if (fields[key]?.input === false) {
-				if (fields[key]?.defaultValue) {
-					parsedData[key] = fields[key]?.defaultValue;
+		if (Object.hasOwn(fields, key)) {
+			if (key in data) {
+				if (fields[key]?.input === false) {
+					if (fields[key]?.defaultValue) {
+						parsedData[key] = fields[key]?.defaultValue;
+						continue;
+					}
 					continue;
 				}
+				// Check if validator exists and is an object with input property (old style)
+				function isLegacyValidator(
+					validator: unknown
+				): validator is { input?: { parse: (value: unknown) => unknown } } {
+					return (
+						typeof validator === 'object' &&
+						validator !== null &&
+						'input' in validator
+					);
+				}
+
+				if (
+					fields[key]?.validator &&
+					isLegacyValidator(fields[key]?.validator) &&
+					fields[key]?.validator.input &&
+					data[key] !== undefined
+				) {
+					parsedData[key] = fields[key]?.validator.input.parse(data[key]);
+					continue;
+				}
+				if (fields[key]?.transform?.input && data[key] !== undefined) {
+					const inputValue = data[key] as
+						| string
+						| number
+						| boolean
+						| Date
+						| string[]
+						| number[];
+					parsedData[key] = fields[key]?.transform?.input(inputValue);
+					continue;
+				}
+				parsedData[key] = data[key];
 				continue;
 			}
-			// Check if validator exists and is an object with input property (old style)
-			function isLegacyValidator(
-				validator: unknown
-			): validator is { input?: { parse: (value: unknown) => unknown } } {
-				return (
-					typeof validator === 'object' &&
-					validator !== null &&
-					'input' in validator
-				);
-			}
 
-			if (
-				fields[key]?.validator &&
-				isLegacyValidator(fields[key]?.validator) &&
-				fields[key]?.validator.input &&
-				data[key] !== undefined
-			) {
-				parsedData[key] = fields[key]?.validator.input.parse(data[key]);
+			if (fields[key]?.defaultValue && action === 'create') {
+				parsedData[key] = fields[key]?.defaultValue;
 				continue;
 			}
-			if (fields[key]?.transform?.input && data[key] !== undefined) {
-				const inputValue = data[key] as
-					| string
-					| number
-					| boolean
-					| Date
-					| string[]
-					| number[];
-				parsedData[key] = fields[key]?.transform?.input(inputValue);
-				continue;
+
+			if (fields[key]?.required && action === 'create') {
+				throw new APIError('BAD_REQUEST', {
+					message: `${key} is required`,
+				});
 			}
-			parsedData[key] = data[key];
-			continue;
-		}
-
-		if (fields[key]?.defaultValue && action === 'create') {
-			parsedData[key] = fields[key]?.defaultValue;
-			continue;
-		}
-
-		if (fields[key]?.required && action === 'create') {
-			throw new APIError('BAD_REQUEST', {
-				message: `${key} is required`,
-			});
 		}
 	}
 	return parsedData as Partial<T>;
@@ -143,22 +144,25 @@ export function mergeSchema<S extends C15TPluginSchema>(
 	if (!newSchema) {
 		return schema;
 	}
-	// biome-ignore lint/nursery/useGuardForIn: <explanation>
 	for (const table in newSchema) {
-		const newEntityName = newSchema[table]?.entityName;
-		if (newEntityName && schema[table]) {
-			schema[table].entityName = newEntityName;
-		}
-		// biome-ignore lint/nursery/useGuardForIn: <explanation>
-		for (const field in schema[table]?.fields || {}) {
-			const newField = newSchema[table]?.fields?.[field];
-			if (!newField) {
-				continue;
+		if (Object.hasOwn(newSchema, table)) {
+			const newEntityName = newSchema[table]?.entityName;
+			if (newEntityName && schema[table]) {
+				schema[table].entityName = newEntityName;
 			}
-			if (schema[table]?.fields) {
-				const fields = schema[table].fields;
-				if (fields?.[field]) {
-					fields[field].fieldName = newField;
+
+			for (const field in schema[table]?.fields || {}) {
+				if (Object.hasOwn(schema[table]?.fields || {}, field)) {
+					const newField = newSchema[table]?.fields?.[field];
+					if (!newField) {
+						continue;
+					}
+					if (schema[table]?.fields) {
+						const fields = schema[table].fields;
+						if (fields?.[field]) {
+							fields[field].fieldName = newField;
+						}
+					}
 				}
 			}
 		}

@@ -20,11 +20,10 @@ export function getEndpoints<C extends C15TContext, Option extends C15TOptions>(
 ) {
 	const pluginEndpoints = options.plugins?.reduce<Record<string, Endpoint>>(
 		(acc, plugin) => {
-			return {
-				// biome-ignore lint/performance/noAccumulatingSpread: <explanation>
-				...acc,
-				...plugin.endpoints,
-			};
+			if (plugin.endpoints) {
+				Object.assign(acc, plugin.endpoints);
+			}
+			return acc;
 		},
 		{}
 	);
@@ -45,8 +44,7 @@ export function getEndpoints<C extends C15TContext, Option extends C15TOptions>(
 		options.plugins
 			?.map((plugin) =>
 				plugin.middlewares?.map((m) => {
-					// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-					const middleware = (async (context: { context: any }) => {
+					const middleware = (async (context: { context: C }) => {
 						return m.middleware({
 							...context,
 							context: {

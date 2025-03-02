@@ -1,4 +1,8 @@
-import type { EndpointContext, InputContext } from 'better-call';
+import type {
+	EndpointContext,
+	EndpointOptions,
+	InputContext,
+} from 'better-call';
 import type { Adapter, C15TOptions } from './index';
 import type { createLogger } from '~/utils';
 import type { getConsentTables } from '~/db';
@@ -6,10 +10,10 @@ import type { DatabaseHook } from '~/db/hooks/types';
 import type { createRegistry } from '~/db/create-registry';
 import type { EntityName } from '~/db/core/types';
 
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-export type HookEndpointContext = EndpointContext<string, any> &
-	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-	Omit<InputContext<string, any>, 'method'> & {
+export type HookEndpointContext<
+	TOptions extends EndpointOptions = EndpointOptions,
+> = EndpointContext<string, TOptions> &
+	Omit<InputContext<string, TOptions>, 'method'> & {
 		context: C15TContext & {
 			returned?: unknown;
 			responseHeaders?: Headers;
@@ -17,8 +21,9 @@ export type HookEndpointContext = EndpointContext<string, any> &
 		headers?: Headers;
 	};
 
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-export type GenericEndpointContext = EndpointContext<string, any> & {
+export type GenericEndpointContext<
+	TOptions extends EndpointOptions = EndpointOptions,
+> = EndpointContext<string, TOptions> & {
 	context: C15TContext;
 };
 

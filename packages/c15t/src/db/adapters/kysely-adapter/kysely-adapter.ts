@@ -68,7 +68,7 @@ export interface KyselyAdapterConfig {
 // schema, where field names and references are determined at runtime.
 // An alternative approach would be to generate fully typed interfaces at build time.
 
-const createTransform = (
+const createEntityTransformer = (
 	db: Kysely<Database>,
 	options: C15TOptions,
 	config?: KyselyAdapterConfig
@@ -87,8 +87,8 @@ const createTransform = (
 			? (modelFields as Record<string, Field>)[field as string]
 			: undefined;
 		if (!f) {
-			// biome-ignore lint/suspicious/noConsoleLog: <explanation>
-			// biome-ignore lint/suspicious/noConsole: <explanation>
+			// biome-ignore lint/suspicious/noConsoleLog: no Logger implementation
+			// biome-ignore lint/suspicious/noConsole: no Logger implementation
 			console.log('Field not found', model, field);
 		}
 		return f?.fieldName || (field as string);
@@ -194,14 +194,15 @@ const createTransform = (
 			if (!data) {
 				return null;
 			}
-			const transformedData: Record<string, unknown> = data.id
-				? // biome-ignore lint/nursery/noNestedTernary: <explanation>
-					select.length === 0 || select.includes('id')
-					? {
-							id: data.id,
-						}
-					: {}
-				: {};
+
+			// Initialize transformedData based on conditions
+			const transformedData: Record<string, unknown> = {};
+
+			// Add id to transformed data if needed
+			if (data.id && (select.length === 0 || select.includes('id'))) {
+				transformedData.id = data.id;
+			}
+
 			const tableSchema = schema[model]?.fields;
 			for (const key in tableSchema) {
 				if (select.length && !select.includes(key)) {
@@ -386,7 +387,7 @@ export const kyselyAdapter =
 			convertWhereClause,
 			getEntityName,
 			getField,
-		} = createTransform(db, opts, config);
+		} = createEntityTransformer(db, opts, config);
 		return {
 			id: 'kysely',
 			async create<

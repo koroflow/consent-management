@@ -21,7 +21,7 @@ export * from './withdrawal';
 export { getConsentTables, type C15TDBSchema } from './definition';
 export {
 	parseInputData,
-	parseOutputData,
+	parseEntityOutputData,
 	getAllFields,
 	mergeSchema,
 } from './parser';

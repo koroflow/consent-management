@@ -35,7 +35,7 @@ import { router } from './api/index';
 import type { C15TOptions } from './types/options';
 import type {
 	InferPluginErrorCodes,
-	InferPluginTypes,
+	ExtractPluginTypeDefinitions,
 	C15TContext,
 	C15TPlugin,
 	InferPluginContexts,
@@ -109,14 +109,17 @@ export const c15t = <
 			ctx.options.baseURL = baseURL;
 			ctx.baseURL = baseURL;
 		}
-		ctx.trustedOrigins = [
-			...(options.trustedOrigins
-				? // biome-ignore lint/nursery/noNestedTernary: its okay
-					Array.isArray(options.trustedOrigins)
-					? options.trustedOrigins
-					: options.trustedOrigins(request)
-				: []),
 
+		// Extract trusted origins logic to avoid nested ternaries
+		let originsFromOptions: string[] = [];
+		if (options.trustedOrigins) {
+			originsFromOptions = Array.isArray(options.trustedOrigins)
+				? options.trustedOrigins
+				: options.trustedOrigins(request);
+		}
+
+		ctx.trustedOrigins = [
+			...originsFromOptions,
 			ctx.options.baseURL || '',
 			url.origin,
 		];
@@ -164,14 +167,13 @@ export const c15t = <
 
 	return {
 		handler,
-		// We're type-casting this for now since the API is loaded asynchronously
 		api: {} as FilterActions<ReturnType<typeof router>['endpoints']>,
 		options,
 		$context: C15TContextPromise,
 		$Infer: {} as {
 			Consent: {
-				Context: C15TContext<InferPluginContexts<PluginArray>>;
-				Record: InferPluginTypes<C15TOptions<PluginArray>>;
+				Context: InferPluginContexts<PluginArray>;
+				Record: ExtractPluginTypeDefinitions<C15TOptions<PluginArray>>;
 			};
 			Error: InferPluginErrorCodes<C15TOptions<PluginArray>> &
 				typeof BASE_ERROR_CODES;

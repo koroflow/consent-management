@@ -9,11 +9,12 @@ export type RequiredKeysOf<BaseType extends object> = Exclude<
 	undefined
 >;
 
-// biome-ignore lint/complexity/noBannedTypes: lets not break the type inference
-export type DeepPartial<T> = T extends Function
+export type DeepPartial<T> = T extends (...args: unknown[]) => unknown
 	? T
 	: T extends object
 		? { [K in keyof T]?: DeepPartial<T[K]> }
 		: T;
 
-export type Expand<T> = T extends infer O ? { [K in keyof O]: O[K] } : never;
+export type ExpandRecursively<T> = T extends infer O
+	? { [K in keyof O]: O[K] }
+	: never;

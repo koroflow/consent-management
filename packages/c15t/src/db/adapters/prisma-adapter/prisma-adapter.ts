@@ -32,7 +32,10 @@ interface PrismaClientInternal {
 	};
 }
 
-const createTransform = (_config: PrismaConfig, options: C15TOptions) => {
+const createEntityTransformer = (
+	_config: PrismaConfig,
+	options: C15TOptions
+) => {
 	const schema = getConsentTables(options);
 
 	function getField(model: string, field: string) {
@@ -191,7 +194,7 @@ export const prismaAdapter =
 			convertSelect,
 			getEntityName,
 			getField,
-		} = createTransform(config, options);
+		} = createEntityTransformer(config, options);
 		return {
 			id: 'prisma',
 			async create(data) {

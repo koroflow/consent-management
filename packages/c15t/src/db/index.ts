@@ -8,7 +8,7 @@
 export {
 	getConsentTables,
 	parseInputData,
-	parseOutputData,
+	parseEntityOutputData,
 	getAllFields,
 } from './schema/index';
 

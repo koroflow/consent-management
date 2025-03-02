@@ -52,7 +52,7 @@ export function processFields<T extends EntityName>(
 				};
 			} else {
 				// Log warning and remove invalid reference if table not found
-				// biome-ignore lint/suspicious/noConsole: <explanation>
+				// biome-ignore lint/suspicious/noConsole: no Logger implementation
 				console.warn(
 					`Warning: Referenced table '${EntityName}' not found for field '${fieldName}'. The reference will be removed to prevent inconsistent state.`
 				);
