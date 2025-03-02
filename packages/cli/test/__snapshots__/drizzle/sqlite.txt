@@ -1,0 +1,130 @@
+import { sqliteTable, text, integer,  } from "drizzle-orm/sqlite-core";
+
+export const user = sqliteTable("user", {
+  id: text("id").primaryKey(),
+  isIdentified: integer('is_identified', { mode: 'boolean' }).notNull(),
+  externalId: text('external_id'),
+  identityProvider: text('identity_provider'),
+  lastIpAddress: text('last_ip_address'),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull()
+});
+
+export const purpose = sqliteTable("purpose", {
+  id: text("id").primaryKey(),
+  code: text('code').notNull(),
+  name: text('name').notNull(),
+  description: text('description').notNull(),
+  isEssential: integer('is_essential', { mode: 'boolean' }).notNull(),
+  dataCategory: text('data_category'),
+  legalBasis: text('legal_basis'),
+  isActive: integer('is_active', { mode: 'boolean' }).notNull(),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull()
+});
+
+export const consentPolicy = sqliteTable("consent_policy", {
+  id: text("id").primaryKey(),
+  version: text('version').notNull(),
+  name: text('name').notNull(),
+  effectiveDate: integer('effective_date', { mode: 'timestamp' }).notNull(),
+  expirationDate: integer('expiration_date', { mode: 'timestamp' }),
+  content: text('content').notNull(),
+  contentHash: text('content_hash').notNull(),
+  isActive: integer('is_active', { mode: 'boolean' }).notNull(),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull()
+});
+
+export const domain = sqliteTable("domain", {
+  id: text("id").primaryKey(),
+  name: text('name').notNull().unique(),
+  description: text('description'),
+  allowedOrigins: text('allowed_origins'),
+  isVerified: integer('is_verified', { mode: 'boolean' }).notNull(),
+  isActive: integer('is_active', { mode: 'boolean' }).notNull(),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
+  updatedAt: integer('updated_at', { mode: 'timestamp' })
+});
+
+export const consent = sqliteTable("consent", {
+  id: text("id").primaryKey(),
+  userId: text('user_id').notNull().references(()=> user.id, { onDelete: 'cascade' }),
+  domainId: text('domain_id').notNull().references(()=> domain.id, { onDelete: 'cascade' }),
+  purposeIds: text('purpose_ids').notNull(),
+  policyId: text('policy_id').references(()=> consentPolicy.id, { onDelete: 'cascade' }),
+  status: text('status').notNull(),
+  withdrawalReason: text('withdrawal_reason'),
+  ipAddress: text('ip_address'),
+  userAgent: text('user_agent'),
+  metadata: text('metadata'),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }),
+  expiresAt: integer('expires_at', { mode: 'timestamp' })
+});
+
+export const purposeJunction = sqliteTable("purpose_junction", {
+  id: text("id").primaryKey(),
+  consentId: text('consent_id').notNull().references(()=> consent.id, { onDelete: 'cascade' }),
+  purposeId: text('purpose_id').notNull().references(()=> purpose.id, { onDelete: 'cascade' }),
+  status: text('status').notNull(),
+  metadata: text('metadata'),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
+  updatedAt: integer('updated_at', { mode: 'timestamp' })
+});
+
+export const record = sqliteTable("record", {
+  id: text("id").primaryKey(),
+  userId: text('user_id').notNull().references(()=> user.id, { onDelete: 'cascade' }),
+  consentId: text('consent_id').references(()=> consent.id, { onDelete: 'cascade' }),
+  actionType: text('action_type').notNull(),
+  details: text('details'),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull()
+});
+
+export const consentGeoLocation = sqliteTable("consent_geo_location", {
+  id: text("id").primaryKey(),
+  consentId: text('consent_id').notNull().references(()=> consent.id, { onDelete: 'cascade' }),
+  ip: text('ip').notNull(),
+  country: text('country'),
+  region: text('region'),
+  city: text('city'),
+  latitude: integer('latitude'),
+  longitude: integer('longitude'),
+  timezone: text('timezone'),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull()
+});
+
+export const withdrawal = sqliteTable("withdrawal", {
+  id: text("id").primaryKey(),
+  consentId: text('consent_id').notNull().references(()=> consent.id, { onDelete: 'cascade' }),
+  userId: text('user_id').notNull().references(()=> user.id, { onDelete: 'cascade' }),
+  withdrawalReason: text('withdrawal_reason'),
+  withdrawalMethod: text('withdrawal_method').notNull(),
+  ipAddress: text('ip_address'),
+  userAgent: text('user_agent'),
+  metadata: text('metadata'),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull()
+});
+
+export const auditLog = sqliteTable("audit_log", {
+  id: text("id").primaryKey(),
+  entityType: text('entity_type').notNull(),
+  entityId: text('entity_id').notNull(),
+  actionType: text('action_type').notNull(),
+  userId: text('user_id').references(()=> user.id, { onDelete: 'cascade' }),
+  ipAddress: text('ip_address'),
+  userAgent: text('user_agent'),
+  changes: text('changes'),
+  metadata: text('metadata'),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull()
+});
+
+export const geoLocation = sqliteTable("geo_location", {
+  id: text("id").primaryKey(),
+  countryCode: text('country_code').notNull(),
+  countryName: text('country_name').notNull(),
+  regionCode: text('region_code'),
+  regionName: text('region_name'),
+  regulatoryZones: text('regulatory_zones'),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull()
+});

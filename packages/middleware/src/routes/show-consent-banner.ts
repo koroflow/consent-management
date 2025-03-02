@@ -64,7 +64,6 @@ export const showConsentBanner = createEndpoint(
 	}
 );
 
-// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: This is a complex function, but it's necessary to check the jurisdiction of the user
 function checkJurisdiction(countryCode: string | null) {
 	const jurisdictions = {
 		EU: new Set([

@@ -83,6 +83,7 @@ export const fetchConsentBannerInfo = async (
 
 			return data;
 		} catch (error) {
+			// biome-ignore lint/suspicious/noConsole: <explanation>
 			console.error('Error fetching consent banner information:', error);
 
 			// Call the onError callback
