@@ -24,11 +24,19 @@ export function getConsentPolicyTable(
 	options: C15TOptions,
 	policyFields?: Record<string, Field>
 ) {
+	const consentPolicyConfig = options.tables?.consentPolicy;
+
 	return {
 		/**
 		 * The name of the policy table in the database, configurable through options
 		 */
-		entityName: options.consentPolicy?.entityName || 'consentPolicy',
+		entityName: consentPolicyConfig?.entityName || 'consentPolicy',
+
+		/**
+		 * The ID prefix for the consent policy table
+		 * Used to generate unique prefixed IDs for consent policies
+		 */
+		entityPrefix: consentPolicyConfig?.entityPrefix || 'pol',
 
 		/**
 		 * The schema for the consent policy table
@@ -45,7 +53,7 @@ export function getConsentPolicyTable(
 			version: {
 				type: 'string',
 				required: true,
-				fieldName: options.consentPolicy?.fields?.version || 'version',
+				fieldName: consentPolicyConfig?.fields?.version || 'version',
 			},
 
 			/**
@@ -54,7 +62,7 @@ export function getConsentPolicyTable(
 			name: {
 				type: 'string',
 				required: true,
-				fieldName: options.consentPolicy?.fields?.name || 'name',
+				fieldName: consentPolicyConfig?.fields?.name || 'name',
 			},
 
 			/**
@@ -64,7 +72,7 @@ export function getConsentPolicyTable(
 				type: 'date',
 				required: true,
 				fieldName:
-					options.consentPolicy?.fields?.effectiveDate || 'effectiveDate',
+					consentPolicyConfig?.fields?.effectiveDate || 'effectiveDate',
 			},
 
 			/**
@@ -74,7 +82,7 @@ export function getConsentPolicyTable(
 				type: 'date',
 				required: false,
 				fieldName:
-					options.consentPolicy?.fields?.expirationDate || 'expirationDate',
+					consentPolicyConfig?.fields?.expirationDate || 'expirationDate',
 			},
 
 			/**
@@ -83,7 +91,7 @@ export function getConsentPolicyTable(
 			content: {
 				type: 'string',
 				required: true,
-				fieldName: options.consentPolicy?.fields?.content || 'content',
+				fieldName: consentPolicyConfig?.fields?.content || 'content',
 			},
 
 			/**
@@ -92,7 +100,7 @@ export function getConsentPolicyTable(
 			contentHash: {
 				type: 'string',
 				required: true,
-				fieldName: options.consentPolicy?.fields?.contentHash || 'contentHash',
+				fieldName: consentPolicyConfig?.fields?.contentHash || 'contentHash',
 			},
 
 			/**
@@ -103,7 +111,7 @@ export function getConsentPolicyTable(
 				type: 'boolean',
 				defaultValue: () => true,
 				required: true,
-				fieldName: options.consentPolicy?.fields?.isActive || 'isActive',
+				fieldName: consentPolicyConfig?.fields?.isActive || 'isActive',
 			},
 
 			/**
@@ -114,14 +122,14 @@ export function getConsentPolicyTable(
 				type: 'date',
 				defaultValue: () => new Date(),
 				required: true,
-				fieldName: options.consentPolicy?.fields?.createdAt || 'createdAt',
+				fieldName: consentPolicyConfig?.fields?.createdAt || 'createdAt',
 			},
 
 			// Include additional fields from plugins
 			...policyFields,
 
 			// Include additional fields from configuration
-			...options.consentPolicy?.additionalFields,
+			...consentPolicyConfig?.additionalFields,
 		},
 
 		/**

@@ -51,17 +51,6 @@ export const status = createAuthEndpoint(
 			status: 'ok',
 			version: context.version || '1.0.0',
 			timestamp: new Date().toISOString(),
-			consent: {
-				enabled: context.consentConfig?.enabled,
-				updateAge:
-					typeof context.consentConfig?.updateAge === 'number'
-						? context.consentConfig.updateAge
-						: 90,
-				expiresIn:
-					typeof context.consentConfig?.expiresIn === 'number'
-						? context.consentConfig.expiresIn
-						: 365,
-			},
 		};
 	}
 );

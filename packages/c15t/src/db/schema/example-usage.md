@@ -1,6 +1,6 @@
-# ID Generation System Usage
+# ID Generation and Table Configuration
 
-This document demonstrates how to use the custom ID generation system for C15T database tables.
+This document demonstrates how to use the custom ID generation system and table configuration in the C15T system.
 
 ## Table-Level ID Generation
 
@@ -14,12 +14,15 @@ When defining a table schema, include the `entityPrefix` and use the `defaultIdG
 import { defaultIdGenerator } from '~/db/core/fields';
 
 export function getExampleTable(options, customFields) {
+  // Get config with backward compatibility
+  const exampleConfig = options.tables?.example || options.example;
+
   return {
     // Table name
-    entityName: options.example?.entityName || 'example',
+    entityName: exampleConfig?.entityName || 'example',
     
     // Entity prefix for IDs - this will be used in generated IDs
-    entityPrefix: options.example?.entityPrefix || 'exm',
+    entityPrefix: exampleConfig?.entityPrefix || 'exm',
     
     // ID generator that automatically uses entityPrefix
     generateId: defaultIdGenerator, // Will generate 'exm_...' IDs
@@ -29,6 +32,7 @@ export function getExampleTable(options, customFields) {
       name: {
         type: 'string',
         required: true,
+        fieldName: exampleConfig?.fields?.name || 'name',
       },
       // ... other fields
     }
@@ -36,45 +40,102 @@ export function getExampleTable(options, customFields) {
 }
 ```
 
-### Configurable Prefixes
+## Configuration Structure
 
-By using options to configure the prefix, you allow users to customize the ID format:
+The C15T system uses a standardized approach to entity configuration with two key improvements:
+
+1. **Typed Entity Configurations** - Each entity has its own typed configuration interface
+2. **Centralized Tables Object** - All tables are organized under a single `tables` object
 
 ```typescript
-// User configuration
-const config = {
-  example: {
-    entityPrefix: 'custom',
-  }
-};
+// In options.ts
+export interface BaseEntityConfig {
+  // Basic entity properties
+  entityName?: string;
+  entityPrefix?: string;
+  fields?: Record<string, string>;
+  additionalFields?: Record<string, Field>;
+}
 
-// In your code
-const tableSchema = getExampleTable(config);
-// This will use 'custom_...' as the ID prefix
+// Specific entity config with typed fields
+export interface UserEntityConfig extends BaseEntityConfig {
+  fields?: Record<string, string> & {
+    email?: string;
+    isIdentified?: string;
+    // ...etc
+  };
+}
+
+// Tables configuration that collects all entity configs
+export interface TablesConfig {
+  user?: UserEntityConfig;
+  record?: RecordEntityConfig;
+  // ... other entities
+}
+
+// Main options with tables object
+export interface C15TOptions {
+  // ...other options
+  
+  // All database tables in one place
+  tables?: TablesConfig;
+}
 ```
 
-### Explicit ID Generator
+### Using the Tables Configuration
 
-If you need more control over ID generation, you can use `createIdGenerator` with a specific prefix:
+The recommended way to configure tables is through the `tables` object:
 
 ```typescript
-import { createIdGenerator } from '~/db/core/fields';
-
-export function getExampleTable(options, customFields) {
-  // Get the prefix from options or use a default
-  const prefix = options.example?.entityPrefix || 'exm';
+// User configuration with tables object
+const config: C15TOptions = {
+  appName: 'My Consent System',
   
-  return {
-    entityName: options.example?.entityName || 'example',
-    entityPrefix: prefix,
+  // All table configuration in one place
+  tables: {
+    // User table configuration
+    user: {
+      entityName: 'customer',
+      entityPrefix: 'cst',
+      fields: {
+        email: 'emailAddress'
+      }
+    },
     
-    // Create a custom generator with the prefix
-    generateId: createIdGenerator(prefix),
-    
-    fields: {
-      // ... fields
+    // Record table configuration
+    record: {
+      entityPrefix: 'log'
     }
-  };
+  }
+};
+```
+
+### Backward Compatibility
+
+For backward compatibility, you can still use the top-level configuration, but it's recommended to migrate to the tables object:
+
+```typescript
+// Legacy configuration (still supported but deprecated)
+const legacyConfig: C15TOptions = {
+  user: {
+    entityPrefix: 'usr',
+    // ...
+  },
+  record: {
+    entityPrefix: 'rec',
+    // ...
+  }
+};
+```
+
+When implementing table schemas, support both approaches:
+
+```typescript
+export function getTable(options) {
+  // Support both new and legacy paths
+  const config = options.tables?.example || options.example;
+  
+  // Use the config...
 }
 ```
 
@@ -100,4 +161,7 @@ const newUserId = generateUserId(); // 'usr_5RtX9...'
 3. **Configurable prefixes** - can be specified through configuration
 4. **Time-ordered IDs** to help with sorting and indexing
 5. **Human-readable prefixes** for easier debugging
-6. **Table-level ID generation** keeps ID logic out of the fields 
+6. **Table-level ID generation** keeps ID logic out of the fields
+7. **Standardized entity configuration** - reduces code duplication and inconsistencies
+8. **Organized configuration** - all table configurations in one place
+9. **Type safety** - specific entity types for better editor support 

@@ -25,17 +25,20 @@ export function getUserTable(
 	options: C15TOptions,
 	userFields?: Record<string, Field>
 ) {
+	// Get user config, supporting both the new tables.user and legacy user format
+	const userConfig = options.tables?.user;
+
 	return {
 		/**
 		 * The name of the user table in the database, configurable through options
 		 */
-		entityName: options.user?.entityName || 'user',
+		entityName: userConfig?.entityName || 'user',
 
 		/**
 		 * The ID prefix for the user table
 		 * Used to generate unique prefixed IDs for users
 		 */
-		entityPrefix: options.user?.entityPrefix || 'usr',
+		entityPrefix: userConfig?.entityPrefix || 'usr',
 
 		/**
 		 * ID generator function for this table
@@ -60,7 +63,7 @@ export function getUserTable(
 				type: 'string',
 				required: true,
 				unique: true,
-				fieldName: options.user?.fields?.email || 'email',
+				fieldName: userConfig?.fields?.email || 'email',
 				transform: {
 					input: (value: string) => value.toLowerCase().trim(),
 				},
@@ -72,7 +75,7 @@ export function getUserTable(
 			name: {
 				type: 'string',
 				required: false,
-				fieldName: options.user?.fields?.name || 'name',
+				fieldName: userConfig?.fields?.name || 'name',
 			},
 
 			/**
@@ -83,7 +86,7 @@ export function getUserTable(
 				type: 'boolean',
 				defaultValue: () => false,
 				required: true,
-				fieldName: options.user?.fields?.isIdentified || 'isIdentified',
+				fieldName: userConfig?.fields?.isIdentified || 'isIdentified',
 			},
 
 			/**
@@ -93,7 +96,7 @@ export function getUserTable(
 			externalId: {
 				type: 'string',
 				required: false,
-				fieldName: options.user?.fields?.externalId || 'externalId',
+				fieldName: userConfig?.fields?.externalId || 'externalId',
 			},
 
 			/**
@@ -103,7 +106,7 @@ export function getUserTable(
 			identityProvider: {
 				type: 'string',
 				required: false,
-				fieldName: options.user?.fields?.identityProvider || 'identityProvider',
+				fieldName: userConfig?.fields?.identityProvider || 'identityProvider',
 			},
 
 			/**
@@ -113,7 +116,7 @@ export function getUserTable(
 			lastIpAddress: {
 				type: 'string',
 				required: false,
-				fieldName: options.user?.fields?.lastIpAddress || 'lastIpAddress',
+				fieldName: userConfig?.fields?.lastIpAddress || 'lastIpAddress',
 			},
 
 			/**
@@ -124,7 +127,7 @@ export function getUserTable(
 				type: 'date',
 				defaultValue: () => new Date(),
 				required: true,
-				fieldName: options.user?.fields?.createdAt || 'createdAt',
+				fieldName: userConfig?.fields?.createdAt || 'createdAt',
 			},
 
 			/**
@@ -135,7 +138,7 @@ export function getUserTable(
 				type: 'date',
 				defaultValue: () => new Date(),
 				required: true,
-				fieldName: options.user?.fields?.updatedAt || 'updatedAt',
+				fieldName: userConfig?.fields?.updatedAt || 'updatedAt',
 			},
 
 			/**
@@ -145,14 +148,14 @@ export function getUserTable(
 				type: 'timezone',
 				required: false,
 				defaultValue: COMMON_TIMEZONES.UTC,
-				fieldName: options.user?.fields?.userTimezone || 'userTimezone',
+				fieldName: userConfig?.fields?.userTimezone || 'userTimezone',
 			},
 
 			// Include additional fields from plugins
 			...userFields,
 
 			// Include additional fields from configuration
-			...options.user?.additionalFields,
+			...userConfig?.additionalFields,
 		},
 
 		/**

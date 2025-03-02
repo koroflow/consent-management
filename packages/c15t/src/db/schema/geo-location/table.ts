@@ -24,11 +24,18 @@ export function getGeoLocationTable(
 	options: C15TOptions,
 	geoLocationFields?: Record<string, Field>
 ) {
+	const geoLocationConfig = options.tables?.geoLocation;
 	return {
 		/**
 		 * The name of the geo-location table in the database, configurable through options
 		 */
-		entityName: options.geoLocation?.entityName || 'geoLocation',
+		entityName: geoLocationConfig?.entityName || 'geoLocation',
+
+		/**
+		 * The ID prefix for the geo-location table
+		 * Used to generate unique prefixed IDs for geo-locations
+		 */
+		entityPrefix: geoLocationConfig?.entityPrefix || 'geo',
 
 		/**
 		 * The schema for the geo-location table
@@ -45,7 +52,7 @@ export function getGeoLocationTable(
 			countryCode: {
 				type: 'string',
 				required: true,
-				fieldName: options.geoLocation?.fields?.countryCode || 'countryCode',
+				fieldName: geoLocationConfig?.fields?.countryCode || 'countryCode',
 			},
 
 			/**
@@ -54,7 +61,7 @@ export function getGeoLocationTable(
 			countryName: {
 				type: 'string',
 				required: true,
-				fieldName: options.geoLocation?.fields?.countryName || 'countryName',
+				fieldName: geoLocationConfig?.fields?.countryName || 'countryName',
 			},
 
 			/**
@@ -63,7 +70,7 @@ export function getGeoLocationTable(
 			regionCode: {
 				type: 'string',
 				required: false,
-				fieldName: options.geoLocation?.fields?.regionCode || 'regionCode',
+				fieldName: geoLocationConfig?.fields?.regionCode || 'regionCode',
 			},
 
 			/**
@@ -72,7 +79,7 @@ export function getGeoLocationTable(
 			regionName: {
 				type: 'string',
 				required: false,
-				fieldName: options.geoLocation?.fields?.regionName || 'regionName',
+				fieldName: geoLocationConfig?.fields?.regionName || 'regionName',
 			},
 
 			/**
@@ -83,7 +90,7 @@ export function getGeoLocationTable(
 				type: 'json',
 				required: false,
 				fieldName:
-					options.geoLocation?.fields?.regulatoryZones || 'regulatoryZones',
+					geoLocationConfig?.fields?.regulatoryZones || 'regulatoryZones',
 				transformer: {
 					input: (value: string[]) => JSON.stringify(value),
 					output: (value: string) => {
@@ -104,14 +111,14 @@ export function getGeoLocationTable(
 				type: 'date',
 				defaultValue: () => new Date(),
 				required: true,
-				fieldName: options.geoLocation?.fields?.createdAt || 'createdAt',
+				fieldName: geoLocationConfig?.fields?.createdAt || 'createdAt',
 			},
 
 			// Include additional fields from plugins
 			...geoLocationFields,
 
 			// Include additional fields from configuration
-			...options.geoLocation?.additionalFields,
+			...geoLocationConfig?.additionalFields,
 		},
 
 		/**

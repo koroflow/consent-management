@@ -107,11 +107,6 @@ export const init = async <P extends C15TPlugin[]>(options: C15TOptions<P>) => {
 		secret,
 		logger,
 		generateId: generateIdFunc,
-		consentConfig: {
-			enabled: true,
-			expiresIn: finalOptions.consent?.expiresIn || 60 * 60 * 24 * 365,
-			updateAge: finalOptions.consent?.updateAge || 60 * 60 * 24,
-		},
 		adapter,
 		registry: createRegistry(registryContext),
 		tables: getConsentTables(options),
@@ -165,18 +160,8 @@ function runPluginInit(ctx: C15TContext) {
  * @param options - The c15t configuration options
  * @returns An array of internal plugins to include
  */
-function getInternalPlugins(options: C15TOptions): C15TPlugin[] {
+function getInternalPlugins(_options: C15TOptions): C15TPlugin[] {
 	const plugins: C15TPlugin[] = [];
-
-	// Add internal plugins based on options
-	if (options.advanced?.crossSubDomainCookies?.enabled) {
-		// Add cross-subdomain cookie plugin
-	}
-
-	// // Add analytics plugin if enabled
-	// if (options.analytics?.enabled !== false) {
-	// 	// Add analytics plugin
-	// }
 
 	return plugins;
 }

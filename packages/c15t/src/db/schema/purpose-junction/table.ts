@@ -24,11 +24,21 @@ export function getPurposeJunctionTable(
 	options: C15TOptions,
 	junctionFields?: Record<string, Field>
 ) {
+	const purposeJunctionConfig = options.tables?.purposeJunction;
+	const consentConfig = options.tables?.consent;
+	const purposeConfig = options.tables?.purpose;
+
 	return {
 		/**
 		 * The name of the junction table in the database, configurable through options
 		 */
-		entityName: options.purposeJunction?.entityName || 'purposeJunction',
+		entityName: purposeJunctionConfig?.entityName || 'purposeJunction',
+
+		/**
+		 * The ID prefix for the purpose junction table
+		 * Used to generate unique prefixed IDs for purpose junctions
+		 */
+		entityPrefix: purposeJunctionConfig?.entityPrefix || 'pjx',
 
 		/**
 		 * The schema for the purpose junction table
@@ -45,9 +55,9 @@ export function getPurposeJunctionTable(
 			consentId: {
 				type: 'string',
 				required: true,
-				fieldName: options.purposeJunction?.fields?.consentId || 'consentId',
+				fieldName: purposeJunctionConfig?.fields?.consentId || 'consentId',
 				references: {
-					model: options.consent?.entityName || 'consent',
+					model: consentConfig?.entityName || 'consent',
 					field: 'id',
 				},
 			},
@@ -58,9 +68,9 @@ export function getPurposeJunctionTable(
 			purposeId: {
 				type: 'string',
 				required: true,
-				fieldName: options.purposeJunction?.fields?.purposeId || 'purposeId',
+				fieldName: purposeJunctionConfig?.fields?.purposeId || 'purposeId',
 				references: {
-					model: options.purpose?.entityName || 'purpose',
+					model: purposeConfig?.entityName || 'purpose',
 					field: 'id',
 				},
 			},
@@ -73,7 +83,7 @@ export function getPurposeJunctionTable(
 				type: 'string',
 				defaultValue: () => 'active',
 				required: true,
-				fieldName: options.purposeJunction?.fields?.status || 'status',
+				fieldName: purposeJunctionConfig?.fields?.status || 'status',
 			},
 
 			/**
@@ -82,7 +92,7 @@ export function getPurposeJunctionTable(
 			metadata: {
 				type: 'json',
 				required: false,
-				fieldName: options.purposeJunction?.fields?.metadata || 'metadata',
+				fieldName: purposeJunctionConfig?.fields?.metadata || 'metadata',
 			},
 
 			/**
@@ -93,7 +103,7 @@ export function getPurposeJunctionTable(
 				type: 'date',
 				defaultValue: () => new Date(),
 				required: true,
-				fieldName: options.purposeJunction?.fields?.createdAt || 'createdAt',
+				fieldName: purposeJunctionConfig?.fields?.createdAt || 'createdAt',
 			},
 
 			/**
@@ -103,14 +113,14 @@ export function getPurposeJunctionTable(
 			updatedAt: {
 				type: 'date',
 				required: false,
-				fieldName: options.purposeJunction?.fields?.updatedAt || 'updatedAt',
+				fieldName: purposeJunctionConfig?.fields?.updatedAt || 'updatedAt',
 			},
 
 			// Include additional fields from plugins
 			...junctionFields,
 
 			// Include additional fields from configuration
-			...options.purposeJunction?.additionalFields,
+			...purposeJunctionConfig?.additionalFields,
 		},
 
 		/**

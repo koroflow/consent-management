@@ -24,11 +24,19 @@ export function getPurposeTable(
 	options: C15TOptions,
 	purposeFields?: Record<string, Field>
 ) {
+	const purposeConfig = options.tables?.purpose;
+
 	return {
 		/**
 		 * The name of the purpose table in the database, configurable through options
 		 */
-		entityName: options.purpose?.entityName || 'purpose',
+		entityName: purposeConfig?.entityName || 'purpose',
+
+		/**
+		 * The ID prefix for the purpose table
+		 * Used to generate unique prefixed IDs for purposes
+		 */
+		entityPrefix: purposeConfig?.entityPrefix || 'pur',
 
 		/**
 		 * The schema for the purpose table
@@ -45,7 +53,7 @@ export function getPurposeTable(
 			code: {
 				type: 'string',
 				required: true,
-				fieldName: options.purpose?.fields?.code || 'code',
+				fieldName: purposeConfig?.fields?.code || 'code',
 			},
 
 			/**
@@ -54,7 +62,7 @@ export function getPurposeTable(
 			name: {
 				type: 'string',
 				required: true,
-				fieldName: options.purpose?.fields?.name || 'name',
+				fieldName: purposeConfig?.fields?.name || 'name',
 			},
 
 			/**
@@ -63,7 +71,7 @@ export function getPurposeTable(
 			description: {
 				type: 'string',
 				required: true,
-				fieldName: options.purpose?.fields?.description || 'description',
+				fieldName: purposeConfig?.fields?.description || 'description',
 			},
 
 			/**
@@ -74,7 +82,7 @@ export function getPurposeTable(
 				type: 'boolean',
 				defaultValue: () => false,
 				required: true,
-				fieldName: options.purpose?.fields?.isEssential || 'isEssential',
+				fieldName: purposeConfig?.fields?.isEssential || 'isEssential',
 			},
 
 			/**
@@ -84,7 +92,7 @@ export function getPurposeTable(
 			dataCategory: {
 				type: 'string',
 				required: false,
-				fieldName: options.purpose?.fields?.dataCategory || 'dataCategory',
+				fieldName: purposeConfig?.fields?.dataCategory || 'dataCategory',
 			},
 
 			/**
@@ -94,7 +102,7 @@ export function getPurposeTable(
 			legalBasis: {
 				type: 'string',
 				required: false,
-				fieldName: options.purpose?.fields?.legalBasis || 'legalBasis',
+				fieldName: purposeConfig?.fields?.legalBasis || 'legalBasis',
 			},
 
 			/**
@@ -105,7 +113,7 @@ export function getPurposeTable(
 				type: 'boolean',
 				defaultValue: () => true,
 				required: true,
-				fieldName: options.purpose?.fields?.isActive || 'isActive',
+				fieldName: purposeConfig?.fields?.isActive || 'isActive',
 			},
 
 			/**
@@ -116,7 +124,7 @@ export function getPurposeTable(
 				type: 'date',
 				defaultValue: () => new Date(),
 				required: true,
-				fieldName: options.purpose?.fields?.createdAt || 'createdAt',
+				fieldName: purposeConfig?.fields?.createdAt || 'createdAt',
 			},
 
 			/**
@@ -127,14 +135,14 @@ export function getPurposeTable(
 				type: 'date',
 				defaultValue: () => new Date(),
 				required: true,
-				fieldName: options.purpose?.fields?.updatedAt || 'updatedAt',
+				fieldName: purposeConfig?.fields?.updatedAt || 'updatedAt',
 			},
 
 			// Include additional fields from plugins
 			...purposeFields,
 
 			// Include additional fields from configuration
-			...options.purpose?.additionalFields,
+			...purposeConfig?.additionalFields,
 		},
 
 		/**

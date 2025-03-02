@@ -24,11 +24,19 @@ export function getDomainTable(
 	options: C15TOptions,
 	domainFields?: Record<string, Field>
 ) {
+	const domainConfig = options.tables?.domain;
+
 	return {
 		/**
 		 * The name of the domain table in the database, configurable through options
 		 */
-		entityName: options.domain?.entityName || 'domain',
+		entityName: domainConfig?.entityName || 'domain',
+
+		/**
+		 * The ID prefix for the domain table
+		 * Used to generate unique prefixed IDs for domains
+		 */
+		entityPrefix: domainConfig?.entityPrefix || 'dom',
 
 		/**
 		 * The schema for the domain table
@@ -47,7 +55,7 @@ export function getDomainTable(
 				type: 'string',
 				required: true,
 				unique: true,
-				fieldName: options.domain?.fields?.name || 'name',
+				fieldName: domainConfig?.fields?.name || 'name',
 			},
 
 			/**
@@ -56,7 +64,7 @@ export function getDomainTable(
 			description: {
 				type: 'string',
 				required: false,
-				fieldName: options.domain?.fields?.description || 'description',
+				fieldName: domainConfig?.fields?.description || 'description',
 			},
 
 			/**
@@ -67,7 +75,7 @@ export function getDomainTable(
 				type: 'json',
 				defaultValue: () => [],
 				required: false,
-				fieldName: options.domain?.fields?.allowedOrigins || 'allowedOrigins',
+				fieldName: domainConfig?.fields?.allowedOrigins || 'allowedOrigins',
 			},
 
 			/**
@@ -78,7 +86,7 @@ export function getDomainTable(
 				type: 'boolean',
 				defaultValue: () => true,
 				required: true,
-				fieldName: options.domain?.fields?.isVerified || 'isVerified',
+				fieldName: domainConfig?.fields?.isVerified || 'isVerified',
 			},
 
 			/**
@@ -89,7 +97,7 @@ export function getDomainTable(
 				type: 'boolean',
 				defaultValue: () => true,
 				required: true,
-				fieldName: options.domain?.fields?.isActive || 'isActive',
+				fieldName: domainConfig?.fields?.isActive || 'isActive',
 			},
 
 			/**
@@ -100,7 +108,7 @@ export function getDomainTable(
 				type: 'date',
 				defaultValue: () => new Date(),
 				required: true,
-				fieldName: options.domain?.fields?.createdAt || 'createdAt',
+				fieldName: domainConfig?.fields?.createdAt || 'createdAt',
 			},
 
 			/**
@@ -110,14 +118,14 @@ export function getDomainTable(
 			updatedAt: {
 				type: 'date',
 				required: false,
-				fieldName: options.domain?.fields?.updatedAt || 'updatedAt',
+				fieldName: domainConfig?.fields?.updatedAt || 'updatedAt',
 			},
 
 			// Include additional fields from plugins
 			...domainFields,
 
 			// Include additional fields from configuration
-			...options.domain?.additionalFields,
+			...domainConfig?.additionalFields,
 		},
 
 		/**

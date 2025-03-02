@@ -53,6 +53,18 @@ export * from './record';
 export * from './user';
 export * from './withdrawal';
 
+// Schema Type Exports
+/**
+ * Type definitions for database schema configuration
+ *
+ * These exports provide interfaces for configuring database entities
+ * and are used throughout the application for type-safe schema definition.
+ *
+ * @see {@link BaseEntityConfig} - Base configuration for all entities
+ * @see {@link TablesConfig} - Configuration for all database tables
+ */
+export * from './types';
+
 // Schema Utility Exports
 /**
  * Schema utilities for working with the complete database schema

@@ -24,11 +24,20 @@ export function getAuditLogTable(
 	options: C15TOptions,
 	auditLogFields?: Record<string, Field>
 ) {
+	const auditLogConfig = options.tables?.auditLog;
+	const userConfig = options.tables?.user;
+
 	return {
 		/**
 		 * The name of the audit log table in the database, configurable through options
 		 */
-		entityName: options.auditLog?.entityName || 'auditLog',
+		entityName: auditLogConfig?.entityName || 'auditLog',
+
+		/**
+		 * The ID prefix for the audit log table
+		 * Used to generate unique prefixed IDs
+		 */
+		entityPrefix: auditLogConfig?.entityPrefix || 'log',
 
 		/**
 		 * The schema for the audit log table
@@ -45,7 +54,7 @@ export function getAuditLogTable(
 			entityType: {
 				type: 'string',
 				required: true,
-				fieldName: options.auditLog?.fields?.entityType || 'entityType',
+				fieldName: auditLogConfig?.fields?.entityType || 'entityType',
 			},
 
 			/**
@@ -54,7 +63,7 @@ export function getAuditLogTable(
 			entityId: {
 				type: 'string',
 				required: true,
-				fieldName: options.auditLog?.fields?.entityId || 'entityId',
+				fieldName: auditLogConfig?.fields?.entityId || 'entityId',
 			},
 
 			/**
@@ -64,7 +73,7 @@ export function getAuditLogTable(
 			actionType: {
 				type: 'string',
 				required: true,
-				fieldName: options.auditLog?.fields?.actionType || 'actionType',
+				fieldName: auditLogConfig?.fields?.actionType || 'actionType',
 			},
 
 			/**
@@ -73,9 +82,9 @@ export function getAuditLogTable(
 			userId: {
 				type: 'string',
 				required: false,
-				fieldName: options.auditLog?.fields?.userId || 'userId',
+				fieldName: auditLogConfig?.fields?.userId || 'userId',
 				references: {
-					model: options.user?.entityName || 'user',
+					model: userConfig?.entityName || 'user',
 					field: 'id',
 				},
 			},
@@ -86,7 +95,7 @@ export function getAuditLogTable(
 			ipAddress: {
 				type: 'string',
 				required: false,
-				fieldName: options.auditLog?.fields?.ipAddress || 'ipAddress',
+				fieldName: auditLogConfig?.fields?.ipAddress || 'ipAddress',
 			},
 
 			/**
@@ -95,7 +104,7 @@ export function getAuditLogTable(
 			userAgent: {
 				type: 'string',
 				required: false,
-				fieldName: options.auditLog?.fields?.userAgent || 'userAgent',
+				fieldName: auditLogConfig?.fields?.userAgent || 'userAgent',
 			},
 
 			/**
@@ -105,7 +114,7 @@ export function getAuditLogTable(
 			changes: {
 				type: 'json',
 				required: false,
-				fieldName: options.auditLog?.fields?.changes || 'changes',
+				fieldName: auditLogConfig?.fields?.changes || 'changes',
 			},
 
 			/**
@@ -114,7 +123,7 @@ export function getAuditLogTable(
 			metadata: {
 				type: 'json',
 				required: false,
-				fieldName: options.auditLog?.fields?.metadata || 'metadata',
+				fieldName: auditLogConfig?.fields?.metadata || 'metadata',
 			},
 
 			/**
@@ -125,7 +134,7 @@ export function getAuditLogTable(
 				type: 'date',
 				defaultValue: () => new Date(),
 				required: true,
-				fieldName: options.auditLog?.fields?.createdAt || 'createdAt',
+				fieldName: auditLogConfig?.fields?.createdAt || 'createdAt',
 			},
 
 			/**
@@ -135,37 +144,37 @@ export function getAuditLogTable(
 				type: 'timezone',
 				required: true,
 				defaultValue: COMMON_TIMEZONES.UTC,
-				fieldName: options.auditLog?.fields?.eventTimezone || 'eventTimezone',
+				fieldName: auditLogConfig?.fields?.eventTimezone || 'eventTimezone',
 			},
 
 			// Include additional fields from plugins
 			...auditLogFields,
 
 			// Include additional fields from configuration
-			...options.auditLog?.additionalFields,
+			...auditLogConfig?.additionalFields,
 		},
 
 		/**
 		 * Add indexes for better query performance
 		 */
-		// indexes: [
-		// 	{
-		// 		name: 'entity_index',
-		// 		fields: ['entityType', 'entityId'],
-		// 	},
-		// 	{
-		// 		name: 'action_type_index',
-		// 		fields: ['actionType'],
-		// 	},
-		// 	{
-		// 		name: 'user_id_index',
-		// 		fields: ['userId'],
-		// 	},
-		// 	{
-		// 		name: 'created_at_index',
-		// 		fields: ['createdAt'],
-		// 	},
-		// ],
+		indexes: [
+			{
+				name: 'entity_index',
+				fields: ['entityType', 'entityId'],
+			},
+			{
+				name: 'action_type_index',
+				fields: ['actionType'],
+			},
+			{
+				name: 'user_id_index',
+				fields: ['userId'],
+			},
+			{
+				name: 'created_at_index',
+				fields: ['createdAt'],
+			},
+		],
 
 		/**
 		 * Execution order during migrations (lower numbers run first)

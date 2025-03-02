@@ -153,26 +153,6 @@ export interface BaseC15TContext {
 	generateId: (options: { model: EntityName; size?: number }) => string;
 
 	/**
-	 * Consent system configuration
-	 */
-	consentConfig: {
-		/**
-		 * Whether the consent system is enabled
-		 */
-		enabled: boolean;
-
-		/**
-		 * Default expiration time for consent in seconds
-		 */
-		expiresIn: number;
-
-		/**
-		 * Time in seconds before refreshing consent data
-		 */
-		updateAge: number;
-	};
-
-	/**
 	 * Database adapter instance
 	 */
 	adapter: Adapter;

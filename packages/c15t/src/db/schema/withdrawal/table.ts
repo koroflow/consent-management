@@ -24,11 +24,21 @@ export function getWithdrawalTable(
 	options: C15TOptions,
 	withdrawalFields?: Record<string, Field>
 ) {
+	const withdrawalConfig = options.tables?.withdrawal;
+	const consentConfig = options.tables?.consent;
+	const userConfig = options.tables?.user;
+
 	return {
 		/**
 		 * The name of the withdrawal table in the database, configurable through options
 		 */
-		entityName: options.withdrawal?.entityName || 'withdrawal',
+		entityName: withdrawalConfig?.entityName || 'withdrawal',
+
+		/**
+		 * The ID prefix for the withdrawal table
+		 * Used to generate unique prefixed IDs for withdrawals
+		 */
+		entityPrefix: withdrawalConfig?.entityPrefix || 'wdr',
 
 		/**
 		 * The schema for the consent withdrawal table
@@ -45,9 +55,9 @@ export function getWithdrawalTable(
 			consentId: {
 				type: 'string',
 				required: true,
-				fieldName: options.withdrawal?.fields?.consentId || 'consentId',
+				fieldName: withdrawalConfig?.fields?.consentId || 'consentId',
 				references: {
-					model: options.consent?.entityName || 'consent',
+					model: consentConfig?.entityName || 'consent',
 					field: 'id',
 				},
 			},
@@ -58,9 +68,9 @@ export function getWithdrawalTable(
 			userId: {
 				type: 'string',
 				required: true,
-				fieldName: options.withdrawal?.fields?.userId || 'userId',
+				fieldName: withdrawalConfig?.fields?.userId || 'userId',
 				references: {
-					model: options.user?.entityName || 'user',
+					model: userConfig?.entityName || 'user',
 					field: 'id',
 				},
 			},
@@ -72,7 +82,7 @@ export function getWithdrawalTable(
 				type: 'string',
 				required: false,
 				fieldName:
-					options.withdrawal?.fields?.withdrawalReason || 'withdrawalReason',
+					withdrawalConfig?.fields?.withdrawalReason || 'withdrawalReason',
 			},
 
 			/**
@@ -84,7 +94,7 @@ export function getWithdrawalTable(
 				defaultValue: () => 'user-initiated',
 				required: true,
 				fieldName:
-					options.withdrawal?.fields?.withdrawalMethod || 'withdrawalMethod',
+					withdrawalConfig?.fields?.withdrawalMethod || 'withdrawalMethod',
 			},
 
 			/**
@@ -93,7 +103,7 @@ export function getWithdrawalTable(
 			ipAddress: {
 				type: 'string',
 				required: false,
-				fieldName: options.withdrawal?.fields?.ipAddress || 'ipAddress',
+				fieldName: withdrawalConfig?.fields?.ipAddress || 'ipAddress',
 			},
 
 			/**
@@ -102,7 +112,7 @@ export function getWithdrawalTable(
 			userAgent: {
 				type: 'string',
 				required: false,
-				fieldName: options.withdrawal?.fields?.userAgent || 'userAgent',
+				fieldName: withdrawalConfig?.fields?.userAgent || 'userAgent',
 			},
 
 			/**
@@ -111,7 +121,7 @@ export function getWithdrawalTable(
 			metadata: {
 				type: 'json',
 				required: false,
-				fieldName: options.withdrawal?.fields?.metadata || 'metadata',
+				fieldName: withdrawalConfig?.fields?.metadata || 'metadata',
 			},
 
 			/**
@@ -122,14 +132,14 @@ export function getWithdrawalTable(
 				type: 'date',
 				defaultValue: () => new Date(),
 				required: true,
-				fieldName: options.withdrawal?.fields?.createdAt || 'createdAt',
+				fieldName: withdrawalConfig?.fields?.createdAt || 'createdAt',
 			},
 
 			// Include additional fields from plugins
 			...withdrawalFields,
 
 			// Include additional fields from configuration
-			...options.withdrawal?.additionalFields,
+			...withdrawalConfig?.additionalFields,
 		},
 
 		/**
@@ -137,7 +147,7 @@ export function getWithdrawalTable(
 		 * (If this constraint is not desired, it can be disabled in options)
 		 */
 		uniqueConstraints:
-			options.withdrawal?.preventMultipleWithdrawals !== false
+			withdrawalConfig?.preventMultipleWithdrawals !== false
 				? [
 						{
 							name: 'unique_consent_withdrawal',

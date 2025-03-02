@@ -24,11 +24,20 @@ export function getConsentGeoLocationTable(
 	options: C15TOptions,
 	geoLocationFields?: Record<string, Field>
 ) {
+	const consentGeoLocationConfig = options.tables?.consentGeoLocation;
+	const consentConfig = options.tables?.consent;
+
 	return {
 		/**
 		 * The name of the geo-location table in the database, configurable through options
 		 */
-		entityName: options.consentGeoLocation?.entityName || 'consentGeoLocation',
+		entityName: consentGeoLocationConfig?.entityName || 'consentGeoLocation',
+
+		/**
+		 * The ID prefix for the consent geo-location table
+		 * Used to generate unique prefixed IDs for consent geo-locations
+		 */
+		entityPrefix: consentGeoLocationConfig?.entityPrefix || 'cgl',
 
 		/**
 		 * The schema for the consent geo-location table
@@ -45,9 +54,9 @@ export function getConsentGeoLocationTable(
 			consentId: {
 				type: 'string',
 				required: true,
-				fieldName: options.consentGeoLocation?.fields?.consentId || 'consentId',
+				fieldName: consentGeoLocationConfig?.fields?.consentId || 'consentId',
 				references: {
-					model: options.consent?.entityName || 'consent',
+					model: consentConfig?.entityName || 'consent',
 					field: 'id',
 				},
 			},
@@ -58,7 +67,7 @@ export function getConsentGeoLocationTable(
 			ip: {
 				type: 'string',
 				required: true,
-				fieldName: options.consentGeoLocation?.fields?.ip || 'ip',
+				fieldName: consentGeoLocationConfig?.fields?.ip || 'ip',
 			},
 
 			/**
@@ -67,7 +76,7 @@ export function getConsentGeoLocationTable(
 			country: {
 				type: 'string',
 				required: false,
-				fieldName: options.consentGeoLocation?.fields?.country || 'country',
+				fieldName: consentGeoLocationConfig?.fields?.country || 'country',
 			},
 
 			/**
@@ -76,7 +85,7 @@ export function getConsentGeoLocationTable(
 			region: {
 				type: 'string',
 				required: false,
-				fieldName: options.consentGeoLocation?.fields?.region || 'region',
+				fieldName: consentGeoLocationConfig?.fields?.region || 'region',
 			},
 
 			/**
@@ -85,7 +94,7 @@ export function getConsentGeoLocationTable(
 			city: {
 				type: 'string',
 				required: false,
-				fieldName: options.consentGeoLocation?.fields?.city || 'city',
+				fieldName: consentGeoLocationConfig?.fields?.city || 'city',
 			},
 
 			/**
@@ -94,7 +103,7 @@ export function getConsentGeoLocationTable(
 			latitude: {
 				type: 'number',
 				required: false,
-				fieldName: options.consentGeoLocation?.fields?.latitude || 'latitude',
+				fieldName: consentGeoLocationConfig?.fields?.latitude || 'latitude',
 			},
 
 			/**
@@ -103,7 +112,7 @@ export function getConsentGeoLocationTable(
 			longitude: {
 				type: 'number',
 				required: false,
-				fieldName: options.consentGeoLocation?.fields?.longitude || 'longitude',
+				fieldName: consentGeoLocationConfig?.fields?.longitude || 'longitude',
 			},
 
 			/**
@@ -112,7 +121,7 @@ export function getConsentGeoLocationTable(
 			timezone: {
 				type: 'string',
 				required: false,
-				fieldName: options.consentGeoLocation?.fields?.timezone || 'timezone',
+				fieldName: consentGeoLocationConfig?.fields?.timezone || 'timezone',
 			},
 
 			/**
@@ -123,14 +132,14 @@ export function getConsentGeoLocationTable(
 				type: 'date',
 				defaultValue: () => new Date(),
 				required: true,
-				fieldName: options.consentGeoLocation?.fields?.createdAt || 'createdAt',
+				fieldName: consentGeoLocationConfig?.fields?.createdAt || 'createdAt',
 			},
 
 			// Include additional fields from plugins
 			...geoLocationFields,
 
 			// Include additional fields from configuration
-			...options.consentGeoLocation?.additionalFields,
+			...consentGeoLocationConfig?.additionalFields,
 		},
 
 		// /**

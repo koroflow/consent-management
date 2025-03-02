@@ -1,7 +1,7 @@
 import type { Field } from '~/db/core/fields';
 import { defaultIdGenerator } from '~/db/core/fields';
 import type { C15TOptions } from '~/types';
-import { recordSchema } from '.';
+import { recordSchema } from './schema';
 
 /**
  * Generates the database table configuration for the consent record entity.
@@ -25,18 +25,23 @@ export function getRecordTable(
 	options: C15TOptions,
 	recordFields?: Record<string, Field>
 ) {
+	// Get record config, supporting both the new tables.record and legacy record format
+	const recordConfig = options.tables?.record;
+	const userConfig = options.tables?.user;
+	const consentConfig = options.tables?.consent;
+
 	return {
 		/**
 		 * The name of the consent record table in the database, configurable through options
 		 */
-		entityName: options.record?.entityName || 'record',
+		entityName: recordConfig?.entityName || 'record',
 
 		/**
 		 * The ID prefix for the consent record table
 		 * Used to generate unique prefixed IDs for records
 		 */
-		entityPrefix: options.record?.entityPrefix || 'rec',
-		
+		entityPrefix: recordConfig?.entityPrefix || 'rec',
+
 		/**
 		 * ID generator function for this table
 		 * Uses the entityPrefix to generate IDs
@@ -58,9 +63,9 @@ export function getRecordTable(
 			userId: {
 				type: 'string',
 				required: true,
-				fieldName: options.record?.fields?.userId || 'userId',
+				fieldName: recordConfig?.fields?.userId || 'userId',
 				references: {
-					model: options.user?.entityName || 'user',
+					model: userConfig?.entityName || 'user',
 					field: 'id',
 				},
 			},
@@ -72,9 +77,9 @@ export function getRecordTable(
 			consentId: {
 				type: 'string',
 				required: false,
-				fieldName: options.record?.fields?.consentId || 'consentId',
+				fieldName: recordConfig?.fields?.consentId || 'consentId',
 				references: {
-					model: options.consent?.entityName || 'consent',
+					model: consentConfig?.entityName || 'consent',
 					field: 'id',
 				},
 			},
@@ -86,7 +91,7 @@ export function getRecordTable(
 			actionType: {
 				type: 'string',
 				required: true,
-				fieldName: options.record?.fields?.actionType || 'actionType',
+				fieldName: recordConfig?.fields?.actionType || 'actionType',
 			},
 
 			/**
@@ -96,7 +101,7 @@ export function getRecordTable(
 			details: {
 				type: 'json',
 				required: false,
-				fieldName: options.record?.fields?.details || 'details',
+				fieldName: recordConfig?.fields?.details || 'details',
 			},
 
 			/**
@@ -107,14 +112,14 @@ export function getRecordTable(
 				type: 'date',
 				defaultValue: () => new Date(),
 				required: true,
-				fieldName: options.record?.fields?.createdAt || 'createdAt',
+				fieldName: recordConfig?.fields?.createdAt || 'createdAt',
 			},
 
 			// Include additional fields from plugins
 			...recordFields,
 
 			// Include additional fields from configuration
-			...options.record?.additionalFields,
+			...recordConfig?.additionalFields,
 		},
 
 		/**

@@ -68,60 +68,24 @@ export function parseEntityOutputData<
 }
 
 /**
- * Gets all fields for a specific table, including any from plugins and options.
+ * Retrieves all fields for a specific table, combining base configuration and plugin fields
  *
- * This function collects field definitions from multiple sources:
- * 1. Core table definitions
- * 2. Additional fields specified in options
- * 3. Fields provided by plugins
- *
- * @param options - The c15t configuration options
- * @param table - The name of the table to get fields for (e.g., 'user', 'consent')
- *
- * @returns A record of all field definitions for the specified table
- *
- * @example
- * ```typescript
- * // Configure c15t with additional user fields and a plugin
- * const options = {
- *   user: {
- *     additionalFields: {
- *       firstName: { name: 'first_name', type: 'string' },
- *       lastName: { name: 'last_name', type: 'string' }
- *     }
- *   },
- *   plugins: [
- *     {
- *       name: 'metadata-plugin',
- *       schema: {
- *         user: {
- *           fields: {
- *             metadata: { name: 'metadata', type: 'json' }
- *           }
- *         }
- *       }
- *     }
- *   ]
- * };
- *
- * // Get all fields for the 'user' table
- * const userFields = getAllFields(options, 'user');
- * // Result includes core fields + additional fields + plugin fields
- * ```
- *
- * @remarks
- * This function is particularly useful for extending the base schema with custom fields
- * while maintaining compatibility with the c15t system.
+ * @param options - The C15T configuration options
+ * @param table - The table name to get fields for
+ * @returns Combined fields from configuration and plugins
  */
 export function getAllFields(options: C15TOptions, table: string) {
-	let schema: Record<string, Field> = {
-		...(table === 'user' && options.user?.additionalFields
-			? options.user.additionalFields
-			: {}),
-		...(table === 'consent' && options.consent?.additionalFields
-			? options.consent.additionalFields
-			: {}),
-	};
+	let schema: Record<string, Field> = {};
+
+	// Get additional fields from the tables configuration if available
+	if (options.tables && table in options.tables) {
+		const tableConfig = options.tables[table as keyof typeof options.tables];
+		if (tableConfig?.additionalFields) {
+			schema = { ...schema, ...tableConfig.additionalFields };
+		}
+	}
+
+	// Add fields from plugins
 	for (const plugin of options.plugins || []) {
 		const pluginSchema = plugin.schema as C15TPluginSchema | undefined;
 		if (pluginSchema?.[table]) {
@@ -131,6 +95,7 @@ export function getAllFields(options: C15TOptions, table: string) {
 			};
 		}
 	}
+
 	return schema;
 }
 

@@ -97,7 +97,7 @@ export function consentRegistry({ adapter, ...ctx }: RegistryContext) {
 
 			if (purposeIds && purposeIds.length > 0) {
 				whereConditions.push({
-					field: 'purposeIds',
+					field: 'preferences',
 					operator: 'contains',
 					value: purposeIds,
 				});
@@ -107,7 +107,7 @@ export function consentRegistry({ adapter, ...ctx }: RegistryContext) {
 				model: 'consent',
 				where: whereConditions,
 				sortBy: {
-					field: 'createdAt',
+					field: 'givenAt',
 					direction: 'desc',
 				},
 			});
@@ -156,7 +156,7 @@ export function consentRegistry({ adapter, ...ctx }: RegistryContext) {
 					},
 				],
 				sortBy: {
-					field: 'createdAt',
+					field: 'givenAt',
 					direction: 'desc',
 				},
 			});
