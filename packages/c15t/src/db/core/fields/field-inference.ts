@@ -126,21 +126,21 @@ type MapToFieldOutputType<TSchema, TKey extends keyof TSchema & string> = {
 		: never;
 };
 
-/**
- * Type-safe property mapping helper for field inputs.
- * Maps properties of a record type to their corresponding input types.
- *
- * @template TSchema - The record type containing field definitions
- * @template TKey - The keys of TSchema to map
- *
- * @internal
- * This is an internal helper type used by InferFieldsInput
- */
-type MapToFieldInputType<TSchema, TKey extends keyof TSchema & string> = {
-	[Property in TKey]: TSchema[Property] extends Field
-		? InferFieldInput<TSchema[Property]>
-		: never;
-};
+// /**
+//  * Type-safe property mapping helper for field inputs.
+//  * Maps properties of a record type to their corresponding input types.
+//  *
+//  * @template TSchema - The record type containing field definitions
+//  * @template TKey - The keys of TSchema to map
+//  *
+//  * @internal
+//  * This is an internal helper type used by InferFieldsInput
+//  */
+// type MapToFieldInputType<TSchema, TKey extends keyof TSchema & string> = {
+// 	[Property in TKey]: TSchema[Property] extends Field
+// 		? InferFieldInput<TSchema[Property]>
+// 		: never;
+// };
 
 /**
  * Type helper to extract required keys from fields that should be returned.

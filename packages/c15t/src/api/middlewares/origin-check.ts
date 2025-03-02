@@ -4,6 +4,10 @@ import { wildcardMatch } from '~/utils/wildcard';
 import { getHost, getOrigin, getProtocol } from '~/utils/url';
 import type { GenericEndpointContext } from '~/types';
 
+// Define regex at the top level for better performance
+const VALID_RELATIVE_URL_REGEX =
+	/^\/(?!\/|\\|%2f|%5c)[\w\-./]*(?:\?[\w\-./=&%]*)?$/;
+
 /**
  * A middleware to validate callbackURL and origin against
  * trustedOrigins.
@@ -49,7 +53,7 @@ export const originCheckMiddleware = createAuthMiddleware(async (ctx) => {
 				matchesPattern(url, origin) ||
 				(url?.startsWith('/') &&
 					label !== 'origin' &&
-					/^\/(?!\/|\\|%2f|%5c)[\w\-./]*(?:\?[\w\-./=&%]*)?$/.test(url))
+					VALID_RELATIVE_URL_REGEX.test(url))
 		);
 		if (!isTrustedOrigin) {
 			ctx.context.logger.error(`Invalid ${label}: ${url}`);
@@ -106,7 +110,7 @@ export const originCheck = (
 					matchesPattern(url, origin) ||
 					(url?.startsWith('/') &&
 						label !== 'origin' &&
-						/^\/(?!\/|\\|%2f|%5c)[\w\-./]*(?:\?[\w\-./=&%]*)?$/.test(url))
+						VALID_RELATIVE_URL_REGEX.test(url))
 			);
 			if (!isTrustedOrigin) {
 				ctx.context.logger.error(`Invalid ${label}: ${url}`);

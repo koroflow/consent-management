@@ -1,11 +1,14 @@
 import { env } from '../utils/env';
 import { C15TError } from '~/error';
 
+// Define regex at the top level for better performance
+const TRAILING_SLASHES_REGEX = /\/+$/;
+
 function checkHasPath(url: string): boolean {
 	try {
 		const parsedUrl = new URL(url);
 		return parsedUrl.pathname !== '/';
-	} catch (error) {
+	} catch {
 		throw new C15TError(
 			`Invalid base URL: ${url}. Please provide a valid base URL.`
 		);
@@ -17,8 +20,8 @@ function withPath(url: string, path = '/api/auth') {
 	if (hasPath) {
 		return url;
 	}
-	path = path.startsWith('/') ? path : `/${path}`;
-	return `${url.replace(/\/+$/, '')}${path}`;
+	const pathWithSlash = path.startsWith('/') ? path : `/${path}`;
+	return `${url.replace(TRAILING_SLASHES_REGEX, '')}${pathWithSlash}`;
 }
 
 export function getBaseURL(url?: string, path?: string) {
@@ -47,7 +50,7 @@ export function getOrigin(url: string) {
 	try {
 		const parsedUrl = new URL(url);
 		return parsedUrl.origin;
-	} catch (error) {
+	} catch {
 		return null;
 	}
 }
@@ -56,7 +59,7 @@ export function getProtocol(url: string) {
 	try {
 		const parsedUrl = new URL(url);
 		return parsedUrl.protocol;
-	} catch (error) {
+	} catch {
 		return null;
 	}
 }

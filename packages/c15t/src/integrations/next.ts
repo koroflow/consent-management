@@ -21,7 +21,6 @@ import type { C15TInstance } from '~/core';
 export function toNextJsHandler(
 	c15t: C15TInstance | ((request: Request) => Promise<Response>)
 ) {
-	// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: <explanation>
 	const handler = async (request: Request) => {
 		// Check if c15t is properly configured
 		if ('handler' in c15t) {

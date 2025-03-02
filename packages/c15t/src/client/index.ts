@@ -155,10 +155,11 @@ export class c15tClient {
 
 				// Throw error if requested
 				if (options.throw) {
-					throw {
-						status: response.status,
-						data,
-					};
+					const error = new Error(
+						`Request failed with status ${response.status}`
+					);
+					Object.assign(error, { status: response.status, data });
+					throw error;
 				}
 			}
 

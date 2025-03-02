@@ -88,15 +88,19 @@ const createTransform = (options: C15TOptions) => {
 			model: T,
 			select: string[] = []
 		): EntityOutput<T> | null {
-			if (!data) return null;
-			const transformedData: Record<string, unknown> =
-				data.id || data._id
-					? select.length === 0 || select.includes('id')
-						? {
-								id: data.id,
-							}
-						: {}
-					: {};
+			if (!data) {
+				return null;
+			}
+
+			// Initialize with empty object
+			const transformedData: Record<string, unknown> = {};
+
+			// Handle ID separately
+			const hasId = data.id || data._id;
+			if (hasId && (select.length === 0 || select.includes('id'))) {
+				transformedData.id = data.id;
+			}
+
 			const tableSchema = schema[model].fields;
 			for (const key in tableSchema) {
 				if (select.length && !select.includes(key)) {

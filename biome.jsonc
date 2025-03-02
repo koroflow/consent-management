@@ -35,6 +35,9 @@
     "rules": {
       "suspicious": {
         "useAwait": "off"
+      },
+      "complexity": {
+        "noExcessiveCognitiveComplexity": "off"
       }
     }
   }

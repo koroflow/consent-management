@@ -41,7 +41,6 @@ interface SchemaEntry {
  * }
  * ```
  */
-// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: its okay
 export function getSchema(config: C15TOptions) {
 	const entities = getConsentTables(config);
 	const schema: Record<string, SchemaEntry> = {};

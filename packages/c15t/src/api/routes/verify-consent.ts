@@ -104,7 +104,6 @@
 // 	{
 // 		method: 'GET',
 // 	},
-// 	// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: <explanation>
 // 	async (ctx) => {
 // 		try {
 // 			// Validate request query parameters

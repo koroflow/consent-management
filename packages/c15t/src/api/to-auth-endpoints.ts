@@ -106,16 +106,21 @@ export function toAuthEndpoints<E extends Record<string, AuthEndpoint>>(
 			if (result.response instanceof APIError && !context?.asResponse) {
 				throw result.response;
 			}
-			const response = context?.asResponse
-				? toResponse(result.response, {
-						headers: result.headers,
-					})
-				: context?.returnHeaders
-					? {
-							headers: result.headers,
-							response: result.response,
-						}
-					: result.response;
+
+			let response;
+			if (context?.asResponse) {
+				response = toResponse(result.response, {
+					headers: result.headers,
+				});
+			} else if (context?.returnHeaders) {
+				response = {
+					headers: result.headers,
+					response: result.response,
+				};
+			} else {
+				response = result.response;
+			}
+
 			return response;
 		};
 		api[key].path = endpoint.path;

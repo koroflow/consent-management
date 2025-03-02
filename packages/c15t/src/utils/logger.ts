@@ -83,7 +83,6 @@ export const createLogger = (
 		level: LogLevel,
 		message: string,
 		args: unknown[] = []
-		// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: its ok
 	): void => {
 		if (!enabled || !shouldPublishLog(logLevel, level)) {
 			return;

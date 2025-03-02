@@ -94,7 +94,6 @@ const createTransform = (
 		return f?.fieldName || (field as string);
 	}
 
-	// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: <explanation>
 	function transformValueToDB<T extends EntityName>(
 		value: unknown,
 		model: T,
@@ -157,7 +156,6 @@ const createTransform = (
 	const useDatabaseGeneratedId = options?.advanced?.generateId === false;
 
 	return {
-		// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: <explanation>
 		transformInput<T extends EntityName>(
 			data: EntityInput<T>,
 			model: T,
@@ -190,7 +188,6 @@ const createTransform = (
 			}
 			return transformedData as InsertExpression<Database, keyof Database>;
 		},
-		// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: <explanation>
 		transformOutput<T extends EntityName>(
 			data: Record<string, unknown> | null,
 			model: T,
@@ -252,7 +249,6 @@ const createTransform = (
 				const fieldString = getField<T>(model, _field);
 				value = transformValueToDB<T>(value, model, _field);
 
-				// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: <explanation>
 				const expr: ExpressionFn = (eb) => {
 					// For type safety, cast field to a reference expression
 					// The double-casting pattern works better than direct any casts
@@ -482,7 +478,6 @@ export const kyselyAdapter =
 					select as string[]
 				) as unknown as Result | null;
 			},
-			// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: <explanation>
 			async findMany<
 				Model extends EntityName,
 				Result extends TableFields<Model>,
@@ -617,7 +612,6 @@ export const kyselyAdapter =
 				);
 				return transformOutput(result, model) as unknown as Result | null;
 			},
-			// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: excessive complexity is necessary for kysely
 			async updateMany<
 				Model extends EntityName,
 				Result extends TableFields<Model>,
@@ -700,7 +694,6 @@ export const kyselyAdapter =
 						) as unknown as Result
 				);
 			},
-			// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: excessive complexity is necessary for kysely
 			async count<Model extends EntityName>(data: {
 				model: Model;
 				where?: Where<Model>;

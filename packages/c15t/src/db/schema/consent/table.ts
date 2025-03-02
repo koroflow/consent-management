@@ -20,7 +20,6 @@ import { consentSchema } from './schema';
  * const migrationPlans = generateMigrations(consentTableSchema);
  * ```
  */
-// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: needed for readability
 export function getConsentTable(
 	options: C15TOptions,
 	consentFields?: Record<string, Field>

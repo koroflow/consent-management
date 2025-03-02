@@ -88,7 +88,6 @@
 // 	{
 // 		method: 'POST',
 // 	},
-// 	// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: <explanation>
 // 	async (ctx) => {
 // 		try {
 // 			// Validate request body

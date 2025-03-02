@@ -417,6 +417,7 @@ export const auditLogs = pgTable(
 		action: varchar('action', { length: 50 }).notNull(),
 		userId: uuid('user_id'),
 		resourceType: varchar('resource_type', { length: 50 }).notNull(),
+		parentDomainId: serial('parent_domain_id').references(() => domains.id),
 		resourceId: varchar('resource_id', { length: 100 }).notNull(),
 		actor: varchar('actor', { length: 100 }), // Person or system
 		changes: json('changes'), // Before/after
@@ -456,7 +457,7 @@ export const usersRelations = relations(users, ({ many }) => ({
 	consents: many(consents),
 }));
 
-export const domainsRelations = relations(domains, ({ many, one }) => ({
+export const domainsRelations = relations(domains, ({ many }) => ({
 	consents: many(consents),
 	// parentDomain: one(domains, {
 	// 	fields: [domains.parentDomainId],

@@ -49,7 +49,6 @@ export const generatePrismaSchema: SchemaGenerator = async ({
 		}
 	}
 
-	// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: <explanation>
 	const schema = produceSchema(schemaPrisma, (builder) => {
 		// biome-ignore lint/nursery/useGuardForIn: <explanation>
 		for (const table in tables) {
@@ -57,7 +56,6 @@ export const generatePrismaSchema: SchemaGenerator = async ({
 			const originalTable = tables[table]?.modelName;
 			const modelName = capitalizeFirstLetter(originalTable || "");
 
-			// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: <explanation>
 			function getType(
 				type: FieldType,
 				isOptional: boolean,

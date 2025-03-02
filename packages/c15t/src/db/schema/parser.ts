@@ -57,7 +57,6 @@ export function getAllFields(options: C15TOptions, table: string) {
 /**
  * Parses and validates input data according to schema field definitions
  */
-// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: <explanation>
 export function parseInputData<T extends Record<string, unknown>>(
 	data: T,
 	schema: {

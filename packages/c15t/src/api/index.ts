@@ -90,8 +90,7 @@ export const router = <C extends C15TContext, Option extends C15TOptions>(
 		if (ctx.baseURL) {
 			basePath = new URL(ctx.baseURL).pathname;
 		}
-	} catch (error) {
-		// Fallback to prevent crashing
+	} catch {
 		basePath = '/api/c15t';
 	}
 
@@ -130,7 +129,6 @@ export const router = <C extends C15TContext, Option extends C15TOptions>(
 			}
 			return res;
 		},
-		// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: <explanation>
 		onError(e) {
 			if (e instanceof APIError && e.status === 'FOUND') {
 				return;

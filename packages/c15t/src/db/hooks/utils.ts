@@ -31,7 +31,6 @@ import type { EntityName } from '../core/types';
  * );
  * ```
  */
-// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: this is a complex function but it's ok
 export async function processHooks<TEntityData extends Record<string, unknown>>(
 	data: TEntityData,
 	model: EntityName,

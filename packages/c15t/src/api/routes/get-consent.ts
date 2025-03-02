@@ -100,7 +100,6 @@
 // 		method: 'GET',
 // 		query: getConsentSchema,
 // 	},
-// 	// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: <explanation>
 // 	async (ctx) => {
 // 		try {
 // 			// Validate request query parameters
