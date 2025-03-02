@@ -30,7 +30,7 @@ export function processFields<T extends EntityName>(
 		const fieldName = field.fieldName || fieldKey;
 
 		// Cast field to Field to ensure it has the right type
-		const typedField = field as unknown as Field;
+		const typedField = field as Field;
 		actualFields[fieldName] = typedField;
 
 		// Handle references to other tables - first check if the field has a references property

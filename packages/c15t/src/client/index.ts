@@ -175,7 +175,7 @@ export class c15tClient {
 						code: (error as { code?: string }).code,
 					},
 					ok: false,
-					response: null as unknown as Response, // Type assertion to handle null as Response
+					response: null,
 				};
 
 				await options.onError(context);
@@ -199,7 +199,7 @@ export class c15tClient {
 					code: (error as { code?: string }).code,
 				},
 				ok: false,
-				response: null as unknown as Response, // Type assertion to handle null as Response
+				response: null,
 			};
 		}
 	}

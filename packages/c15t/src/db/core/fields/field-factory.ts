@@ -139,7 +139,7 @@ export type StringFieldOptions = {
  */
 export function createField<
 	TFieldType extends FieldType,
-	TConfig extends TypedFieldOptions<TFieldType> & Record<string, any>,
+	TConfig extends TypedFieldOptions<TFieldType> & Record<string, unknown>,
 >(type: TFieldType, config: TConfig = {} as TConfig): Field<TFieldType> {
 	const { transform, ...rest } = config;
 

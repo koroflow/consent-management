@@ -164,7 +164,7 @@ export interface ResponseContext<T = unknown> {
 	 * This contains the raw response information, such as status, headers, etc.
 	 * For network errors or other exceptions, this may be null.
 	 */
-	response: Response;
+	response: Response | null;
 
 	/**
 	 * Error information if the request failed.

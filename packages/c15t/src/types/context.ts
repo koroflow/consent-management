@@ -60,7 +60,7 @@ export interface BaseC15TContext {
  * Extended context type with generic plugin extensions
  */
 export type C15TContext<
-	TPluginContext extends Record<string, any> = Record<string, any>,
+	TPluginContext extends Record<string, unknown> = Record<string, unknown>,
 > = BaseC15TContext & TPluginContext;
 
 /**
@@ -68,5 +68,5 @@ export type C15TContext<
  */
 export type ContextWithPlugin<
 	TPluginName extends string,
-	TPluginContext extends Record<string, any>,
+	TPluginContext extends Record<string, unknown>,
 > = C15TContext<Record<TPluginName, TPluginContext>>;

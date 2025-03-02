@@ -10,15 +10,19 @@ import { logger } from '../utils';
 export async function getAdapter(options: C15TOptions): Promise<Adapter> {
 	if (!options.database) {
 		const tables = getConsentTables(options);
-		const memoryDB = Object.keys(tables).reduce((acc, key) => {
-			// @ts-ignore
-			acc[key] = [];
-			return acc;
-		}, {});
+		const memoryDB = Object.keys(tables).reduce<Record<string, unknown[]>>(
+			(acc, key) => {
+				acc[key] = [];
+				return acc;
+			},
+			{}
+		);
 		logger.warn(
 			'No database configuration provided. Using memory adapter in development'
 		);
-		return memoryAdapter(memoryDB)(options);
+		return memoryAdapter(memoryDB as Record<string, Record<string, unknown>[]>)(
+			options
+		);
 	}
 
 	if (typeof options.database === 'function') {

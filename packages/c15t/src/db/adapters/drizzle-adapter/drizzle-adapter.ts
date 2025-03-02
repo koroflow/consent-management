@@ -19,7 +19,7 @@ import { applyDefaultValue } from '../utils';
 import type { EntityName } from '~/db/core/types';
 
 export interface DB {
-	[key: string]: any;
+	[key: string]: unknown;
 }
 
 const createTransform = (
@@ -146,11 +146,11 @@ const createTransform = (
 	return {
 		getSchema,
 		transformInput(
-			data: Record<string, any>,
+			data: Record<string, unknown>,
 			model: string,
 			action: 'create' | 'update'
 		) {
-			const transformedData: Record<string, any> =
+			const transformedData: Record<string, unknown> =
 				useDatabaseGeneratedId || action === 'update'
 					? {}
 					: {
@@ -177,7 +177,7 @@ const createTransform = (
 			return transformedData;
 		},
 		transformOutput(
-			data: Record<string, any>,
+			data: Record<string, unknown>,
 			model: string,
 			select: string[] = []
 		) {
@@ -185,7 +185,7 @@ const createTransform = (
 				return null;
 			}
 
-			let transformedData: Record<string, any> = {};
+			let transformedData: Record<string, unknown> = {};
 
 			if (
 				(data.id || data._id) &&
@@ -204,13 +204,13 @@ const createTransform = (
 					transformedData[key] = data[field.fieldName || key];
 				}
 			}
-			return transformedData as any;
+			return transformedData;
 		},
 		convertWhereClause,
 		withReturning: async (
 			model: string,
-			builder: any,
-			data: Record<string, any>,
+			builder: unknown,
+			data: Record<string, unknown>,
 			where?: Where<string>[]
 		) => {
 			if (config.provider !== 'mysql') {
@@ -257,7 +257,7 @@ export interface DrizzleAdapterConfig {
 	/**
 	 * The schema object that defines the tables and fields
 	 */
-	schema?: Record<string, any>;
+	schema?: Record<string, unknown>;
 	/**
 	 * The database provider
 	 */
@@ -271,9 +271,9 @@ export interface DrizzleAdapterConfig {
 }
 
 function checkMissingFields(
-	schema: Record<string, any>,
+	schema: Record<string, unknown>,
 	model: string,
-	values: Record<string, any>
+	values: Record<string, unknown>
 ) {
 	if (!schema) {
 		throw new C15TError(
@@ -339,7 +339,7 @@ export const drizzleAdapter =
 				if (sortBy?.field) {
 					builder.orderBy(sortFn(schemaModel[getField(model, sortBy?.field)]));
 				}
-				const res = (await builder.where(...clause)) as any[];
+				const res = await builder.where(...clause);
 				return res.map((r) => transformOutput(r, model));
 			},
 			async count(data) {

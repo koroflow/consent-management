@@ -44,7 +44,7 @@ export async function updateWithHooks<
 	const hooks = ctx.hooks || [];
 
 	// Process before hooks
-	const transformedData = await processHooks<Partial<TInputData>>(
+	const transformedData = await processHooks<EntityName, Partial<TInputData>>(
 		data,
 		model,
 		'update',
@@ -76,7 +76,7 @@ export async function updateWithHooks<
 
 	// Process after hooks
 	if (updated) {
-		await processHooks<TOutputData>(
+		await processHooks<EntityName, TOutputData>(
 			updated,
 			model,
 			'update',

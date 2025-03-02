@@ -61,7 +61,7 @@ export function getSchema(config: C15TOptions) {
 
 			const fieldName = field.fieldName || fieldKey;
 			// Cast field to Field to ensure it has the right type
-			const typedField = field as unknown as Field;
+			const typedField = field as Field;
 			processedFields[fieldName] = typedField;
 
 			// Handle references - first check if the field has a references property

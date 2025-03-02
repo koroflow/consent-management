@@ -89,7 +89,7 @@ export function getGeoLocationTable(
 					output: (value: string) => {
 						try {
 							return JSON.parse(value);
-						} catch (e) {
+						} catch {
 							return [];
 						}
 					},

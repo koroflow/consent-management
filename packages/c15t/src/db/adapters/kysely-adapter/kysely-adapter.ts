@@ -151,9 +151,7 @@ const createTransform = (
 		return schema[model].entityName as TableReference<Database>;
 	}
 
-	// Check if generateId option is explicitly set to false
-	//@ts-expect-error
-	const useDatabaseGeneratedId = options?.advanced?.generateId === false;
+	const useDatabaseGeneratedId = !options?.advanced?.generateId;
 
 	return {
 		transformInput<T extends EntityName>(

@@ -535,8 +535,9 @@ export function createConsentClient(
 		const store = useConsent();
 
 		const canShow = () => {
-			if (store.isLoading || !store.hasConsented || !store.preferences)
+			if (store.isLoading || !store.hasConsented || !store.preferences) {
 				return false;
+			}
 
 			if (Array.isArray(requiredConsent)) {
 				return requiredConsent.every((key) => store.preferences?.[key]);

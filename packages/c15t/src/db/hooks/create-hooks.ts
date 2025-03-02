@@ -43,7 +43,7 @@ export async function createWithHook<
 	const hooks = ctx.hooks || [];
 
 	// Process before hooks
-	const transformedData = await processHooks<TInputData>(
+	const transformedData = await processHooks<EntityName, TInputData>(
 		data,
 		model,
 		'create',
@@ -74,7 +74,7 @@ export async function createWithHook<
 
 	// Process after hooks
 	if (created) {
-		await processHooks<TOutputData>(
+		await processHooks<EntityName, TOutputData>(
 			created,
 			model,
 			'create',

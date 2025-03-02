@@ -19,20 +19,20 @@ export interface PrismaConfig {
 		| 'mongodb';
 }
 
-type PrismaClient = {};
-
+type PrismaClient = Record<string, unknown>;
+type data = Record<string, unknown>;
 interface PrismaClientInternal {
 	[model: string]: {
-		create: (data: any) => Promise<any>;
-		findFirst: (data: any) => Promise<any>;
-		findMany: (data: any) => Promise<any>;
-		update: (data: any) => Promise<any>;
-		delete: (data: any) => Promise<any>;
-		[key: string]: any;
+		create: (data: data) => Promise<data>;
+		findFirst: (data: data) => Promise<data>;
+		findMany: (data: data) => Promise<data>;
+		update: (data: data) => Promise<data>;
+		delete: (data: data) => Promise<data>;
+		[key: string]: data;
 	};
 }
 
-const createTransform = (config: PrismaConfig, options: C15TOptions) => {
+const createTransform = (_config: PrismaConfig, options: C15TOptions) => {
 	const schema = getConsentTables(options);
 
 	function getField(model: string, field: string) {
@@ -61,11 +61,11 @@ const createTransform = (config: PrismaConfig, options: C15TOptions) => {
 	const useDatabaseGeneratedId = options?.advanced?.generateId === false;
 	return {
 		transformInput(
-			data: Record<string, any>,
+			data: Record<string, unknown>,
 			model: string,
 			action: 'create' | 'update'
 		) {
-			const transformedData: Record<string, any> =
+			const transformedData: Record<string, unknown> =
 				useDatabaseGeneratedId || action === 'update'
 					? {}
 					: {
@@ -95,7 +95,7 @@ const createTransform = (config: PrismaConfig, options: C15TOptions) => {
 			return transformedData;
 		},
 		transformOutput(
-			data: Record<string, any>,
+			data: Record<string, unknown>,
 			model: string,
 			select: string[] = []
 		) {
@@ -103,7 +103,7 @@ const createTransform = (config: PrismaConfig, options: C15TOptions) => {
 				return null;
 			}
 
-			let transformedData: Record<string, any> = {};
+			let transformedData: Record<string, unknown> = {};
 
 			if (
 				(data.id || data._id) &&
@@ -122,10 +122,12 @@ const createTransform = (config: PrismaConfig, options: C15TOptions) => {
 					transformedData[key] = data[field.fieldName || key];
 				}
 			}
-			return transformedData as any;
+			return transformedData as unknown;
 		},
-		convertWhereClause<T extends EntityName>(model: T, where?: Where<T>[]) {
-			if (!where) return {};
+		convertWhereClause<T>(model: T, where?: Where<T>[]) {
+			if (!where) {
+				return {};
+			}
 			if (where.length === 1) {
 				const w = where[0];
 				if (!w) {
@@ -170,10 +172,8 @@ const createTransform = (config: PrismaConfig, options: C15TOptions) => {
 				return undefined;
 			}
 			return select.reduce((prev, cur) => {
-				return {
-					...prev,
-					[getField(model, cur)]: true,
-				};
+				const field = getField(model, cur);
+				return Object.assign({}, prev, { [field]: true });
 			}, {});
 		},
 		getEntityName,
@@ -243,7 +243,7 @@ export const prismaAdapter =
 								},
 							}
 						: {}),
-				})) as any[];
+				})) as unknown[];
 				return result.map((r) => transformOutput(r, model));
 			},
 			async count(data) {

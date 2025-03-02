@@ -160,6 +160,18 @@ export interface C15TOptions<P extends C15TPlugin[] = C15TPlugin[]> {
 			 * ⚠︎ This is a security risk and it may expose your application to abuse
 			 */
 			disableIpTracking?: boolean;
+			/**
+			 * Custom generateId function.
+			 *
+			 * If not provided, random ids will be generated.
+			 * If set to false, the database's auto generated id will be used.
+			 */
+			generateId?:
+				| ((options: {
+						model: EntityName;
+						size?: number;
+				  }) => string)
+				| false;
 		};
 
 		/**
@@ -567,6 +579,15 @@ export interface C15TOptions<P extends C15TPlugin[] = C15TPlugin[]> {
 		 * Additional fields for the consent withdrawal table
 		 */
 		additionalFields?: Record<string, Field>;
+
+		/**
+		 * Prevent multiple withdrawals
+		 *
+		 * If true, a user can only have one withdrawal record per consent
+		 *
+		 * @default false
+		 */
+		preventMultipleWithdrawals?: boolean;
 	};
 
 	/**

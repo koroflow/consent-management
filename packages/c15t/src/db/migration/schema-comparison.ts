@@ -25,6 +25,7 @@ import type { TableToCreate, ColumnsToAdd } from './types';
 import { matchType } from './type-mapping';
 import type { KyselyDatabaseType } from '../adapters/kysely-adapter/types';
 import type { TableMetadata } from 'kysely';
+import type { TableSchemaDefinition } from './get-schema/types';
 
 /**
  * Analyzes schema differences between the expected schema and actual database
@@ -65,11 +66,18 @@ export function analyzeSchemaChanges(
 	for (const [key, value] of Object.entries(betterAuthSchema)) {
 		const table = tableMetadata.find((t: { name: string }) => t.name === key);
 		if (!table) {
-			handleNewTable(key, value as any, toBeCreated);
+			handleNewTable(key, value as TableSchemaDefinition, toBeCreated);
 			continue;
 		}
 
-		handleExistingTable(key, value as any, table, toBeAdded, dbType, logger);
+		handleExistingTable(
+			key,
+			value as TableSchemaDefinition,
+			table,
+			toBeAdded,
+			dbType,
+			logger
+		);
 	}
 
 	return { toBeCreated, toBeAdded };
@@ -95,7 +103,7 @@ export function analyzeSchemaChanges(
  */
 function handleNewTable(
 	tableName: string,
-	value: { fields: Record<string, Field>; order: number },
+	value: TableSchemaDefinition,
 	toBeCreated: TableToCreate[]
 ): void {
 	const tIndex = toBeCreated.findIndex((t) => t.table === tableName);
@@ -163,7 +171,7 @@ function handleNewTable(
  */
 function handleExistingTable(
 	tableName: string,
-	value: { fields: Record<string, Field>; order: number },
+	value: TableSchemaDefinition,
 	table: TableMetadata,
 	toBeAdded: ColumnsToAdd[],
 	dbType: KyselyDatabaseType,

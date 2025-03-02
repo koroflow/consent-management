@@ -9,8 +9,8 @@ import type { C15TEndpoint, C15TMiddleware } from './call';
 import defu from 'defu';
 import type { HookEndpointContext, C15TContext } from '~/types';
 
-type InternalContext = InputContext<string, any> &
-	EndpointContext<string, any> & {
+type InternalContext = InputContext<string, EndpointOptions> &
+	EndpointContext<string, EndpointOptions, unknown> & {
 		asResponse?: boolean;
 		context: C15TContext & {
 			returned?: unknown;
@@ -25,8 +25,9 @@ export function toEndpoints<E extends Record<string, C15TEndpoint>>(
 	const api: Record<
 		string,
 		((
-			context: EndpointContext<string, any> & InputContext<string, any>
-		) => Promise<any>) & {
+			context: EndpointContext<string, EndpointOptions, unknown> &
+				InputContext<string, EndpointOptions>
+		) => Promise<unknown>) & {
 			path?: string;
 			options?: EndpointOptions;
 		}
@@ -78,7 +79,7 @@ export function toEndpoints<E extends Record<string, C15TEndpoint>>(
 
 			internalContext.asResponse = false;
 			internalContext.returnHeaders = true;
-			const result = (await endpoint(internalContext as any).catch((e) => {
+			const result = (await endpoint(internalContext).catch((e) => {
 				if (e instanceof APIError) {
 					/**
 					 * API Errors from response are caught
@@ -92,7 +93,7 @@ export function toEndpoints<E extends Record<string, C15TEndpoint>>(
 				throw e;
 			})) as {
 				headers: Headers;
-				response: any;
+				response: unknown;
 			};
 			internalContext.context.returned = result.response;
 			internalContext.context.responseHeaders = result.headers;
@@ -107,7 +108,8 @@ export function toEndpoints<E extends Record<string, C15TEndpoint>>(
 				throw result.response;
 			}
 
-			let response;
+			let response: unknown;
+
 			if (context?.asResponse) {
 				response = toResponse(result.response, {
 					headers: result.headers,
@@ -187,7 +189,7 @@ async function runAfterHooks(
 				}
 				throw e;
 			})) as {
-				response: any;
+				response: unknown;
 				headers: Headers;
 			};
 			if (result.headers) {

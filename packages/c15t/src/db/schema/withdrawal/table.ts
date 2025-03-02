@@ -137,7 +137,6 @@ export function getWithdrawalTable(
 		 * (If this constraint is not desired, it can be disabled in options)
 		 */
 		uniqueConstraints:
-			//@ts-expect-error
 			options.withdrawal?.preventMultipleWithdrawals !== false
 				? [
 						{

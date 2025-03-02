@@ -1,6 +1,6 @@
 import type { GenericEndpointContext } from '~/types';
+import type { EntityName, EntityTypeMap } from '../core/types';
 import type { DatabaseHook, HookOperation, HookPhase } from './types';
-import type { EntityName } from '../core/types';
 
 /**
  * Process hooks for a given phase and operation.
@@ -31,9 +31,12 @@ import type { EntityName } from '../core/types';
  * );
  * ```
  */
-export async function processHooks<TEntityData extends Record<string, unknown>>(
+export async function processHooks<
+	TEntityName extends EntityName,
+	TEntityData extends Record<string, unknown>,
+>(
 	data: TEntityData,
-	model: EntityName,
+	model: TEntityName,
 	operation: HookOperation,
 	phase: HookPhase,
 	hooks: DatabaseHook[],
@@ -61,14 +64,16 @@ export async function processHooks<TEntityData extends Record<string, unknown>>(
 		}
 
 		if (phase === 'before') {
-			const result = await hookFn(currentData as any, context);
+			const result = await hookFn(
+				currentData as unknown as EntityTypeMap[TEntityName],
+				context
+			);
 
 			if (result && typeof result === 'object' && 'kind' in result) {
 				switch (result.kind) {
 					case 'abort':
 						return null;
 					case 'transform': {
-						// Type assertion only for the nested property access
 						const transformData = result.data;
 						currentData = {
 							...currentData,
@@ -82,8 +87,11 @@ export async function processHooks<TEntityData extends Record<string, unknown>>(
 				}
 			}
 		} else {
-			// For 'after' hooks, just execute the hook
-			await hookFn(currentData as any, context);
+			// For 'after' hooks, we use the same type casting approach
+			await hookFn(
+				currentData as unknown as EntityTypeMap[TEntityName],
+				context
+			);
 		}
 	}
 
@@ -93,6 +101,7 @@ export async function processHooks<TEntityData extends Record<string, unknown>>(
 /**
  * Process hooks for multiple records.
  *
+ * @typeParam TEntityName - Type of the entity name
  * @typeParam TEntityData - Type of the entity data
  *
  * @param records - Array of records to process
@@ -117,10 +126,11 @@ export async function processHooks<TEntityData extends Record<string, unknown>>(
  * ```
  */
 export async function processAfterHooksForMany<
+	TEntityName extends EntityName,
 	TEntityData extends Record<string, unknown>,
 >(
 	records: TEntityData[],
-	model: EntityName,
+	model: TEntityName,
 	hooks: DatabaseHook[],
 	context?: GenericEndpointContext
 ): Promise<void> {
@@ -129,7 +139,7 @@ export async function processAfterHooksForMany<
 	}
 
 	for (const record of records) {
-		await processHooks<TEntityData>(
+		await processHooks<TEntityName, TEntityData>(
 			record,
 			model,
 			'update',
