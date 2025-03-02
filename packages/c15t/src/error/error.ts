@@ -1,4 +1,8 @@
-import { BASE_ERROR_CODES, type ErrorMessage } from './codes';
+import {
+	BASE_ERROR_CODES,
+	type ErrorCategory,
+	type ErrorMessage,
+} from './codes';
 
 /**
  * Custom error class for c15t consent management errors.
@@ -37,6 +41,11 @@ export class C15TError extends Error {
 	data?: Record<string, unknown>;
 
 	/**
+	 * Category of the error for better organization
+	 */
+	category?: ErrorCategory;
+
+	/**
 	 * Creates a new C15TError instance.
 	 *
 	 * @param message - Human-readable error message
@@ -59,6 +68,11 @@ export class C15TError extends Error {
 			 * Additional data providing context about the error
 			 */
 			data?: Record<string, unknown>;
+
+			/**
+			 * Category of the error for better organization
+			 */
+			category?: ErrorCategory;
 		}
 	) {
 		super(message);
@@ -68,6 +82,7 @@ export class C15TError extends Error {
 			this.code = options.code;
 			this.status = options.status;
 			this.data = options.data;
+			this.category = options.category;
 		}
 
 		// Ensure prototype chain works correctly

@@ -144,7 +144,74 @@ export const BASE_ERROR_CODES = {
 	 * This is a general error for unexpected exceptions during request processing.
 	 */
 	INTERNAL_SERVER_ERROR: 'Internal server error',
+
+	/**
+	 * Unknown or unclassified error.
+	 * Used when an error occurs that doesn't match any other error code.
+	 */
+	UNKNOWN_ERROR: 'Unknown error',
+
+	/**
+	 * Initialization of the system failed.
+	 * This may occur when the system cannot be initialized due to configuration
+	 * errors, missing dependencies, or other setup issues.
+	 */
+	INITIALIZATION_FAILED: 'Initialization failed',
+
+	/**
+	 * Plugin initialization failed.
+	 * This may occur when a plugin cannot be initialized due to configuration
+	 * errors, missing dependencies, or other setup issues.
+	 */
+	PLUGIN_INITIALIZATION_FAILED: 'Plugin initialization failed',
+
+	/**
+	 * Error in request handler.
+	 * This may occur when processing a request fails due to unexpected errors
+	 * in the request handler.
+	 */
+	REQUEST_HANDLER_ERROR: 'Request handler error',
+
+	/**
+	 * Error retrieving API endpoints.
+	 * This may occur when the system cannot retrieve API endpoints due to
+	 * configuration errors or other internal issues.
+	 */
+	API_RETRIEVAL_ERROR: 'API retrieval error',
+
+	/**
+	 * Database connection error.
+	 * This may occur when the system cannot connect to the database due to
+	 * connection issues, authentication failures, or other database-related problems.
+	 */
+	DATABASE_CONNECTION_ERROR: 'Database connection error',
+
+	/**
+	 * Database query error.
+	 * This may occur when a database query fails due to syntax errors,
+	 * constraint violations, or other database-related issues.
+	 */
+	DATABASE_QUERY_ERROR: 'Database query error',
 } as const;
+
+/**
+ * Error categories for organizing errors by domain
+ */
+export const ERROR_CATEGORIES = {
+	VALIDATION: 'validation',
+	AUTHORIZATION: 'authorization',
+	STORAGE: 'storage',
+	NETWORK: 'network',
+	PLUGIN: 'plugin',
+	CONFIGURATION: 'configuration',
+	UNEXPECTED: 'unexpected',
+} as const;
+
+/**
+ * Type for error categories
+ */
+export type ErrorCategory =
+	(typeof ERROR_CATEGORIES)[keyof typeof ERROR_CATEGORIES];
 
 /**
  * Type containing all possible error codes from the BASE_ERROR_CODES object

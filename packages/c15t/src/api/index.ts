@@ -8,6 +8,7 @@ import {
 import type { C15TOptions, C15TPlugin, C15TContext } from '~/types';
 
 import { originCheckMiddleware } from './middlewares/origin-check';
+import { validateContextMiddleware } from './middlewares/validate-context';
 import { baseEndpoints } from './routes';
 import { ok } from './routes/ok';
 import { error } from './routes/error';
@@ -187,6 +188,10 @@ export const router = <
 		},
 		basePath,
 		routerMiddleware: [
+			{
+				path: '/**',
+				middleware: validateContextMiddleware,
+			},
 			{
 				path: '/**',
 				middleware: originCheckMiddleware,

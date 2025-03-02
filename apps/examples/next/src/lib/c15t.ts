@@ -1,5 +1,10 @@
-import { c15t as c15tInstance } from '@c15t/new';
-import { LibsqlDialect } from '@libsql/kysely-libsql';
+import { c15tInstance } from '@c15t/new';
+import { LibsqlDialect } from "@libsql/kysely-libsql";
+
+const libsql = new LibsqlDialect({
+	url: process.env.TURSO_DATABASE_URL || "",
+	authToken: process.env.TURSO_AUTH_TOKEN || "",
+});
 
 /**
  * Authentication and authorization configuration using c15t
@@ -25,13 +30,7 @@ export const c15t = c15tInstance({
 	// Add any trusted origins if needed
 	trustedOrigins: ['http://localhost:3000'],
 	// Configure storage adapter
-  database: {
-    dialect: new LibsqlDialect({
-      url: process.env.TURSO_DATABASE_URL || "",
-      authToken: process.env.TURSO_AUTH_TOKEN || "",
-    }),
-    type: "sqlite" 
-  },
+  database: libsql,
 	// Configure consent options
 	consent: {
 		expiresIn: 60 * 60 * 24 * 365, // 1 year in seconds
