@@ -1,5 +1,5 @@
 import { getConsentTables } from '../..';
-import type { Adapter, C15TOptions, Where } from '~/types';
+import type { C15TOptions } from '~/types';
 import type {
 	EntityName,
 	EntityTypeMap,
@@ -10,15 +10,73 @@ import type { TableFields } from '~/db/schema/definition';
 import type { Field, Primitive } from '~/db/core/fields';
 import { generateId } from '~/utils';
 import { applyDefaultValue } from '../utils';
+import type { Adapter, Where } from '../types';
 
+/**
+ * In-memory database structure for the memory adapter
+ *
+ * This interface defines the structure of the in-memory database used by the
+ * memory adapter. It's a simple key-value store where each key represents a
+ * collection/table name, and the value is an array of records.
+ *
+ * @example
+ * ```typescript
+ * const db: MemoryDB = {
+ *   consent: [
+ *     { id: '1', userId: 'user123', purposeId: 'marketing', allowed: true },
+ *     { id: '2', userId: 'user456', purposeId: 'analytics', allowed: false }
+ *   ],
+ *   purpose: [
+ *     { id: 'marketing', name: 'Marketing', description: 'For sending promotional materials' }
+ *   ]
+ * };
+ * ```
+ */
 export interface MemoryDB {
 	[key: string]: Record<string, unknown>[];
 }
 
-// Define a type for Where conditions similar to the Kysely adapter
-interface WhereCondition<T extends EntityName> {
-	field: keyof EntityTypeMap[T] | 'id';
+/**
+ * Interface for where conditions in memory adapter queries
+ *
+ * This interface defines the structure of query conditions used
+ * in database operations. It supports various operators and connectors
+ * for building complex query conditions.
+ *
+ * @typeParam EntityType - The entity type being queried
+ *
+ * @example
+ * ```typescript
+ * // Simple equality condition
+ * const whereCondition: WhereCondition<'consent'> = {
+ *   field: 'userId',
+ *   value: 'user123'
+ * };
+ *
+ * // More complex condition with operator
+ * const complexCondition: WhereCondition<'consent'> = {
+ *   field: 'purposeId',
+ *   value: ['marketing', 'analytics'],
+ *   operator: 'in'
+ * };
+ * ```
+ */
+interface WhereCondition<EntityType extends EntityName> {
+	/**
+	 * The field to apply the condition to
+	 */
+	field: keyof EntityTypeMap[EntityType] | 'id';
+
+	/**
+	 * The value to compare against
+	 */
 	value: unknown;
+
+	/**
+	 * The operator to use for comparison
+	 *
+	 * @default "="
+	 */
 	operator?:
 		| 'in'
 		| 'eq'
@@ -27,15 +85,41 @@ interface WhereCondition<T extends EntityName> {
 		| 'starts_with'
 		| 'ends_with'
 		| '=';
+
+	/**
+	 * The logical connector to use with previous conditions
+	 *
+	 * @default "AND"
+	 */
 	connector?: 'AND' | 'OR';
 }
 
+/**
+ * Creates entity transformation utilities for the memory adapter
+ *
+ * This function creates helper methods for converting between c15t's
+ * data format and the in-memory format, handling field mapping,
+ * value transformation, and query filtering.
+ *
+ * @internal This function is used internally by the memoryAdapter
+ * @param options - The c15t options
+ * @returns An object containing entity transformation utilities
+ */
 const createEntityTransformer = (options: C15TOptions) => {
 	const schema = getConsentTables(options);
 
-	function getField<T extends EntityName>(
-		model: T,
-		field: keyof EntityTypeMap[T] | string
+	/**
+	 * Gets the database field name for a model field
+	 *
+	 * @internal
+	 * @typeParam EntityType - The entity type
+	 * @param model - The model name
+	 * @param field - The field name in the c15t model
+	 * @returns The corresponding field name in the database schema
+	 */
+	function getField<EntityType extends EntityName>(
+		model: EntityType,
+		field: keyof EntityTypeMap[EntityType] | string
 	): string {
 		if (field === 'id') {
 			return field;
@@ -48,9 +132,19 @@ const createEntityTransformer = (options: C15TOptions) => {
 	}
 
 	return {
-		transformInput<T extends EntityName>(
-			data: EntityInput<T>,
-			model: T,
+		/**
+		 * Transforms input data from c15t format to database format
+		 *
+		 * @internal
+		 * @typeParam EntityType - The entity type
+		 * @param data - The data to transform
+		 * @param model - The model name
+		 * @param action - Whether this is a create or update operation
+		 * @returns Transformed data for database insertion/update
+		 */
+		transformInput<EntityType extends EntityName>(
+			data: EntityInput<EntityType>,
+			model: EntityType,
 			action: 'update' | 'create'
 		): Record<string, unknown> {
 			const transformedData: Record<string, unknown> =
@@ -83,11 +177,21 @@ const createEntityTransformer = (options: C15TOptions) => {
 			return transformedData;
 		},
 
-		transformOutput<T extends EntityName>(
+		/**
+		 * Transforms output data from database format to c15t format
+		 *
+		 * @internal
+		 * @typeParam EntityType - The entity type
+		 * @param data - The data from the database
+		 * @param model - The model name
+		 * @param select - Optional array of fields to select
+		 * @returns Transformed data for c15t or null if no data
+		 */
+		transformOutput<EntityType extends EntityName>(
 			data: Record<string, unknown> | null,
-			model: T,
+			model: EntityType,
 			select: string[] = []
-		): EntityOutput<T> | null {
+		): EntityOutput<EntityType> | null {
 			if (!data) {
 				return null;
 			}
@@ -111,13 +215,24 @@ const createEntityTransformer = (options: C15TOptions) => {
 					transformedData[key] = data[field.fieldName || key];
 				}
 			}
-			return transformedData as EntityOutput<T>;
+			return transformedData as EntityOutput<EntityType>;
 		},
 
-		convertWhereClause<T extends EntityName>(
-			where: WhereCondition<T>[],
+		/**
+		 * Filters records based on where conditions
+		 *
+		 * @internal
+		 * @typeParam EntityType - The entity type
+		 * @param where - Array of where conditions
+		 * @param table - The table of records to filter
+		 * @param model - The model name
+		 * @returns Filtered array of records
+		 * @throws {Error} When an invalid value is provided for 'in' operator
+		 */
+		convertWhereClause<EntityType extends EntityName>(
+			where: WhereCondition<EntityType>[],
 			table: Record<string, unknown>[],
-			model: T
+			model: EntityType
 		): Record<string, unknown>[] {
 			return table.filter((record) => {
 				return where.every((clause) => {
@@ -171,6 +286,35 @@ const createEntityTransformer = (options: C15TOptions) => {
 	};
 };
 
+/**
+ * Creates a c15t adapter for in-memory storage
+ *
+ * This factory function creates an adapter that allows c15t to use in-memory
+ * storage for development, testing, or simple production use cases where
+ * persistence is not required.
+ *
+ * @param db - The in-memory database object
+ * @returns A c15t adapter factory function
+ *
+ * @example
+ * ```typescript
+ * import { c15t } from '@c15t/core';
+ * import { memoryAdapter } from '@c15t/adapters/memory';
+ *
+ * // Create an empty in-memory database
+ * const db = {};
+ *
+ * // Create the c15t instance with memory adapter
+ * const c15tInstance = c15t({
+ *   storage: memoryAdapter(db),
+ *   secret: process.env.SECRET_KEY
+ * });
+ *
+ * // The database will be populated as records are created
+ * // You can also inspect the database during development
+ * console.log(db);
+ * ```
+ */
 export const memoryAdapter =
 	(db: MemoryDB) =>
 	(options: C15TOptions): Adapter => {
@@ -179,6 +323,15 @@ export const memoryAdapter =
 
 		return {
 			id: 'memory',
+			/**
+			 * Creates a new record in the in-memory database
+			 *
+			 * @typeParam Model - The model type
+			 * @typeParam Data - The data type
+			 * @typeParam Result - The result type
+			 * @param data - The data for the create operation
+			 * @returns The created record
+			 */
 			async create<
 				Model extends EntityName,
 				Data extends Record<string, unknown>,
@@ -208,6 +361,14 @@ export const memoryAdapter =
 				) as Result;
 			},
 
+			/**
+			 * Finds a single record matching the where conditions
+			 *
+			 * @typeParam Model - The model type
+			 * @typeParam Result - The result type
+			 * @param data - The data for the find operation
+			 * @returns The found record or null if not found
+			 */
 			async findOne<
 				Model extends EntityName,
 				Result extends TableFields<Model>,
@@ -231,6 +392,14 @@ export const memoryAdapter =
 				) as Result | null;
 			},
 
+			/**
+			 * Finds multiple records matching the where conditions
+			 *
+			 * @typeParam Model - The model type
+			 * @typeParam Result - The result type
+			 * @param data - The data for the find operation
+			 * @returns Array of matching records
+			 */
 			async findMany<
 				Model extends EntityName,
 				Result extends TableFields<Model>,
@@ -273,6 +442,13 @@ export const memoryAdapter =
 				return result.map((record) => transformOutput(record, model) as Result);
 			},
 
+			/**
+			 * Counts records matching the where conditions
+			 *
+			 * @typeParam Model - The model type
+			 * @param data - The data for the count operation
+			 * @returns The count of matching records
+			 */
 			async count<Model extends EntityName>(data: {
 				model: Model;
 				where?: Where<Model>;
@@ -292,6 +468,14 @@ export const memoryAdapter =
 				return filtered.length;
 			},
 
+			/**
+			 * Updates a single record matching the where conditions
+			 *
+			 * @typeParam Model - The model type
+			 * @typeParam Result - The result type
+			 * @param data - The data for the update operation
+			 * @returns The updated record or null if not found
+			 */
 			async update<
 				Model extends EntityName,
 				Result extends TableFields<Model>,
@@ -318,6 +502,14 @@ export const memoryAdapter =
 				return transformOutput(res[0] || null, model) as Result | null;
 			},
 
+			/**
+			 * Updates multiple records matching the where conditions
+			 *
+			 * @typeParam Model - The model type
+			 * @typeParam Result - The result type
+			 * @param data - The data for the update operation
+			 * @returns Array of updated records
+			 */
 			async updateMany<
 				Model extends EntityName,
 				Result extends TableFields<Model>,
@@ -344,6 +536,12 @@ export const memoryAdapter =
 				return res.map((record) => transformOutput(record, model) as Result);
 			},
 
+			/**
+			 * Deletes a single record matching the where conditions
+			 *
+			 * @typeParam Model - The model type
+			 * @param data - The data for the delete operation
+			 */
 			async delete<Model extends EntityName>(data: {
 				model: Model;
 				where: Where<Model>;
@@ -358,6 +556,13 @@ export const memoryAdapter =
 				db[model] = table.filter((record) => !res.includes(record));
 			},
 
+			/**
+			 * Deletes multiple records matching the where conditions
+			 *
+			 * @typeParam Model - The model type
+			 * @param data - The data for the delete operation
+			 * @returns The number of records deleted
+			 */
 			async deleteMany<Model extends EntityName>(data: {
 				model: Model;
 				where: Where<Model>;

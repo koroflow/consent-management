@@ -16,7 +16,22 @@ import type { EntityName } from '~/db/core/types';
 /**
  * Main configuration options for the c15t consent management system
  *
- * @template P - The array of plugin types that will be used with this configuration
+ * This interface provides a comprehensive set of options for configuring
+ * all aspects of the consent management system, including core functionality,
+ * database settings, UI components, and plugin extensions.
+ *
+ * @typeParam P - Array of plugin types to be used with this configuration
+ *
+ * @example
+ * ```ts
+ * // Basic configuration
+ * const config: C15TOptions = {
+ *   appName: 'My Application',
+ *   baseURL: 'https://example.com',
+ *   secret: 'strong-secret-key',
+ *   plugins: [geoPlugin, analyticsPlugin]
+ * };
+ * ```
  */
 export interface C15TOptions<P extends C15TPlugin[] = C15TPlugin[]> {
 	/**
@@ -581,9 +596,11 @@ export interface C15TOptions<P extends C15TPlugin[] = C15TPlugin[]> {
 		additionalFields?: Record<string, Field>;
 
 		/**
-		 * Prevent multiple withdrawals
+		 * Prevent multiple withdrawals for the same consent
 		 *
-		 * If true, a user can only have one withdrawal record per consent
+		 * If true, a user can only have one withdrawal record per consent,
+		 * preventing multiple revocation records for the same consent.
+		 * This helps maintain data integrity and clearer consent history.
 		 *
 		 * @default false
 		 */

@@ -4,13 +4,63 @@ import { wildcardMatch } from '~/utils/wildcard';
 import { getHost, getOrigin, getProtocol } from '~/utils/url';
 import type { GenericEndpointContext } from '~/types';
 
-// Define regex at the top level for better performance
+/**
+ * Regular expression for validating relative URLs
+ * Ensures URLs don't contain path traversal attacks and have a valid structure
+ *
+ * @internal
+ */
 const VALID_RELATIVE_URL_REGEX =
 	/^\/(?!\/|\\|%2f|%5c)[\w\-./]*(?:\?[\w\-./=&%]*)?$/;
 
 /**
- * A middleware to validate callbackURL and origin against
- * trustedOrigins.
+ * Middleware that validates request origins and callback URLs against trusted origins
+ *
+ * This middleware performs security checks to prevent cross-site request forgery (CSRF)
+ * and open redirect vulnerabilities by validating various URLs in the request against
+ * a list of trusted origins configured in the C15T context.
+ *
+ * @remarks
+ * The middleware checks the following URLs from request body and headers:
+ * - Origin/Referer header (when cookies are used and CSRF checks are enabled)
+ * - callbackURL
+ * - redirectTo
+ * - errorCallbackURL
+ * - newUserCallbackURL
+ *
+ * URLs are validated using exact matching for origins and wildcard pattern matching
+ * for hostnames. Relative URLs are allowed for callback URLs but must match a safe
+ * URL pattern.
+ *
+ * @throws {APIError} Throws a FORBIDDEN error if any URL fails validation
+ *
+ * @example
+ * ```typescript
+ * // This middleware is typically used in router configuration
+ * const router = createRouter(endpoints, {
+ *   routerMiddleware: [
+ *     {
+ *       path: '/**',
+ *       middleware: originCheckMiddleware
+ *     }
+ *   ]
+ * });
+ *
+ * // To configure trusted origins in your C15T options:
+ * const c15tInstance = c15t({
+ *   // Static list of trusted origins
+ *   trustedOrigins: [
+ *     'https://example.com',
+ *     'https://*.example.org'
+ *   ]
+ *
+ *   // Or a function to dynamically determine trusted origins
+ *   trustedOrigins: (request) => {
+ *     const host = new URL(request.url).host;
+ *     return [`https://${host}`, `http://${host}`];
+ *   }
+ * });
+ * ```
  */
 export const originCheckMiddleware = createAuthMiddleware(async (ctx) => {
 	if (ctx.request?.method !== 'POST' || !ctx.request) {
@@ -31,6 +81,14 @@ export const originCheckMiddleware = createAuthMiddleware(async (ctx) => {
 			];
 	const usesCookies = ctx.headers?.has('cookie');
 
+	/**
+	 * Determines if a URL matches a trusted origin pattern
+	 *
+	 * @internal
+	 * @param url - The URL to check
+	 * @param pattern - The trusted origin pattern to match against
+	 * @returns Whether the URL matches the pattern
+	 */
 	const matchesPattern = (url: string, pattern: string): boolean => {
 		if (url.startsWith('/')) {
 			return false;
@@ -44,6 +102,15 @@ export const originCheckMiddleware = createAuthMiddleware(async (ctx) => {
 			? pattern === getOrigin(url)
 			: url.startsWith(pattern);
 	};
+
+	/**
+	 * Validates a URL against trusted origins
+	 *
+	 * @internal
+	 * @param url - The URL to validate
+	 * @param label - A label describing what type of URL is being validated
+	 * @throws {APIError} If the URL is not from a trusted origin
+	 */
 	const validateURL = (url: string | undefined, label: string) => {
 		if (!url) {
 			return;
@@ -73,6 +140,34 @@ export const originCheckMiddleware = createAuthMiddleware(async (ctx) => {
 	newUserCallbackURL && validateURL(newUserCallbackURL, 'newUserCallbackURL');
 });
 
+/**
+ * Creates a middleware that validates a specific URL against trusted origins
+ *
+ * This factory function creates a middleware for validating a single URL extracted
+ * from the request context against the list of trusted origins.
+ *
+ * @param getValue - A function that extracts the URL to validate from the endpoint context
+ * @returns A middleware that validates the extracted URL
+ * @throws {APIError} Throws a FORBIDDEN error if the URL fails validation
+ *
+ * @remarks
+ * Unlike the more comprehensive originCheckMiddleware, this factory allows creating
+ * targeted middleware for specific URL fields or custom extraction logic.
+ *
+ * @example
+ * ```typescript
+ * // Create a middleware that validates the 'returnUrl' from request body
+ * const validateReturnUrl = originCheck(ctx => ctx.body?.returnUrl);
+ *
+ * // Use the middleware in a specific route
+ * router.post('/api/subscribe', validateReturnUrl, subscribeHandler);
+ *
+ * // Create a middleware that validates a URL from a custom header
+ * const validateHeaderUrl = originCheck(ctx =>
+ *   ctx.headers?.get('x-callback-url')
+ * );
+ * ```
+ */
 export const originCheck = (
 	getValue: (ctx: GenericEndpointContext) => string
 ) =>
@@ -91,6 +186,14 @@ export const originCheck = (
 					...(context.options.trustedOrigins?.(ctx.request) || []),
 				];
 
+		/**
+		 * Determines if a URL matches a trusted origin pattern
+		 *
+		 * @internal
+		 * @param url - The URL to check
+		 * @param pattern - The trusted origin pattern to match against
+		 * @returns Whether the URL matches the pattern
+		 */
 		const matchesPattern = (url: string, pattern: string): boolean => {
 			if (url.startsWith('/')) {
 				return false;
@@ -101,6 +204,14 @@ export const originCheck = (
 			return url.startsWith(pattern);
 		};
 
+		/**
+		 * Validates a URL against trusted origins
+		 *
+		 * @internal
+		 * @param url - The URL to validate
+		 * @param label - A label describing what type of URL is being validated
+		 * @throws {APIError} If the URL is not from a trusted origin
+		 */
 		const validateURL = (url: string | undefined, label: string) => {
 			if (!url) {
 				return;

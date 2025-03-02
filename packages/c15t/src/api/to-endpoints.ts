@@ -9,6 +9,11 @@ import type { C15TEndpoint, C15TMiddleware } from './call';
 import defu from 'defu';
 import type { HookEndpointContext, C15TContext } from '~/types';
 
+/**
+ * Internal context type combining endpoint and input contexts with C15T-specific properties
+ *
+ * @internal
+ */
 type InternalContext = InputContext<string, EndpointOptions> &
 	EndpointContext<string, EndpointOptions, unknown> & {
 		asResponse?: boolean;
@@ -18,8 +23,39 @@ type InternalContext = InputContext<string, EndpointOptions> &
 		};
 	};
 
-export function toEndpoints<E extends Record<string, C15TEndpoint>>(
-	endpoints: E,
+/**
+ * Converts a map of endpoint definitions to callable API functions
+ *
+ * This function transforms raw endpoint definitions into API handlers that
+ * properly manage context, execute hooks, and handle responses.
+ *
+ * @remarks
+ * The generated API handlers maintain the path and options from the original
+ * endpoints while adding hook processing, error handling, and response formatting.
+ *
+ * @typeParam EndpointMap - Record type mapping endpoint names to their handler functions
+ * @param endpoints - Map of endpoint definitions to convert
+ * @param ctx - The C15T context or promise that will resolve to context
+ * @returns A record of API functions matching the endpoint definitions
+ * @throws Will re-throw any errors not instanceof APIError that occur during endpoint execution
+ *
+ * @example
+ * ```typescript
+ * const api = toEndpoints({
+ *   getUser: createAuthEndpoint(async (ctx) => {
+ *     return { id: 1, name: "User" };
+ *   }),
+ *   updateUser: createAuthEndpoint(async (ctx) => {
+ *     // Process update logic
+ *   })
+ * }, contextPromise);
+ *
+ * // Later use the API
+ * const user = await api.getUser({ params: { id: "123" } });
+ * ```
+ */
+export function toEndpoints<EndpointMap extends Record<string, C15TEndpoint>>(
+	endpoints: EndpointMap,
 	ctx: C15TContext | Promise<C15TContext>
 ) {
 	const api: Record<
@@ -128,9 +164,21 @@ export function toEndpoints<E extends Record<string, C15TEndpoint>>(
 		api[key].path = endpoint.path;
 		api[key].options = endpoint.options;
 	}
-	return api as E;
+	return api as EndpointMap;
 }
 
+/**
+ * Executes before hooks on the request context
+ *
+ * Runs through all matching hooks in sequence, accumulating and applying
+ * context modifications.
+ *
+ * @internal
+ * @param context - The endpoint context to pass to hooks
+ * @param hooks - Array of hook definitions with matchers and handlers
+ * @returns Modified context or hook response
+ * @throws Will propagate any errors thrown by hook handlers that aren't caught internally
+ */
 async function runBeforeHooks(
 	context: HookEndpointContext,
 	hooks: {
@@ -171,6 +219,18 @@ async function runBeforeHooks(
 	return { context: modifiedContext };
 }
 
+/**
+ * Executes after hooks on the response context
+ *
+ * Runs through all matching hooks in sequence, allowing them to
+ * modify the response before it's sent.
+ *
+ * @internal
+ * @param context - The endpoint context to pass to hooks
+ * @param hooks - Array of hook definitions with matchers and handlers
+ * @returns Modified response with updated headers
+ * @throws Will propagate any non-APIError exceptions thrown by hook handlers
+ */
 async function runAfterHooks(
 	context: HookEndpointContext,
 	hooks: {
@@ -217,6 +277,16 @@ async function runAfterHooks(
 	};
 }
 
+/**
+ * Extracts hook definitions from the C15T context
+ *
+ * Collects hooks from core configuration and plugins, organizing them
+ * into before and after hooks.
+ *
+ * @internal
+ * @param C15TContext - The consent management context
+ * @returns Object containing arrays of before and after hooks
+ */
 function getHooks(C15TContext: C15TContext) {
 	const plugins = C15TContext.options.plugins || [];
 	const beforeHooks: {
@@ -245,7 +315,9 @@ function getHooks(C15TContext: C15TContext) {
 				return plugin.hooks.before;
 			}
 		})
-		.filter((plugin) => plugin !== undefined)
+		.filter(
+			(plugin): plugin is NonNullable<typeof plugin> => plugin !== undefined
+		)
 		.flat();
 	const pluginAfterHooks = plugins
 		.map((plugin) => {
@@ -253,7 +325,9 @@ function getHooks(C15TContext: C15TContext) {
 				return plugin.hooks.after;
 			}
 		})
-		.filter((plugin) => plugin !== undefined)
+		.filter(
+			(plugin): plugin is NonNullable<typeof plugin> => plugin !== undefined
+		)
 		.flat();
 
 	/**

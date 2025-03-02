@@ -18,10 +18,33 @@ import { generateId } from '~/utils';
 import { applyDefaultValue } from '../utils';
 import type { EntityName } from '~/db/core/types';
 
+/**
+ * Database interface for Drizzle ORM integration
+ *
+ * This generic interface represents a Drizzle ORM database connection.
+ * It allows the adapter to work with different Drizzle providers.
+ *
+ * @remarks
+ * The interface uses an index signature to allow for dynamic access to
+ * the database's properties and methods.
+ */
 export interface DB {
 	[key: string]: unknown;
 }
 
+/**
+ * Creates a transformer for converting between C15T data models and Drizzle schema
+ *
+ * This function creates an object with utility methods for converting data between
+ * the C15T internal representation and the Drizzle ORM schema representation.
+ *
+ * @internal This function is primarily used internally by the drizzleAdapter
+ * @param db - The Drizzle database instance
+ * @param config - Configuration options for the Drizzle adapter
+ * @param options - C15T options
+ * @returns An object containing entity transformation utilities
+ * @throws {C15TError} If the schema is not found or if a model or field doesn't exist
+ */
 const createEntityTransformer = (
 	db: DB,
 	config: DrizzleAdapterConfig,
@@ -29,6 +52,14 @@ const createEntityTransformer = (
 ) => {
 	const schema = getConsentTables(options);
 
+	/**
+	 * Gets the field name in the database schema
+	 *
+	 * @internal
+	 * @param model - The model name
+	 * @param field - The field name in the C15T model
+	 * @returns The corresponding field name in the database schema
+	 */
 	function getField(model: string, field: string) {
 		if (field === 'id') {
 			return field;
@@ -37,6 +68,14 @@ const createEntityTransformer = (
 		return f.fieldName || field;
 	}
 
+	/**
+	 * Gets the schema model for a given entity name
+	 *
+	 * @internal
+	 * @param entityName - The entity name to get the schema for
+	 * @returns The schema model for the entity
+	 * @throws {C15TError} If the schema is not found or the model doesn't exist in the schema
+	 */
 	function getSchema(entityName: string) {
 		const schema = config.schema || db._.fullSchema;
 		if (!schema) {
@@ -54,6 +93,13 @@ const createEntityTransformer = (
 		return schemaModel;
 	}
 
+	/**
+	 * Converts a model name to its corresponding entity name in the database
+	 *
+	 * @internal
+	 * @param model - The model name to convert
+	 * @returns The database entity name
+	 */
 	const getEntityName = (model: string) => {
 		if (schema[model].entityName !== model) {
 			return schema[model].entityName;
@@ -66,9 +112,19 @@ const createEntityTransformer = (
 		return model;
 	};
 
-	function convertWhereClause<T extends EntityName>(
-		where: Where<T>[],
-		model: T
+	/**
+	 * Converts C15T where clauses to Drizzle ORM conditions
+	 *
+	 * @internal
+	 * @typeParam EntityType - The type of entity being queried
+	 * @param where - Array of where conditions from C15T
+	 * @param model - The model name
+	 * @returns Array of Drizzle ORM conditions
+	 * @throws {C15TError} If a field doesn't exist or if the operator value is invalid
+	 */
+	function convertWhereClause<EntityType extends EntityName>(
+		where: Where<EntityType>[],
+		model: EntityType
 	) {
 		const schemaModel = getSchema(model);
 		if (!where) {
@@ -145,6 +201,15 @@ const createEntityTransformer = (
 	const useDatabaseGeneratedId = options?.advanced?.generateId === false;
 	return {
 		getSchema,
+		/**
+		 * Transforms input data from C15T format to Drizzle format
+		 *
+		 * @internal
+		 * @param data - The data to transform
+		 * @param model - The model name
+		 * @param action - Whether this is a create or update operation
+		 * @returns Transformed data for Drizzle ORM
+		 */
 		transformInput(
 			data: Record<string, unknown>,
 			model: string,
@@ -176,6 +241,15 @@ const createEntityTransformer = (
 			}
 			return transformedData;
 		},
+		/**
+		 * Transforms output data from Drizzle format to C15T format
+		 *
+		 * @internal
+		 * @param data - The data to transform
+		 * @param model - The model name
+		 * @param select - Optional array of fields to select
+		 * @returns Transformed data for C15T or null if no data
+		 */
 		transformOutput(
 			data: Record<string, unknown>,
 			model: string,
@@ -207,6 +281,16 @@ const createEntityTransformer = (
 			return transformedData;
 		},
 		convertWhereClause,
+		/**
+		 * Helper for returning data from operations in MySQL
+		 *
+		 * @internal
+		 * @param model - The model name
+		 * @param builder - The query builder
+		 * @param data - The data being operated on
+		 * @param where - Optional where conditions
+		 * @returns The result of the operation
+		 */
 		withReturning: async (
 			model: string,
 			builder: unknown,
@@ -253,23 +337,64 @@ const createEntityTransformer = (
 	};
 };
 
+/**
+ * Configuration options for the Drizzle adapter
+ *
+ * @example
+ * ```typescript
+ * // Basic Drizzle adapter configuration
+ * const config: DrizzleAdapterConfig = {
+ *   provider: 'pg', // PostgreSQL
+ *   usePlural: true // Use plural table names
+ * };
+ *
+ * // Configuration with explicit schema
+ * const configWithSchema: DrizzleAdapterConfig = {
+ *   provider: 'mysql',
+ *   schema: {
+ *     users: users, // Drizzle schema objects
+ *     consents: consents,
+ *     purposes: purposes
+ *   }
+ * };
+ * ```
+ */
 export interface DrizzleAdapterConfig {
 	/**
 	 * The schema object that defines the tables and fields
+	 *
+	 * @remarks
+	 * If not provided, the adapter will attempt to use `db._.fullSchema`
 	 */
 	schema?: Record<string, unknown>;
+
 	/**
 	 * The database provider
+	 *
+	 * @remarks
+	 * Different providers have different SQL dialects and features
 	 */
 	provider: 'pg' | 'mysql' | 'sqlite';
+
 	/**
 	 * If the table names in the schema are plural
 	 * set this to true. For example, if the schema
 	 * has an object with a key "users" instead of "user"
+	 *
+	 * @default false
 	 */
 	usePlural?: boolean;
 }
 
+/**
+ * Validates that the schema contains all required fields
+ *
+ * @internal
+ * @param schema - The schema to check
+ * @param model - The model name
+ * @param values - The values to validate against the schema
+ * @throws {C15TError} If the schema is missing or a field doesn't exist
+ */
 function checkMissingFields(
 	schema: Record<string, unknown>,
 	model: string,
@@ -289,6 +414,64 @@ function checkMissingFields(
 	}
 }
 
+/**
+ * Creates a C15T adapter for Drizzle ORM
+ *
+ * This factory function creates an adapter that allows C15T to use Drizzle ORM
+ * as its database layer. It supports PostgreSQL, MySQL, and SQLite.
+ *
+ * @param db - The Drizzle database instance
+ * @param config - Configuration options for the Drizzle adapter
+ * @returns A C15T adapter factory function
+ *
+ * @example
+ * ```typescript
+ * import { drizzle } from 'drizzle-orm/postgres-js';
+ * import postgres from 'postgres';
+ * import { drizzleAdapter } from '@c15t/adapters/drizzle';
+ * import * as schema from './schema';
+ *
+ * // Create a Postgres connection
+ * const connection = postgres('postgresql://user:password@localhost:5432/db');
+ * const db = drizzle(connection, { schema });
+ *
+ * // Create the C15T instance with Drizzle adapter
+ * const c15tInstance = c15t({
+ *   storage: drizzleAdapter(db, {
+ *     provider: 'pg',
+ *     schema, // Pass your Drizzle schema
+ *     usePlural: true
+ *   }),
+ *   // Other C15T options...
+ *   secret: process.env.SECRET
+ * });
+ *
+ * // Use in your application
+ * export default c15tInstance.handler;
+ * ```
+ *
+ * @example
+ * ```typescript
+ * // Using with MySQL
+ * import { drizzle } from 'drizzle-orm/mysql2';
+ * import mysql from 'mysql2/promise';
+ *
+ * const connection = await mysql.createConnection({
+ *   host: 'localhost',
+ *   user: 'root',
+ *   database: 'c15t'
+ * });
+ *
+ * const db = drizzle(connection);
+ *
+ * const c15tInstance = c15t({
+ *   storage: drizzleAdapter(db, {
+ *     provider: 'mysql'
+ *   }),
+ *   secret: process.env.SECRET
+ * });
+ * ```
+ */
 export const drizzleAdapter =
 	(db: DB, config: DrizzleAdapterConfig) => (options: C15TOptions) => {
 		const {
@@ -302,6 +485,13 @@ export const drizzleAdapter =
 		} = createEntityTransformer(db, config, options);
 		return {
 			id: 'drizzle',
+			/**
+			 * Creates a new record in the database
+			 *
+			 * @param data - The data for the create operation
+			 * @returns The created record
+			 * @throws {C15TError} If the model or fields don't exist
+			 */
 			async create(data) {
 				const { model, data: values } = data;
 				const transformed = transformInput(values, model, 'create');
@@ -311,6 +501,13 @@ export const drizzleAdapter =
 				const returned = await withReturning(model, builder, transformed);
 				return transformOutput(returned, model);
 			},
+			/**
+			 * Finds a single record matching the where conditions
+			 *
+			 * @param data - The data for the find operation
+			 * @returns The found record or null if not found
+			 * @throws {C15TError} If the model or fields don't exist
+			 */
 			async findOne(data) {
 				const { model, where, select } = data;
 				const schemaModel = getSchema(model);
@@ -325,6 +522,13 @@ export const drizzleAdapter =
 				}
 				return transformOutput(res[0], model, select);
 			},
+			/**
+			 * Finds multiple records matching the where conditions
+			 *
+			 * @param data - The data for the find operation
+			 * @returns Array of matching records
+			 * @throws {C15TError} If the model or fields don't exist
+			 */
 			async findMany(data) {
 				const { model, where, sortBy, limit, offset } = data;
 				const schemaModel = getSchema(model);
@@ -342,6 +546,13 @@ export const drizzleAdapter =
 				const res = await builder.where(...clause);
 				return res.map((r) => transformOutput(r, model));
 			},
+			/**
+			 * Counts records matching the where conditions
+			 *
+			 * @param data - The data for the count operation
+			 * @returns The count of matching records
+			 * @throws {C15TError} If the model or fields don't exist
+			 */
 			async count(data) {
 				const { model, where } = data;
 				const schemaModel = getSchema(model);
@@ -352,6 +563,13 @@ export const drizzleAdapter =
 					.where(...clause);
 				return res[0].count;
 			},
+			/**
+			 * Updates a single record matching the where conditions
+			 *
+			 * @param data - The data for the update operation
+			 * @returns The updated record
+			 * @throws {C15TError} If the model or fields don't exist
+			 */
 			async update(data) {
 				const { model, where, update: values } = data;
 				const schemaModel = getSchema(model);
@@ -369,6 +587,13 @@ export const drizzleAdapter =
 				);
 				return transformOutput(returned, model);
 			},
+			/**
+			 * Updates multiple records matching the where conditions
+			 *
+			 * @param data - The data for the update operation
+			 * @returns The number of records updated
+			 * @throws {C15TError} If the model or fields don't exist
+			 */
 			async updateMany(data) {
 				const { model, where, update: values } = data;
 				const schemaModel = getSchema(model);
@@ -381,6 +606,12 @@ export const drizzleAdapter =
 				const res = await builder;
 				return res ? res.changes : 0;
 			},
+			/**
+			 * Deletes a single record matching the where conditions
+			 *
+			 * @param data - The data for the delete operation
+			 * @throws {C15TError} If the model or fields don't exist
+			 */
 			async delete(data) {
 				const { model, where } = data;
 				const schemaModel = getSchema(model);
@@ -388,6 +619,13 @@ export const drizzleAdapter =
 				const builder = db.delete(schemaModel).where(...clause);
 				await builder;
 			},
+			/**
+			 * Deletes multiple records matching the where conditions
+			 *
+			 * @param data - The data for the delete operation
+			 * @returns The number of records deleted
+			 * @throws {C15TError} If the model or fields don't exist
+			 */
 			async deleteMany(data) {
 				const { model, where } = data;
 				const schemaModel = getSchema(model);

@@ -8,6 +8,11 @@ import type { c15tClientOptions, FetchOptions, ResponseContext } from './types';
  * listing consent purposes, and accessing consent history. It handles HTTP requests
  * to the c15t API and provides a type-safe interface for working with consent data.
  *
+ * @remarks
+ * The client abstracts away the details of making HTTP requests to the c15t API,
+ * handling authentication, error handling, and response parsing. It provides
+ * a clean, type-safe interface for working with consent data.
+ *
  * @example
  * ```typescript
  * import { createConsentClient } from '@c15t/client';
@@ -30,16 +35,22 @@ import type { c15tClientOptions, FetchOptions, ResponseContext } from './types';
 export class c15tClient {
 	/**
 	 * Base URL for API requests (without trailing slash)
+	 *
+	 * @internal
 	 */
 	private baseURL: string;
 
 	/**
 	 * Default headers to include with all requests
+	 *
+	 * @internal
 	 */
 	private headers: Record<string, string>;
 
 	/**
 	 * Custom fetch implementation (if provided)
+	 *
+	 * @internal
 	 */
 	private customFetch?: typeof fetch;
 
@@ -47,6 +58,7 @@ export class c15tClient {
 	 * Creates a new c15t client instance.
 	 *
 	 * @param options - Configuration options for the client
+	 * @throws Will throw an error if the baseURL is invalid or if required options are missing
 	 */
 	constructor(options: c15tClientOptions) {
 		this.baseURL = options.baseURL.endsWith('/')
@@ -68,15 +80,17 @@ export class c15tClient {
 	 * and executing any callbacks based on the response status. It provides standardized
 	 * error handling and response formatting.
 	 *
+	 * @typeParam ResponseType - The expected type of the response data
 	 * @param path - API endpoint path (will be appended to the baseURL)
 	 * @param options - Request configuration options
 	 * @returns A response context object containing the data, response metadata, and any errors
-	 * @internal
+	 * @throws Will throw an error if options.throw is true and the request fails
+	 * @internal This method is not intended to be used directly, use the public API methods instead
 	 */
-	private async fetcher<T>(
+	private async fetcher<ResponseType>(
 		path: string,
-		options: FetchOptions<T> = {}
-	): Promise<ResponseContext<T>> {
+		options: FetchOptions<ResponseType> = {}
+	): Promise<ResponseContext<ResponseType>> {
 		try {
 			const url = new URL(path, this.baseURL);
 
@@ -112,7 +126,7 @@ export class c15tClient {
 			const fetchImpl = this.customFetch || fetch;
 			const response = await fetchImpl(url.toString(), fetchOptions);
 
-			let data: T | null = null;
+			let data: ResponseType | null = null;
 			let error: Error | null = null;
 
 			// Parse response data
@@ -131,7 +145,7 @@ export class c15tClient {
 			}
 
 			// Create context object
-			const context: ResponseContext<T> = {
+			const context: ResponseContext<ResponseType> = {
 				data,
 				response,
 				error: error
@@ -167,7 +181,7 @@ export class c15tClient {
 		} catch (error: unknown) {
 			if (options.onError) {
 				const errorObj = error as Error;
-				const context: ResponseContext<T> = {
+				const context: ResponseContext<ResponseType> = {
 					data: null,
 					error: {
 						message: errorObj.message || 'Request failed',
@@ -240,9 +254,16 @@ export class c15tClient {
 	 * including their IDs, names, descriptions, and whether they are required
 	 * or optional.
 	 *
+	 * @throws Will throw an error if options.throw is true and the request fails
+	 *
 	 * @example
 	 * ```typescript
-	 * const { data } = await client.listPurposes();
+	 * const { data, error } = await client.listPurposes();
+	 *
+	 * if (error) {
+	 *   console.error('Failed to fetch purposes:', error.message);
+	 *   return;
+	 * }
 	 *
 	 * if (data) {
 	 *   // Display available consent purposes to the user
@@ -349,27 +370,44 @@ export class c15tClient {
 	 * This method allows for making requests to custom endpoints not covered
 	 * by the standard methods, such as plugin-specific endpoints.
 	 *
-	 * @example
-	 * ```typescript
-	 * // Call a custom analytics endpoint
-	 * const { data } = await client.$fetch<AnalyticsResponse>('/analytics/track', {
-	 *   method: 'POST',
-	 *   body: {
-	 *     event: 'page_view',
-	 *     properties: { page: '/home' }
-	 *   }
-	 * });
-	 * ```
-	 *
+	 * @typeParam ResponseType - The expected type of the response data
 	 * @param path - The API endpoint path
 	 * @param options - Request configuration options
 	 * @returns Response context containing the requested data if successful
+	 * @throws Will throw an error if options.throw is true and the request fails
+	 *
+	 * @example
+	 * ```typescript
+	 * // Call a custom analytics endpoint with error handling
+	 * try {
+	 *   const { data, error } = await client.$fetch<AnalyticsResponse>('/analytics/track', {
+	 *     method: 'POST',
+	 *     body: {
+	 *       event: 'page_view',
+	 *       properties: { page: '/home' }
+	 *     },
+	 *     throw: true // Automatically throw on error
+	 *   });
+	 *
+	 *   console.log('Event tracked successfully:', data);
+	 * } catch (error) {
+	 *   console.error('Failed to track event:', error);
+	 * }
+	 *
+	 * // Using callbacks for success/error handling
+	 * await client.$fetch('/analytics/track', {
+	 *   method: 'POST',
+	 *   body: { event: 'button_click' },
+	 *   onSuccess: ({ data }) => console.log('Tracked:', data),
+	 *   onError: ({ error }) => console.error('Failed:', error.message)
+	 * });
+	 * ```
 	 */
-	async $fetch<T>(
+	async $fetch<ResponseType>(
 		path: string,
-		options?: FetchOptions<T>
-	): Promise<ResponseContext<T>> {
-		return this.fetcher<T>(path, options);
+		options?: FetchOptions<ResponseType>
+	): Promise<ResponseContext<ResponseType>> {
+		return this.fetcher<ResponseType>(path, options);
 	}
 }
 
@@ -380,6 +418,8 @@ export class c15tClient {
  * It provides a convenient factory function that instantiates a properly configured
  * client based on the provided options.
  *
+ * @throws Will throw an error if the baseURL is invalid or if required options are missing
+ *
  * @example
  * ```typescript
  * import { createConsentClient } from '@c15t/client';
@@ -388,7 +428,8 @@ export class c15tClient {
  * const client = createConsentClient({
  *   baseURL: 'https://api.example.com/consent',
  *   headers: {
- *     'X-API-Key': process.env.API_KEY
+ *     'X-API-Key': process.env.API_KEY,
+ *     'User-Agent': 'MyConsentApp/1.0'
  *   },
  *   fetchOptions: {
  *     // Optional custom fetch implementation
@@ -397,7 +438,29 @@ export class c15tClient {
  * });
  *
  * // Use the client in your application
- * const { data } = await client.getConsent();
+ * async function handleConsentFlow() {
+ *   // Get available purposes
+ *   const { data: purposes, error } = await client.listPurposes();
+ *
+ *   if (error) {
+ *     console.error('Failed to load consent purposes:', error.message);
+ *     return;
+ *   }
+ *
+ *   // Display purposes to user and collect their choices
+ *   // ...
+ *
+ *   // Then update their consent
+ *   const userChoices = {
+ *     analytics: true,
+ *     marketing: false
+ *   };
+ *
+ *   await client.$fetch('/update-consent', {
+ *     method: 'POST',
+ *     body: { preferences: userChoices }
+ *   });
+ * }
  * ```
  *
  * @param options - Configuration options for the client

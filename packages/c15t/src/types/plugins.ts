@@ -104,11 +104,23 @@ export interface PluginHook {
  * ```
  */
 export interface C15TPlugin {
+	/**
+	 * Unique identifier for the plugin
+	 * Must be a string literal for type safety
+	 */
 	id: LiteralString;
+
+	/**
+	 * Type of plugin for classification and type guards
+	 */
 	type: string;
+
 	/**
 	 * The init function is called when the plugin is initialized.
 	 * You can return a new context or modify the existing context.
+	 *
+	 * @param ctx - The c15t context
+	 * @returns An object with context or options modifications, or undefined
 	 */
 	init?: (ctx: C15TContext) =>
 		| {
@@ -116,13 +128,31 @@ export interface C15TPlugin {
 				options?: Partial<C15TOptions>;
 		  }
 		| undefined;
+
+	/**
+	 * Custom API endpoints provided by this plugin
+	 * Each key is the endpoint name, and the value is the endpoint handler
+	 */
 	endpoints?: {
 		[key: string]: Endpoint;
 	};
+
+	/**
+	 * Middleware functions to process requests for specific paths
+	 * Each middleware includes a path pattern and the middleware function
+	 */
 	middlewares?: {
 		path: string;
 		middleware: Endpoint;
 	}[];
+
+	/**
+	 * Handler for intercepting and potentially modifying incoming requests
+	 *
+	 * @param request - The incoming HTTP request
+	 * @param ctx - The c15t context
+	 * @returns A modified request, a response to short-circuit handling, or undefined to continue
+	 */
 	onRequest?: (
 		request: Request,
 		ctx: C15TContext
@@ -135,6 +165,14 @@ export interface C15TPlugin {
 		  }
 		| undefined
 	>;
+
+	/**
+	 * Handler for intercepting and potentially modifying outgoing responses
+	 *
+	 * @param response - The outgoing HTTP response
+	 * @param ctx - The c15t context
+	 * @returns A modified response or undefined to continue with the original
+	 */
 	onResponse?: (
 		response: Response,
 		ctx: C15TContext
@@ -144,16 +182,30 @@ export interface C15TPlugin {
 		  }
 		| undefined
 	>;
+
+	/**
+	 * Request lifecycle hooks for executing code before or after endpoint handling
+	 */
 	hooks?: {
+		/**
+		 * Hooks that run before the endpoint handler
+		 * Each hook has a matcher to determine when it should run
+		 */
 		before?: {
 			matcher: (context: HookEndpointContext) => boolean;
 			handler: C15TMiddleware;
 		}[];
+
+		/**
+		 * Hooks that run after the endpoint handler has completed
+		 * Each hook has a matcher to determine when it should run
+		 */
 		after?: {
 			matcher: (context: HookEndpointContext) => boolean;
 			handler: C15TMiddleware;
 		}[];
 	};
+
 	/**
 	 * Schema the plugin needs
 	 *
@@ -182,6 +234,7 @@ export interface C15TPlugin {
 	 * ```
 	 */
 	schema?: C15TPluginSchema;
+
 	/**
 	 * The migrations of the plugin. If you define schema that will automatically create
 	 * migrations for you.
@@ -190,17 +243,21 @@ export interface C15TPlugin {
 	 * the tables.
 	 */
 	migrations?: Record<string, Migration>;
+
 	/**
 	 * The options of the plugin
 	 */
 	options?: Record<string, unknown>;
+
 	/**
-	 * types to be inferred
+	 * Types to be inferred by the type system
+	 * Used for type information in the plugin system
 	 */
 	$Infer?: Record<string, unknown>;
 
 	/**
 	 * The error codes returned by the plugin
+	 * Used for consistent error handling across the system
 	 */
 	$ERROR_CODES?: Record<string, string>;
 
@@ -213,7 +270,19 @@ export interface C15TPlugin {
 
 /**
  * Improved type inference for plugin types
- * This creates a union of all plugin $Infer types
+ *
+ * This type utility extracts all plugin type definitions from configuration options,
+ * allowing for comprehensive type checking of plugin features.
+ *
+ * @typeParam TOptions - The c15t configuration options type
+ *
+ * @example
+ * ```ts
+ * // Get all plugin types from configuration
+ * type AllPluginTypes = ExtractPluginTypeDefinitions<MyAppOptions>;
+ *
+ * // Types will include all properties from all plugins' $Infer fields
+ * ```
  */
 export type ExtractPluginTypeDefinitions<TOptions extends C15TOptions> =
 	TOptions['plugins'] extends Array<infer Plugin>
@@ -225,8 +294,21 @@ export type ExtractPluginTypeDefinitions<TOptions extends C15TOptions> =
 				: Record<string, never>
 			: Record<string, never>
 		: Record<string, never>;
+
 /**
  * Helper to extract specific plugin type from options
+ *
+ * This type utility finds plugins of a specific type from a configuration
+ * object, enabling type-safe access to plugin instances.
+ *
+ * @typeParam O - The c15t configuration options type
+ * @typeParam T - The plugin type string to extract
+ *
+ * @example
+ * ```ts
+ * // Extract all analytics plugins from configuration
+ * type MyAnalyticsPlugins = ExtractPluginType<MyAppOptions, 'analytics'>;
+ * ```
  */
 export type ExtractPluginType<
 	O extends C15TOptions,
@@ -241,6 +323,22 @@ export type ExtractPluginType<
 
 /**
  * Type-safe plugin factory function
+ *
+ * A type definition for functions that create plugin instances with proper typing.
+ *
+ * @typeParam T - The specific plugin type being created
+ *
+ * @example
+ * ```ts
+ * // Create a type-safe plugin factory
+ * const createAnalyticsPlugin: PluginFactory<AnalyticsPlugin> =
+ *   (options) => ({
+ *     id: options?.id || 'analytics',
+ *     type: 'analytics',
+ *     // Other plugin properties
+ *     analyticsOptions: options?.analyticsOptions
+ *   });
+ * ```
  */
 export type PluginFactory<T extends C15TPlugin> = (
 	options?: Omit<T, 'id' | 'type'> & { id?: string }
@@ -251,6 +349,14 @@ export type PluginFactory<T extends C15TPlugin> = (
  *
  * This type utility extracts the error codes defined by plugins from a configuration object,
  * allowing TypeScript to understand the possible error codes.
+ *
+ * @typeParam O - The c15t configuration options type
+ *
+ * @example
+ * ```ts
+ * // Get all error codes from plugins
+ * type AllErrorCodes = InferPluginErrorCodes<MyAppOptions>;
+ * ```
  */
 export type InferPluginErrorCodes<O extends C15TOptions> =
 	O['plugins'] extends Array<infer P>
@@ -264,52 +370,154 @@ export type InferPluginErrorCodes<O extends C15TOptions> =
 		: Record<string, never>;
 
 /**
- * Schema type for plugin extensions
+ * Schema type for plugin database extensions
  *
- * This can include additional types, validation schemas, or other
- * schema-related extensions provided by plugins.
+ * This defines the structure for database schema extensions provided by plugins,
+ * including table definitions, fields, and migration controls.
  */
 export type C15TPluginSchema = {
 	[table in string]: {
+		/**
+		 * Field definitions for this table
+		 */
 		fields: {
 			[field in string]: Field;
 		};
+
+		/**
+		 * Whether to disable automatic migration generation for this table
+		 */
 		disableMigration?: boolean;
+
+		/**
+		 * Custom entity name for this table
+		 */
 		entityName?: string;
 	};
 };
 
-// Example specific plugin types with discriminated unions
+/**
+ * Analytics plugin type definition
+ *
+ * Specialized plugin type for analytics functionality with type-safe options.
+ *
+ * @example
+ * ```ts
+ * // Create an analytics plugin
+ * const analytics: AnalyticsPlugin = {
+ *   id: 'google-analytics',
+ *   type: 'analytics',
+ *   analyticsOptions: {
+ *     trackingEvents: ['consent_given', 'consent_withdrawn'],
+ *     anonymizeData: true
+ *   }
+ * };
+ * ```
+ */
 export interface AnalyticsPlugin extends C15TPlugin {
 	type: 'analytics';
 	analyticsOptions?: {
+		/**
+		 * List of events to track
+		 */
 		trackingEvents: string[];
+
+		/**
+		 * Whether to anonymize user data
+		 */
 		anonymizeData?: boolean;
 	};
 }
 
+/**
+ * Geolocation plugin type definition
+ *
+ * Specialized plugin type for geolocation functionality with type-safe options.
+ *
+ * @example
+ * ```ts
+ * // Create a geolocation plugin
+ * const geo: GeoPlugin = {
+ *   id: 'maxmind',
+ *   type: 'geo',
+ *   geoOptions: {
+ *     defaultJurisdiction: 'EU',
+ *     ipLookupService: 'https://geo.example.com'
+ *   }
+ * };
+ * ```
+ */
 export interface GeoPlugin extends C15TPlugin {
 	type: 'geo';
 	geoOptions?: {
+		/**
+		 * Default jurisdiction to use when geolocation fails
+		 */
 		defaultJurisdiction?: string;
+
+		/**
+		 * Service URL for IP address lookups
+		 */
 		ipLookupService?: string;
 	};
 }
 
-// Type guard functions
+/**
+ * Type guard to check if a plugin is an analytics plugin
+ *
+ * @param plugin - The plugin to check
+ * @returns True if the plugin is an analytics plugin
+ *
+ * @example
+ * ```ts
+ * if (isAnalyticsPlugin(plugin)) {
+ *   // Can safely access analyticsOptions
+ *   const events = plugin.analyticsOptions?.trackingEvents;
+ * }
+ * ```
+ */
 export function isAnalyticsPlugin(
 	plugin: C15TPlugin
 ): plugin is AnalyticsPlugin {
 	return plugin.type === 'analytics';
 }
 
+/**
+ * Type guard to check if a plugin is a geo plugin
+ *
+ * @param plugin - The plugin to check
+ * @returns True if the plugin is a geo plugin
+ *
+ * @example
+ * ```ts
+ * if (isGeoPlugin(plugin)) {
+ *   // Can safely access geoOptions
+ *   const defaultRegion = plugin.geoOptions?.defaultJurisdiction;
+ * }
+ * ```
+ */
 export function isGeoPlugin(plugin: C15TPlugin): plugin is GeoPlugin {
 	return plugin.type === 'geo';
 }
 
 /**
  * Helper to extract plugin context types from plugin array
- * Used to properly type the context passed to plugin hooks and methods
+ *
+ * This utility combines all context extensions from an array of plugins
+ * into a single type, allowing for proper typing of the complete context.
+ *
+ * @typeParam PluginArray - Array of plugin types
+ *
+ * @example
+ * ```ts
+ * // Given plugins array with plugins that extend context
+ * const plugins = [authPlugin, geoPlugin, analyticsPlugin];
+ *
+ * // Get combined context type from all plugins
+ * type MyAppContext = InferPluginContexts<typeof plugins>;
+ *
+ * // Context will have auth, geo, and analytics properties with correct types
+ * ```
  */
 export type InferPluginContexts<PluginArray extends C15TPlugin[]> =
 	UnionToIntersection<

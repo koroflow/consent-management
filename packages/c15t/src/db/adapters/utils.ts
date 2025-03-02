@@ -4,6 +4,7 @@ import type { Field, Primitive } from '../core/fields/field-types';
  * Applies the default value of a field if the provided value is undefined or null.
  * Used in create and update operations to handle default values consistently.
  *
+ * @typeParam PrimitiveValue - The primitive type of the field value
  * @param inputValue - The input value provided for the field (may be undefined/null)
  * @param field - The field definition containing the default value
  * @param operation - The database operation being performed ('create' or 'update')
@@ -16,6 +17,8 @@ import type { Field, Primitive } from '../core/fields/field-types';
  * 3. When the field has a defaultValue defined
  *
  * If the defaultValue is a function, it will be called to generate the value.
+ * This allows for dynamic default values such as timestamps, UUIDs, or any
+ * other values that need to be computed at runtime.
  *
  * @example
  * ```typescript
@@ -46,10 +49,3 @@ export function applyDefaultValue(
 	}
 	return inputValue;
 }
-
-/**
- * @deprecated Use applyDefaultValue instead
- *
- * Alias for applyDefaultValue to maintain backward compatibility.
- */
-export const withApplyDefault = applyDefaultValue;

@@ -3,10 +3,47 @@ import type { C15TOptions, C15TPluginSchema } from '~/types';
 import { APIError } from 'better-call';
 
 /**
- * Parses and transforms output data according to schema field definitions
+ * Parses and transforms output data according to schema field definitions.
+ *
+ * This function filters and processes entity data being returned from the database,
+ * ensuring that only fields marked as returnable are included in the output.
+ *
+ * @typeParam EntityType - The type of entity being processed
+ *
+ * @param data - The raw data object retrieved from the database
+ * @param schema - The schema containing field definitions
+ * @param schema.fields - Record of field definitions for the entity
+ *
+ * @returns The processed data object with appropriate fields included or excluded
+ *
+ * @example
+ * ```typescript
+ * // Get user data from database
+ * const userData = { id: '123', email: 'user@example.com', password: 'hash123' };
+ *
+ * // Define schema with password field marked as not returnable
+ * const userSchema = {
+ *   fields: {
+ *     id: { name: 'id', type: 'string', returned: true },
+ *     email: { name: 'email', type: 'string', returned: true },
+ *     password: { name: 'password', type: 'string', returned: false }
+ *   }
+ * };
+ *
+ * // Process the data - password will be excluded
+ * const processedData = parseEntityOutputData(userData, userSchema);
+ * // Result: { id: '123', email: 'user@example.com' }
+ * ```
+ *
+ * @remarks
+ * - Fields marked with `returned: false` will be excluded from the output
+ * - Fields not found in the schema will be passed through unchanged
+ * - The function preserves the original type of the input data
  */
-export function parseEntityOutputData<T extends Record<string, unknown>>(
-	data: T,
+export function parseEntityOutputData<
+	EntityType extends Record<string, unknown>,
+>(
+	data: EntityType,
 	schema: {
 		fields: Record<string, Field>;
 	}
@@ -27,11 +64,54 @@ export function parseEntityOutputData<T extends Record<string, unknown>>(
 			parsedData[key] = data[key];
 		}
 	}
-	return parsedData as T;
+	return parsedData as EntityType;
 }
 
 /**
- * Gets all fields for a table, including any from plugins and options
+ * Gets all fields for a specific table, including any from plugins and options.
+ *
+ * This function collects field definitions from multiple sources:
+ * 1. Core table definitions
+ * 2. Additional fields specified in options
+ * 3. Fields provided by plugins
+ *
+ * @param options - The c15t configuration options
+ * @param table - The name of the table to get fields for (e.g., 'user', 'consent')
+ *
+ * @returns A record of all field definitions for the specified table
+ *
+ * @example
+ * ```typescript
+ * // Configure c15t with additional user fields and a plugin
+ * const options = {
+ *   user: {
+ *     additionalFields: {
+ *       firstName: { name: 'first_name', type: 'string' },
+ *       lastName: { name: 'last_name', type: 'string' }
+ *     }
+ *   },
+ *   plugins: [
+ *     {
+ *       name: 'metadata-plugin',
+ *       schema: {
+ *         user: {
+ *           fields: {
+ *             metadata: { name: 'metadata', type: 'json' }
+ *           }
+ *         }
+ *       }
+ *     }
+ *   ]
+ * };
+ *
+ * // Get all fields for the 'user' table
+ * const userFields = getAllFields(options, 'user');
+ * // Result includes core fields + additional fields + plugin fields
+ * ```
+ *
+ * @remarks
+ * This function is particularly useful for extending the base schema with custom fields
+ * while maintaining compatibility with the c15t system.
  */
 export function getAllFields(options: C15TOptions, table: string) {
 	let schema: Record<string, Field> = {
@@ -55,10 +135,83 @@ export function getAllFields(options: C15TOptions, table: string) {
 }
 
 /**
- * Parses and validates input data according to schema field definitions
+ * Parses and validates input data according to schema field definitions.
+ *
+ * This function processes data being sent to the database, ensuring it meets
+ * schema requirements by:
+ * - Validating required fields
+ * - Applying transformations
+ * - Setting default values
+ * - Handling field-specific validation
+ *
+ * @typeParam EntityType - The type of entity being processed
+ *
+ * @param data - The input data to validate and transform
+ * @param schema - The schema to validate against
+ * @param schema.fields - Record of field definitions
+ * @param schema.action - The current operation ('create' or 'update')
+ *
+ * @returns The validated and transformed data
+ *
+ * @throws {APIError} When a required field is missing during creation
+ *
+ * @example
+ * ```typescript
+ * // Input data from client
+ * const inputData = {
+ *   email: 'user@example.com',
+ *   role: 'user'
+ * };
+ *
+ * // Schema with field definitions
+ * const userSchema = {
+ *   fields: {
+ *     id: {
+ *       name: 'id',
+ *       type: 'string',
+ *       defaultValue: () => crypto.randomUUID()
+ *     },
+ *     email: {
+ *       name: 'email',
+ *       type: 'string',
+ *       required: true,
+ *       transform: {
+ *         input: (value) => value.toLowerCase()
+ *       }
+ *     },
+ *     role: {
+ *       name: 'role',
+ *       type: 'string',
+ *       defaultValue: 'user'
+ *     },
+ *     createdAt: {
+ *       name: 'created_at',
+ *       type: 'date',
+ *       defaultValue: () => new Date(),
+ *       input: false
+ *     }
+ *   },
+ *   action: 'create'
+ * };
+ *
+ * // Process the data
+ * const validatedData = parseInputData(inputData, userSchema);
+ * // Result: {
+ * //   id: 'generated-uuid',
+ * //   email: 'user@example.com',
+ * //   role: 'user',
+ * //   createdAt: Date
+ * // }
+ * ```
+ *
+ * @remarks
+ * - During 'create' operations, required fields must be present or an error is thrown
+ * - Default values are only applied during 'create' operations
+ * - Fields marked with `input: false` are excluded unless they have a default value
+ * - The function handles both modern transform functions and legacy validators
  */
-export function parseInputData<T extends Record<string, unknown>>(
-	data: T,
+export function parseInputData<EntityType extends Record<string, unknown>>(
+	data: EntityType,
 	schema: {
 		fields: Record<string, Field>;
 		action?: 'create' | 'update';
@@ -124,16 +277,70 @@ export function parseInputData<T extends Record<string, unknown>>(
 			}
 		}
 	}
-	return parsedData as Partial<T>;
+	return parsedData as Partial<EntityType>;
 }
 
 /**
- * Merges additional schema information with an existing schema
+ * Merges additional schema information with an existing schema.
+ *
+ * This function allows for customizing field names and entity names in an existing schema,
+ * which is particularly useful for adapting the schema to different database systems or
+ * naming conventions.
+ *
+ * @typeParam SchemaType - The type of schema being merged
+ *
+ * @param schema - The original schema to merge into
+ * @param newSchema - Additional schema information to merge
+ *
+ * @returns The merged schema with updated entity and field names
+ *
+ * @example
+ * ```typescript
+ * // Original schema
+ * const originalSchema = {
+ *   user: {
+ *     entityName: 'users',
+ *     fields: {
+ *       id: { name: 'id', type: 'string' },
+ *       email: { name: 'email', type: 'string' }
+ *     }
+ *   },
+ *   consent: {
+ *     entityName: 'consents',
+ *     fields: {
+ *       id: { name: 'id', type: 'string' },
+ *       userId: { name: 'user_id', type: 'string' }
+ *     }
+ *   }
+ * };
+ *
+ * // Schema customizations
+ * const customSchema = {
+ *   user: {
+ *     entityName: 'app_users',
+ *     fields: {
+ *       email: 'user_email'
+ *     }
+ *   }
+ * };
+ *
+ * // Merge the schemas
+ * const mergedSchema = mergeSchema(originalSchema, customSchema);
+ * // Result:
+ * // - user table is now 'app_users'
+ * // - email field is now 'user_email'
+ * // - Other fields remain unchanged
+ * ```
+ *
+ * @remarks
+ * - This function only modifies existing entity and field names
+ * - It does not add new fields or entities to the schema
+ * - It's commonly used when adapting the schema for different database dialects
  */
-export function mergeSchema<S extends C15TPluginSchema>(
-	schema: S,
+export function mergeSchema<SchemaType extends C15TPluginSchema>(
+	schema: SchemaType,
 	newSchema?: {
-		[K in keyof S]?: {
+		[K in keyof SchemaType]?: {
 			entityName?: string;
 			fields?: {
 				[P: string]: string;

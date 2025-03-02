@@ -8,13 +8,29 @@
  *
  * @example
  * ```typescript
+ * // Basic client configuration
  * const options: c15tClientOptions = {
  *   baseURL: 'https://api.example.com/consent',
  *   headers: {
  *     'X-API-Key': 'your-api-key',
  *     'Authorization': 'Bearer token'
+ *   }
+ * };
+ *
+ * // Advanced configuration with plugins and custom fetch
+ * const advancedOptions: c15tClientOptions = {
+ *   baseURL: 'https://api.example.com/consent',
+ *   headers: {
+ *     'X-API-Key': 'your-api-key',
+ *     'Authorization': 'Bearer token'
  *   },
- *   plugins: [analyticsPlugin(), geoPlugin()]
+ *   fetchOptions: {
+ *     customFetchImpl: nodeFetch // Use node-fetch in Node.js environments
+ *   },
+ *   plugins: [
+ *     analyticsPlugin({ trackConsent: true }),
+ *     geoPlugin({ defaultJurisdiction: 'us-ca' })
+ *   ]
  * };
  * ```
  */
@@ -50,6 +66,17 @@ export interface c15tClientOptions {
 		 *
 		 * This can be useful for environments without a native fetch,
 		 * or for using a fetch implementation with additional features.
+		 *
+		 * @example
+		 * ```typescript
+		 * import nodeFetch from 'node-fetch';
+		 *
+		 * const options = {
+		 *   fetchOptions: {
+		 *     customFetchImpl: nodeFetch
+		 *   }
+		 * };
+		 * ```
 		 */
 		customFetchImpl?: typeof fetch;
 	};
@@ -59,6 +86,22 @@ export interface c15tClientOptions {
 	 *
 	 * Plugins can add additional methods and features to the client,
 	 * such as analytics tracking, geo-location services, etc.
+	 *
+	 * @example
+	 * ```typescript
+	 * const options = {
+	 *   plugins: [
+	 *     analyticsPlugin({
+	 *       trackConsentChanges: true,
+	 *       eventPrefix: 'consent_'
+	 *     }),
+	 *     geoPlugin({
+	 *       defaultJurisdiction: 'us-ca',
+	 *       cacheResults: true
+	 *     })
+	 *   ]
+	 * };
+	 * ```
 	 */
 	plugins?: c15tClientPlugin[];
 }
@@ -69,9 +112,28 @@ export interface c15tClientOptions {
  * This interface defines the options that can be provided when making
  * HTTP requests to the c15t API endpoints.
  *
- * @template T The expected response data type
+ * @typeParam ResponseType - The expected response data type
+ *
+ * @example
+ * ```typescript
+ * // Basic GET request options
+ * const getOptions: FetchOptions<UserConsent> = {
+ *   method: 'GET',
+ *   query: { userId: '123' }
+ * };
+ *
+ * // POST request with error handling
+ * const postOptions: FetchOptions<UpdateResult> = {
+ *   method: 'POST',
+ *   body: { preferences: { analytics: true } },
+ *   throw: true,
+ *   onError: ({ error }) => {
+ *     console.error(`Error ${error.status}: ${error.message}`);
+ *   }
+ * };
+ * ```
  */
-export interface FetchOptions<T = unknown> {
+export interface FetchOptions<ResponseType = unknown> {
 	/**
 	 * HTTP method for the request.
 	 *
@@ -84,6 +146,16 @@ export interface FetchOptions<T = unknown> {
 	 *
 	 * For non-GET requests, this data will be serialized as JSON
 	 * and sent in the request body.
+	 *
+	 * @example
+	 * ```typescript
+	 * const options = {
+	 *   body: {
+	 *     preferences: { analytics: true, marketing: false },
+	 *     timestamp: new Date().toISOString()
+	 *   }
+	 * };
+	 * ```
 	 */
 	body?: Record<string, unknown>;
 
@@ -92,6 +164,17 @@ export interface FetchOptions<T = unknown> {
 	 *
 	 * These parameters will be appended to the URL as query string parameters.
 	 * Array values will result in multiple query parameters with the same name.
+	 *
+	 * @example
+	 * ```typescript
+	 * const options = {
+	 *   query: {
+	 *     userId: '123',
+	 *     purposes: ['analytics', 'marketing'], // Results in ?purposes=analytics&purposes=marketing
+	 *     includeHistory: true
+	 *   }
+	 * };
+	 * ```
 	 */
 	query?: Record<string, string | number | boolean | string[] | undefined>;
 
@@ -100,6 +183,16 @@ export interface FetchOptions<T = unknown> {
 	 *
 	 * These headers will be merged with the default headers
 	 * configured for the client.
+	 *
+	 * @example
+	 * ```typescript
+	 * const options = {
+	 *   headers: {
+	 *     'X-Request-ID': generateRequestId(),
+	 *     'Cache-Control': 'no-cache'
+	 *   }
+	 * };
+	 * ```
 	 */
 	headers?: Record<string, string>;
 
@@ -110,6 +203,20 @@ export interface FetchOptions<T = unknown> {
 	 * instead of returning a response context with the error.
 	 *
 	 * @default false
+	 *
+	 * @example
+	 * ```typescript
+	 * // This will throw an error if the request fails
+	 * try {
+	 *   const result = await client.$fetch('/important-endpoint', {
+	 *     throw: true
+	 *   });
+	 *   // Only runs if request was successful
+	 *   processResult(result.data);
+	 * } catch (error) {
+	 *   handleError(error);
+	 * }
+	 * ```
 	 */
 	throw?: boolean;
 
@@ -120,8 +227,18 @@ export interface FetchOptions<T = unknown> {
 	 * with a 2xx status code.
 	 *
 	 * @param context The response context containing the result data
+	 *
+	 * @example
+	 * ```typescript
+	 * const options = {
+	 *   onSuccess: ({ data }) => {
+	 *     console.log('Request succeeded:', data);
+	 *     updateUI(data);
+	 *   }
+	 * };
+	 * ```
 	 */
-	onSuccess?: (context: ResponseContext<T>) => void | Promise<void>;
+	onSuccess?: (context: ResponseContext<ResponseType>) => void | Promise<void>;
 
 	/**
 	 * Callback function to execute on error response.
@@ -130,13 +247,34 @@ export interface FetchOptions<T = unknown> {
 	 * status code or when an exception occurs during the request.
 	 *
 	 * @param context The response context containing the error details
+	 *
+	 * @example
+	 * ```typescript
+	 * const options = {
+	 *   onError: ({ error }) => {
+	 *     console.error(`Request failed (${error.status}):`, error.message);
+	 *     showErrorNotification(error.message);
+	 *   }
+	 * };
+	 * ```
 	 */
-	onError?: (context: ResponseContext<T>) => void | Promise<void>;
+	onError?: (context: ResponseContext<ResponseType>) => void | Promise<void>;
 
 	/**
 	 * Additional fetch options to include in the request.
 	 *
 	 * These options will be passed directly to the fetch implementation.
+	 *
+	 * @example
+	 * ```typescript
+	 * const options = {
+	 *   fetchOptions: {
+	 *     credentials: 'include', // Send cookies with cross-origin requests
+	 *     mode: 'cors',
+	 *     cache: 'no-cache'
+	 *   }
+	 * };
+	 * ```
 	 */
 	fetchOptions?: RequestInit;
 }
@@ -147,16 +285,35 @@ export interface FetchOptions<T = unknown> {
  * This interface contains the complete information about an API response,
  * including the data, response object, and any error information.
  *
- * @template T The expected response data type
+ * @typeParam ResponseType - The expected response data type
+ *
+ * @example
+ * ```typescript
+ * // Processing a response context
+ * const response: ResponseContext<UserData> = await client.$fetch('/user/123');
+ *
+ * if (response.ok) {
+ *   // Handle successful response
+ *   console.log('User data:', response.data);
+ *   // Access headers if needed
+ *   const etag = response.response?.headers.get('ETag');
+ * } else {
+ *   // Handle error response
+ *   console.error(`Error ${response.error?.status}: ${response.error?.message}`);
+ *   if (response.error?.status === 404) {
+ *     console.log('User not found');
+ *   }
+ * }
+ * ```
  */
-export interface ResponseContext<T = unknown> {
+export interface ResponseContext<ResponseType = unknown> {
 	/**
 	 * Response data returned by the API.
 	 *
 	 * For successful requests, this will contain the parsed JSON response.
 	 * For failed requests or non-JSON responses, this will be null.
 	 */
-	data: T | null;
+	data: ResponseType | null;
 
 	/**
 	 * Original fetch Response object.
@@ -202,6 +359,39 @@ export interface ResponseContext<T = unknown> {
  *
  * Plugins can add additional methods and features to the client,
  * such as analytics tracking, geo-location services, etc.
+ *
+ * @example
+ * ```typescript
+ * // Defining a custom plugin
+ * const analyticsPlugin = (options = {}): c15tClientPlugin => ({
+ *   id: 'analytics',
+ *
+ *   init: (client) => {
+ *     console.log('Analytics plugin initialized');
+ *   },
+ *
+ *   methods: {
+ *     trackEvent: async (eventName, properties) => {
+ *       // Implementation logic
+ *       return { success: true };
+ *     },
+ *
+ *     getAnalyticsConsent: async () => {
+ *       // Get analytics-specific consent
+ *       return { allowed: true };
+ *     }
+ *   }
+ * });
+ *
+ * // Using the plugin
+ * const client = createConsentClient({
+ *   baseURL: 'https://api.example.com',
+ *   plugins: [analyticsPlugin({ trackPageviews: true })]
+ * });
+ *
+ * // Now you can use the plugin methods
+ * client.trackEvent('button_click', { buttonId: 'submit' });
+ * ```
  */
 export interface c15tClientPlugin {
 	/**
@@ -234,6 +424,8 @@ export interface c15tClientPlugin {
 	 *
 	 * This is used for type checking to ensure the client plugin is compatible
 	 * with the server-side plugin implementation.
+	 *
+	 * @internal This property is primarily for TypeScript type checking
 	 */
 	$InferServerPlugin?: Record<string, unknown>;
 }
@@ -241,11 +433,26 @@ export interface c15tClientPlugin {
 /**
  * Interface for c15t client instance.
  * This is used for the plugin init type to avoid circular references.
+ *
+ * @internal This interface is primarily used internally for type definitions
  */
 export interface c15tClient {
-	$fetch<T>(
+	/**
+	 * Makes a custom API request to any endpoint.
+	 *
+	 * @typeParam ResponseType - The expected response data type
+	 * @param path - The API endpoint path
+	 * @param options - Request configuration options
+	 * @returns Response context containing the requested data if successful
+	 */
+	$fetch<ResponseType>(
 		path: string,
-		options?: FetchOptions<T>
-	): Promise<ResponseContext<T>>;
+		options?: FetchOptions<ResponseType>
+	): Promise<ResponseContext<ResponseType>>;
+
+	/**
+	 * Index signature to allow dynamic access to properties.
+	 * This enables plugins to add methods to the client.
+	 */
 	[key: string]: unknown;
 }

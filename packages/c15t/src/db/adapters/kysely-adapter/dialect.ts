@@ -23,6 +23,7 @@ import type {
  * It handles different configuration formats including direct dialect instances,
  * connection pools, and raw database connections.
  *
+ * @internal This function is used internally by the createKyselyAdapter function
  * @param db - The database configuration to analyze
  * @returns The detected database type or null if unable to determine
  */
@@ -76,6 +77,56 @@ function getDatabaseType(
  *
  * @param config - The C15T configuration options containing database settings
  * @returns An object containing the initialized Kysely instance and database type
+ *
+ * @example
+ * ```typescript
+ * // Using with a pre-configured Kysely instance
+ * import { Kysely, PostgresDialect } from 'kysely';
+ * import { Pool } from 'pg';
+ * import { c15t } from '@c15t/core';
+ *
+ * // Create a Postgres connection pool
+ * const pool = new Pool({
+ *   host: 'localhost',
+ *   database: 'consent_db',
+ *   user: 'postgres',
+ *   password: 'password'
+ * });
+ *
+ * // Create Kysely instance
+ * const db = new Kysely({
+ *   dialect: new PostgresDialect({ pool })
+ * });
+ *
+ * // Use in c15t configuration
+ * const consentManager = c15t({
+ *   secret: process.env.SECRET_KEY,
+ *   database: { db, type: 'postgres' } // Pre-configured Kysely instance
+ * });
+ * ```
+ *
+ * @example
+ * ```typescript
+ * // Using with a direct connection pool
+ * import { Pool } from 'pg';
+ * import { c15t } from '@c15t/core';
+ *
+ * // Create a Postgres connection pool
+ * const pool = new Pool({
+ *   host: 'localhost',
+ *   database: 'consent_db',
+ *   user: 'postgres',
+ *   password: 'password'
+ * });
+ *
+ * // Pass the pool directly to c15t
+ * const consentManager = c15t({
+ *   secret: process.env.SECRET_KEY,
+ *   database: pool // The adapter will detect it's a Postgres pool
+ * });
+ * ```
+ *
+ * @throws {Error} Will throw an error if the database configuration is invalid or if a connection cannot be established
  */
 export const createKyselyAdapter = async (
 	config: C15TOptions

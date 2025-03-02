@@ -3,7 +3,7 @@ import type {
 	OperandValueExpressionOrList,
 } from 'node_modules/kysely/dist/esm/parser/binary-operation-parser';
 import { getConsentTables } from '../..';
-import type { Adapter, C15TOptions, Where } from '../../../types';
+import type { C15TOptions } from '../../../types';
 import { generateId } from '../../../utils';
 import { applyDefaultValue } from '../utils';
 import type { Database, KyselyDatabaseType } from './types';
@@ -27,19 +27,52 @@ import type { TableReference } from 'node_modules/kysely/dist/esm/parser/table-p
 import type { TableFields } from '~/db/schema/definition';
 import type { Field, Primitive } from '~/db/core/fields';
 import type { InsertExpression } from 'node_modules/kysely/dist/esm/parser/insert-values-parser';
+import type { Adapter, Where } from '../types';
 
-// Define an intermediate interface for Kysely field references
+/**
+ * Type alias for Kysely field references
+ *
+ * This type helps bridge the gap between c15t's field paths and Kysely's
+ * strongly typed reference expressions.
+ *
+ * @internal
+ */
 type KyselyFieldRef = ReferenceExpression<Database, keyof Database>;
 
-// Type for expression builder function
+/**
+ * Type for expression builder functions used in queries
+ *
+ * @internal
+ */
 type ExpressionFn = (
 	eb: ExpressionBuilder<Database, keyof Database>
 ) => unknown;
 
-// Define a common interface for where conditions
-export interface WhereCondition<T extends EntityName> {
-	field: keyof EntityTypeMap[T] | 'id';
+/**
+ * Interface for where conditions in Kysely queries
+ *
+ * This interface defines the structure of query conditions used
+ * in database operations. It supports various operators and connectors
+ * for building complex query conditions.
+ *
+ * @typeParam EntityType - The entity type being queried
+ */
+export interface WhereCondition<EntityType extends EntityName> {
+	/**
+	 * The field to apply the condition to
+	 */
+	field: keyof EntityTypeMap[EntityType] | 'id';
+
+	/**
+	 * The value to compare against
+	 */
 	value: unknown;
+
+	/**
+	 * The operator to use for comparison
+	 *
+	 * @default "="
+	 */
 	operator?:
 		| 'in'
 		| 'eq'
@@ -52,12 +85,31 @@ export interface WhereCondition<T extends EntityName> {
 		| 'starts_with'
 		| 'ends_with'
 		| '=';
+
+	/**
+	 * The logical connector to use with previous conditions
+	 *
+	 * @default "AND"
+	 */
 	connector?: 'AND' | 'OR';
 }
 
+/**
+ * Configuration options for the Kysely adapter
+ *
+ * @example
+ * ```typescript
+ * const config: KyselyAdapterConfig = {
+ *   type: 'postgres' // Explicitly set the database type
+ * };
+ * ```
+ */
 export interface KyselyAdapterConfig {
 	/**
-	 * Database type.
+	 * Database type to use with the adapter
+	 *
+	 * Setting this explicitly can override the auto-detected type
+	 * and can be necessary in some environments where detection fails.
 	 */
 	type?: KyselyDatabaseType;
 }
@@ -68,6 +120,19 @@ export interface KyselyAdapterConfig {
 // schema, where field names and references are determined at runtime.
 // An alternative approach would be to generate fully typed interfaces at build time.
 
+/**
+ * Creates entity transformation utilities for the Kysely adapter
+ *
+ * This function creates helper methods for converting between c15t's
+ * data format and Kysely's query format, handling field mapping,
+ * value transformation, and query building.
+ *
+ * @internal This function is used internally by the kyselyAdapter
+ * @param db - The Kysely database instance
+ * @param options - The c15t options
+ * @param config - Optional Kysely adapter configuration
+ * @returns An object containing entity transformation utilities
+ */
 const createEntityTransformer = (
 	db: Kysely<Database>,
 	options: C15TOptions,
@@ -75,9 +140,18 @@ const createEntityTransformer = (
 ) => {
 	const schema = getConsentTables(options);
 
-	function getField<T extends EntityName>(
-		model: T,
-		field: keyof EntityTypeMap[T] | string
+	/**
+	 * Gets the database field name for a model field
+	 *
+	 * @internal
+	 * @typeParam EntityType - The entity type
+	 * @param model - The model name
+	 * @param field - The field name in the c15t model
+	 * @returns The corresponding field name in the database schema
+	 */
+	function getField<EntityType extends EntityName>(
+		model: EntityType,
+		field: keyof EntityTypeMap[EntityType] | string
 	) {
 		if (field === 'id') {
 			return field;
@@ -94,10 +168,23 @@ const createEntityTransformer = (
 		return f?.fieldName || (field as string);
 	}
 
-	function transformValueToDB<T extends EntityName>(
+	/**
+	 * Transforms a value from c15t format to database format
+	 *
+	 * Handles type conversions like booleans to integers for SQLite,
+	 * dates to ISO strings, etc.
+	 *
+	 * @internal
+	 * @typeParam EntityType - The entity type
+	 * @param value - The value to transform
+	 * @param model - The model name
+	 * @param field - The field name
+	 * @returns The transformed value for database storage
+	 */
+	function transformValueToDB<EntityType extends EntityName>(
 		value: unknown,
-		model: T,
-		field: keyof EntityTypeMap[T] | string
+		model: EntityType,
+		field: keyof EntityTypeMap[EntityType] | string
 	): unknown {
 		if (field === 'id') {
 			return value;
@@ -121,10 +208,23 @@ const createEntityTransformer = (
 		return value;
 	}
 
-	function transformValueFromDB<T extends EntityName>(
+	/**
+	 * Transforms a value from database format to c15t format
+	 *
+	 * Handles type conversions like integers to booleans for SQLite,
+	 * ISO strings to Date objects, etc.
+	 *
+	 * @internal
+	 * @typeParam EntityType - The entity type
+	 * @param value - The value from the database
+	 * @param model - The model name
+	 * @param field - The field name
+	 * @returns The transformed value for c15t usage
+	 */
+	function transformValueFromDB<EntityType extends EntityName>(
 		value: unknown,
-		model: T,
-		field: keyof EntityTypeMap[T] | string
+		model: EntityType,
+		field: keyof EntityTypeMap[EntityType] | string
 	): unknown {
 		const { type = 'sqlite' } = config || {};
 
@@ -145,8 +245,16 @@ const createEntityTransformer = (
 		return value;
 	}
 
-	function getEntityName<T extends EntityName>(
-		model: T
+	/**
+	 * Gets the database entity name for a model
+	 *
+	 * @internal
+	 * @typeParam EntityType - The entity type
+	 * @param model - The model name
+	 * @returns The database table name
+	 */
+	function getEntityName<EntityType extends EntityName>(
+		model: EntityType
 	): TableReference<Database> {
 		return schema[model].entityName as TableReference<Database>;
 	}
@@ -154,9 +262,19 @@ const createEntityTransformer = (
 	const useDatabaseGeneratedId = !options?.advanced?.generateId;
 
 	return {
-		transformInput<T extends EntityName>(
-			data: EntityInput<T>,
-			model: T,
+		/**
+		 * Transforms input data from c15t format to database format
+		 *
+		 * @internal
+		 * @typeParam EntityType - The entity type
+		 * @param data - The data to transform
+		 * @param model - The model name
+		 * @param action - Whether this is a create or update operation
+		 * @returns Transformed data for database insertion/update
+		 */
+		transformInput<EntityType extends EntityName>(
+			data: EntityInput<EntityType>,
+			model: EntityType,
 			action: 'create' | 'update'
 		): InsertExpression<Database, keyof Database> {
 			const transformedData: Record<string, unknown> =
@@ -186,11 +304,22 @@ const createEntityTransformer = (
 			}
 			return transformedData as InsertExpression<Database, keyof Database>;
 		},
-		transformOutput<T extends EntityName>(
+
+		/**
+		 * Transforms output data from database format to c15t format
+		 *
+		 * @internal
+		 * @typeParam EntityType - The entity type
+		 * @param data - The data from the database
+		 * @param model - The model name
+		 * @param select - Optional array of fields to select
+		 * @returns Transformed data for c15t or null if no data
+		 */
+		transformOutput<EntityType extends EntityName>(
 			data: Record<string, unknown> | null,
-			model: T,
+			model: EntityType,
 			select: string[] = []
-		): EntityOutput<T> | null {
+		): EntityOutput<EntityType> | null {
 			if (!data) {
 				return null;
 			}
@@ -217,11 +346,21 @@ const createEntityTransformer = (
 					);
 				}
 			}
-			return transformedData as EntityOutput<T>;
+			return transformedData as EntityOutput<EntityType>;
 		},
-		convertWhereClause<T extends EntityName>(
-			model: T,
-			whereConditions?: WhereCondition<T>[]
+
+		/**
+		 * Converts c15t where clauses to Kysely query conditions
+		 *
+		 * @internal
+		 * @typeParam EntityType - The entity type
+		 * @param model - The model name
+		 * @param whereConditions - Array of where conditions
+		 * @returns Object with AND and OR expressions for Kysely
+		 */
+		convertWhereClause<EntityType extends EntityName>(
+			model: EntityType,
+			whereConditions?: WhereCondition<EntityType>[]
 		): {
 			and: ExpressionFn[] | null;
 			or: ExpressionFn[] | null;
@@ -245,8 +384,8 @@ const createEntityTransformer = (
 					operator = '=',
 					connector = 'AND',
 				} = condition;
-				const fieldString = getField<T>(model, _field);
-				value = transformValueToDB<T>(value, model, _field);
+				const fieldString = getField<EntityType>(model, _field);
+				value = transformValueToDB<EntityType>(value, model, _field);
 
 				const expr: ExpressionFn = (eb) => {
 					// For type safety, cast field to a reference expression
@@ -308,8 +447,20 @@ const createEntityTransformer = (
 				or: conditions.or.length ? conditions.or : null,
 			};
 		},
-		async withReturning<T extends EntityName>(
-			values: EntityInput<T>,
+
+		/**
+		 * Helper for returning data from operations in different database types
+		 *
+		 * @internal
+		 * @typeParam EntityType - The entity type
+		 * @param values - The values being inserted/updated
+		 * @param builder - The query builder
+		 * @param model - The model name
+		 * @param where - Where conditions for finding the modified record
+		 * @returns The result of the operation
+		 */
+		async withReturning<EntityType extends EntityName>(
+			values: EntityInput<EntityType>,
 			builder:
 				| InsertQueryBuilder<Database, keyof Database, keyof Database>
 				| UpdateQueryBuilder<
@@ -318,8 +469,8 @@ const createEntityTransformer = (
 						keyof Database,
 						keyof Database
 				  >,
-			model: T,
-			where: WhereCondition<T>[]
+			model: EntityType,
+			where: WhereCondition<EntityType>[]
 		): Promise<Record<string, unknown> | null> {
 			let res: Record<string, unknown> | null = null;
 			if (config?.type === 'mysql') {
@@ -377,6 +528,47 @@ const createEntityTransformer = (
 	};
 };
 
+/**
+ * Creates a c15t adapter for Kysely ORM
+ *
+ * This factory function creates an adapter that allows c15t to use Kysely ORM
+ * as its database layer. It supports PostgreSQL, MySQL, SQLite, and MSSQL.
+ *
+ * @param db - The Kysely database instance
+ * @param config - Optional configuration for the Kysely adapter
+ * @returns A c15t adapter factory function
+ *
+ * @example
+ * ```typescript
+ * import { Kysely, PostgresDialect } from 'kysely';
+ * import { Pool } from 'pg';
+ * import { c15t } from '@c15t/core';
+ * import { kyselyAdapter } from '@c15t/adapters/kysely';
+ *
+ * // Create a Postgres connection pool
+ * const pool = new Pool({
+ *   host: 'localhost',
+ *   database: 'consent_db',
+ *   user: 'postgres',
+ *   password: 'password'
+ * });
+ *
+ * // Create Kysely instance
+ * const db = new Kysely({
+ *   dialect: new PostgresDialect({ pool })
+ * });
+ *
+ * // Create the c15t instance with Kysely adapter
+ * const c15tInstance = c15t({
+ *   storage: kyselyAdapter(db, { type: 'postgres' }),
+ *   // Other c15t options...
+ *   secret: process.env.SECRET
+ * });
+ *
+ * // Use in your application
+ * export default c15tInstance.handler;
+ * ```
+ */
 export const kyselyAdapter =
 	(db: Kysely<Database>, config?: KyselyAdapterConfig) =>
 	(opts: C15TOptions): Adapter => {
@@ -390,6 +582,15 @@ export const kyselyAdapter =
 		} = createEntityTransformer(db, opts, config);
 		return {
 			id: 'kysely',
+			/**
+			 * Creates a new record in the database
+			 *
+			 * @typeParam Model - The model type
+			 * @typeParam Data - The data type
+			 * @typeParam Result - The result type
+			 * @param data - The data for the create operation
+			 * @returns The created record
+			 */
 			async create<
 				Model extends EntityName,
 				Data extends Record<string, unknown>,
@@ -430,6 +631,14 @@ export const kyselyAdapter =
 					select as string[]
 				) as unknown as Result;
 			},
+			/**
+			 * Finds a single record matching the where conditions
+			 *
+			 * @typeParam Model - The model type
+			 * @typeParam Result - The result type
+			 * @param data - The data for the find operation
+			 * @returns The found record or null if not found
+			 */
 			async findOne<
 				Model extends EntityName,
 				Result extends TableFields<Model>,
@@ -477,6 +686,14 @@ export const kyselyAdapter =
 					select as string[]
 				) as unknown as Result | null;
 			},
+			/**
+			 * Finds multiple records matching the where conditions
+			 *
+			 * @typeParam Model - The model type
+			 * @typeParam Result - The result type
+			 * @param data - The data for the find operation
+			 * @returns Array of matching records
+			 */
 			async findMany<
 				Model extends EntityName,
 				Result extends TableFields<Model>,
@@ -556,6 +773,14 @@ export const kyselyAdapter =
 						) as unknown as Result
 				);
 			},
+			/**
+			 * Updates a single record matching the where conditions
+			 *
+			 * @typeParam Model - The model type
+			 * @typeParam Result - The result type
+			 * @param data - The data for the update operation
+			 * @returns The updated record or null if not found
+			 */
 			async update<
 				Model extends EntityName,
 				Result extends TableFields<Model>,
@@ -611,6 +836,14 @@ export const kyselyAdapter =
 				);
 				return transformOutput(result, model) as unknown as Result | null;
 			},
+			/**
+			 * Updates multiple records matching the where conditions
+			 *
+			 * @typeParam Model - The model type
+			 * @typeParam Result - The result type
+			 * @param data - The data for the update operation
+			 * @returns Array of updated records
+			 */
 			async updateMany<
 				Model extends EntityName,
 				Result extends TableFields<Model>,
@@ -693,6 +926,13 @@ export const kyselyAdapter =
 						) as unknown as Result
 				);
 			},
+			/**
+			 * Counts records matching the where conditions
+			 *
+			 * @typeParam Model - The model type
+			 * @param data - The data for the count operation
+			 * @returns The count of matching records
+			 */
 			async count<Model extends EntityName>(data: {
 				model: Model;
 				where?: Where<Model>;
@@ -734,6 +974,12 @@ export const kyselyAdapter =
 				const count = (res[0] as Record<string, unknown>)?.count;
 				return typeof count === 'number' ? count : 0;
 			},
+			/**
+			 * Deletes a single record matching the where conditions
+			 *
+			 * @typeParam Model - The model type
+			 * @param data - The data for the delete operation
+			 */
 			async delete<Model extends EntityName>(data: {
 				model: Model;
 				where: Where<Model>;
@@ -768,6 +1014,13 @@ export const kyselyAdapter =
 				}
 				await query.execute();
 			},
+			/**
+			 * Deletes multiple records matching the where conditions
+			 *
+			 * @typeParam Model - The model type
+			 * @param data - The data for the delete operation
+			 * @returns The number of records deleted
+			 */
 			async deleteMany<Model extends EntityName>(data: {
 				model: Model;
 				where: Where<Model>;

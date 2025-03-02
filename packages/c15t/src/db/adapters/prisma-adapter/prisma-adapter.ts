@@ -6,9 +6,25 @@ import type { Adapter, C15TOptions, Where } from '~/types';
 import { generateId } from '~/utils';
 import { applyDefaultValue } from '../utils';
 
+/**
+ * Configuration options for the Prisma adapter
+ *
+ * This interface defines the configuration options for the Prisma adapter,
+ * including which database provider to use.
+ *
+ * @example
+ * ```typescript
+ * const config: PrismaConfig = {
+ *   provider: 'postgresql'
+ * };
+ * ```
+ */
 export interface PrismaConfig {
 	/**
 	 * Database provider.
+	 *
+	 * Specifies which database engine the Prisma client is configured to use.
+	 * This affects how queries are constructed and executed.
 	 */
 	provider:
 		| 'sqlite'
@@ -19,8 +35,22 @@ export interface PrismaConfig {
 		| 'mongodb';
 }
 
+/**
+ * Type alias for a Prisma client instance
+ *
+ * This represents a generic Prisma client that can be used with the adapter.
+ * The actual shape will depend on your specific Prisma schema.
+ */
 type PrismaClient = Record<string, unknown>;
-type data = Record<string, unknown>;
+
+/**
+ * Internal type representing the expected structure of a Prisma client
+ *
+ * This interface defines the expected methods and properties that the
+ * adapter will use when interacting with the Prisma client.
+ *
+ * @internal
+ */
 interface PrismaClientInternal {
 	[model: string]: {
 		create: (data: data) => Promise<data>;
@@ -32,12 +62,39 @@ interface PrismaClientInternal {
 	};
 }
 
+/**
+ * Type alias for generic data objects
+ *
+ * @internal
+ */
+type data = Record<string, unknown>;
+
+/**
+ * Creates entity transformation utilities for the Prisma adapter
+ *
+ * This function creates helper methods for converting between c15t's
+ * data format and Prisma's query format, handling field mapping,
+ * value transformation, and query building.
+ *
+ * @internal This function is used internally by the prismaAdapter
+ * @param _config - The Prisma adapter configuration
+ * @param options - The c15t options
+ * @returns An object containing entity transformation utilities
+ */
 const createEntityTransformer = (
 	_config: PrismaConfig,
 	options: C15TOptions
 ) => {
 	const schema = getConsentTables(options);
 
+	/**
+	 * Gets the database field name for a model field
+	 *
+	 * @internal
+	 * @param model - The model name
+	 * @param field - The field name in the c15t model
+	 * @returns The corresponding field name in the database schema
+	 */
 	function getField(model: string, field: string) {
 		if (field === 'id') {
 			return field;
@@ -46,6 +103,13 @@ const createEntityTransformer = (
 		return f.fieldName || field;
 	}
 
+	/**
+	 * Converts c15t operators to Prisma operators
+	 *
+	 * @internal
+	 * @param operator - The c15t operator
+	 * @returns The equivalent Prisma operator
+	 */
 	function operatorToPrismaOperator(operator: string) {
 		switch (operator) {
 			case 'starts_with':
@@ -57,12 +121,28 @@ const createEntityTransformer = (
 		}
 	}
 
+	/**
+	 * Gets the database entity name for a model
+	 *
+	 * @internal
+	 * @param model - The model name
+	 * @returns The database table/collection name
+	 */
 	function getEntityName(model: string) {
 		return schema[model].entityName;
 	}
 
 	const useDatabaseGeneratedId = options?.advanced?.generateId === false;
 	return {
+		/**
+		 * Transforms input data from c15t format to Prisma format
+		 *
+		 * @internal
+		 * @param data - The data to transform
+		 * @param model - The model name
+		 * @param action - Whether this is a create or update operation
+		 * @returns Transformed data for Prisma operations
+		 */
 		transformInput(
 			data: Record<string, unknown>,
 			model: string,
@@ -97,6 +177,16 @@ const createEntityTransformer = (
 			}
 			return transformedData;
 		},
+
+		/**
+		 * Transforms output data from Prisma format to c15t format
+		 *
+		 * @internal
+		 * @param data - The data from Prisma
+		 * @param model - The model name
+		 * @param select - Optional array of fields to select
+		 * @returns Transformed data for c15t or null if no data
+		 */
 		transformOutput(
 			data: Record<string, unknown>,
 			model: string,
@@ -127,7 +217,20 @@ const createEntityTransformer = (
 			}
 			return transformedData as unknown;
 		},
-		convertWhereClause<T>(model: T, where?: Where<T>[]) {
+
+		/**
+		 * Converts c15t where clauses to Prisma query conditions
+		 *
+		 * @internal
+		 * @typeParam EntityType - The entity type
+		 * @param model - The model name
+		 * @param where - The where conditions
+		 * @returns Prisma-compatible where clause object
+		 */
+		convertWhereClause<EntityType>(
+			model: EntityType,
+			where?: Where<EntityType>[]
+		) {
 			if (!where) {
 				return {};
 			}
@@ -137,7 +240,7 @@ const createEntityTransformer = (
 					return;
 				}
 				return {
-					[getField(model, w.field)]:
+					[getField(model as string, w.field as string)]:
 						w.operator === 'eq' || !w.operator
 							? w.value
 							: {
@@ -149,7 +252,7 @@ const createEntityTransformer = (
 			const or = where.filter((w) => w.connector === 'OR');
 			const andClause = and.map((w) => {
 				return {
-					[getField(model, w.field)]:
+					[getField(model as string, w.field as string)]:
 						w.operator === 'eq' || !w.operator
 							? w.value
 							: {
@@ -159,7 +262,7 @@ const createEntityTransformer = (
 			});
 			const orClause = or.map((w) => {
 				return {
-					[getField(model, w.field)]: {
+					[getField(model as string, w.field as string)]: {
 						[w.operator || 'eq']: w.value,
 					},
 				};
@@ -170,6 +273,15 @@ const createEntityTransformer = (
 				...(orClause.length ? { OR: orClause } : {}),
 			};
 		},
+
+		/**
+		 * Converts c15t select array to Prisma select object
+		 *
+		 * @internal
+		 * @param select - Array of fields to select
+		 * @param model - The model name
+		 * @returns Prisma-compatible select object or undefined
+		 */
 		convertSelect: (select?: string[], model?: string) => {
 			if (!select || !model) {
 				return undefined;
@@ -184,6 +296,35 @@ const createEntityTransformer = (
 	};
 };
 
+/**
+ * Creates a c15t adapter for Prisma ORM
+ *
+ * This factory function creates an adapter that allows c15t to use Prisma ORM
+ * as its database layer. It translates c15t operations into Prisma queries.
+ *
+ * @param prisma - The Prisma client instance
+ * @param config - Configuration for the Prisma adapter
+ * @returns A c15t adapter factory function
+ *
+ * @example
+ * ```typescript
+ * import { PrismaClient } from '@prisma/client';
+ * import { c15t } from '@c15t/core';
+ * import { prismaAdapter } from '@c15t/adapters/prisma';
+ *
+ * // Create a Prisma client
+ * const prisma = new PrismaClient();
+ *
+ * // Create the c15t instance with Prisma adapter
+ * const c15tInstance = c15t({
+ *   storage: prismaAdapter(prisma, { provider: 'postgresql' }),
+ *   secret: process.env.SECRET_KEY
+ * });
+ *
+ * // Use in your application
+ * export default c15tInstance.handler;
+ * ```
+ */
 export const prismaAdapter =
 	(prisma: PrismaClient, config: PrismaConfig) => (options: C15TOptions) => {
 		const db = prisma as PrismaClientInternal;
@@ -197,6 +338,13 @@ export const prismaAdapter =
 		} = createEntityTransformer(config, options);
 		return {
 			id: 'prisma',
+			/**
+			 * Creates a new record in the database
+			 *
+			 * @param data - The data for the create operation
+			 * @returns The created record
+			 * @throws {C15TError} When the model does not exist in the database
+			 */
 			async create(data) {
 				const { model, data: values, select } = data;
 				const transformed = transformInput(values, model, 'create');
@@ -211,6 +359,14 @@ export const prismaAdapter =
 				});
 				return transformOutput(result, model, select);
 			},
+
+			/**
+			 * Finds a single record matching the where conditions
+			 *
+			 * @param data - The data for the find operation
+			 * @returns The found record or null if not found
+			 * @throws {C15TError} When the model does not exist in the database
+			 */
 			async findOne(data) {
 				const { model, where, select } = data;
 				const whereClause = convertWhereClause(model, where);
@@ -225,6 +381,14 @@ export const prismaAdapter =
 				});
 				return transformOutput(result, model, select);
 			},
+
+			/**
+			 * Finds multiple records matching the where conditions
+			 *
+			 * @param data - The data for the find operation
+			 * @returns Array of matching records
+			 * @throws {C15TError} When the model does not exist in the database
+			 */
 			async findMany(data) {
 				const { model, where, limit, offset, sortBy } = data;
 				const whereClause = convertWhereClause(model, where);
@@ -249,6 +413,14 @@ export const prismaAdapter =
 				})) as unknown[];
 				return result.map((r) => transformOutput(r, model));
 			},
+
+			/**
+			 * Counts records matching the where conditions
+			 *
+			 * @param data - The data for the count operation
+			 * @returns The count of matching records
+			 * @throws {C15TError} When the model does not exist in the database
+			 */
 			async count(data) {
 				const { model, where } = data;
 				const whereClause = convertWhereClause(model, where);
@@ -262,6 +434,14 @@ export const prismaAdapter =
 				});
 				return result;
 			},
+
+			/**
+			 * Updates a single record matching the where conditions
+			 *
+			 * @param data - The data for the update operation
+			 * @returns The updated record or null if not found
+			 * @throws {C15TError} When the model does not exist in the database
+			 */
 			async update(data) {
 				const { model, where, update } = data;
 				if (!db[getEntityName(model)]) {
@@ -277,6 +457,14 @@ export const prismaAdapter =
 				});
 				return transformOutput(result, model);
 			},
+
+			/**
+			 * Updates multiple records matching the where conditions
+			 *
+			 * @param data - The data for the update operation
+			 * @returns The number of records updated
+			 * @throws {C15TError} When the model does not exist in the database
+			 */
 			async updateMany(data) {
 				const { model, where, update } = data;
 				const whereClause = convertWhereClause(model, where);
@@ -287,6 +475,13 @@ export const prismaAdapter =
 				});
 				return result ? (result.count as number) : 0;
 			},
+
+			/**
+			 * Deletes a single record matching the where conditions
+			 *
+			 * @param data - The data for the delete operation
+			 * @throws {C15TError} When the model does not exist in the database (but catches and ignores if record not found)
+			 */
 			async delete(data) {
 				const { model, where } = data;
 				const whereClause = convertWhereClause(model, where);
@@ -298,6 +493,14 @@ export const prismaAdapter =
 					// If the record doesn't exist, we don't want to throw an error
 				}
 			},
+
+			/**
+			 * Deletes multiple records matching the where conditions
+			 *
+			 * @param data - The data for the delete operation
+			 * @returns The number of records deleted
+			 * @throws {C15TError} When the model does not exist in the database
+			 */
 			async deleteMany(data) {
 				const { model, where } = data;
 				const whereClause = convertWhereClause(model, where);

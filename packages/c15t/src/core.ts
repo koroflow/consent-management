@@ -5,6 +5,7 @@
  * It handles initialization of the consent management context, sets up request handlers,
  * manages plugin integration, and exposes the necessary API endpoints.
  *
+ * @remarks
  * The core module is responsible for:
  * - Initializing the consent management context
  * - Setting up request routing and URL configuration
@@ -51,7 +52,9 @@ import { BASE_ERROR_CODES } from './error/codes';
  * It initializes the consent management context, sets up request handling,
  * configures plugins, and exposes the necessary API endpoints.
  *
- * @template PluginArray - The specific plugin types to use
+ * @typeParam PluginTypes - The specific plugin types to use with the consent management system
+ * @typeParam ConfigOptions - Configuration options type extending C15TOptions with plugin-specific settings
+ *
  * @param options - Configuration options for the c15t instance
  * @returns A fully initialized c15t instance with request handler and API
  *
@@ -92,13 +95,19 @@ import { BASE_ERROR_CODES } from './error/codes';
  * ```
  */
 export const c15t = <
-	PluginArray extends C15TPlugin[] = C15TPlugin[],
-	OptionsType extends C15TOptions<PluginArray> = C15TOptions<PluginArray>,
+	PluginTypes extends C15TPlugin[] = C15TPlugin[],
+	ConfigOptions extends C15TOptions<PluginTypes> = C15TOptions<PluginTypes>,
 >(
-	options: OptionsType
-) => {
+	options: ConfigOptions
+): C15TInstance<PluginTypes> => {
 	const C15TContextPromise = init(options);
 
+	/**
+	 * Processes incoming requests and routes them to the appropriate handler
+	 *
+	 * @param request - The incoming web request
+	 * @returns A promise resolving to a web response
+	 */
 	const handler = async (request: Request): Promise<Response> => {
 		const ctx = await C15TContextPromise;
 		const basePath = ctx.options.basePath || '/api/auth';
@@ -128,14 +137,21 @@ export const c15t = <
 	};
 
 	// Store additional plugin error codes
-	const errorCodes = options.plugins?.reduce((acc, plugin) => {
-		if (plugin.$ERROR_CODES) {
-			return Object.assign({}, acc, plugin.$ERROR_CODES);
-		}
-		return acc;
-	}, {});
+	const errorCodes = options.plugins?.reduce<Record<string, string>>(
+		(acc, plugin) => {
+			if (plugin.$ERROR_CODES) {
+				return Object.assign({}, acc, plugin.$ERROR_CODES);
+			}
+			return acc;
+		},
+		{}
+	);
 
-	// Get API endpoints (lazy-loaded)
+	/**
+	 * Retrieves API endpoints from the router
+	 *
+	 * @returns A promise resolving to the available API endpoints
+	 */
 	const getApi = async () => {
 		const context = await C15TContextPromise;
 
@@ -165,34 +181,41 @@ export const c15t = <
 	// biome-ignore lint/correctness/noUnusedVariables: warm up the api promise
 	const apiPromise = getApi();
 
-	return {
+	// Combined error codes from base and plugins
+	type CombinedErrorCodes = InferPluginErrorCodes<ConfigOptions> &
+		typeof BASE_ERROR_CODES;
+
+	// Construct the full consent management instance
+	const instance: C15TInstance<PluginTypes> = {
 		handler,
 		api: {} as FilterActions<ReturnType<typeof router>['endpoints']>,
 		options,
-		$context: C15TContextPromise,
+		$context: C15TContextPromise as Promise<
+			C15TContext<InferPluginContexts<PluginTypes>>
+		>,
 		$Infer: {} as {
 			Consent: {
-				Context: InferPluginContexts<PluginArray>;
-				Record: ExtractPluginTypeDefinitions<C15TOptions<PluginArray>>;
+				Context: InferPluginContexts<PluginTypes>;
+				Record: ExtractPluginTypeDefinitions<ConfigOptions>;
 			};
-			Error: InferPluginErrorCodes<C15TOptions<PluginArray>> &
-				typeof BASE_ERROR_CODES;
+			Error: CombinedErrorCodes;
 		},
 		$ERROR_CODES: Object.assign(
 			{},
 			BASE_ERROR_CODES,
 			errorCodes || {}
-		) as InferPluginErrorCodes<C15TOptions<PluginArray>> &
-			typeof BASE_ERROR_CODES,
+		) as CombinedErrorCodes,
 	};
+
+	return instance;
 };
 
 /**
  * Type definition for a c15t instance with specific plugin types
  *
- * @template PluginArray - The specific plugin types used in this instance
+ * @typeParam PluginTypes - The specific plugin types used in this instance
  */
-export type C15TInstance<PluginArray extends C15TPlugin[] = C15TPlugin[]> = {
+export type C15TInstance<PluginTypes extends C15TPlugin[] = C15TPlugin[]> = {
 	/**
 	 * Request handler for processing incoming consent-related requests
 	 *
@@ -214,14 +237,14 @@ export type C15TInstance<PluginArray extends C15TPlugin[] = C15TPlugin[]> = {
 	/**
 	 * Configuration options used to create the instance
 	 */
-	options: C15TOptions<PluginArray>;
+	options: C15TOptions<PluginTypes>;
 
 	/**
 	 * Error codes from the core system and all registered plugins
 	 *
 	 * These can be used for error handling and internationalization.
 	 */
-	$ERROR_CODES: InferPluginErrorCodes<C15TOptions<PluginArray>> &
+	$ERROR_CODES: InferPluginErrorCodes<C15TOptions<PluginTypes>> &
 		typeof BASE_ERROR_CODES;
 
 	/**
@@ -230,7 +253,21 @@ export type C15TInstance<PluginArray extends C15TPlugin[] = C15TPlugin[]> = {
 	 * This is mainly for advanced usage scenarios where direct access
 	 * to the context is required.
 	 */
-	$context: Promise<C15TContext<InferPluginContexts<PluginArray>>>;
+	$context: Promise<C15TContext<InferPluginContexts<PluginTypes>>>;
+
+	/**
+	 * Type inference helpers for TypeScript users
+	 *
+	 * Provides type definitions for consent contexts, records, and error codes.
+	 */
+	$Infer: {
+		Consent: {
+			Context: InferPluginContexts<PluginTypes>;
+			Record: ExtractPluginTypeDefinitions<C15TOptions<PluginTypes>>;
+		};
+		Error: InferPluginErrorCodes<C15TOptions<PluginTypes>> &
+			typeof BASE_ERROR_CODES;
+	};
 
 	/**
 	 * Index signature for dynamic access to API handlers

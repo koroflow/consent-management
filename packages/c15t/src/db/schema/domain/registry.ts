@@ -1,7 +1,8 @@
-import type { Where, GenericEndpointContext, RegistryContext } from '~/types';
+import type { GenericEndpointContext, RegistryContext } from '~/types';
 import type { Domain } from './schema';
 import { getWithHooks } from '~/db/hooks';
 import { validateEntityOutput } from '../definition';
+import type { Where } from '~/db/adapters/types';
 
 /**
  * Creates and returns a set of domain-related adapter methods to interact with the database.

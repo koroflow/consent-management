@@ -14,10 +14,39 @@ import { error } from './routes/error';
 import { toEndpoints } from './to-endpoints';
 import { logger } from '~/utils/logger';
 
-export function getEndpoints<C extends C15TContext, Option extends C15TOptions>(
-	ctx: Promise<C> | C,
-	options: Option
-) {
+/**
+ * Retrieves and configures endpoints from plugins and core functionality
+ *
+ * This function collects endpoints from plugins, combines them with
+ * base endpoints, and builds an API object with properly configured
+ * handlers.
+ *
+ * @remarks
+ * Plugin endpoints are merged with core endpoints, with core endpoints
+ * taking precedence in case of naming conflicts.
+ *
+ * @typeParam ContextType - The specific context type extending C15TContext
+ * @typeParam OptionsType - Configuration options type extending C15TOptions
+ * @param ctx - The consent management context (or promise resolving to it)
+ * @param options - Configuration options for the consent system
+ * @returns Object containing API handlers and middleware configurations
+ *
+ * @example
+ * ```typescript
+ * const { api, middlewares } = getEndpoints(contextInstance, {
+ *   plugins: [analyticsPlugin(), geoPlugin()]
+ * });
+ *
+ * // Use the configured API
+ * const response = await api.getConsentStatus({
+ *   params: { userId: "123" }
+ * });
+ * ```
+ */
+export function getEndpoints<
+	ContextType extends C15TContext,
+	OptionsType extends C15TOptions,
+>(ctx: Promise<ContextType> | ContextType, options: OptionsType) {
 	const pluginEndpoints = options.plugins?.reduce<Record<string, Endpoint>>(
 		(acc, plugin) => {
 			if (plugin.endpoints) {
@@ -28,13 +57,18 @@ export function getEndpoints<C extends C15TContext, Option extends C15TOptions>(
 		{}
 	);
 
+	/**
+	 * Type representing the intersection of all plugin endpoint types
+	 *
+	 * @internal
+	 */
 	type PluginEndpoint = UnionToIntersection<
-		Option['plugins'] extends Array<infer T>
-			? T extends C15TPlugin
-				? T extends {
-						endpoints: infer E;
+		OptionsType['plugins'] extends Array<infer PluginType>
+			? PluginType extends C15TPlugin
+				? PluginType extends {
+						endpoints: infer EndpointType;
 					}
-					? E
+					? EndpointType
 					: Record<string, never>
 				: Record<string, never>
 			: Record<string, never>
@@ -44,7 +78,7 @@ export function getEndpoints<C extends C15TContext, Option extends C15TOptions>(
 		options.plugins
 			?.map((plugin) =>
 				plugin.middlewares?.map((m) => {
-					const middleware = (async (context: { context: C }) => {
+					const middleware = (async (context: { context: ContextType }) => {
 						return m.middleware({
 							...context,
 							context: {
@@ -60,7 +94,9 @@ export function getEndpoints<C extends C15TContext, Option extends C15TOptions>(
 					};
 				})
 			)
-			.filter((plugin) => plugin !== undefined)
+			.filter(
+				(plugin): plugin is NonNullable<typeof plugin> => plugin !== undefined
+			)
 			.flat() || [];
 
 	const endpoints = {
@@ -76,9 +112,56 @@ export function getEndpoints<C extends C15TContext, Option extends C15TOptions>(
 	};
 }
 
-export const router = <C extends C15TContext, Option extends C15TOptions>(
-	ctx: C,
-	options: Option
+/**
+ * Creates a router for handling API requests
+ *
+ * Sets up routing with proper error handling, CORS, and response processing.
+ * Integrates plugin-provided middlewares and response handlers.
+ *
+ * @remarks
+ * This router automatically applies the origin check middleware to all routes
+ * and handles error conditions appropriately based on configuration.
+ *
+ * @typeParam ContextType - The specific context type extending C15TContext
+ * @typeParam OptionsType - Configuration options type extending C15TOptions
+ * @param ctx - The initialized consent management context
+ * @param options - Configuration options for the consent system
+ * @returns A configured router with handler and endpoint functions
+ * @throws May throw errors in the onError handler if options.onAPIError.throw is true
+ *
+ * @example
+ * ```typescript
+ * const consentRouter = router(contextInstance, {
+ *   logger: { level: 'error' },
+ *   plugins: [analyticsPlugin()]
+ * });
+ *
+ * // Use the router to handle incoming requests
+ * app.use('/api/consent', async (req, res) => {
+ *   const response = await consentRouter.handler(
+ *     new Request(`https://example.com${req.url}`, {
+ *       method: req.method,
+ *       headers: req.headers,
+ *       body: req.body ? JSON.stringify(req.body) : undefined
+ *     })
+ *   );
+ *
+ *   // Send the response back
+ *   res.status(response.status);
+ *   response.headers.forEach((value, key) => {
+ *     res.setHeader(key, value);
+ *   });
+ *   const body = await response.text();
+ *   res.send(body);
+ * });
+ * ```
+ */
+export const router = <
+	ContextType extends C15TContext,
+	OptionsType extends C15TOptions,
+>(
+	ctx: ContextType,
+	options: OptionsType
 ) => {
 	const { api, middlewares } = getEndpoints(ctx, options);
 
@@ -92,6 +175,11 @@ export const router = <C extends C15TContext, Option extends C15TOptions>(
 		basePath = '/api/c15t';
 	}
 
+	/**
+	 * Configure and create the router instance
+	 *
+	 * @internal
+	 */
 	const routerInstance = createRouter(api, {
 		routerContext: ctx,
 		openapi: {
@@ -116,6 +204,14 @@ export const router = <C extends C15TContext, Option extends C15TOptions>(
 		// 	}
 		// 	return onRequestRateLimit(req, ctx);
 		// },
+
+		/**
+		 * Handle response processing through plugins
+		 *
+		 * @internal
+		 * @param res - The response to process
+		 * @returns The processed response
+		 */
 		async onResponse(res) {
 			for (const plugin of ctx.options.plugins || []) {
 				if (plugin.onResponse) {
@@ -127,6 +223,13 @@ export const router = <C extends C15TContext, Option extends C15TOptions>(
 			}
 			return res;
 		},
+
+		/**
+		 * Handle errors that occur during request processing
+		 *
+		 * @internal
+		 * @param e - The error that occurred
+		 */
 		onError(e) {
 			if (e instanceof APIError && e.status === 'FOUND') {
 				return;
