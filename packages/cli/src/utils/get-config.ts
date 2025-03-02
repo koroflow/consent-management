@@ -443,6 +443,11 @@ export const c15t = c15tInstance({
 					"Please temporarily remove the 'server-only' import while using the CLI,\n" +
 					'and you can add it back afterwards.'
 			);
+
+			// Don't exit the process during tests
+			if (process.env.NODE_ENV === 'test') {
+				throw new Error('Server-only import detected in config file');
+			}
 			process.exit(1);
 		}
 
@@ -460,7 +465,12 @@ export const c15t = c15tInstance({
 			logger.info('   DEBUG=c15t* npx c15t@latest <command>');
 		}
 
-		process.exit(1);
+		// Don't exit the process during tests
+		if (process.env.NODE_ENV === 'test') {
+			throw e;
+		} else {
+			process.exit(1);
+		}
 	}
 }
 

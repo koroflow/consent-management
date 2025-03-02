@@ -5,15 +5,12 @@ import { c15t } from '@c15t/new';
 import Database from 'better-sqlite3';
 import type { C15TPlugin } from '@c15t/new/types';
 
-describe('migrate base auth instance', () => {
+describe('migrate base c15t instance', () => {
 	const db = new Database(':memory:');
 
 	const auth = c15t({
 		baseURL: 'http://localhost:3000',
 		database: db,
-		emailAndPassword: {
-			enabled: true,
-		},
 	});
 
 	beforeEach(() => {
@@ -27,20 +24,12 @@ describe('migrate base auth instance', () => {
 		vi.restoreAllMocks();
 	});
 
-	it('should migrate the database and sign-up a user', async () => {
+	it('should migrate the database', async () => {
 		await migrateAction({
 			cwd: process.cwd(),
 			config: 'test/c15t.ts',
 			y: true,
 		});
-		// const signUpRes = await auth.api.signUpEmail({
-		// 	body: {
-		// 		name: "test",
-		// 		email: "test@email.com",
-		// 		password: "password",
-		// 	},
-		// });
-		// expect(signUpRes.token).toBeDefined();
 	});
 });
 
