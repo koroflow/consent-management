@@ -118,6 +118,7 @@
 	},
 	"dependencies": {
 		"@better-fetch/fetch": "^1.1.15",
+		"base-x": "^5.0.0",
 		"better-call": "^1.0.3",
 		"better-sqlite3": "^11.8.1",
 		"defu": "^6.1.4",

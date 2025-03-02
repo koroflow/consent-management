@@ -14,6 +14,56 @@ import type { DatabaseConfiguration } from '~/db/adapters/kysely-adapter/types';
 import type { EntityName } from '~/db/core/types';
 
 /**
+ * Base entity configuration shared by all entities
+ * Provides common configuration options for database entities
+ */
+export interface BaseEntityConfig {
+	/**
+	 * Custom model name for the entity table
+	 */
+	entityName?: string;
+	
+	/**
+	 * The ID prefix for the entity table
+	 * Used to generate unique prefixed IDs
+	 */
+	entityPrefix?: string;
+	
+	/**
+	 * Custom field names for the entity table
+	 */
+	fields?: Record<string, string>;
+	
+	/**
+	 * Additional fields for the entity table
+	 */
+	additionalFields?: Record<string, Field>;
+}
+
+/**
+ * Entity configuration with standard timestamps
+ * Extends base configuration with created/updated timestamp fields
+ */
+export interface TimestampedEntityConfig extends BaseEntityConfig {
+	fields?: Record<string, string> & {
+		createdAt?: string;
+		updatedAt?: string;
+	};
+}
+
+/**
+ * Entity configuration for entities with active status
+ * Extends timestamped configuration with isActive field
+ */
+export interface ActiveEntityConfig extends TimestampedEntityConfig {
+	fields?: Record<string, string> & {
+		createdAt?: string;
+		updatedAt?: string;
+		isActive?: string;
+	};
+}
+
+/**
  * Main configuration options for the c15t consent management system
  *
  * This interface provides a comprehensive set of options for configuring
@@ -252,19 +302,11 @@ export interface C15TOptions<P extends C15TPlugin[] = C15TPlugin[]> {
 	};
 
 	/**
-	 * Database table configuration
-	 * Allows customizing table and field names
+	 * User entity configuration
+	 * @default entityName: "user", entityPrefix: "usr"
 	 */
-	user?: {
-		/**
-		 * Custom model name for user table
-		 * @default "user"
-		 */
-		entityName?: string;
-		/**
-		 * Custom field names for user table
-		 */
-		fields?: {
+	user?: TimestampedEntityConfig & {
+		fields?: Record<string, string> & {
 			id?: string;
 			isIdentified?: string;
 			externalId?: string;
@@ -272,27 +314,15 @@ export interface C15TOptions<P extends C15TPlugin[] = C15TPlugin[]> {
 			lastIpAddress?: string;
 			createdAt?: string;
 			updatedAt?: string;
-			[key: string]: string | undefined;
 		};
-		/**
-		 * Additional fields for the user table
-		 */
-		additionalFields?: Record<string, Field>;
 	};
 
 	/**
-	 * Consent purpose configuration
+	 * Purpose entity configuration
+	 * @default entityName: "purpose", entityPrefix: "pur"
 	 */
-	purpose?: {
-		/**
-		 * Custom model name for consent purpose table
-		 * @default "purpose"
-		 */
-		entityName?: string;
-		/**
-		 * Custom field names for consent purpose table
-		 */
-		fields?: {
+	purpose?: ActiveEntityConfig & {
+		fields?: Record<string, string> & {
 			id?: string;
 			code?: string;
 			name?: string;
@@ -303,27 +333,15 @@ export interface C15TOptions<P extends C15TPlugin[] = C15TPlugin[]> {
 			isActive?: string;
 			createdAt?: string;
 			updatedAt?: string;
-			[key: string]: string | undefined;
 		};
-		/**
-		 * Additional fields for the consent purpose table
-		 */
-		additionalFields?: Record<string, Field>;
 	};
 
 	/**
 	 * Consent policy configuration
+	 * @default entityName: "consentPolicy", entityPrefix: "pol"
 	 */
-	consentPolicy?: {
-		/**
-		 * Custom model name for consent policy table
-		 * @default "consentPolicy"
-		 */
-		entityName?: string;
-		/**
-		 * Custom field names for consent policy table
-		 */
-		fields?: {
+	consentPolicy?: BaseEntityConfig & {
+		fields?: Record<string, string> & {
 			id?: string;
 			version?: string;
 			name?: string;
@@ -333,27 +351,15 @@ export interface C15TOptions<P extends C15TPlugin[] = C15TPlugin[]> {
 			contentHash?: string;
 			isActive?: string;
 			createdAt?: string;
-			[key: string]: string | undefined;
 		};
-		/**
-		 * Additional fields for the consent policy table
-		 */
-		additionalFields?: Record<string, Field>;
 	};
 
 	/**
 	 * Domain configuration
+	 * @default entityName: "domain", entityPrefix: "dom"
 	 */
-	domain?: {
-		/**
-		 * Custom model name for domain table
-		 * @default "domain"
-		 */
-		entityName?: string;
-		/**
-		 * Custom field names for domain table
-		 */
-		fields?: {
+	domain?: ActiveEntityConfig & {
+		fields?: Record<string, string> & {
 			id?: string;
 			domain?: string;
 			isPattern?: string;
@@ -363,27 +369,15 @@ export interface C15TOptions<P extends C15TPlugin[] = C15TPlugin[]> {
 			isActive?: string;
 			createdAt?: string;
 			updatedAt?: string;
-			[key: string]: string | undefined;
 		};
-		/**
-		 * Additional fields for the domain table
-		 */
-		additionalFields?: Record<string, Field>;
 	};
 
 	/**
 	 * Geo location configuration
+	 * @default entityName: "geoLocation", entityPrefix: "geo"
 	 */
-	geoLocation?: {
-		/**
-		 * Custom model name for geo location table
-		 * @default "geoLocation"
-		 */
-		entityName?: string;
-		/**
-		 * Custom field names for geo location table
-		 */
-		fields?: {
+	geoLocation?: BaseEntityConfig & {
+		fields?: Record<string, string> & {
 			id?: string;
 			countryCode?: string;
 			countryName?: string;
@@ -391,19 +385,14 @@ export interface C15TOptions<P extends C15TPlugin[] = C15TPlugin[]> {
 			regionName?: string;
 			regulatoryZones?: string;
 			createdAt?: string;
-			[key: string]: string | undefined;
 		};
-		/**
-		 * Additional fields for the geo location table
-		 */
-		additionalFields?: Record<string, Field>;
 	};
 
 	/**
-	 * Consent fields configuration
-	 * Extends the consent configuration with database fields
+	 * Consent configuration
+	 * @default entityName: "consent", entityPrefix: "cns"
 	 */
-	consent?: {
+	consent?: BaseEntityConfig & {
 		/**
 		 * Default expiration for consent in seconds
 		 * @default 31536000 (1 year)
@@ -458,16 +447,7 @@ export interface C15TOptions<P extends C15TPlugin[] = C15TPlugin[]> {
 			secure?: boolean;
 		};
 
-		/**
-		 * Custom model name for consent table
-		 * @default "consent"
-		 */
-		entityName?: string;
-
-		/**
-		 * Custom field names for consent table
-		 */
-		fields?: {
+		fields?: Record<string, string> & {
 			id?: string;
 			userId?: string;
 			domainId?: string;
@@ -479,107 +459,56 @@ export interface C15TOptions<P extends C15TPlugin[] = C15TPlugin[]> {
 			givenAt?: string;
 			validUntil?: string;
 			isActive?: string;
-			[key: string]: string | undefined;
 		};
-
-		/**
-		 * Additional fields for the consent table
-		 */
-		additionalFields?: Record<string, Field>;
 	};
 
 	/**
-	 * Consent purpose junction configuration
+	 * Purpose junction configuration
+	 * @default entityName: "purposeJunction", entityPrefix: "pjx"
 	 */
-	purposeJunction?: {
-		/**
-		 * Custom model name for consent purpose junction table
-		 * @default "purposeJunction"
-		 */
-		entityName?: string;
-		/**
-		 * Custom field names for consent purpose junction table
-		 */
-		fields?: {
+	purposeJunction?: BaseEntityConfig & {
+		fields?: Record<string, string> & {
 			id?: string;
 			consentId?: string;
 			purposeId?: string;
 			isAccepted?: string;
-			[key: string]: string | undefined;
 		};
-		/**
-		 * Additional fields for the consent purpose junction table
-		 */
-		additionalFields?: Record<string, Field>;
 	};
 
 	/**
-	 * Consent record configuration
+	 * Record entity configuration
+	 * @default entityName: "record", entityPrefix: "rec"
 	 */
-	record?: {
-		/**
-		 * Custom model name for consent record table
-		 * @default "record"
-		 */
-		entityName?: string;
-		/**
-		 * Custom field names for consent record table
-		 */
-		fields?: {
+	record?: BaseEntityConfig & {
+		fields?: Record<string, string> & {
 			id?: string;
+			userId?: string;
 			consentId?: string;
-			recordType?: string;
-			recordTypeDetail?: string;
-			content?: string;
-			ipAddress?: string;
-			recordMetadata?: string;
+			actionType?: string;
+			details?: string;
 			createdAt?: string;
-			[key: string]: string | undefined;
 		};
-		/**
-		 * Additional fields for the consent record table
-		 */
-		additionalFields?: Record<string, Field>;
 	};
 
 	/**
 	 * Consent geo location configuration
+	 * @default entityName: "consentGeoLocation", entityPrefix: "cgl"
 	 */
-	consentGeoLocation?: {
-		/**
-		 * Custom model name for consent geo location table
-		 * @default "consentGeoLocation"
-		 */
-		entityName?: string;
-		/**
-		 * Custom field names for consent geo location table
-		 */
-		fields?: {
+	consentGeoLocation?: BaseEntityConfig & {
+		fields?: Record<string, string> & {
 			id?: string;
 			consentId?: string;
 			geoLocationId?: string;
 			createdAt?: string;
-			[key: string]: string | undefined;
 		};
-		/**
-		 * Additional fields for the consent geo location table
-		 */
-		additionalFields?: Record<string, Field>;
 	};
 
 	/**
-	 * Consent withdrawal configuration
+	 * Withdrawal configuration
+	 * @default entityName: "withdrawal", entityPrefix: "wdr"
 	 */
-	withdrawal?: {
-		/**
-		 * Custom model name for consent withdrawal table
-		 * @default "withdrawal"
-		 */
-		entityName?: string;
-		/**
-		 * Custom field names for consent withdrawal table
-		 */
-		fields?: {
+	withdrawal?: BaseEntityConfig & {
+		fields?: Record<string, string> & {
 			id?: string;
 			consentId?: string;
 			revokedAt?: string;
@@ -588,12 +517,7 @@ export interface C15TOptions<P extends C15TPlugin[] = C15TPlugin[]> {
 			actor?: string;
 			metadata?: string;
 			createdAt?: string;
-			[key: string]: string | undefined;
 		};
-		/**
-		 * Additional fields for the consent withdrawal table
-		 */
-		additionalFields?: Record<string, Field>;
 
 		/**
 		 * Prevent multiple withdrawals for the same consent
@@ -608,18 +532,11 @@ export interface C15TOptions<P extends C15TPlugin[] = C15TPlugin[]> {
 	};
 
 	/**
-	 * Consent audit log configuration
+	 * Audit log configuration
+	 * @default entityName: "auditLog", entityPrefix: "log"
 	 */
-	auditLog?: {
-		/**
-		 * Custom model name for consent audit log table
-		 * @default "auditLog"
-		 */
-		entityName?: string;
-		/**
-		 * Custom field names for consent audit log table
-		 */
-		fields?: {
+	auditLog?: BaseEntityConfig & {
+		fields?: Record<string, string> & {
 			id?: string;
 			timestamp?: string;
 			action?: string;
@@ -631,11 +548,6 @@ export interface C15TOptions<P extends C15TPlugin[] = C15TPlugin[]> {
 			deviceInfo?: string;
 			ipAddress?: string;
 			createdAt?: string;
-			[key: string]: string | undefined;
 		};
-		/**
-		 * Additional fields for the consent audit log table
-		 */
-		additionalFields?: Record<string, Field>;
 	};
 }

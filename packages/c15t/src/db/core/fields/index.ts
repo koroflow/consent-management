@@ -32,6 +32,9 @@ export type {
 	InferFieldsFromOptions,
 } from './field-options-integration';
 
+// Export custom ID generation system
+export type { TableWithPrefix } from './id-generator';
+
 // Export factory functions directly
 export {
 	createField,
@@ -46,3 +49,10 @@ export {
 	COMMON_TIMEZONES,
 	DateTimeUtils,
 } from './field-factory';
+
+// Export ID generation functions
+export {
+	generateId,
+	createIdGenerator,
+	defaultIdGenerator,
+} from './id-generator';

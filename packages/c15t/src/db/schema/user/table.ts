@@ -1,4 +1,5 @@
-import { COMMON_TIMEZONES, type Field } from '~/db/core/fields';
+import type { Field } from '~/db/core/fields';
+import { defaultIdGenerator, COMMON_TIMEZONES } from '~/db/core/fields';
 import type { C15TOptions } from '~/types';
 import { userSchema } from './schema';
 
@@ -31,6 +32,18 @@ export function getUserTable(
 		entityName: options.user?.entityName || 'user',
 
 		/**
+		 * The ID prefix for the user table
+		 * Used to generate unique prefixed IDs for users
+		 */
+		entityPrefix: options.user?.entityPrefix || 'usr',
+
+		/**
+		 * ID generator function for this table
+		 * Uses the entityPrefix to generate IDs
+		 */
+		generateId: defaultIdGenerator,
+
+		/**
 		 * The schema for the user table
 		 */
 		schema: userSchema,
@@ -39,6 +52,29 @@ export function getUserTable(
 		 * Field definitions for the user table
 		 */
 		fields: {
+			/**
+			 * User's email address
+			 * Used for notifications and/or login
+			 */
+			email: {
+				type: 'string',
+				required: true,
+				unique: true,
+				fieldName: options.user?.fields?.email || 'email',
+				transform: {
+					input: (value: string) => value.toLowerCase().trim(),
+				},
+			},
+
+			/**
+			 * User's display name
+			 */
+			name: {
+				type: 'string',
+				required: false,
+				fieldName: options.user?.fields?.name || 'name',
+			},
+
 			/**
 			 * Whether the user has been identified/verified
 			 * Default: false
@@ -81,7 +117,7 @@ export function getUserTable(
 			},
 
 			/**
-			 * When the user record was created
+			 * When the user was created
 			 * Automatically set to current time by default
 			 */
 			createdAt: {
@@ -92,8 +128,8 @@ export function getUserTable(
 			},
 
 			/**
-			 * When the user record was last updated
-			 * Automatically updated on each modification
+			 * When the user was last updated
+			 * Automatically set to current time on update
 			 */
 			updatedAt: {
 				type: 'date',
@@ -121,7 +157,7 @@ export function getUserTable(
 
 		/**
 		 * Execution order during migrations (lower numbers run first)
-		 * User table needs to be created before tables that reference it
+		 * User table needs to be created early as other tables reference it
 		 */
 		order: 1,
 	};
