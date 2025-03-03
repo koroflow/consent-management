@@ -60,7 +60,7 @@ describe('getConfig', async () => {
 		//create dummy c15t.ts
 		await fs.writeFile(
 			path.join(c15tPath, 'c15t.ts'),
-			`import { c15t as c15tInstance } from '@c15t/backend';
+			`import { c15tInstance } from '@c15t/backend';
 			 import { prismaAdapter } from "@c15t/backend/db/adapters/prisma";			
 			 import { db } from "@server/db/db";
 
@@ -129,7 +129,7 @@ describe('getConfig', async () => {
 		//create dummy c15t.ts
 		await fs.writeFile(
 			path.join(c15tPath, 'c15t.ts'),
-			`import { c15t as c15tInstance } from '@c15t/backend';
+			`import { c15tInstance } from '@c15t/backend';
 			 import { prismaAdapter } from "@c15t/backend/db/adapters/prisma";			
 			 import { db } from "prismaDbClient";
 
@@ -196,7 +196,7 @@ describe('getConfig', async () => {
 		//create dummy c15t.ts
 		await fs.writeFile(
 			path.join(c15tPath, 'c15t.ts'),
-			`import { c15t as c15tInstance } from '@c15t/backend';
+			`import { c15tInstance } from '@c15t/backend';
 			 import { prismaAdapter } from "@c15t/backend/db/adapters/prisma";			
 			 import { db } from "@server/db/db";
 
@@ -262,7 +262,7 @@ describe('getConfig', async () => {
 		//create dummy c15t.ts
 		await fs.writeFile(
 			path.join(c15tPath, 'c15t.ts'),
-			`import { c15t as c15tInstance } from '@c15t/backend';
+			`import { c15tInstance } from '@c15t/backend';
 			 import { prismaAdapter } from "@c15t/backend/db/adapters/prisma";			
 			 import { db } from "prismaDbClient";
 
@@ -328,7 +328,7 @@ describe('getConfig', async () => {
 		//create dummy c15t.ts
 		await fs.writeFile(
 			path.join(c15tPath, 'c15t.ts'),
-			`import { c15t as c15tInstance } from '@c15t/backend';
+			`import { c15tInstance } from '@c15t/backend';
 			 import { prismaAdapter } from "@c15t/backend/db/adapters/prisma";			
 			 import { db } from "../db/db";
 
@@ -394,7 +394,7 @@ describe('getConfig', async () => {
 		//create dummy c15t.ts
 		await fs.writeFile(
 			path.join(c15tPath, 'c15t.ts'),
-			`import { c15t as c15tInstance } from '@c15t/backend';
+			`import { c15tInstance } from '@c15t/backend';
 			 import { prismaAdapter } from "@c15t/backend/db/adapters/prisma";			
 			 import { db } from "@server/db/db";
 
@@ -436,10 +436,10 @@ describe('getConfig', async () => {
 		await fs.mkdir(c15tPath, { recursive: true });
 		await fs.mkdir(dbPath, { recursive: true });
 
-		//create dummy c15t.ts
+		//create dummy c15t.js
 		await fs.writeFile(
 			path.join(c15tPath, 'c15t.js'),
-			`import { c15t as c15tInstance } from "@c15t/backend";
+			`import { c15tInstance } from "@c15t/backend";
 
 			 export const c15t = c15tInstance({
 					appName: 'Test App',

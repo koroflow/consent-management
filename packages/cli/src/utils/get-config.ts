@@ -172,7 +172,21 @@ type config = {
  * Looks for various common export names for the c15t instance
  */
 function extractOptionsFromConfig(config: config): C15TOptions | null {
-	// Check for different possible export names
+	// First check for direct exports of the c15t instance
+	if (config.c15t && typeof config.c15t === 'function') {
+		return config.c15t();
+	}
+	if (config.default && typeof config.default === 'function') {
+		return config.default();
+	}
+	if (config.c15tInstance && typeof config.c15tInstance === 'function') {
+		return config.c15tInstance();
+	}
+	if (config.consent && typeof config.consent === 'function') {
+		return config.consent();
+	}
+
+	// Then check for options objects
 	return (
 		config.c15t?.options ||
 		config.default?.options ||
@@ -185,6 +199,10 @@ function extractOptionsFromConfig(config: config): C15TOptions | null {
 		typeof config.default === 'object' &&
 		'appName' in config.default
 			? config.default
+			: null) ||
+		// Finally check for direct exports of the instance
+		(config.c15t && typeof config.c15t === 'object' && 'appName' in config.c15t
+			? config.c15t
 			: null) ||
 		null
 	);
@@ -413,7 +431,7 @@ export async function getConfig({
 			);
 			logger.info('\n📝 Create a c15t.ts file with your configuration:');
 			logger.info(`
-import { c15t as c15tInstance } from '@c15t/backend';
+import { c15tInstance } from '@c15t/backend';
 
 export const c15t = c15tInstance({
   appName: 'My App',
