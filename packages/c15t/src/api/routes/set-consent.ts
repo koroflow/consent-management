@@ -19,7 +19,6 @@ const setConsentSchema = z.object({
 	metadata: z.record(z.any()).optional(),
 });
 
-
 export interface SetConsentResponse {
 	success: boolean;
 	consentId: string;
