@@ -109,10 +109,10 @@ export function getRecordTable(
 			},
 
 			// Include additional fields from plugins
-			...recordFields,
+			...(recordFields || {}),
 
 			// Include additional fields from configuration
-			...recordConfig?.additionalFields,
+			...(recordConfig?.additionalFields || {}),
 		},
 
 		/**

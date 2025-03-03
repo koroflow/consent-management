@@ -103,8 +103,8 @@ export const error = createAuthEndpoint(
 			openapi: {
 				description: 'Displays an error page',
 				responses: {
-					'200': {
-						description: 'Success',
+					'400': {
+						description: 'Error page displayed',
 						content: {
 							'text/html': {
 								schema: {
@@ -121,6 +121,7 @@ export const error = createAuthEndpoint(
 		const query =
 			new URL(c.request?.url || '').searchParams.get('error') || 'Unknown';
 		return new Response(html(query), {
+			status: 400,
 			headers: {
 				'Content-Type': 'text/html',
 			},

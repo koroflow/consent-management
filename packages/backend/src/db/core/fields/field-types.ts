@@ -238,10 +238,10 @@ export type FieldConfig<TFieldType extends FieldType = FieldType> = {
 };
 
 /**
- * Helper type to infer JavaScript types from field types.
+ * Helper type to infer the base JavaScript type from a field type.
  * Internal use only - not exported directly.
  */
-type InferValueType<TFieldType extends FieldType> = TFieldType extends 'string'
+type InferBaseType<TFieldType extends FieldType> = TFieldType extends 'string'
 	? string
 	: TFieldType extends 'number'
 		? number
@@ -253,15 +253,24 @@ type InferValueType<TFieldType extends FieldType> = TFieldType extends 'string'
 					? string
 					: TFieldType extends 'json'
 						? JsonValue
-						: TFieldType extends `${infer BaseType}[]`
-							? BaseType extends 'string'
-								? string[]
-								: BaseType extends 'number'
-									? number[]
-									: never
-							: TFieldType extends (infer ArrayType)[]
-								? ArrayType
-								: never;
+						: never;
+
+/**
+ * Helper type to infer JavaScript types from field types.
+ * Internal use only - not exported directly.
+ *
+ * @remarks
+ * This type handles both scalar types and array types.
+ * For arrays, it maps the base type to an array of that type.
+ * This approach is more maintainable and future-proof than
+ * explicitly handling each array type.
+ */
+export type InferValueType<TFieldType extends FieldType> =
+	TFieldType extends `${infer BaseType}[]`
+		? BaseType extends FieldType
+			? InferBaseType<BaseType>[]
+			: never
+		: InferBaseType<TFieldType>;
 
 /**
  * The complete definition of a database field.

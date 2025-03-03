@@ -61,37 +61,35 @@ export const getConsentHistory = createAuthEndpoint(
 
 			// Process each consent to include withdrawals and records
 			const processedConsents = await Promise.all(
-				paginatedConsents.map(
-					async (consent: EntityOutputFields<'consent'>) => {
-						const withdrawals = await registry.getWithdrawals(consent.id);
-						const records = await registry.getRecords(consent.id);
+				paginatedConsents.map(async (consent) => {
+					const withdrawals = await registry.getWithdrawals(consent.id);
+					const records = await registry.getRecords(consent.id);
 
-						return {
-							id: consent.id,
-							domainId: consent.domainId as string,
-							status: consent.status as string,
-							givenAt: (consent.givenAt as Date).toISOString(),
-							withdrawals: withdrawals.map(
-								(withdrawal: EntityOutputFields<'withdrawal'>) => ({
-									id: withdrawal.id,
-									createdAt: (withdrawal.createdAt as Date).toISOString(),
-									reason: withdrawal.withdrawalReason || '',
-									method: withdrawal.withdrawalMethod || '',
-									actor:
-										(withdrawal.metadata as Record<string, unknown>)?.actor ||
-										'system',
-									metadata: withdrawal.metadata as Record<string, unknown>,
-								})
-							),
-							records: records.map((record: EntityOutputFields<'record'>) => ({
-								id: record.id,
-								createdAt: (record.createdAt as Date).toISOString(),
-								type: record.actionType as string,
-								details: record.details as Record<string, unknown>,
-							})),
-						};
-					}
-				)
+					return {
+						id: consent.id,
+						domainId: consent.domainId,
+						status: consent.status as string,
+						givenAt: (consent.givenAt as Date).toISOString(),
+						withdrawals: withdrawals.map(
+							(withdrawal: EntityOutputFields<'withdrawal'>) => ({
+								id: withdrawal.id,
+								createdAt: (withdrawal.createdAt as Date).toISOString(),
+								reason: withdrawal.withdrawalReason || '',
+								method: withdrawal.withdrawalMethod || '',
+								actor:
+									(withdrawal.metadata as Record<string, unknown>)?.actor ||
+									'system',
+								metadata: withdrawal.metadata as Record<string, unknown>,
+							})
+						),
+						records: records.map((record: EntityOutputFields<'record'>) => ({
+							id: record.id,
+							createdAt: (record.createdAt as Date).toISOString(),
+							type: record.actionType as string,
+							details: record.details as Record<string, unknown>,
+						})),
+					};
+				})
 			);
 
 			// Get audit logs if available

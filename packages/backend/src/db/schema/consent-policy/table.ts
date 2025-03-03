@@ -126,10 +126,10 @@ export function getConsentPolicyTable(
 			},
 
 			// Include additional fields from plugins
-			...policyFields,
+			...(policyFields || {}),
 
 			// Include additional fields from configuration
-			...consentPolicyConfig?.additionalFields,
+			...(consentPolicyConfig?.additionalFields || {}),
 		},
 
 		/**

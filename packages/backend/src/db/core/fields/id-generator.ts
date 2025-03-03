@@ -41,10 +41,17 @@ export function generateId(prefix: string): string {
 
 	const t = Date.now() - EPOCH_TIMESTAMP;
 
-	buf[0] = (t >>> 24) & 255;
-	buf[1] = (t >>> 16) & 255;
-	buf[2] = (t >>> 8) & 255;
-	buf[3] = t & 255;
+	// Use 8 bytes for the timestamp (0..7) and shift accordingly:
+	const high = Math.floor(t / 0x100000000);
+	const low = t >>> 0;
+	buf[0] = (high >>> 24) & 255;
+	buf[1] = (high >>> 16) & 255;
+	buf[2] = (high >>> 8) & 255;
+	buf[3] = high & 255;
+	buf[4] = (low >>> 24) & 255;
+	buf[5] = (low >>> 16) & 255;
+	buf[6] = (low >>> 8) & 255;
+	buf[7] = low & 255;
 
 	return `${prefix}_${b58.encode(buf)}`;
 }

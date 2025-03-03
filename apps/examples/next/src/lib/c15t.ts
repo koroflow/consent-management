@@ -18,7 +18,11 @@ const libsql = new LibsqlDialect({
  * // In an API route handler
  * import { c15t } from '@/lib/c15t';
  *
- * export default c15t.handleRequest(req, res);
+ * // For App Router (in route.ts)
+ * import { toNextJsHandler } from '@c15t/backend/integrations/next';
+ * 
+ * export const GET = toNextJsHandler(c15t);
+ * export const POST = toNextJsHandler(c15t);
  * ```
  *
  * @throws {Error} When required environment variables are missing

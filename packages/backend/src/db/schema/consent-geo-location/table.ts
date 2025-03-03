@@ -136,10 +136,10 @@ export function getConsentGeoLocationTable(
 			},
 
 			// Include additional fields from plugins
-			...geoLocationFields,
+			...(geoLocationFields || {}),
 
 			// Include additional fields from configuration
-			...consentGeoLocationConfig?.additionalFields,
+			...(consentGeoLocationConfig?.additionalFields || {}),
 		},
 
 		// /**

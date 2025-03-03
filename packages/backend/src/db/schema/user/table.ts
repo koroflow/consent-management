@@ -123,10 +123,10 @@ export function getUserTable(
 			},
 
 			// Include additional fields from plugins
-			...userFields,
+			...(userFields || {}),
 
 			// Include additional fields from configuration
-			...userConfig?.additionalFields,
+			...(userConfig?.additionalFields || {}),
 		},
 
 		/**

@@ -139,10 +139,10 @@ export function getPurposeTable(
 			},
 
 			// Include additional fields from plugins
-			...purposeFields,
+			...(purposeFields || {}),
 
 			// Include additional fields from configuration
-			...purposeConfig?.additionalFields,
+			...(purposeConfig?.additionalFields || {}),
 		},
 
 		/**

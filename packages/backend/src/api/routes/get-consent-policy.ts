@@ -206,9 +206,7 @@ export const getConsentPolicy = createAuthEndpoint(
 					policy: {
 						id: policy.id,
 						domain: params.domain,
-						//@ts-expect-error
 						version: policy.version,
-						//@ts-expect-error
 						content: policy.content,
 						availablePreferences: params.includePreferences
 							? //@ts-expect-error

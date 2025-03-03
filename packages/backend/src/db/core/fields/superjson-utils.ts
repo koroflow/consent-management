@@ -124,10 +124,9 @@ export function transformForDb(
 }
 
 /**
- * Parse a value from the database based on the database type
+ * Parse a value from the database using the global database type.
  *
  * @param value - The value from the database
- * @param dbType - The database type (defaults to current global setting)
  * @returns Parsed value
  */
 export function parseFromDb(value: unknown): unknown {

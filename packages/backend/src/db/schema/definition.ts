@@ -14,6 +14,12 @@ import {
 	getGeoLocationTable,
 } from './index';
 import type { PluginSchema } from '../core/types';
+import type {} from '../core/fields/field-inference';
+import type {
+	Field,
+	FieldType,
+	InferValueType,
+} from '../core/fields/field-types';
 
 /**
  * Retrieves all consent-related database table definitions
@@ -120,110 +126,47 @@ export type C15TDBSchema = ReturnType<typeof getConsentTables>;
 
 /**
  * Generic type to get all fields of a table by its name
- *
- * This utility type extracts the field definitions for a specific table,
- * providing type-safe access to the table's structure. It allows you to
- * reference fields with proper type checking throughout the system.
- *
- * @typeParam TableName - The table name from C15TDBSchema
- *
- * @remarks
- * This type is used extensively throughout the adapter implementations
- * to ensure type safety when creating, querying, and updating records.
- *
- * @example
- * ```typescript
- * // Get the type definition for all user fields
- * type UserFields = TableFields<'user'>;
- *
- * // Create a strongly-typed user object
- * const user: UserFields = {
- *   id: 'user-123',
- *   email: 'user@example.com',
- *   firstName: 'John',
- *   lastName: 'Doe'
- * };
- * ```
  */
-export type TableFields<TableName extends keyof C15TDBSchema> =
-	C15TDBSchema[TableName]['fields'];
-
-/**
- * Generic type to get all input fields of a table by its name
- *
- * This utility type extracts only the fields that are allowed for input
- * operations (create/update) on a specific table. It automatically excludes
- * fields marked with `{ input: false }`.
- *
- * @typeParam TableName - The table name from C15TDBSchema
- *
- * @remarks
- * Required fields (those with `{ required: true }`) will be non-optional in the
- * resulting type, while optional fields will allow undefined values.
- *
- * @example
- * ```typescript
- * // Get the type definition for user input fields
- * type UserInputFields = EntityInputFields<'user'>;
- *
- * // Create a strongly-typed user input object
- * const userInput: UserInputFields = {
- *   email: 'user@example.com',  // Required field
- *   firstName: 'John',          // Optional field
- *   // No need to specify fields marked with { input: false }
- * };
- * ```
- */
-export type EntityInputFields<TableName extends keyof C15TDBSchema> = {
-	[K in keyof TableFields<TableName> as TableFields<TableName>[K] extends {
-		input: false;
-	}
-		? never
-		: K]: TableFields<TableName>[K] extends { required: true }
-		? unknown
-		: unknown | undefined;
+export type TableFields<TableName extends keyof C15TDBSchema> = {
+	[K in keyof C15TDBSchema[TableName]['fields']]: C15TDBSchema[TableName]['fields'][K] extends Field
+		? C15TDBSchema[TableName]['fields'][K]
+		: never;
 };
 
 /**
  * Generic type to get all output fields of a table by its name
- *
- * This utility type extracts only the fields that are included in output
- * operations (read/query) for a specific table. It automatically excludes
- * fields marked with `{ returned: false }`.
- *
- * @typeParam TableName - The table name from C15TDBSchema
- *
- * @remarks
- * Optional fields (those with `{ required: false }`) will allow null or undefined
- * values in the resulting type.
- *
- * @example
- * ```typescript
- * // Get the type definition for user output fields
- * type UserOutputFields = EntityOutputFields<'user'>;
- *
- * // Process a user result with type safety
- * function processUser(user: UserOutputFields) {
- *   console.log(user.id);       // Always defined
- *   console.log(user.email);    // Always defined
- *
- *   // Safe handling of optional fields
- *   if (user.lastLogin) {
- *     console.log(new Date(user.lastLogin));
- *   }
- * }
- * ```
+ * This type extracts only the fields that are included in output operations,
+ * automatically excluding fields marked with { returned: false }.
  */
 export type EntityOutputFields<TableName extends keyof C15TDBSchema> = {
 	id: string;
 } & {
-	[K in keyof TableFields<TableName> as TableFields<TableName>[K] extends {
-		returned: false;
+	[K in keyof TableFields<TableName>]: TableFields<TableName>[K] extends {
+		type: infer Type extends FieldType;
 	}
-		? never
-		: K]: TableFields<TableName>[K] extends { required: false }
-		? unknown | null | undefined
-		: unknown;
+		? TableFields<TableName>[K] extends { returned: false }
+			? never
+			: TableFields<TableName>[K] extends { required: false }
+				? InferValueType<Type> | null | undefined
+				: InferValueType<Type>
+		: never;
+};
+
+/**
+ * Generic type to get all input fields of a table by its name
+ * This type extracts only the fields that are allowed for input operations,
+ * automatically excluding fields marked with { input: false }.
+ */
+export type EntityInputFields<TableName extends keyof C15TDBSchema> = {
+	[K in keyof TableFields<TableName>]: TableFields<TableName>[K] extends {
+		type: infer Type extends FieldType;
+	}
+		? TableFields<TableName>[K] extends { input: false }
+			? never
+			: TableFields<TableName>[K] extends { required: true }
+				? InferValueType<Type>
+				: InferValueType<Type> | null | undefined
+		: never;
 };
 
 /**

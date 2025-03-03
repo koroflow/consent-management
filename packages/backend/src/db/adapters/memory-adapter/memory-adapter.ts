@@ -35,7 +35,6 @@ import type { Adapter, Where } from '../types';
 export interface MemoryDB {
 	[key: string]: Record<string, unknown>[];
 }
-
 /**
  * Interface for where conditions in memory adapter queries
  *
@@ -58,6 +57,13 @@ export interface MemoryDB {
  *   field: 'purposeId',
  *   value: ['marketing', 'analytics'],
  *   operator: 'in'
+ * };
+ *
+ * // Using OR connector
+ * const orCondition: WhereCondition<'consent'> = {
+ *   field: 'purposeId',
+ *   value: 'marketing',
+ *   connector: 'OR'  // Will match this OR the previous condition
  * };
  * ```
  */
@@ -87,9 +93,20 @@ interface WhereCondition<EntityType extends EntityName> {
 		| '=';
 
 	/**
-	 * The logical connector to use with previous conditions
+	 * The logical connector to use with previous conditions.
+	 * When set to 'OR', the condition will be combined with previous conditions using OR logic.
+	 * When set to 'AND' or omitted, conditions will be combined using AND logic.
 	 *
 	 * @default "AND"
+	 *
+	 * @example
+	 * ```typescript
+	 * // Match records where purposeId is 'marketing' OR userId is 'user123'
+	 * const where = [
+	 *   { field: 'purposeId', value: 'marketing' },
+	 *   { field: 'userId', value: 'user123', connector: 'OR' }
+	 * ];
+	 * ```
 	 */
 	connector?: 'AND' | 'OR';
 }

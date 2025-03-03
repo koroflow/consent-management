@@ -122,10 +122,10 @@ export function getDomainTable(
 			},
 
 			// Include additional fields from plugins
-			...domainFields,
+			...(domainFields || {}),
 
 			// Include additional fields from configuration
-			...domainConfig?.additionalFields,
+			...(domainConfig?.additionalFields || {}),
 		},
 
 		/**

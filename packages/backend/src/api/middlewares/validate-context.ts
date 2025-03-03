@@ -1,8 +1,56 @@
 import { APIError } from 'better-call';
 import { createAuthMiddleware } from '../call';
-import type { C15TContext } from '~/types';
+import type { C15TContext, C15TPlugin } from '~/types';
 import { BASE_ERROR_CODES } from '~/error/codes';
 import type { Adapter } from '~/db/adapters/types';
+
+/**
+ * Redacts sensitive information from context for error reporting
+ *
+ * @param context - The context object to redact
+ * @returns A sanitized version of the context
+ */
+function redactContext(context: unknown): Record<string, unknown> {
+	if (!context || typeof context !== 'object') {
+		return { type: typeof context };
+	}
+
+	const typedContext = context as C15TContext;
+	return {
+		baseURL: typedContext.baseURL,
+		storageType: typedContext.storage?.constructor.name,
+		pluginsCount: Array.isArray(typedContext.plugins)
+			? typedContext.plugins.length
+			: 0,
+		hasOptions: !!typedContext.options,
+		hasLogger: !!typedContext.logger,
+		hasPlugins: !!typedContext.plugins,
+	};
+}
+
+/**
+ * Validates plugin initialization status
+ *
+ * @param plugins - Array of configured plugins
+ * @param initializedPlugins - Array of successfully initialized plugins
+ * @returns Array of failed plugin names, or null if all plugins initialized
+ */
+function validatePlugins(
+	plugins: C15TPlugin[] | undefined,
+	initializedPlugins: C15TPlugin[] | undefined
+): string[] | null {
+	if (!plugins?.length) {
+		return null;
+	}
+
+	const initializedNames = new Set(initializedPlugins?.map((p) => p.id) ?? []);
+
+	const failedPlugins = plugins
+		.filter((p) => !initializedNames.has(p.id))
+		.map((p) => p.id);
+
+	return failedPlugins.length > 0 ? failedPlugins : null;
+}
 
 /**
  * Middleware that validates the context for all routes
@@ -45,7 +93,7 @@ export const validateContextMiddleware = createAuthMiddleware(async (ctx) => {
 		throw new APIError('FORBIDDEN', {
 			message: BASE_ERROR_CODES.INVALID_CONFIGURATION,
 			status: 400,
-			data: { context },
+			data: redactContext(context),
 		});
 	}
 
@@ -57,7 +105,7 @@ export const validateContextMiddleware = createAuthMiddleware(async (ctx) => {
 		throw new APIError('FORBIDDEN', {
 			message: BASE_ERROR_CODES.INVALID_CONFIGURATION,
 			status: 400,
-			data: { error: 'Missing options in context' },
+			data: { error: 'Missing required configuration' },
 		});
 	}
 
@@ -87,14 +135,19 @@ export const validateContextMiddleware = createAuthMiddleware(async (ctx) => {
 	}
 
 	// Validate plugins if any are configured
-	if (
-		(typedContext.options.plugins?.length ?? 0) > 0 &&
-		!typedContext.plugins
-	) {
+	const failedPlugins = validatePlugins(
+		typedContext.options.plugins,
+		typedContext.plugins as C15TPlugin[] | undefined
+	);
+	if (failedPlugins) {
 		throw new APIError('INTERNAL_SERVER_ERROR', {
 			message: BASE_ERROR_CODES.PLUGIN_INITIALIZATION_FAILED,
 			status: 503,
-			data: { error: 'Plugins failed to initialize' },
+			data: {
+				error: 'Plugin initialization failed',
+				failedPlugins,
+				totalPlugins: typedContext.options.plugins?.length ?? 0,
+			},
 		});
 	}
 

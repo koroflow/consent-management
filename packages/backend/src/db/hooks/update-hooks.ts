@@ -59,6 +59,7 @@ export async function updateWithHooks<
 	// Execute operation
 	let updated: TOutputData | null = null;
 	if (customFn) {
+		// Ensure customFn handles partial updates correctly
 		const result = await customFn.fn(transformedData as TOutputData);
 		updated = result;
 		if (!customFn.executeMainFn && updated) {

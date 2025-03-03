@@ -14,12 +14,25 @@ import { z } from 'zod';
  *   id: '123e4567-e89b-12d3-a456-426614174000',
  *   userId: 'user-123',
  *   domainId: 'domain-456',
- *   purposeIds: ['purpose-789'],
- *   status: 'active'
+ *   purposeIds: ['purpose-789'], // Array of strings
+ *   status: 'active',
+ *   givenAt: new Date(),
+ *   isActive: true
  * };
  *
  * // Validate and parse the consent data
  * const validConsent = consentSchema.parse(consentData);
+ *
+ * // Or with defaults applied:
+ * const minimalConsentData = {
+ *   id: '123e4567-e89b-12d3-a456-426614174000',
+ *   userId: 'user-123',
+ *   domainId: 'domain-456',
+ *   purposeIds: ['purpose-789']
+ * };
+ *
+ * // status will default to 'active', isActive to true, etc.
+ * const consentWithDefaults = consentSchema.parse(minimalConsentData);
  * ```
  */
 export const consentSchema = z.object({

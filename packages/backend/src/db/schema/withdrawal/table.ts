@@ -136,10 +136,10 @@ export function getWithdrawalTable(
 			},
 
 			// Include additional fields from plugins
-			...withdrawalFields,
+			...(withdrawalFields || {}),
 
 			// Include additional fields from configuration
-			...withdrawalConfig?.additionalFields,
+			...(withdrawalConfig?.additionalFields || {}),
 		},
 
 		/**

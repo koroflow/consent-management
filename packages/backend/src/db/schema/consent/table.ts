@@ -205,10 +205,10 @@ export function getConsentTable(
 			},
 
 			// Include additional fields from plugins
-			...consentFields,
+			...(consentFields || {}),
 
 			// Include additional fields from configuration
-			...consentConfig?.additionalFields,
+			...(consentConfig?.additionalFields || {}),
 		},
 
 		/**

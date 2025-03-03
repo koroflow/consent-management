@@ -1,4 +1,9 @@
-import type { FieldType, Field, Primitive } from './field-types';
+import type {
+	FieldType,
+	Field,
+	Primitive,
+	InferValueType as BaseInferValueType,
+} from './field-types';
 
 /**
  * Infers the JavaScript type from a field type.
@@ -13,32 +18,18 @@ import type { FieldType, Field, Primitive } from './field-types';
  *
  * // Infer array types
  * type TagsType = InferValueType<'string[]'>;  // string[]
+ * type FlagsType = InferValueType<'boolean[]'>;  // boolean[]
+ * type DatesType = InferValueType<'date[]'>;  // Date[]
  * ```
  *
  * @remarks
- * This is a conditional type that recursively handles:
- * - Basic scalar types (string, number, boolean, date)
- * - Array types with string notation ('string[]')
- * - Array types with array notation (string[])
+ * This type handles both scalar types and array types.
+ * For arrays, it maps the base type to an array of that type.
+ * This approach is more maintainable and future-proof than
+ * explicitly handling each array type.
  */
 export type InferValueType<TFieldType extends FieldType> =
-	TFieldType extends 'string'
-		? string
-		: TFieldType extends 'number'
-			? number
-			: TFieldType extends 'boolean'
-				? boolean
-				: TFieldType extends 'date'
-					? Date
-					: TFieldType extends `${infer BaseType}[]`
-						? BaseType extends 'string'
-							? string[]
-							: BaseType extends 'number'
-								? number[]
-								: never
-						: TFieldType extends (infer ArrayType)[]
-							? ArrayType
-							: never;
+	BaseInferValueType<TFieldType>;
 
 /**
  * Infers the output type for a single field.

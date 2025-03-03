@@ -189,14 +189,15 @@ export const c15tInstance = <
 					BASE_ERROR_CODES.REQUEST_HANDLER_ERROR
 				);
 			} catch (error) {
-				return failAsync(
-					`Error processing request: ${error instanceof Error ? error.message : String(error)}`,
-					{
-						code: BASE_ERROR_CODES.REQUEST_HANDLER_ERROR,
-						status: 500,
-						data: { error, url: request.url },
-					}
-				);
+				const safeErrorMessage =
+					error instanceof Error
+						? error.message.split('\n')[0]
+						: 'An unknown error occurred';
+				return failAsync(`Error processing request: ${safeErrorMessage}`, {
+					code: BASE_ERROR_CODES.REQUEST_HANDLER_ERROR,
+					status: 500,
+					data: { url: request.url },
+				});
 			}
 		});
 	};

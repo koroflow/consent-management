@@ -1,6 +1,7 @@
 import type { SchemaDefinition } from './types';
 import { processFields } from './process-fields';
 import type { C15TDBSchema } from '../../schema/definition';
+import type { Field } from '~/db/core/fields';
 
 /**
  * Processes table definitions into a structured schema
@@ -24,7 +25,14 @@ export function processTablesIntoSchema(
 		}
 
 		// Process the fields for this table
-		const actualFields = processFields(table.fields || {}, tables);
+		let actualFields: Record<string, Field>;
+		try {
+			actualFields = processFields(table.fields || {}, tables);
+		} catch (error) {
+			// biome-ignore lint/suspicious/noConsole: its okay
+			console.error(`Error processing fields for table ${key}:`, error);
+			continue; // Skip this table if field processing fails
+		}
 
 		// Determine the model name (use the key if EntityName is not specified)
 		const EntityName = table.entityName || key;

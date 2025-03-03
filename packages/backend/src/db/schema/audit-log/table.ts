@@ -148,10 +148,10 @@ export function getAuditLogTable(
 			},
 
 			// Include additional fields from plugins
-			...auditLogFields,
+			...(auditLogFields || {}),
 
 			// Include additional fields from configuration
-			...auditLogConfig?.additionalFields,
+			...(auditLogConfig?.additionalFields || {}),
 		},
 
 		/**

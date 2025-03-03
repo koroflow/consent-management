@@ -115,10 +115,10 @@ export function getGeoLocationTable(
 			},
 
 			// Include additional fields from plugins
-			...geoLocationFields,
+			...(geoLocationFields || {}),
 
 			// Include additional fields from configuration
-			...geoLocationConfig?.additionalFields,
+			...(geoLocationConfig?.additionalFields || {}),
 		},
 
 		/**

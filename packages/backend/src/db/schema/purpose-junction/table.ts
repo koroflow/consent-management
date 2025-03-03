@@ -117,10 +117,10 @@ export function getPurposeJunctionTable(
 			},
 
 			// Include additional fields from plugins
-			...junctionFields,
+			...(junctionFields || {}),
 
 			// Include additional fields from configuration
-			...purposeJunctionConfig?.additionalFields,
+			...(purposeJunctionConfig?.additionalFields || {}),
 		},
 
 		/**
