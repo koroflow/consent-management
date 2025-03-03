@@ -5,6 +5,21 @@ import { getWithHooks } from '~/db/hooks';
 import { validateEntityOutput } from '../definition';
 import type { Where } from '~/db/adapters/types';
 
+export interface FindConsentsParams {
+	userId?: string;
+	domainId?: string;
+	status?: string;
+	purposeIds?: string[];
+}
+
+export interface RevokeConsentParams {
+	consentId: string;
+	reason: string;
+	actor: string;
+	metadata?: Record<string, unknown>;
+	context?: GenericEndpointContext;
+}
+
 /**
  * Creates and returns a set of consent-related adapter methods to interact with the database.
  * These methods provide a consistent interface for creating, finding, and updating
@@ -34,7 +49,7 @@ import type { Where } from '~/db/adapters/types';
  */
 export function consentRegistry({ adapter, ...ctx }: RegistryContext) {
 	const { createWithHooks, updateWithHooks } = getWithHooks(adapter, ctx);
-	return {
+	const registry = {
 		/**
 		 * Creates a new consent record in the database.
 		 * Automatically sets creation timestamp and applies any
@@ -69,37 +84,38 @@ export function consentRegistry({ adapter, ...ctx }: RegistryContext) {
 		 * Finds all consents matching specified filters.
 		 * Returns consents with processed output fields according to the schema configuration.
 		 *
-		 * @param userId - Optional user ID to filter consents
-		 * @param domainId - Optional domain ID to filter consents
-		 * @param purposeIds - Optional array of purpose IDs to filter consents
+		 * @param params - Filter parameters
 		 * @returns Array of consents matching the criteria
 		 */
-		findConsents: async (
-			userId?: string,
-			domainId?: string,
-			purposeIds?: string[]
-		) => {
+		findConsents: async (params: FindConsentsParams) => {
 			const whereConditions: Where<'consent'> = [];
 
-			if (userId) {
+			if (params.userId) {
 				whereConditions.push({
 					field: 'userId',
-					value: userId,
+					value: params.userId,
 				});
 			}
 
-			if (domainId) {
+			if (params.domainId) {
 				whereConditions.push({
 					field: 'domainId',
-					value: domainId,
+					value: params.domainId,
 				});
 			}
 
-			if (purposeIds && purposeIds.length > 0) {
+			if (params.status) {
+				whereConditions.push({
+					field: 'status',
+					value: params.status,
+				});
+			}
+
+			if (params.purposeIds && params.purposeIds.length > 0) {
 				whereConditions.push({
 					field: 'purposeIds',
 					operator: 'contains',
-					value: purposeIds,
+					value: params.purposeIds,
 				});
 			}
 
@@ -239,48 +255,75 @@ export function consentRegistry({ adapter, ...ctx }: RegistryContext) {
 				: null;
 		},
 
-		// revokeConsent: async ({
-		// 	consentId,
-		// 	reason,
-		// 	actor,
-		// 	metadata,
-		// 	context,
-		// }: {
-		// 	consentId: string;
-		// 	reason: string;
-		// 	actor: string;
-		// 	metadata?: Record<string, unknown>;
-		// 	context?: GenericEndpointContext;
-		// }) => {
-		// 	// Mark consent as inactive
-		// 	const updatedConsent = await consentAdapter.updateConsent(
-		// 		consentId,
-		// 		{
-		// 			isActive: false,
-		// 		},
-		// 		context
-		// 	);
+		revokeConsent: async ({
+			consentId,
+			reason,
+			actor,
+			metadata,
+			context,
+		}: RevokeConsentParams) => {
+			const consent = await registry.findConsentById(consentId);
+			if (!consent) {
+				throw new Error('Consent not found');
+			}
 
-		// 	if (!updatedConsent) {
-		// 		return null;
-		// 	}
+			const updateData: Partial<Consent> = {
+				status: 'withdrawn',
+				withdrawalReason: reason,
+				updatedAt: new Date(),
+				metadata: {
+					...(consent.metadata as Record<string, unknown>),
+					withdrawal: {
+						actor,
+						timestamp: new Date().toISOString(),
+						...metadata,
+					},
+				},
+			};
 
-		// 	// Create withdrawal record
-		// 	const withdrawal = await withdrawalAdapter.createWithdrawal(
-		// 		{
-		// 			consentId,
-		// 			withdrawalReason: reason,
-		// 			withdrawalMethod: 'api',
-		// 			actor,
-		// 			metadata: metadata || {},
-		// 		},
-		// 		context
-		// 	);
+			return registry.updateConsent(consentId, updateData, context);
+		},
 
-		// 	return {
-		// 		consent: updatedConsent,
-		// 		withdrawal,
-		// 	};
-		// },
+		getRecords: async (consentId: string) => {
+			const records = await adapter.findMany({
+				model: 'record',
+				where: [
+					{
+						field: 'consentId',
+						value: consentId,
+					},
+				],
+				sortBy: {
+					field: 'createdAt',
+					direction: 'desc',
+				},
+			});
+
+			return records.map((record) =>
+				validateEntityOutput('record', record, ctx.options)
+			);
+		},
+
+		getWithdrawals: async (consentId: string) => {
+			const withdrawals = await adapter.findMany({
+				model: 'withdrawal',
+				where: [
+					{
+						field: 'consentId',
+						value: consentId,
+					},
+				],
+				sortBy: {
+					field: 'createdAt',
+					direction: 'desc',
+				},
+			});
+
+			return withdrawals.map((withdrawal) =>
+				validateEntityOutput('withdrawal', withdrawal, ctx.options)
+			);
+		},
 	};
+
+	return registry;
 }

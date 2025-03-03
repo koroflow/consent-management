@@ -2,6 +2,13 @@ import type { GenericEndpointContext, RegistryContext } from '~/types';
 import type { ConsentPolicy } from './schema';
 import { getWithHooks } from '~/db/hooks';
 import { validateEntityOutput } from '../definition';
+import type { Where } from '~/db/adapters/types';
+
+export interface FindPolicyParams {
+	domainId?: string;
+	version?: string;
+	includeInactive?: boolean;
+}
 
 /**
  * Creates and returns a set of consent policy-related adapter methods to interact with the database.
@@ -33,7 +40,7 @@ import { validateEntityOutput } from '../definition';
  */
 export function policyRegistry({ adapter, ...ctx }: RegistryContext) {
 	const { createWithHooks, updateWithHooks } = getWithHooks(adapter, ctx);
-	return {
+	const registry = {
 		/**
 		 * Creates a new consent policy record in the database.
 		 * Automatically sets creation timestamp and applies any
@@ -51,7 +58,6 @@ export function policyRegistry({ adapter, ...ctx }: RegistryContext) {
 			const createdPolicy = await createWithHooks({
 				data: {
 					createdAt: new Date(),
-					// isActive: true,
 					...policy,
 				},
 				model: 'consentPolicy',
@@ -65,6 +71,49 @@ export function policyRegistry({ adapter, ...ctx }: RegistryContext) {
 			}
 
 			return createdPolicy as ConsentPolicy;
+		},
+
+		findPolicies: async (params: FindPolicyParams = {}) => {
+			const whereConditions: Where<'consentPolicy'> = [];
+
+			if (!params.includeInactive) {
+				whereConditions.push({
+					field: 'isActive',
+					value: true,
+				});
+			}
+
+			if (params.domainId) {
+				whereConditions.push({
+					field: 'id',
+					value: params.domainId,
+				});
+			}
+
+			if (params.version) {
+				whereConditions.push({
+					field: 'version',
+					value: params.version,
+				});
+			}
+
+			const policies = await adapter.findMany({
+				model: 'consentPolicy',
+				where: whereConditions,
+				sortBy: {
+					field: 'effectiveDate',
+					direction: 'desc',
+				},
+			});
+
+			return policies.map((policy) =>
+				validateEntityOutput('consentPolicy', policy, ctx.options)
+			);
+		},
+
+		findPolicy: async (domainId: string, version?: string) => {
+			const policies = await registry.findPolicies({ domainId, version });
+			return policies[0] || null;
 		},
 
 		/**
@@ -172,4 +221,6 @@ export function policyRegistry({ adapter, ...ctx }: RegistryContext) {
 				: null;
 		},
 	};
+
+	return registry;
 }

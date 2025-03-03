@@ -4,6 +4,11 @@ import { getWithHooks } from '~/db/hooks';
 import { validateEntityOutput } from '../definition';
 import type { Where } from '~/db/adapters/types';
 
+export interface FindDomainParams {
+	name?: string;
+	includeInactive?: boolean;
+}
+
 /**
  * Creates and returns a set of domain-related adapter methods to interact with the database.
  * These methods provide a consistent interface for creating, finding, and updating
@@ -32,7 +37,7 @@ import type { Where } from '~/db/adapters/types';
  */
 export function domainRegistry({ adapter, ...ctx }: RegistryContext) {
 	const { createWithHooks, updateWithHooks } = getWithHooks(adapter, ctx);
-	return {
+	const registry = {
 		/**
 		 * Creates a new domain record in the database.
 		 * Automatically sets creation timestamp and applies any
@@ -50,7 +55,6 @@ export function domainRegistry({ adapter, ...ctx }: RegistryContext) {
 			const createdDomain = await createWithHooks({
 				data: {
 					createdAt: new Date(),
-					// isActive: true,
 					...domain,
 				},
 				model: 'domain',
@@ -69,16 +73,23 @@ export function domainRegistry({ adapter, ...ctx }: RegistryContext) {
 		 * Finds all domains, optionally including inactive ones.
 		 * Returns domains with processed output fields according to the schema configuration.
 		 *
-		 * @param includeInactive - Whether to include inactive domains in the results
+		 * @param params - Optional parameters to filter the results
 		 * @returns Array of domains matching the criteria
 		 */
-		findDomains: async (includeInactive = false) => {
+		findDomains: async (params: FindDomainParams = {}) => {
 			const whereConditions: Where<'domain'> = [];
 
-			if (!includeInactive) {
+			if (!params.includeInactive) {
 				whereConditions.push({
 					field: 'isActive',
 					value: true,
+				});
+			}
+
+			if (params.name) {
+				whereConditions.push({
+					field: 'name',
+					value: params.name,
 				});
 			}
 
@@ -94,6 +105,21 @@ export function domainRegistry({ adapter, ...ctx }: RegistryContext) {
 			return domains.map((domain) =>
 				validateEntityOutput('domain', domain, ctx.options)
 			);
+		},
+
+		/**
+		 * Finds a domain by its name.
+		 * Returns the domain with processed output fields according to the schema configuration.
+		 *
+		 * @param name - The domain name to search for
+		 * @returns The domain object if found, null otherwise
+		 */
+		findDomain: async (name: string) => {
+			const domains = await registry.findDomains({
+				name,
+				includeInactive: false,
+			});
+			return domains[0] || null;
 		},
 
 		/**
@@ -199,4 +225,6 @@ export function domainRegistry({ adapter, ...ctx }: RegistryContext) {
 			return !!domain;
 		},
 	};
+
+	return registry;
 }

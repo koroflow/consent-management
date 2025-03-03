@@ -53,7 +53,7 @@ export function toNextJsHandler(instance: C15TInstance) {
 							// Handle context error silently - the handler will deal with it
 						}
 					);
-				} catch (error) {
+				} catch {
 					// Handle promise rejection silently - the handler will deal with it
 				}
 			}
@@ -85,6 +85,7 @@ export function toNextJsHandler(instance: C15TInstance) {
 			);
 		} catch (error) {
 			// Handle any unexpected errors
+			// biome-ignore lint/suspicious/noConsole: This is a logging error
 			console.error('Unexpected error in c15t handler:', error);
 			return new Response(
 				JSON.stringify({

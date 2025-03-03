@@ -11,7 +11,7 @@ import type { Result, ResultAsync } from 'neverthrow';
  */
 export const logError = <T>(
 	result: Result<T, C15TError>,
-	logger: { error: (message: string, ...args: any[]) => void },
+	logger: { error: (message: string, ...args: unknown[]) => void },
 	message = 'Error occurred:'
 ): Result<T, C15TError> => {
 	return result.mapErr((error) => {
@@ -36,7 +36,7 @@ export const logError = <T>(
  */
 export const logErrorAsync = <T>(
 	resultAsync: ResultAsync<T, C15TError>,
-	logger: { error: (message: string, ...args: any[]) => void },
+	logger: { error: (message: string, ...args: unknown[]) => void },
 	message = 'Error occurred:'
 ): ResultAsync<T, C15TError> => {
 	return resultAsync.mapErr((error) => {

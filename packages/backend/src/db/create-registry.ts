@@ -10,6 +10,7 @@ import {
 	purposeJunctionRegistry,
 	withdrawalRegistry,
 	geoLocationRegistry,
+	policyRegistry,
 	consentGeoLocationRegistry,
 } from './schema/index';
 
@@ -22,6 +23,7 @@ export const createRegistry = (ctx: RegistryContext) => {
 		...consentGeoLocationRegistry(ctx),
 		...purposeJunctionRegistry(ctx),
 		...purposeRegistry(ctx),
+		...policyRegistry(ctx),
 		...recordRegistry(ctx),
 		...userRegistry(ctx),
 		...withdrawalRegistry(ctx),
