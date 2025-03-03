@@ -34,7 +34,6 @@ export {
 export {
 	validateField,
 	createFieldValueSchema,
-	createRecordSchema,
 } from './zod-fields';
 
 // Export field inference utilities
@@ -43,16 +42,12 @@ export type {
 	InferFieldInput,
 	InferFieldsOutput,
 	InferFieldsInput,
-	InferFieldsInputClient,
-	TransformInputFn,
 	TransformOutputFn,
 } from './field-inference';
 
 // Export SuperJSON utilities
 export {
 	getDatabaseType,
-	setDatabaseType,
-	shouldUseSuperJson,
 	transformForDb,
 	parseFromDb,
 } from './superjson-utils';

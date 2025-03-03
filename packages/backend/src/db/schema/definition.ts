@@ -15,7 +15,6 @@ import {
 } from './index';
 import type { PluginSchema } from '../core/types';
 import type { InferTableShape } from './schemas';
-import { z } from 'zod';
 
 /**
  * Retrieves all consent-related database table definitions
@@ -138,68 +137,6 @@ export type EntityInputFields<TableName extends keyof C15TDBSchema> = Omit<
 	InferTableShape<TableName>,
 	'id' | 'createdAt' | 'updatedAt'
 >;
-
-/**
- * Validates input data against table schema using Zod
- *
- * This function validates and transforms input data according to the
- * schema definition for a specific table. It ensures that all required
- * fields are present, all values match their expected types, and no
- * disallowed fields are included.
- *
- * @typeParam TableName - The table name from C15TDBSchema
- * @param tableName - The name of the table to validate against
- * @param data - The data to validate
- * @param options - The C15TOptions instance
- * @param action - Whether this is a create or update operation ('create' by default)
- * @returns Validated and typed data
- * @throws {Error} If the table is not found or validation fails
- *
- * @remarks
- * During updates (`action: 'update'`), required field validation may be more
- * lenient as only the fields being updated need to be provided.
- *
- * @example
- * ```typescript
- * // Validate user input data
- * try {
- *   const validUserData = validateEntityInput(
- *     'user',
- *     { email: 'user@example.com', firstName: 'John' },
- *     options
- *   );
- *
- *   // validUserData is now typed as EntityInputFields<'user'>
- *   saveToDatabase(validUserData);
- * } catch (error) {
- *   console.error('Validation failed:', error.message);
- * }
- * ```
- */
-export function validateEntityInput<TableName extends keyof C15TDBSchema>(
-	tableName: TableName,
-	data: Record<string, unknown>,
-	options: C15TOptions,
-	action: 'create' | 'update' = 'create'
-): EntityInputFields<TableName> {
-	const tables = getConsentTables(options);
-	const table = tables[tableName];
-
-	if (!table) {
-		throw new Error(`Table ${tableName} not found`);
-	}
-	// Validate and return data using Zod schema
-	const baseSchema =
-		action === 'create' ? table.schema : table.schema.partial();
-	// const excludedFields = ['id', 'createdAt', 'updatedAt'];
-	const schema = baseSchema.extend({
-		id: z.never(),
-		createdAt: z.never(),
-		updatedAt: z.never(),
-	});
-
-	return schema.parse(data) as EntityInputFields<TableName>;
-}
 
 /**
  * Validates output data against table schema using Zod

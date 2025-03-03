@@ -88,11 +88,9 @@ export { getConsentTables, type C15TDBSchema } from './definition';
  * @see {@link parseInputData} - Validates input data against a table schema
  * @see {@link parseEntityOutputData} - Validates output data against a table schema
  * @see {@link getAllFields} - Retrieves all fields from a schema
- * @see {@link mergeSchema} - Merges multiple schema definitions
  */
 export {
 	parseInputData,
 	parseEntityOutputData,
 	getAllFields,
-	mergeSchema,
 } from './parser';

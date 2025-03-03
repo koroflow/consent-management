@@ -267,29 +267,3 @@ export function validateField<TFieldType extends FieldType>(
 ): ValidatedField<TFieldType> {
 	return fieldSchema.parse(field) as ValidatedField<TFieldType>;
 }
-
-/**
- * Creates a Zod schema for a record of fields
- */
-export function createRecordSchema<T extends Record<string, Field>>(
-	fields: T
-): z.ZodObject<{
-	[K in keyof T]: z.ZodType<InferValueType<T[K]['type']>>;
-}> {
-	const shape: Record<string, z.ZodType> = {};
-
-	for (const [key, field] of Object.entries(fields)) {
-		const validatedField = validateField(field);
-		const valueSchema = createFieldValueSchema(validatedField);
-
-		if (field.required) {
-			shape[key] = valueSchema;
-		} else {
-			shape[key] = valueSchema.optional();
-		}
-	}
-
-	return z.object(shape) as z.ZodObject<{
-		[K in keyof T]: z.ZodType<InferValueType<T[K]['type']>>;
-	}>;
-}

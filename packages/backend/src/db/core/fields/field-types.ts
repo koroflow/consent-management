@@ -1,6 +1,3 @@
-import type { z } from 'zod';
-import type { fieldSchema } from './zod-fields';
-
 /**
  * The set of field types supported by C15T.
  * Specifies the data types that can be used for database fields.
@@ -177,15 +174,6 @@ export type FieldConfig<TFieldType extends FieldType> = {
 };
 
 /**
- * Type for a validated field configuration from Zod
- */
-export type ValidatedField<TFieldType extends FieldType> = z.infer<
-	typeof fieldSchema
-> & {
-	type: TFieldType;
-};
-
-/**
  * Helper type to infer the base JavaScript type from a field type.
  */
 export type InferValueType<TFieldType extends FieldType> =
@@ -243,15 +231,3 @@ export type InferValueType<TFieldType extends FieldType> =
  */
 export type Field<TFieldType extends FieldType = FieldType> =
 	FieldConfig<TFieldType>;
-
-/**
- * Field definition for use in plugins.
- * A simplified version of Field that excludes advanced features.
- *
- * @remarks
- * This type is used when plugins need to define their own fields
- * but with a restricted set of capabilities for security and consistency.
- * It omits certain advanced features like custom database field names
- * and sortability configuration.
- */
-export type PluginField = Omit<Field, 'fieldName' | 'sortable' | 'references'>;

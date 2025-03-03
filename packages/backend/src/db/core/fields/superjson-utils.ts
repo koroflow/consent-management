@@ -35,21 +35,7 @@ export function normalizeDatabaseType(provider?: string): DatabaseType {
 }
 
 // Global database type setting that can be configured at startup
-let currentDatabaseType: DatabaseType = 'unknown';
-
-/**
- * Set the current database type for the application
- * This should be called early in the application startup process
- *
- * @param dbType - The database type or provider string
- */
-export function setDatabaseType(dbType: string | DatabaseType): void {
-	currentDatabaseType =
-		typeof dbType === 'string' &&
-		!['sqlite', 'postgresql', 'mysql', 'unknown'].includes(dbType)
-			? normalizeDatabaseType(dbType)
-			: (dbType as DatabaseType);
-}
+const currentDatabaseType: DatabaseType = 'unknown';
 
 /**
  * Get the current database type
@@ -58,39 +44,6 @@ export function setDatabaseType(dbType: string | DatabaseType): void {
  */
 export function getDatabaseType(): DatabaseType {
 	return currentDatabaseType;
-}
-
-/**
- * Determines if SuperJSON should be used for a specific field type
- * based on the current database type
- *
- * @param fieldType - The field type to check
- * @param dbType - The database type (defaults to current global setting)
- * @returns Whether SuperJSON should be used
- */
-export function shouldUseSuperJson(
-	fieldType: 'json' | 'date',
-	dbType: DatabaseType = currentDatabaseType
-): boolean {
-	if (dbType === 'sqlite') {
-		// SQLite needs SuperJSON for all complex types
-		return true;
-	}
-
-	if (dbType === 'mysql') {
-		// MySQL benefits from SuperJSON for dates to handle timezone issues
-		// and for JSON fields with complex types
-		return true;
-	}
-
-	if (dbType === 'postgresql') {
-		// PostgreSQL only needs SuperJSON for complex JS types in JSON fields
-		// Basic JSON and dates are handled well natively
-		return fieldType === 'json';
-	}
-
-	// Default to using SuperJSON for unknown database types
-	return true;
 }
 
 /**

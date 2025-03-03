@@ -45,31 +45,6 @@ export type FieldTransformers<TFieldType extends FieldType> = {
 };
 
 /**
- * Extends the base field configuration with type-aware transform objects.
- *
- * @template TFieldType - The field type that determines the configuration
- *
- * @example
- * ```typescript
- * // Configuration for a string field with transforms
- * const emailConfig: TypedFieldOptions<'string'> = {
- *   required: true,
- *   transform: {
- *     input: (value) => value.toLowerCase().trim(),
- *     output: (value) => value
- *   },
- *   validator: (value) => value.includes('@') ? null : 'Invalid email'
- * };
- * ```
- */
-export type TypedFieldOptions<TFieldType extends FieldType> = Omit<
-	FieldConfig<TFieldType>,
-	'transform'
-> & {
-	transform?: FieldTransformers<TFieldType>;
-};
-
-/**
  * Configuration options specific to number fields.
  * Provides additional validation options for number fields.
  *
@@ -217,13 +192,6 @@ export const COMMON_TIMEZONES = {
 	// South America
 	SAO_PAULO: 'America/Sao_Paulo',
 } as const;
-
-/**
- * Type representing common timezone identifiers.
- * String literal union type of common IANA timezone identifiers.
- */
-export type CommonTimezone =
-	(typeof COMMON_TIMEZONES)[keyof typeof COMMON_TIMEZONES];
 
 /**
  * Configuration options specific to timezone fields.

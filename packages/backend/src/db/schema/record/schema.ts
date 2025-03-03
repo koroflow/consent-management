@@ -39,17 +39,3 @@ export const recordSchema = z.object({
  * that are part of the consent record entity.
  */
 export type inferRecord = z.infer<typeof recordSchema>;
-
-export const recordTypeEnum = z.enum([
-	'form_submission',
-	'api_call',
-	'banner_interaction',
-	'preference_center',
-	'verbal_consent',
-	'offline_consent',
-	'partner_consent',
-	'implied_consent',
-	'consent_migration',
-	'withdrawal',
-	'other',
-]);

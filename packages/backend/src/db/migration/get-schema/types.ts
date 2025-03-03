@@ -16,13 +16,3 @@ export interface TableSchemaDefinition {
  * Maps table names to their definitions
  */
 export type SchemaDefinition = Record<string, TableSchemaDefinition>;
-
-/**
- * Internal type used during schema processing
- * Represents a table with its fields and metadata
- */
-export interface TableDefinition {
-	EntityName?: string;
-	fields?: Record<string, Field>;
-	order?: number;
-}

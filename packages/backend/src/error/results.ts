@@ -98,29 +98,3 @@ export const safeResultAsync = <T>(
 			})
 	);
 };
-
-/**
- * Helper to convert C15TError instances back to traditional thrown errors
- * Useful for backward compatibility with existing code that expects errors to be thrown
- */
-export const toThrowable = <T>(result: C15TResult<T>): T => {
-	return result.match(
-		(value: T) => value,
-		(error: C15TError) => {
-			throw error;
-		}
-	);
-};
-
-/**
- * Helper to convert async Result to a throwing Promise
- * Useful for backward compatibility with existing code that expects promises with thrown errors
- */
-export const toPromise = <T>(result: C15TResultAsync<T>): Promise<T> => {
-	return new Promise<T>((resolve, reject) => {
-		result.match(
-			(value: T) => resolve(value),
-			(error: C15TError) => reject(error)
-		);
-	});
-};
