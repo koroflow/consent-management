@@ -19,9 +19,8 @@ const setConsentSchema = z.object({
 	metadata: z.record(z.any()).optional(),
 });
 
-type SetConsentRequest = z.infer<typeof setConsentSchema>;
 
-interface SetConsentResponse {
+export interface SetConsentResponse {
 	success: boolean;
 	consentId: string;
 	preferences: {
@@ -98,116 +97,94 @@ export const setConsent = createAuthEndpoint(
 	'/consent/set',
 	{
 		method: 'POST',
+		body: setConsentSchema,
 	},
 	async (ctx) => {
 		try {
 			const validatedData = setConsentSchema.safeParse(ctx.body);
 
-			// if (!validatedData.success) {
-			// 	throw new APIError({
-			// 		message: 'Invalid consent data provided',
-			// 		status: 'BAD_REQUEST',
-			// 		details: validatedData.error.errors,
-			// 	});
-			// }
+			if (!validatedData.success) {
+				throw new APIError('BAD_REQUEST', {
+					message: 'Invalid consent data provided',
+					details: validatedData.error.errors,
+				});
+			}
 
 			const params = validatedData.data;
 			const { registry } = ctx.context as C15TContext;
 
-			// if (!registry) {
-			// 	throw new APIError({
-			// 		message: 'registry not available',
-			// 		status: 'INTERNAL_SERVER_ERROR',
-			// 	});
-			// }
+			if (!registry) {
+				throw new APIError('INTERNAL_SERVER_ERROR', {
+					message: 'Registry not available',
+					status: 503,
+				});
+			}
 
 			// Check if user exists, create if not
-			// let user = await registry.crea();
+			let user = await registry.findUserByExternalId(params.userId);
 
-			// if (!user) {
-			const user = await registry.createUser({
-				// id: "test",
-				// externalId: params?.userId,
-				isIdentified: false,
-				createdAt: new Date(),
-			});
-			console.log(user);
-			// ctx.logger?.info?.(`User created: ${user}`);
-			// }
+			if (!user) {
+				user = await registry.createUser({
+					externalId: params.userId,
+					isIdentified: false,
+					createdAt: new Date(),
+				});
 
-			// if (!user) {
-			// 	throw new APIError({
-			// 		message: 'Failed to create user',
-			// 		status: 'INTERNAL_SERVER_ERROR',
-			// 	});
-			// }
+				if (!user) {
+					throw new APIError('INTERNAL_SERVER_ERROR', {
+						message: 'Failed to create user',
+						status: 503,
+					});
+				}
+			}
 
 			const now = new Date();
 
-			// // Create consent record
-			// const consent = await registry.createRecord({
-			//   // id: crypto.randomUUID(),
-			//   //@ts-expect-error
-			//   userId: user?.id,
-			//   // entityType: 'consent',
-			//   // entityId: params?.domain,
-			//   actionType: 'set_consent',
-			//   details: {
-			//     preferences: params?.preferences,
-			//     policyVersion: params?.policyVersion,
-			//   },
-			//   // metadata: params?.metadata,
-			//   // ipAddress: ctx.request?.ip,
-			// })
-			// const consent = await storage.records.create({
-			// 	id: crypto.randomUUID(),
-			// 	userId: user.id,
-			// 	entityType: 'consent',
-			// 	entityId: params.domain,
-			// 	actionType: 'set_consent',
-			// 	details: {
-			// 		preferences: params.preferences,
-			// 		policyVersion: params.policyVersion,
-			// 	},
-			// 	metadata: params.metadata,
-			// 	ipAddress: ctx.request?.ip,
-			// 	userAgent: ctx.request?.headers?.['user-agent'],
-			// 	createdAt: now,
-			// });
+			// Create consent record
+			const consent = await registry.createRecord({
+				userId: user.id,
+				actionType: 'set_consent',
+				details: {
+					preferences: params.preferences,
+					policyVersion: params.policyVersion,
+				},
+				// metadata: params.metadata,
+				//@ts-expect-error
+				ipAddress: ctx.request?.ip || '1.1.1',
+				//@ts-expect-error
+				userAgent: ctx.request?.headers?.['user-agent'] || 'test',
+				createdAt: now,
+			});
 
-			// // Create audit log
-			// await storage.records.create({
-			// 	id: crypto.randomUUID(),
-			// 	userId: user.id,
-			// 	entityType: 'audit',
-			// 	entityId: consent.id,
-			// 	actionType: 'create_consent',
-			// 	details: {
-			// 		preferences: params.preferences,
-			// 		policyVersion: params.policyVersion,
-			// 	},
-			// 	metadata: {
-			// 		source: 'api',
-			// 		...params.metadata,
-			// 	},
-			// 	ipAddress: ctx.request?.ip,
-			// 	userAgent: ctx.request?.headers?.['user-agent'],
-			// 	createdAt: now,
-			// });
+			// Create audit log
+			await registry.createAuditLog({
+				userId: user.id,
+				entityType: 'consent',
+				entityId: consent.id,
+				actionType: 'create_consent',
+				changes: {
+					preferences: params.preferences,
+					policyVersion: params.policyVersion,
+				},
+				metadata: {
+					source: 'api',
+					...params.metadata,
+				},
+				//@ts-expect-error
+				ipAddress: ctx.request?.ip || '1.1.1',
+				//@ts-expect-error
+				userAgent: ctx.request?.headers?.['user-agent'] || 'test',
+				createdAt: now,
+			});
 
-			// const response: SetConsentResponse = {
-			// 	success: true,
-			// 	consentId: consent.id,
-			// 	preferences: params.preferences,
-			// 	timestamp: now.toISOString(),
-			// };
-
-			return {
+			const response: SetConsentResponse = {
 				success: true,
-				consentId: '2',
-				preferences: '2',
+				consentId: consent.id,
+				preferences: params.preferences,
 				timestamp: now.toISOString(),
 			};
+
+			return response;
 		} catch (error) {
 			const context = ctx.context as C15TContext;
 			context.logger?.error?.('Error setting consent:', error);
@@ -224,7 +201,7 @@ export const setConsent = createAuthEndpoint(
 
 			throw new APIError('INTERNAL_SERVER_ERROR', {
 				message: 'Failed to set consent preferences',
-				status: 'INTERNAL_SERVER_ERROR',
+				status: 503,
 				details:
 					error instanceof Error ? { message: error.message } : { error },
 			});

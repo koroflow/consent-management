@@ -215,6 +215,8 @@ export type EntityInputFields<TableName extends keyof C15TDBSchema> = {
  * ```
  */
 export type EntityOutputFields<TableName extends keyof C15TDBSchema> = {
+	id: string;
+} & {
 	[K in keyof TableFields<TableName> as TableFields<TableName>[K] extends {
 		returned: false;
 	}
