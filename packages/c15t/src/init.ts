@@ -23,13 +23,7 @@ import { getConsentTables } from './db';
 import { getAdapter } from './db/utils';
 import { createRegistry } from './db/create-registry';
 import type { EntityName } from './db/core/types';
-import {
-	getBaseURL,
-	generateId,
-	createLogger,
-	env,
-	isProduction,
-} from './utils';
+import { getBaseURL, createLogger, env, isProduction } from './utils';
 import {
 	failAsync,
 	fromPromise,
@@ -38,6 +32,7 @@ import {
 } from './error';
 import { type C15TResult, fail, ok } from './error/results';
 import { defu } from 'defu';
+import { generateId } from './db/core/fields';
 
 /**
  * Helper function to convert a Promise to a C15T-specific ResultAsync
@@ -131,11 +126,11 @@ export const init = async <P extends C15TPlugin[]>(
 			// Create ID generator
 			const generateIdFunc = ({
 				model,
-				size,
+				size = 16,
 			}: { model: EntityName; size?: number }) => {
 				return (
 					finalOptions?.advanced?.generateId?.({ model, size }) ||
-					generateId(size || 21)
+					generateId(getConsentTables(finalOptions)[model].entityPrefix)
 				);
 			};
 

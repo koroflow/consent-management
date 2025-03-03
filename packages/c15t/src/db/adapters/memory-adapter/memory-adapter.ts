@@ -7,8 +7,8 @@ import type {
 	EntityOutput,
 } from '~/db/core/types';
 import type { TableFields } from '~/db/schema/definition';
-import type { Field, Primitive } from '~/db/core/fields';
-import { generateId } from '~/utils';
+import { generateId, type Field, type Primitive } from '~/db/core/fields';
+
 import { applyDefaultValue } from '../utils';
 import type { Adapter, Where } from '../types';
 
@@ -155,7 +155,7 @@ const createEntityTransformer = (options: C15TOptions) => {
 								? options.advanced.generateId({
 										model,
 									})
-								: data.id || generateId(),
+								: data.id || generateId(schema[model].entityPrefix),
 						};
 
 			const fields = schema[model].fields;

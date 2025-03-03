@@ -8,16 +8,21 @@ export interface StatusResponse {
 	status: 'ok' | 'error';
 	version: string;
 	timestamp: string;
+	storage: {
+		type: string;
+		available: boolean;
+	};
 }
 
 /**
  * Status endpoint that returns information about the c15t instance.
  *
  * This endpoint provides basic operational information about the c15t instance,
- * including its version, current timestamp, and consent configuration settings.
+ * including its version, current timestamp, and storage adapter configuration.
  * It can be used for:
  * - Health checks to verify the API is operational
  * - Version verification
+ * - Storage adapter verification
  * - Retrieving configuration information about the consent system
  *
  * The endpoint does not require authentication and is accessible via a GET request.
@@ -29,6 +34,10 @@ export interface StatusResponse {
  *   "status": "ok",
  *   "version": "1.0.0",
  *   "timestamp": "2023-04-01T12:34:56.789Z",
+ *   "storage": {
+ *     "type": "MemoryAdapter",
+ *     "available": true
+ *   }
  * }
  * ```
  */
@@ -42,6 +51,10 @@ export const status = createAuthEndpoint(
 			status: 'ok',
 			version: '1.0.0',
 			timestamp: new Date().toISOString(),
+			storage: {
+				type: ctx.context?.storage?.constructor.name ?? 'MemoryAdapter',
+				available: !!ctx.context?.storage,
+			},
 		};
 
 		return response;

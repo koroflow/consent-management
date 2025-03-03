@@ -4,7 +4,6 @@ import type {
 } from 'node_modules/kysely/dist/esm/parser/binary-operation-parser';
 import { getConsentTables } from '../..';
 import type { C15TOptions } from '../../../types';
-import { generateId } from '../../../utils';
 import { applyDefaultValue } from '../utils';
 import type { Database, KyselyDatabaseType } from './types';
 import type {
@@ -25,7 +24,7 @@ import type {
 } from '~/db/core/types';
 import type { TableReference } from 'node_modules/kysely/dist/esm/parser/table-parser';
 import type { TableFields } from '~/db/schema/definition';
-import type { Field, Primitive } from '~/db/core/fields';
+import { generateId, type Field, type Primitive } from '~/db/core/fields';
 import type { InsertExpression } from 'node_modules/kysely/dist/esm/parser/insert-values-parser';
 import type { Adapter, Where } from '../types';
 import superjson from 'superjson';
@@ -295,8 +294,6 @@ const createEntityTransformer = (
 		return schema[model].entityName as TableReference<Database>;
 	}
 
-	const useDatabaseGeneratedId = !options?.advanced?.generateId;
-
 	return {
 		/**
 		 * Transforms input data from c15t format to database format
@@ -313,16 +310,20 @@ const createEntityTransformer = (
 			model: EntityType,
 			action: 'create' | 'update'
 		): InsertExpression<Database, keyof Database> {
-			const transformedData: Record<string, unknown> =
-				useDatabaseGeneratedId || action === 'update'
-					? {}
-					: {
-							id: options.advanced?.generateId
-								? options.advanced.generateId({
-										model,
-									})
-								: data.id || generateId(),
-						};
+			// Initialize with empty object
+			const transformedData: Record<string, unknown> = {};
+
+			// Handle ID for create operations
+			if (action === 'create') {
+				// If an ID is provided in the input data, use it
+				// Otherwise generate a new one with the appropriate prefix
+				transformedData.id =
+					data.id ||
+					(options.advanced?.generateId
+						? options.advanced.generateId({ model })
+						: generateId(schema[model].entityPrefix));
+			}
+
 			const fields = schema[model].fields;
 			for (const field in fields) {
 				if (Object.hasOwn(fields, field)) {
@@ -338,6 +339,7 @@ const createEntityTransformer = (
 					}
 				}
 			}
+
 			return transformedData as InsertExpression<Database, keyof Database>;
 		},
 
@@ -661,11 +663,14 @@ export const kyselyAdapter =
 					model,
 					[]
 				);
-				return transformOutput(
+
+				const output = transformOutput(
 					result,
 					model,
 					select as string[]
 				) as unknown as Result;
+
+				return output;
 			},
 			/**
 			 * Finds a single record matching the where conditions

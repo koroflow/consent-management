@@ -1,10 +1,13 @@
 //@ts-nocheck
 
-import { getConsentTables } from '../..';
 import { C15TError } from '~/error';
-import type { Adapter, C15TOptions, Where } from '~/types';
-import { generateId } from '~/utils';
+import type { C15TOptions } from '~/types';
+
 import { applyDefaultValue } from '../utils';
+import { generateId } from '~/db/core/fields';
+import { getConsentTables } from '~/db';
+import type { Where } from '../types';
+import type { EntityName } from '~/db/core/types';
 
 /**
  * Configuration options for the Prisma adapter
@@ -156,7 +159,7 @@ const createEntityTransformer = (
 								? options.advanced.generateId({
 										model,
 									})
-								: data.id || generateId(),
+								: data.id || generateId(schema[model].entityPrefix),
 						};
 			const fields = schema[model].fields;
 			for (const field in fields) {
@@ -227,7 +230,7 @@ const createEntityTransformer = (
 		 * @param where - The where conditions
 		 * @returns Prisma-compatible where clause object
 		 */
-		convertWhereClause<EntityType>(
+		convertWhereClause<EntityType extends EntityName>(
 			model: EntityType,
 			where?: Where<EntityType>[]
 		) {

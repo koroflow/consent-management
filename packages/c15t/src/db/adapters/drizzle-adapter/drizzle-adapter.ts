@@ -14,9 +14,10 @@ import {
 import { getConsentTables } from '../..';
 import { C15TError } from '~/error';
 import type { Adapter, C15TOptions, Where } from '~/types';
-import { generateId } from '~/utils';
+
 import { applyDefaultValue } from '../utils';
 import type { EntityName } from '~/db/core/types';
+import { generateId } from '~/db/core/fields';
 
 /**
  * Database interface for Drizzle ORM integration
@@ -223,7 +224,7 @@ const createEntityTransformer = (
 								? options.advanced.generateId({
 										model,
 									})
-								: data.id || generateId(),
+								: data.id || generateId(schema[model].entityPrefix),
 						};
 			const fields = schema[model].fields;
 			for (const field in fields) {

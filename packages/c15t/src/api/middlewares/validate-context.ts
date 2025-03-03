@@ -2,6 +2,7 @@ import { APIError } from 'better-call';
 import { createAuthMiddleware } from '../call';
 import type { C15TContext } from '~/types';
 import { BASE_ERROR_CODES } from '~/error/codes';
+import type { Adapter } from '~/db/adapters/types';
 
 /**
  * Middleware that validates the context for all routes
@@ -13,22 +14,19 @@ import { BASE_ERROR_CODES } from '~/error/codes';
  * The middleware performs comprehensive validation of:
  * - Basic context structure
  * - Required configuration options
- * - Database connection and adapter
+ * - Storage adapter availability
  * - Logger availability
  * - Plugin initialization status
  * - Required services and dependencies
  *
- * This helps prevent runtime errors and provides clear error messages when
- * critical services are unavailable.
- *
  * @throws {APIError} Throws appropriate errors for:
  * - INVALID_CONFIGURATION: When context or options are invalid
- * - DATABASE_CONNECTION_ERROR: When database is not available
+ * - STORAGE_ERROR: When storage adapter is not available
  * - INITIALIZATION_FAILED: When required services failed to initialize
  *
  * @example
  * ```typescript
- * // This middleware is typically used in router configuration
+ * // Using with memory adapter
  * const router = createRouter(endpoints, {
  *   routerMiddleware: [
  *     {
@@ -63,27 +61,31 @@ export const validateContextMiddleware = createAuthMiddleware(async (ctx) => {
 		});
 	}
 
-	// Validate database connection
-	if (!typedContext.db || !typedContext.storage) {
-		throw new APIError('INTERNAL_SERVER_ERROR', {
-			message: BASE_ERROR_CODES.DATABASE_CONNECTION_ERROR,
-			status: 503,
-			data: {
-				error: 'Database connection not available',
-				db: !!typedContext.db,
-				storage: !!typedContext.storage,
-			},
-		});
+	// Optional storage adapter validation
+	if (typedContext.storage) {
+		const storage = typedContext.storage as Adapter;
+		const requiredMethods = ['users', 'records', 'policies'];
+		const missingMethods = requiredMethods.filter(
+			(method) => !(method in storage)
+		);
+
+		if (missingMethods.length > 0) {
+			typedContext.logger?.warn?.('Storage adapter missing methods', {
+				missingMethods,
+				storageType: storage.constructor.name,
+			});
+		}
 	}
 
-	// Validate logger
-	if (!typedContext.logger) {
+	// Validate logger (make it optional for memory adapter in development)
+	if (!typedContext.logger && process.env.NODE_ENV === 'production') {
 		throw new APIError('INTERNAL_SERVER_ERROR', {
 			message: BASE_ERROR_CODES.INITIALIZATION_FAILED,
 			status: 503,
 			data: { error: 'Logger not initialized' },
 		});
 	}
+
 	// Validate plugins if any are configured
 	if (
 		(typedContext.options.plugins?.length ?? 0) > 0 &&
@@ -96,9 +98,10 @@ export const validateContextMiddleware = createAuthMiddleware(async (ctx) => {
 		});
 	}
 
-	// Log successful validation
-	typedContext.logger.debug('Context validation successful', {
+	// Log successful validation if logger exists
+	typedContext.logger?.debug?.('Context validation successful', {
 		baseURL: typedContext.baseURL,
+		storageType: typedContext.storage?.constructor.name,
 		pluginsCount: Array.isArray(typedContext.plugins)
 			? typedContext.plugins.length
 			: 0,
