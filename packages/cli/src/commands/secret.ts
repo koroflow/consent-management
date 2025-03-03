@@ -1,4 +1,4 @@
-import { logger } from '@c15t/new';
+import { logger } from '@c15t/backend';
 import chalk from 'chalk';
 import { Command } from 'commander';
 import Crypto from 'node:crypto';

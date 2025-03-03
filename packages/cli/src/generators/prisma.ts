@@ -1,4 +1,4 @@
-import { getConsentTables } from '@c15t/new/db';
+import { getConsentTables } from '@c15t/backend/db';
 import { produceSchema } from '@mrleebo/prisma-ast';
 import { existsSync } from 'node:fs';
 import path from 'node:path';

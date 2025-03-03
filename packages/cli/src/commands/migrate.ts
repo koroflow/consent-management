@@ -5,8 +5,8 @@ import path from 'node:path';
 import yoctoSpinner from 'yocto-spinner';
 import chalk from 'chalk';
 import prompts from 'prompts';
-import { logger } from '@c15t/new';
-import { getAdapter, getMigrations } from '@c15t/new/db';
+import { logger } from '@c15t/backend';
+import { getAdapter, getMigrations } from '@c15t/backend/db';
 import { getConfig } from '../utils/get-config';
 
 export async function migrateAction(opts: unknown) {

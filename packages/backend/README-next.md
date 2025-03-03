@@ -8,18 +8,18 @@ Follow these steps to add c15t to your Next.js project:
 
 1. Install the c15t package:
    ```bash
-   npm install @c15t/new
+   npm install @c15t/backend
    # or
-   yarn add @c15t/new
+   yarn add @c15t/backend
    # or
-   pnpm add @c15t/new
+   pnpm add @c15t/backend
    ```
 
 2. Create a shared c15t instance:
    ```typescript
    // lib/c15t.ts
-   import { c15t } from '@c15t/new';
-   import { memoryAdapter } from '@c15t/new/storage/memory';
+   import { c15t } from '@c15t/backend';
+   import { memoryAdapter } from '@c15t/backend/storage/memory';
    
    export const C15TInstance = c15t({
      appName: 'My Next.js App',
@@ -35,7 +35,7 @@ Follow these steps to add c15t to your Next.js project:
 3. Create the API route handler:
    ```typescript
    // app/api/c15t/[...route]/route.ts
-   import { toNextJsHandler } from '@c15t/new/integrations/next';
+   import { toNextJsHandler } from '@c15t/backend/integrations/next';
    import { C15TInstance } from '@/lib/c15t';
    
    // Export all HTTP methods
@@ -45,7 +45,7 @@ Follow these steps to add c15t to your Next.js project:
 4. Create a React client for client components:
    ```typescript
    // lib/consent-client.ts
-   import { createConsentClient } from '@c15t/new/integrations/react';
+   import { createConsentClient } from '@c15t/backend/integrations/react';
    
    export const consentClient = createConsentClient({
      baseUrl: '/api/c15t',
@@ -112,7 +112,7 @@ export function AnalyticsContent() {
 #### Server Component with Consent Check
 ```tsx
 // app/protected-content/page.tsx
-import { getServerConsent } from '@c15t/new/integrations/server';
+import { getServerConsent } from '@c15t/backend/integrations/server';
 import { headers } from 'next/headers';
 import { C15TInstance } from '@/lib/c15t';
 
@@ -142,7 +142,7 @@ export default async function ProtectedPage() {
 ```tsx
 // app/actions.ts
 'use server'
-import { setServerConsent } from '@c15t/new/integrations/server';
+import { setServerConsent } from '@c15t/backend/integrations/server';
 import { cookies } from 'next/headers';
 import { C15TInstance } from '@/lib/c15t';
 
@@ -172,7 +172,7 @@ export async function rejectAllCookies() {
 ```typescript
 // middleware.ts
 import { NextResponse } from 'next/server';
-import { checkConsentCookie } from '@c15t/new/integrations/next';
+import { checkConsentCookie } from '@c15t/backend/integrations/next';
 
 export function middleware(request) {
   // Check if user has provided consent
@@ -199,8 +199,8 @@ For production use, consider using a persistent storage adapter:
 
 ```typescript
 // lib/c15t.ts
-import { c15t } from '@c15t/new';
-import { cookieAdapter } from '@c15t/new/storage/cookie';
+import { c15t } from '@c15t/backend';
+import { cookieAdapter } from '@c15t/backend/storage/cookie';
 
 export const C15TInstance = c15t({
   // ... other config
@@ -217,7 +217,7 @@ You can define custom consent categories beyond the standard ones:
 
 ```typescript
 // lib/consent-client.ts
-import { createConsentClient } from '@c15t/new/integrations/react';
+import { createConsentClient } from '@c15t/backend/integrations/react';
 
 export const consentClient = createConsentClient({
   defaultPreferences: {

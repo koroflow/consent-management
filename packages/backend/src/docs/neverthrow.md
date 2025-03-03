@@ -56,8 +56,8 @@ The c15t library provides two versions of most core functions:
 2. New functions with the `WithResult` suffix that return `Result` objects
 
 ```typescript
-import { c15tWithResult } from '@c15t/new';
-import { memoryAdapter } from '@c15t/new/db/adapters/memory';
+import { c15tWithResult } from '@c15t/backend';
+import { memoryAdapter } from '@c15t/backend/db/adapters/memory';
 
 // Create a c15t instance with Result-based error handling
 const c15tInstance = c15tWithResult({
@@ -141,7 +141,7 @@ c15tInstance.$context
 You can convert between Results and Promises:
 
 ```typescript
-import { toPromise, fromC15TPromise } from '@c15t/new/utils';
+import { toPromise, fromC15TPromise } from '@c15t/backend/utils';
 
 // Convert Result to Promise (might throw)
 const contextPromise = toPromise(c15tInstance.$context);

@@ -3,12 +3,12 @@ import { getConfig } from '../utils/get-config';
 import { z } from 'zod';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
-import { logger } from '@c15t/new';
+import { logger } from '@c15t/backend';
 import yoctoSpinner from 'yocto-spinner';
 import prompts from 'prompts';
 import fs from 'node:fs/promises';
 import chalk from 'chalk';
-import { getAdapter } from '@c15t/new/db';
+import { getAdapter } from '@c15t/backend/db';
 import { getGenerator } from '../generators';
 
 export async function generateAction(opts: unknown) {

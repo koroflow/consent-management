@@ -1,4 +1,4 @@
-import type { Adapter, C15TOptions } from '@c15t/new/types';
+import type { Adapter, C15TOptions } from '@c15t/backend/types';
 
 export type SchemaGenerator = (opts: {
 	file?: string;

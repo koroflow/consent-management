@@ -1,4 +1,4 @@
-import { c15tInstance } from '@c15t/new';
+import { c15tInstance } from '@c15t/backend';
 
 import { LibsqlDialect } from "@libsql/kysely-libsql";
 const libsql = new LibsqlDialect({

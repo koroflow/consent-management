@@ -1,14 +1,14 @@
 import { loadConfig } from 'c12';
-import { logger } from '@c15t/new';
+import { logger } from '@c15t/backend';
 import path from 'node:path';
 // @ts-ignore
 import babelPresetTypescript from '@babel/preset-typescript';
 // @ts-ignore
 import babelPresetReact from '@babel/preset-react';
 import fs from 'node:fs';
-import { C15TError } from '@c15t/new/error';
+import { C15TError } from '@c15t/backend/error';
 import { addSvelteKitEnvModules } from './add-svelte-kit-env-modules';
-import type { C15TOptions } from '@c15t/new/types';
+import type { C15TOptions } from '@c15t/backend/types';
 
 /**
  * List of possible config file names and locations to search
@@ -413,7 +413,7 @@ export async function getConfig({
 			);
 			logger.info('\n📝 Create a c15t.ts file with your configuration:');
 			logger.info(`
-import { c15t as c15tInstance } from '@c15t/new';
+import { c15t as c15tInstance } from '@c15t/backend';
 
 export const c15t = c15tInstance({
   appName: 'My App',

@@ -1,5 +1,4 @@
-import { } from '@c15t/new';
-import { createConsentClient } from '@c15t/new/integrations/react';
+import { createConsentClient } from '@c15t/backend/integrations/react';
 
 /**
  * Create a client for React components to use

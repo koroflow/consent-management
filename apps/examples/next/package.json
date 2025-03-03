@@ -9,7 +9,7 @@
 	},
 	"dependencies": {
 		"@c15t/cli": "workspace:*",
-		"@c15t/new": "workspace:*",
+		"@c15t/backend": "workspace:*",
 		"@libsql/client": "^0.14.0",
 		"@libsql/kysely-libsql": "^0.4.1",
 		"libsql": "0.5.0-pre.6",

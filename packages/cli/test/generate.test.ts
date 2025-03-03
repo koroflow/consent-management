@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { drizzleAdapter } from '@c15t/new/db/adapters/drizzle';
-import { prismaAdapter } from '@c15t/new/db/adapters/prisma';
-import { kyselyAdapter } from '@c15t/new/db/adapters/kysely';
+import { drizzleAdapter } from '@c15t/backend/db/adapters/drizzle';
+import { prismaAdapter } from '@c15t/backend/db/adapters/prisma';
+import { kyselyAdapter } from '@c15t/backend/db/adapters/kysely';
 import { generateDrizzleSchema } from '../src/generators/drizzle';
-import type { C15TOptions } from '@c15t/new/types';
+import type { C15TOptions } from '@c15t/backend/types';
 import { generatePrismaSchema } from '../src/generators/prisma';
 import { generateMigrations } from '../src/generators/kysely';
 import Database from 'better-sqlite3';

@@ -1,4 +1,4 @@
-import { type Field, getConsentTables } from '@c15t/new/db';
+import { type Field, getConsentTables } from '@c15t/backend/db';
 import { existsSync } from 'node:fs';
 import type { SchemaGenerator } from './types';
 

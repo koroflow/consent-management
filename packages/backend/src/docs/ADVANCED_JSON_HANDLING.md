@@ -74,7 +74,7 @@ The database-specific handling is applied automatically based on your database c
 If needed, you can manually set the database type:
 
 ```typescript
-import { setDatabaseType } from '@c15t/new/db/core/fields/superjson-utils';
+import { setDatabaseType } from '@c15t/backend/db/core/fields/superjson-utils';
 
 // Must be called before using any field operations
 setDatabaseType('sqlite'); // or 'postgresql', 'mysql'
