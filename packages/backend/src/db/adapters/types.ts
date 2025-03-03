@@ -116,10 +116,10 @@ export type Tables<EntityType extends EntityName> =
  * @example
  * ```typescript
  * // Example usage in a c15t instance
- * import { c15t } from '@c15t/core';
+ * import { c15tInstance } from '@c15t/backend';
  * import { memoryAdapter } from '@c15t/adapters/memory';
  *
- * const consentManager = c15t({
+ * const c15t = c15tInstance({
  *   storage: memoryAdapter({}),
  *   secret: 'your-secret-key'
  * });

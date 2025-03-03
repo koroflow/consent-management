@@ -25,7 +25,7 @@ import type { C15TResult, C15TResultAsync } from './error/results';
  *
  * @example
  * ```typescript
- * const instance: C15TInstance = c15t({
+ * const instance: C15TInstance = c15tInstance({
  *   secret: 'your-secret',
  *   storage: memoryAdapter()
  * });
@@ -115,7 +115,9 @@ export interface C15TInstance<PluginTypes extends C15TPlugin[] = C15TPlugin[]> {
  * @example
  * Basic initialization:
  * ```typescript
- * const manager = c15t({
+ * import { c15tInstance } from '@c15t/backend';
+ *
+ * const manager = c15tInstance({
  *   secret: process.env.SECRET_KEY,
  *   storage: memoryAdapter()
  * });

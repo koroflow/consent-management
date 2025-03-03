@@ -298,14 +298,14 @@ const createEntityTransformer = (options: C15TOptions) => {
  *
  * @example
  * ```typescript
- * import { c15t } from '@c15t/core';
+ * import { c15tInstance } from '@c15t/backend';
  * import { memoryAdapter } from '@c15t/adapters/memory';
  *
  * // Create an empty in-memory database
  * const db = {};
  *
  * // Create the c15t instance with memory adapter
- * const c15tInstance = c15t({
+ * const c15t = c15tInstance({
  *   storage: memoryAdapter(db),
  *   secret: process.env.SECRET_KEY
  * });

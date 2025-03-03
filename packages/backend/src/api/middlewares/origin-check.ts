@@ -36,6 +36,7 @@ const VALID_RELATIVE_URL_REGEX =
  *
  * @example
  * ```typescript
+ * import { c15tInstance } from '@c15t/backend';
  * // This middleware is typically used in router configuration
  * const router = createRouter(endpoints, {
  *   routerMiddleware: [
@@ -47,7 +48,7 @@ const VALID_RELATIVE_URL_REGEX =
  * });
  *
  * // To configure trusted origins in your C15T options:
- * const c15tInstance = c15t({
+ * const c15t = c15tInstance({
  *   // Static list of trusted origins
  *   trustedOrigins: [
  *     'https://example.com',

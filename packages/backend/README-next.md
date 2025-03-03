@@ -18,10 +18,10 @@ Follow these steps to add c15t to your Next.js project:
 2. Create a shared c15t instance:
    ```typescript
    // lib/c15t.ts
-   import { c15t } from '@c15t/backend';
+   import { c15tInstance } from '@c15t/backend';
    import { memoryAdapter } from '@c15t/backend/storage/memory';
    
-   export const C15TInstance = c15t({
+   export const C15TInstance = c15tInstance({
      appName: 'My Next.js App',
      trustedOrigins: ['http://localhost:3000'],
      storage: memoryAdapter(), // Use a persistent adapter for production
@@ -192,24 +192,6 @@ export const config = {
 ```
 
 ## Advanced Configuration
-
-### Using a Different Storage Adapter
-
-For production use, consider using a persistent storage adapter:
-
-```typescript
-// lib/c15t.ts
-import { c15t } from '@c15t/backend';
-import { cookieAdapter } from '@c15t/backend/storage/cookie';
-
-export const C15TInstance = c15t({
-  // ... other config
-  storage: cookieAdapter({
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-  }),
-});
-```
 
 ### Custom Consent Preferences
 

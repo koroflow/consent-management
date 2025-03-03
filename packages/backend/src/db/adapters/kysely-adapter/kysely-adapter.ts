@@ -580,7 +580,7 @@ const createEntityTransformer = (
  * ```typescript
  * import { Kysely, PostgresDialect } from 'kysely';
  * import { Pool } from 'pg';
- * import { c15t } from '@c15t/core';
+ * import { c15tInstance } from '@c15t/backend';
  * import { kyselyAdapter } from '@c15t/adapters/kysely';
  *
  * // Create a Postgres connection pool
@@ -597,7 +597,7 @@ const createEntityTransformer = (
  * });
  *
  * // Create the c15t instance with Kysely adapter
- * const c15tInstance = c15t({
+ * const c15t = c15tInstance({
  *   storage: kyselyAdapter(db, { type: 'postgres' }),
  *   // Other c15t options...
  *   secret: process.env.SECRET

@@ -431,13 +431,14 @@ function checkMissingFields(
  * import postgres from 'postgres';
  * import { drizzleAdapter } from '@c15t/db/adapters/drizzle';
  * import * as schema from './schema';
+ * import { c15tInstance } from '@c15t/backend';
  *
  * // Create a Postgres connection
  * const connection = postgres('postgresql://user:password@localhost:5432/db');
  * const db = drizzle(connection, { schema });
  *
  * // Create the C15T instance with Drizzle adapter
- * const c15tInstance = c15t({
+ * const c15t = c15tInstance({
  *   storage: drizzleAdapter(db, {
  *     provider: 'pg',
  *     schema, // Pass your Drizzle schema
@@ -456,6 +457,7 @@ function checkMissingFields(
  * // Using with MySQL
  * import { drizzle } from 'drizzle-orm/mysql2';
  * import mysql from 'mysql2/promise';
+ * import { c15tInstance } from '@c15t/backend';
  *
  * const connection = await mysql.createConnection({
  *   host: 'localhost',
@@ -465,7 +467,7 @@ function checkMissingFields(
  *
  * const db = drizzle(connection);
  *
- * const c15tInstance = c15t({
+ * const c15t = c15tInstance({
  *   storage: drizzleAdapter(db, {
  *     provider: 'mysql'
  *   }),

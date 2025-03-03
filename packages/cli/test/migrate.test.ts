@@ -1,14 +1,14 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { migrateAction } from '../src/commands/migrate';
 import * as config from '../src/utils/get-config';
-import { c15t } from '@c15t/backend';
+import { c15tInstance } from '@c15t/backend';
 import Database from 'better-sqlite3';
 import type { C15TPlugin } from '@c15t/backend/types';
 
 describe('migrate base c15t instance', () => {
 	const db = new Database(':memory:');
 
-	const auth = c15t({
+	const auth = c15tInstance({
 		baseURL: 'http://localhost:3000',
 		database: db,
 	});
@@ -50,7 +50,7 @@ describe('migrate auth instance with plugins', () => {
 		type: 'plugin',
 	} satisfies C15TPlugin;
 
-	const auth = c15t({
+	const auth = c15tInstance({
 		baseURL: 'http://localhost:3000',
 		database: db,
 		plugins: [testPlugin],

@@ -312,14 +312,14 @@ const createEntityTransformer = (
  * @example
  * ```typescript
  * import { PrismaClient } from '@prisma/client';
- * import { c15t } from '@c15t/core';
+ * import { c15tInstance } from '@c15t/backend';
  * import { prismaAdapter } from '@c15t/db/adapters/prisma';
  *
  * // Create a Prisma client
  * const prisma = new PrismaClient();
  *
  * // Create the c15t instance with Prisma adapter
- * const c15tInstance = c15t({
+ * const c15t = c15tInstance({
  *   storage: prismaAdapter(prisma, { provider: 'postgresql' }),
  *   secret: process.env.SECRET_KEY
  * });

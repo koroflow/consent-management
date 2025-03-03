@@ -120,6 +120,7 @@ export type SQLiteDatabaseConfig = SQLiteDatabase;
  * ```typescript
  * import { PostgresDialect } from 'kysely';
  * import { Pool } from 'pg';
+ * import { c15tInstance } from '@c15t/backend';
  *
  * // Create a PostgreSQL connection pool
  * const pool = new Pool({
@@ -135,7 +136,7 @@ export type SQLiteDatabaseConfig = SQLiteDatabase;
  * };
  *
  * // Use in c15t configuration
- * const c15tInstance = c15t({
+ * const c15t = c15tInstance({
  *   storage: kyselyAdapter(dialectConfig),
  *   secret: process.env.SECRET_KEY
  * });
@@ -173,6 +174,7 @@ export interface DialectConfig {
  * ```typescript
  * import { Kysely, PostgresDialect } from 'kysely';
  * import { Pool } from 'pg';
+ * import { c15tInstance } from '@c15t/backend';
  *
  * // Create a Postgres connection pool
  * const pool = new Pool({
@@ -193,7 +195,7 @@ export interface DialectConfig {
  * };
  *
  * // Pass to c15t configuration
- * const c15tInstance = c15t({
+ * const c15t = c15tInstance({
  *   storage: kyselyAdapter(config),
  *   secret: process.env.SECRET_KEY
  * });
