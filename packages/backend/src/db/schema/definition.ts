@@ -14,12 +14,8 @@ import {
 	getGeoLocationTable,
 } from './index';
 import type { PluginSchema } from '../core/types';
-import type {} from '../core/fields/field-inference';
-import type {
-	Field,
-	FieldType,
-	InferValueType,
-} from '../core/fields/field-types';
+import type { InferTableShape } from './schemas';
+import { z } from 'zod';
 
 /**
  * Retrieves all consent-related database table definitions
@@ -125,49 +121,23 @@ export const getConsentTables = (options: C15TOptions) => {
 export type C15TDBSchema = ReturnType<typeof getConsentTables>;
 
 /**
- * Generic type to get all fields of a table by its name
- */
-export type TableFields<TableName extends keyof C15TDBSchema> = {
-	[K in keyof C15TDBSchema[TableName]['fields']]: C15TDBSchema[TableName]['fields'][K] extends Field
-		? C15TDBSchema[TableName]['fields'][K]
-		: never;
-};
-
-/**
- * Generic type to get all output fields of a table by its name
+ * Type to get all output fields of a table by its name
  * This type extracts only the fields that are included in output operations,
  * automatically excluding fields marked with { returned: false }.
+ * It also resolves relationships between tables.
  */
-export type EntityOutputFields<TableName extends keyof C15TDBSchema> = {
-	id: string;
-} & {
-	[K in keyof TableFields<TableName>]: TableFields<TableName>[K] extends {
-		type: infer Type extends FieldType;
-	}
-		? TableFields<TableName>[K] extends { returned: false }
-			? never
-			: TableFields<TableName>[K] extends { required: false }
-				? InferValueType<Type> | null | undefined
-				: InferValueType<Type>
-		: never;
-};
+export type EntityOutputFields<TableName extends keyof C15TDBSchema> =
+	InferTableShape<TableName>;
 
 /**
- * Generic type to get all input fields of a table by its name
+ * Type to get all input fields of a table by its name
  * This type extracts only the fields that are allowed for input operations,
  * automatically excluding fields marked with { input: false }.
  */
-export type EntityInputFields<TableName extends keyof C15TDBSchema> = {
-	[K in keyof TableFields<TableName>]: TableFields<TableName>[K] extends {
-		type: infer Type extends FieldType;
-	}
-		? TableFields<TableName>[K] extends { input: false }
-			? never
-			: TableFields<TableName>[K] extends { required: true }
-				? InferValueType<Type>
-				: InferValueType<Type> | null | undefined
-		: never;
-};
+export type EntityInputFields<TableName extends keyof C15TDBSchema> = Omit<
+	InferTableShape<TableName>,
+	'id' | 'createdAt' | 'updatedAt'
+>;
 
 /**
  * Validates input data against table schema using Zod
@@ -218,15 +188,17 @@ export function validateEntityInput<TableName extends keyof C15TDBSchema>(
 	if (!table) {
 		throw new Error(`Table ${tableName} not found`);
 	}
+	// Validate and return data using Zod schema
+	const baseSchema =
+		action === 'create' ? table.schema : table.schema.partial();
+	// const excludedFields = ['id', 'createdAt', 'updatedAt'];
+	const schema = baseSchema.extend({
+		id: z.never(),
+		createdAt: z.never(),
+		updatedAt: z.never(),
+	});
 
-	// Import the parseInputData function to validate against schema
-	const { parseInputData } = require('../schema');
-
-	// Validate and return data
-	return parseInputData(data, {
-		fields: table.fields,
-		action,
-	}) as EntityInputFields<TableName>;
+	return schema.parse(data) as EntityInputFields<TableName>;
 }
 
 /**
@@ -276,11 +248,6 @@ export function validateEntityOutput<TableName extends keyof C15TDBSchema>(
 		throw new Error(`Table ${tableName} not found`);
 	}
 
-	// Import the parseEntityOutputData function to validate against schema
-	const { parseEntityOutputData } = require('../schema');
-
-	// Validate and return data
-	return parseEntityOutputData(data, {
-		fields: table.fields,
-	}) as EntityOutputFields<TableName>;
+	// Validate and return data using Zod schema
+	return table.schema.parse(data) as EntityOutputFields<TableName>;
 }

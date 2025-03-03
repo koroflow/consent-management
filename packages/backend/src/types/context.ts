@@ -166,6 +166,11 @@ export interface BaseC15TContext {
 	 * Database tables for the consent system
 	 */
 	tables: ReturnType<typeof getConsentTables>;
+
+	/**
+	 * IP address of the client
+	 */
+	ipAddress?: string | null;
 }
 
 /**

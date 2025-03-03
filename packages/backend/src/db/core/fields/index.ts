@@ -1,41 +1,22 @@
-// Export types directly from their source files
+// Export core types
 export type {
+	FieldType,
 	Field,
 	FieldConfig,
-	FieldType,
-	PluginField,
 	Primitive,
+	JsonValue,
 } from './field-types';
 
-export type {
-	InferValueType,
-	InferFieldOutput,
-	InferFieldInput,
-	InferFieldsOutput,
-	InferFieldsInput,
-	InferFieldsInputClient,
-	TransformInputFn,
-	TransformOutputFn,
-} from './field-inference';
-
+// Export field options
 export type {
 	NumberFieldOptions,
 	StringFieldOptions,
 	JsonFieldOptions,
 	TimezoneFieldOptions,
 	DateFieldOptions,
-	CommonTimezone,
 } from './field-factory';
 
-export type {
-	InferFieldsFromPlugins,
-	InferFieldsFromOptions,
-} from './field-options-integration';
-
-// Export custom ID generation system
-export type { TableWithPrefix } from './id-generator';
-
-// Export factory functions directly
+// Export factory functions
 export {
 	createField,
 	stringField,
@@ -47,12 +28,40 @@ export {
 	numberArrayField,
 	timezoneField,
 	COMMON_TIMEZONES,
-	DateTimeUtils,
 } from './field-factory';
 
-// Export ID generation functions
+// Export Zod utilities
 export {
-	generateId,
-	createIdGenerator,
-	defaultIdGenerator,
-} from './id-generator';
+	validateField,
+	createFieldValueSchema,
+	createRecordSchema,
+} from './zod-fields';
+
+// Export field inference utilities
+export type {
+	InferFieldOutput,
+	InferFieldInput,
+	InferFieldsOutput,
+	InferFieldsInput,
+	InferFieldsInputClient,
+	TransformInputFn,
+	TransformOutputFn,
+} from './field-inference';
+
+// Export SuperJSON utilities
+export {
+	getDatabaseType,
+	setDatabaseType,
+	shouldUseSuperJson,
+	transformForDb,
+	parseFromDb,
+} from './superjson-utils';
+
+/**
+ * Generates a unique ID for database records
+ * @param prefix - Optional prefix to add to the ID
+ */
+export function generateId(prefix?: string): string {
+	const id = Math.random().toString(36).substring(2) + Date.now().toString(36);
+	return prefix ? `${prefix}_${id}` : id;
+}

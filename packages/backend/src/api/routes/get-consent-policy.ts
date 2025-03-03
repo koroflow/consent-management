@@ -212,7 +212,7 @@ export const getConsentPolicy = createAuthEndpoint(
 							? //@ts-expect-error
 								policy.availablePreferences
 							: undefined,
-						createdAt: (policy.createdAt as Date).toISOString(),
+						createdAt: policy.createdAt.toISOString(),
 					},
 				},
 			};
@@ -256,7 +256,7 @@ export const getConsentPolicy = createAuthEndpoint(
 						//@ts-expect-error
 						currentPreferences: userConsent ? userConsent.preferences : null,
 						consentedAt: userConsent
-							? (userConsent.givenAt as Date).toISOString() || null
+							? userConsent.givenAt.toISOString() || null
 							: null,
 						needsRenewal: userConsent
 							? userConsent.policyId !== policy.id

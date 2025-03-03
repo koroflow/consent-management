@@ -12,6 +12,7 @@ import {
 	parseFromDb,
 	transformForDb,
 } from './superjson-utils';
+import { validateField } from './zod-fields';
 
 /**
  * Defines transform functions for field input and output operations.
@@ -246,6 +247,10 @@ export type CommonTimezone =
  *   ]
  * });
  * ```
+ *
+ * @remarks
+ * The timezone field stores timezone identifiers according to the IANA timezone database.
+ * It validates timezone strings to ensure they are valid IANA timezone identifiers.
  */
 export type TimezoneFieldOptions = {
 	/**
@@ -296,162 +301,78 @@ export type TimezoneFieldOptions = {
  * });
  * ```
  */
-export function createField<
-	TFieldType extends FieldType,
-	TConfig extends TypedFieldOptions<TFieldType> & Record<string, unknown>,
->(type: TFieldType, config: TConfig = {} as TConfig): Field<TFieldType> {
-	const { transform, ...rest } = config;
-
-	return {
+export function createField<TFieldType extends FieldType>(
+	type: TFieldType,
+	config?: Omit<FieldConfig<TFieldType>, 'type'>
+): Field<TFieldType> {
+	const fieldConfig: FieldConfig<TFieldType> = {
 		type,
 		required: true,
 		returned: true,
 		input: true,
-		bigint: false,
 		sortable: true,
-		...rest,
-		...(transform
-			? {
-					transform: {
-						...transform,
-					},
-				}
-			: {}),
-	} as Field<TFieldType>;
+		bigint: false,
+		...config,
+	};
+
+	return validateField(fieldConfig);
 }
 
 /**
  * Creates a string field with the specified configuration.
- * Convenience wrapper around createField with string type.
- *
- * @template TConfig - The configuration type for the field
- *
- * @param config - Configuration options for the field including string-specific options
- * @returns A fully configured string field definition
- *
- * @example
- * ```typescript
- * // Create a required string field
- * const nameField = stringField({ required: true });
- *
- * // Create a string field with validation
- * const emailField = stringField({
- *   required: true,
- *   pattern: '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$',
- *   transform: {
- *     input: (value) => value.toLowerCase().trim()
- *   },
- *   validator: (value) => value.includes('@') ? null : 'Invalid email'
- * });
- * ```
  */
 export function stringField<
-	TConfig extends TypedFieldOptions<'string'> & StringFieldOptions,
+	TConfig extends Omit<FieldConfig<'string'>, 'type' | 'transform'> & {
+		transform?: {
+			input?: (value: string) => Primitive | Promise<Primitive>;
+			output?: (value: unknown) => string | Promise<string>;
+		};
+	} & StringFieldOptions,
 >(config: TConfig = {} as TConfig): Field<'string'> {
 	return createField('string', config);
 }
 
 /**
  * Creates a number field with the specified configuration.
- * Convenience wrapper around createField with number type.
- *
- * @template TConfig - The configuration type for the field
- *
- * @param config - Configuration options for the field including number-specific options
- * @returns A fully configured number field definition
- *
- * @example
- * ```typescript
- * // Create a required number field
- * const scoreField = numberField({ required: true });
- *
- * // Create a number field with validation
- * const ageField = numberField({
- *   required: true,
- *   min: 0,
- *   max: 120,
- *   validator: (value) => value >= 18 ? null : 'Must be at least 18'
- * });
- * ```
  */
 export function numberField<
-	TConfig extends TypedFieldOptions<'number'> & NumberFieldOptions,
+	TConfig extends Omit<FieldConfig<'number'>, 'type' | 'transform'> & {
+		transform?: {
+			input?: (value: number) => Primitive | Promise<Primitive>;
+			output?: (value: unknown) => number | Promise<number>;
+		};
+	} & NumberFieldOptions,
 >(config: TConfig = {} as TConfig): Field<'number'> {
 	return createField('number', config);
 }
 
 /**
  * Creates a boolean field with the specified configuration.
- * Convenience wrapper around createField with boolean type.
- *
- * @template TConfig - The configuration type for the field
- *
- * @param config - Configuration options for the field
- * @returns A fully configured boolean field definition
- *
- * @example
- * ```typescript
- * // Create a required boolean field
- * const isActiveField = booleanField({ required: true });
- *
- * // Create a boolean field with default value
- * const isVerifiedField = booleanField({
- *   required: true,
- *   defaultValue: false
- * });
- * ```
  */
-export function booleanField<TConfig extends TypedFieldOptions<'boolean'>>(
-	config: TConfig = {} as TConfig
-): Field<'boolean'> {
+export function booleanField<
+	TConfig extends Omit<FieldConfig<'boolean'>, 'type' | 'transform'> & {
+		transform?: {
+			input?: (value: boolean) => Primitive | Promise<Primitive>;
+			output?: (value: unknown) => boolean | Promise<boolean>;
+		};
+	},
+>(config: TConfig = {} as TConfig): Field<'boolean'> {
 	return createField('boolean', config);
 }
 
 /**
  * Creates a date field with the specified configuration.
- * Convenience wrapper around createField with date type.
- *
- * @template TConfig - The configuration type for the field
- *
- * @param config - Configuration options for the field
- * @returns A fully configured date field definition
- *
- * @example
- * ```typescript
- * // Create a required date field
- * const createdAtField = dateField({ required: true });
- *
- * // Create a date field with transform and default value
- * const lastLoginField = dateField({
- *   required: false,
- *   defaultValue: () => new Date(),
- *   transform: {
- *     output: (value) => value.toISOString()
- *   }
- * });
- *
- * // Create a date-only field with min/max validation
- * const birthdateField = dateField({
- *   required: true,
- *   dateOnly: true,
- *   minDate: new Date('1900-01-01'),
- *   maxDate: new Date(),
- *   format: {
- *     year: 'numeric',
- *     month: 'long',
- *     day: 'numeric'
- *   }
- * });
- * ```
- *
- * @remarks
- * The database-specific behavior of this field is as follows:
- * - **SQLite**: Uses a special date handling mechanism to preserve timezone information
- * - **MySQL**: Provides consistent timezone handling across deployments
- * - **PostgreSQL**: Uses native TIMESTAMPTZ type which handles timezones effectively
  */
 export function dateField<
-	TConfig extends TypedFieldOptions<'date'> & DateFieldOptions,
+	TConfig extends Omit<
+		FieldConfig<'date'>,
+		'type' | 'transform' | 'minDate' | 'maxDate' | 'dateOnly' | 'format'
+	> & {
+		transform?: {
+			input?: (value: Date) => Primitive | Promise<Primitive>;
+			output?: (value: unknown) => Date | Promise<Date>;
+		};
+	} & DateFieldOptions,
 >(config: TConfig = {} as TConfig): Field<'date'> {
 	const {
 		transform = {},
@@ -459,6 +380,7 @@ export function dateField<
 		maxDate,
 		dateOnly = false,
 		format,
+		validator,
 		...restConfig
 	} = config;
 
@@ -486,15 +408,13 @@ export function dateField<
 
 		// Apply special handling for SQLite (and optionally MySQL) to preserve timezone info
 		if (dbType === 'sqlite') {
-			// For SQLite, we need to ensure timezone information is preserved
-			// Use SuperJSON to stringify the date, which will maintain timezone info
 			return superjson.stringify({ date: transformedValue });
 		}
 
 		return transformedValue;
 	};
 
-	const outputTransform = async (value: unknown) => {
+	const outputTransform = async (value: unknown): Promise<Date> => {
 		let parsedValue = value;
 
 		// Handle SQLite date format (SuperJSON string)
@@ -505,7 +425,6 @@ export function dateField<
 		) {
 			try {
 				const parsed = superjson.parse(value);
-				// Use type assertion to handle the 'parsed' is of type 'unknown' error
 				parsedValue = (parsed as { date: Date }).date;
 			} catch {
 				// If parsing fails, keep the original value
@@ -514,26 +433,22 @@ export function dateField<
 
 		// Apply the user's transform if provided
 		if (originalOutputTransform && parsedValue instanceof Date) {
-			parsedValue = await originalOutputTransform(parsedValue);
+			return await originalOutputTransform(parsedValue);
 		}
 		// Apply formatting if no custom transform was provided and format is specified
-		else if (
-			!originalOutputTransform &&
-			format &&
-			parsedValue instanceof Date
-		) {
-			parsedValue = new Intl.DateTimeFormat(undefined, format).format(
-				parsedValue
+		if (!originalOutputTransform && format && parsedValue instanceof Date) {
+			return new Date(
+				new Intl.DateTimeFormat(undefined, format).format(parsedValue)
 			);
 		}
 
-		return parsedValue;
+		return parsedValue as Date;
 	};
 
 	// Create a validator for min/max date constraints
-	let validator = config.validator;
-	if ((minDate || maxDate) && !validator) {
-		validator = (value: Date) => {
+	let dateValidator = validator;
+	if ((minDate || maxDate) && !dateValidator) {
+		dateValidator = (value: Date) => {
 			if (!(value instanceof Date)) {
 				return 'Value must be a Date object';
 			}
@@ -552,11 +467,11 @@ export function dateField<
 	// If there's already a validator and min/max constraints, chain them
 	else if (
 		(minDate || maxDate) &&
-		validator &&
-		typeof validator === 'function'
+		dateValidator &&
+		typeof dateValidator === 'function'
 	) {
-		const originalValidator = validator;
-		validator = async (value: Date) => {
+		const originalValidator = dateValidator;
+		dateValidator = (value: Date) => {
 			if (!(value instanceof Date)) {
 				return 'Value must be a Date object';
 			}
@@ -581,7 +496,7 @@ export function dateField<
 			input: inputTransform,
 			output: outputTransform,
 		},
-		validator,
+		validator: dateValidator,
 	});
 }
 
@@ -622,7 +537,12 @@ export function dateField<
  * It validates timezone strings to ensure they are valid IANA timezone identifiers.
  */
 export function timezoneField<
-	TConfig extends TypedFieldOptions<'timezone'> & TimezoneFieldOptions,
+	TConfig extends Omit<FieldConfig<'timezone'>, 'type' | 'transform'> & {
+		transform?: {
+			input?: (value: string) => string | Promise<string>;
+			output?: (value: unknown) => string | Promise<string>;
+		};
+	} & TimezoneFieldOptions,
 >(config: TConfig = {} as TConfig): Field<'timezone'> {
 	const {
 		validateTimezone = true,
@@ -657,37 +577,31 @@ export function timezoneField<
 	};
 
 	// Custom input transform that applies validation if enabled
-	const inputTransform = async (value: string) => {
+	const inputTransform = async (value: string): Promise<string> => {
 		// First apply the user's transform if provided
 		let transformedValue = value;
 		if (originalInputTransform) {
-			// Properly type the transform function
-			transformedValue = (await originalInputTransform(
-				value as InferValueType<'timezone'>
-			)) as string;
+			transformedValue = await originalInputTransform(value);
 		}
 
 		return transformedValue;
 	};
 
 	// Output transform
-	const outputTransform = async (value: unknown) => {
+	const outputTransform = async (value: unknown): Promise<string> => {
 		let parsedValue = value;
 
 		// Then apply the user's transform if provided
 		if (originalOutputTransform && typeof parsedValue === 'string') {
-			// Properly type the transform function
-			parsedValue = await originalOutputTransform(
-				parsedValue as InferValueType<'timezone'>
-			);
+			parsedValue = await originalOutputTransform(parsedValue);
 		}
 
-		return parsedValue;
+		return parsedValue as string;
 	};
 
 	// Create the validator function
 	const validator = validateTimezone
-		? async (value: string) => {
+		? (value: string) => {
 				if (value === null || value === undefined) {
 					return null;
 				}
@@ -707,104 +621,42 @@ export function timezoneField<
 
 /**
  * Creates a string array field with the specified configuration.
- * Convenience wrapper around createField with string[] type.
- *
- * @template TConfig - The configuration type for the field
- *
- * @param config - Configuration options for the field
- * @returns A fully configured string array field definition
- *
- * @example
- * ```typescript
- * // Create a required string array field
- * const tagsField = stringArrayField({ required: true });
- *
- * // Create a string array field with default value
- * const categoriesField = stringArrayField({
- *   required: true,
- *   defaultValue: ['general']
- * });
- * ```
  */
-export function stringArrayField<TConfig extends TypedFieldOptions<'string[]'>>(
-	config: TConfig = {} as TConfig
-): Field<'string[]'> {
+export function stringArrayField<
+	TConfig extends Omit<FieldConfig<'string[]'>, 'type' | 'transform'> & {
+		transform?: {
+			input?: (value: string[]) => Primitive | Promise<Primitive>;
+			output?: (value: unknown) => string[] | Promise<string[]>;
+		};
+	},
+>(config: TConfig = {} as TConfig): Field<'string[]'> {
 	return createField('string[]', config);
 }
 
 /**
  * Creates a number array field with the specified configuration.
- * Convenience wrapper around createField with number[] type.
- *
- * @template TConfig - The configuration type for the field
- *
- * @param config - Configuration options for the field
- * @returns A fully configured number array field definition
- *
- * @example
- * ```typescript
- * // Create a required number array field
- * const scoresField = numberArrayField({ required: true });
- *
- * // Create a number array field with default value
- * const ratingsField = numberArrayField({
- *   required: true,
- *   defaultValue: [0, 0, 0]
- * });
- * ```
  */
-export function numberArrayField<TConfig extends TypedFieldOptions<'number[]'>>(
-	config: TConfig = {} as TConfig
-): Field<'number[]'> {
+export function numberArrayField<
+	TConfig extends Omit<FieldConfig<'number[]'>, 'type' | 'transform'> & {
+		transform?: {
+			input?: (value: number[]) => Primitive | Promise<Primitive>;
+			output?: (value: unknown) => number[] | Promise<number[]>;
+		};
+	},
+>(config: TConfig = {} as TConfig): Field<'number[]'> {
 	return createField('number[]', config);
 }
 
 /**
  * Creates a JSON field with the specified configuration.
- * Convenience wrapper around createField with json type.
- * Uses SuperJSON for enhanced JSON handling that supports additional types
- * like Date, Map, Set, BigInt, etc. beyond what native JSON serialization allows.
- *
- * @template TConfig - The configuration type for the field
- *
- * @param config - Configuration options for the JSON field
- * @returns A fully configured JSON field definition
- *
- * @example
- * ```typescript
- * // Create a basic JSON field
- * const configField = jsonField({ required: true });
- *
- * // Create a JSON field with custom transform and validation
- * const metadataField = jsonField({
- *   required: true,
- *   transform: {
- *     input: (value) => {
- *       // Add timestamp to all incoming JSON
- *       return { ...value, updatedAt: new Date().toISOString() };
- *     },
- *     output: (value) => {
- *       // Remove internal properties on output
- *       const { _internal, ...rest } = value;
- *       return rest;
- *     }
- *   },
- *   validator: (value) => {
- *     // Ensure the JSON has required fields
- *     if (!value.version) return 'Missing version field';
- *     return null;
- *   }
- * });
- * ```
- *
- * @remarks
- * The database-specific behavior of this field is as follows:
- * - **SQLite**: Always uses SuperJSON as SQLite has no native JSON support
- * - **MySQL**: Uses SuperJSON when complex JS types are detected (Date, Map, BigInt, etc.)
- * - **PostgreSQL**: Uses native JSON/JSONB storage for simple types, SuperJSON only when needed
  */
 export function jsonField<
-	TConfig extends TypedFieldOptions<'json'> & JsonFieldOptions,
+	TConfig extends Omit<FieldConfig<'json'>, 'type' | 'transform'> & {
+		transform?: {
+			input?: (value: JsonValue) => Primitive | Promise<Primitive>;
+			output?: (value: unknown) => JsonValue | Promise<JsonValue>;
+		};
+	} & JsonFieldOptions,
 >(config: TConfig = {} as TConfig): Field<'json'> {
 	const { validateJson = true, transform = {}, ...restConfig } = config;
 
@@ -813,23 +665,37 @@ export function jsonField<
 	const originalOutputTransform = transform.output;
 
 	// Create database-aware transform functions
-	const inputTransform = async (value: JsonValue) => {
+	const inputTransform = async (value: JsonValue): Promise<Primitive> => {
 		// First apply the user's transform if provided
 		let transformedValue = value;
 		if (originalInputTransform) {
-			// Use proper type casting to handle the transformation
-			// We need to cast to InferValueType<'json'> which is what the transform expects
-			const result = await originalInputTransform(
-				value as unknown as InferValueType<'json'>
-			);
-			transformedValue = result as unknown as JsonValue;
+			const result = await originalInputTransform(value);
+			if (result === undefined || result === null) {
+				throw new Error('Transform returned invalid value');
+			}
+			transformedValue = result instanceof Date ? result.toISOString() : result;
 		}
 
 		// Then apply database-specific serialization
+		if (
+			typeof transformedValue !== 'string' &&
+			typeof transformedValue !== 'number' &&
+			typeof transformedValue !== 'boolean'
+		) {
+			throw new Error('Invalid primitive value');
+		}
+		const isPrimitive = (value: unknown): value is Primitive =>
+			typeof value === 'string' ||
+			typeof value === 'number' ||
+			typeof value === 'boolean';
+
+		if (!isPrimitive(transformedValue)) {
+			throw new Error('Invalid primitive value');
+		}
 		return transformForDb(transformedValue);
 	};
 
-	const outputTransform = async (value: unknown) => {
+	const outputTransform = async (value: unknown): Promise<JsonValue> => {
 		// First parse from database format
 		let parsedValue = parseFromDb(value);
 
@@ -839,23 +705,18 @@ export function jsonField<
 			typeof parsedValue === 'object' &&
 			parsedValue !== null
 		) {
-			// Use proper type casting to handle the transformation
-			// We need to cast to InferValueType<'json'> which is what the transform expects
-			parsedValue = await originalOutputTransform(
-				parsedValue as unknown as InferValueType<'json'>
-			);
+			parsedValue = await originalOutputTransform(parsedValue);
 		}
 
-		return parsedValue;
+		return parsedValue as JsonValue;
 	};
 
-	let validator = config.validator;
+	let jsonValidator = config.validator;
 
 	// If validateJson is true and no validator is specified, add JSON validation
-	if (validateJson && !validator) {
-		validator = (value: JsonValue) => {
+	if (validateJson && !jsonValidator) {
+		jsonValidator = (value: JsonValue) => {
 			try {
-				// Check if value can be properly serialized with SuperJSON
 				superjson.stringify(value);
 				return null;
 			} catch (error) {
@@ -864,14 +725,11 @@ export function jsonField<
 		};
 	}
 	// If validateJson is true and there's an existing validator, chain them
-	else if (validateJson && validator) {
-		const originalValidator = validator;
-		validator = (value: JsonValue) => {
+	else if (validateJson && jsonValidator) {
+		const originalValidator = jsonValidator;
+		jsonValidator = (value: JsonValue) => {
 			try {
-				// First check if it's valid JSON with SuperJSON
 				superjson.stringify(value);
-
-				// Then run the original validator
 				if (typeof originalValidator === 'function') {
 					return originalValidator(value);
 				}
@@ -884,7 +742,7 @@ export function jsonField<
 
 	return createField('json', {
 		...restConfig,
-		validator,
+		validator: jsonValidator,
 		transform: {
 			input: inputTransform,
 			output: outputTransform,

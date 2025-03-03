@@ -23,10 +23,9 @@ import type {
 	EntityOutput,
 } from '~/db/core/types';
 import type { TableReference } from 'node_modules/kysely/dist/esm/parser/table-parser';
-import type { TableFields } from '~/db/schema/definition';
 import { generateId, type Field, type Primitive } from '~/db/core/fields';
 import type { InsertExpression } from 'node_modules/kysely/dist/esm/parser/insert-values-parser';
-import type { Adapter, Where } from '../types';
+import type { Adapter, TableFields, Where } from '../types';
 import superjson from 'superjson';
 
 /**

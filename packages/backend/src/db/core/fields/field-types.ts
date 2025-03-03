@@ -1,3 +1,6 @@
+import type { z } from 'zod';
+import type { fieldSchema } from './zod-fields';
+
 /**
  * The set of field types supported by C15T.
  * Specifies the data types that can be used for database fields.
@@ -17,36 +20,20 @@ export type FieldType =
 	| 'number[]';
 
 /**
- * Primitive values that fields can contain at runtime.
- * This defines the allowed JavaScript values for database fields.
- *
- * @remarks
- * This includes the JavaScript primitive types that correspond to
- * the database field types, as well as null and undefined.
+ * Primitive types that can be stored in the database.
  */
-export type Primitive =
-	| string
-	| number
-	| boolean
-	| Date
-	| object
-	| Record<string, unknown>
-	| string[]
-	| number[]
-	| null
-	| undefined;
+export type Primitive = string | number | boolean | Date | null | undefined;
 
 /**
- * JSON value type that more accurately represents valid JSON data.
- * Includes all possible JSON types according to the JSON specification.
+ * JSON value types that can be stored in JSON fields.
  */
 export type JsonValue =
 	| string
 	| number
 	| boolean
 	| null
-	| { [key: string]: JsonValue }
-	| JsonValue[];
+	| JsonValue[]
+	| { [key: string]: JsonValue };
 
 /**
  * Configuration options for a database field.
@@ -84,7 +71,7 @@ export type JsonValue =
  * in the database schema. It controls whether the field is required, how
  * it's transformed, validated, and more.
  */
-export type FieldConfig<TFieldType extends FieldType = FieldType> = {
+export type FieldConfig<TFieldType extends FieldType> = {
 	/**
 	 * The data type of the field.
 	 * Determines how the field is stored and validated.
@@ -136,141 +123,89 @@ export type FieldConfig<TFieldType extends FieldType = FieldType> = {
 		 * Applied when data is being retrieved from the database.
 		 */
 		output?: (
-			value: InferValueType<TFieldType>
-		) => Primitive | Promise<Primitive>;
+			value: unknown
+		) => InferValueType<TFieldType> | Promise<InferValueType<TFieldType>>;
 	};
-
-	/**
-	 * References configuration for foreign key relationships.
-	 * Used to define relations between different entity types.
-	 */
-	references?: {
-		/**
-		 * The entity type this field references.
-		 */
-		entity: string;
-
-		/**
-		 * The field on the referenced entity this relates to.
-		 * @default 'id'
-		 */
-		field?: string;
-
-		/**
-		 * Whether the reference is required.
-		 * If true, the referenced record must exist.
-		 * @default true
-		 */
-		required?: boolean;
-
-		/**
-		 * @deprecated Use entity instead
-		 * The model to reference (backward compatibility).
-		 */
-		model?: string;
-
-		/**
-		 * @deprecated
-		 * The action to perform when the reference is deleted.
-		 * Controls referential integrity behavior.
-		 *
-		 * @default "cascade"
-		 */
-		onDelete?:
-			| 'no action'
-			| 'restrict'
-			| 'cascade'
-			| 'set null'
-			| 'set default';
-	};
-
-	/**
-	 * Whether the field value must be unique across all records.
-	 * If true, no two records can have the same value for this field.
-	 * @default false
-	 */
-	unique?: boolean;
-
-	/**
-	 * For number fields, whether to use bigint storage.
-	 * Useful for IDs or very large numbers.
-	 * @default false
-	 */
-	bigint?: boolean;
 
 	/**
 	 * Custom validation function for the field.
 	 * Returns null if valid, or an error message if invalid.
 	 */
-	validator?:
-		| ((
-				value: InferValueType<TFieldType>
-		  ) => string | null | Promise<string | null>)
-		| {
-				/**
-				 * @deprecated Use the function form of validator instead
-				 * Schema for validating data before it's written to the database.
-				 */
-				input?: {
-					parse: (value: unknown) => unknown;
-				};
-				/**
-				 * @deprecated Use the function form of validator instead
-				 * Schema for validating data after it's read from the database.
-				 */
-				output?: {
-					parse: (value: unknown) => unknown;
-				};
-		  };
+	validator?: (value: InferValueType<TFieldType>) => string | null;
 
 	/**
-	 * Custom field name to use in the database.
-	 * If not provided, the property name in the schema is used.
+	 * Whether the field should be unique across all records.
+	 * If true, no two records can have the same value for this field.
+	 */
+	unique?: boolean;
+
+	/**
+	 * Whether the field should be indexed for faster lookups.
+	 * If true, an index will be created for this field.
+	 */
+	indexed?: boolean;
+
+	/**
+	 * Whether the field should be sortable in queries.
+	 * If false, the field cannot be used in ORDER BY clauses.
+	 * @default true
+	 */
+	sortable?: boolean;
+
+	/**
+	 * Custom database field name.
+	 * If not provided, the field name will be used as-is.
 	 */
 	fieldName?: string;
 
 	/**
-	 * Whether the field can be sorted in queries.
-	 * Some database engines require special handling for sortable fields.
-	 * @default true for string fields, false for large text
+	 * Whether the field should be stored as a bigint.
+	 * Only applicable to number fields.
+	 * @default false
 	 */
-	sortable?: boolean;
+	bigint?: boolean;
+
+	/**
+	 * References to other models.
+	 */
+	references?: {
+		model: string;
+		entity: string;
+		field: string;
+		onDelete: 'CASCADE' | 'SET NULL' | 'RESTRICT' | 'NO ACTION';
+	};
+};
+
+/**
+ * Type for a validated field configuration from Zod
+ */
+export type ValidatedField<TFieldType extends FieldType> = z.infer<
+	typeof fieldSchema
+> & {
+	type: TFieldType;
 };
 
 /**
  * Helper type to infer the base JavaScript type from a field type.
- * Internal use only - not exported directly.
- */
-type InferBaseType<TFieldType extends FieldType> = TFieldType extends 'string'
-	? string
-	: TFieldType extends 'number'
-		? number
-		: TFieldType extends 'boolean'
-			? boolean
-			: TFieldType extends 'date'
-				? Date
-				: TFieldType extends 'timezone'
-					? string
-					: TFieldType extends 'json'
-						? JsonValue
-						: never;
-
-/**
- * Helper type to infer JavaScript types from field types.
- * Internal use only - not exported directly.
- *
- * @remarks
- * This type handles both scalar types and array types.
- * For arrays, it maps the base type to an array of that type.
- * This approach is more maintainable and future-proof than
- * explicitly handling each array type.
  */
 export type InferValueType<TFieldType extends FieldType> =
-	TFieldType extends `${infer BaseType}[]`
-		? BaseType extends FieldType
-			? InferBaseType<BaseType>[]
-			: never
-		: InferBaseType<TFieldType>;
+	TFieldType extends 'string'
+		? string
+		: TFieldType extends 'number'
+			? number
+			: TFieldType extends 'boolean'
+				? boolean
+				: TFieldType extends 'date'
+					? Date
+					: TFieldType extends 'timezone'
+						? string
+						: TFieldType extends 'json'
+							? JsonValue
+							: TFieldType extends 'string[]'
+								? string[]
+								: TFieldType extends 'number[]'
+									? number[]
+									: never;
 
 /**
  * The complete definition of a database field.
@@ -319,4 +254,4 @@ export type Field<TFieldType extends FieldType = FieldType> =
  * It omits certain advanced features like custom database field names
  * and sortability configuration.
  */
-export type PluginField = Omit<Field, 'fieldName' | 'sortable'>;
+export type PluginField = Omit<Field, 'fieldName' | 'sortable' | 'references'>;

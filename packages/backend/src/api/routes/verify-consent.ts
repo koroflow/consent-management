@@ -139,9 +139,7 @@ export const verifyConsent = createAuthEndpoint(
 
 			// Sort consents by givenAt date, most recent first
 			activeConsents.sort(
-				(a, b) =>
-					new Date(b.givenAt as Date).getTime() -
-					new Date(a.givenAt as Date).getTime()
+				(a, b) => new Date(b.givenAt).getTime() - new Date(a.givenAt).getTime()
 			);
 
 			// Get the most recent active consent for this domain, if any
@@ -214,7 +212,7 @@ export const verifyConsent = createAuthEndpoint(
 					verified,
 					consentDetails: {
 						id: record.id,
-						givenAt: (record.givenAt as Date).toISOString(),
+						givenAt: record.givenAt.toISOString(),
 						policyVersion: record.policyId || '',
 						preferences:
 							(record.metadata as Record<string, unknown>)?.preferences || {},

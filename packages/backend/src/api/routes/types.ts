@@ -35,7 +35,7 @@ export const DomainSchema = z.object({
 export const UserIdentifierSchema = z.discriminatedUnion('identifierType', [
 	z.object({
 		identifierType: z.literal(IdentifierType.UserId),
-		userId: z.string().uuid(),
+		userId: z.string(),
 	}),
 	z.object({
 		identifierType: z.literal(IdentifierType.ExternalId),

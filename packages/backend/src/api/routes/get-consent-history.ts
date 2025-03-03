@@ -1,15 +1,14 @@
 import { createAuthEndpoint } from '../call';
 import { z } from 'zod';
 import type { EntityOutputFields } from '~/db/schema/definition';
-import type { C15TContext } from '~/types';
 import { APIError } from '..';
 import { logger } from '~/utils';
 
 // Define the schema for validating request parameters
 const getConsentHistorySchema = z.object({
-	userId: z.string().uuid(),
+	userId: z.string(),
 	domain: z.string().optional(),
-	limit: z.coerce.number().int().positive().default(100),
+	limit: z.coerce.number().int().positive().max(1000).default(100),
 	offset: z.coerce.number().int().min(0).default(0),
 });
 
@@ -31,7 +30,7 @@ export const getConsentHistory = createAuthEndpoint(
 	async (ctx) => {
 		try {
 			const params = getConsentHistorySchema.parse(ctx.query);
-			const { registry } = ctx.context as C15TContext;
+			const { registry } = ctx.context;
 
 			if (!registry) {
 				throw new APIError('INTERNAL_SERVER_ERROR', {
@@ -43,16 +42,12 @@ export const getConsentHistory = createAuthEndpoint(
 			let userConsents = await registry.findConsents({ userId: params.userId });
 			if (params.domain) {
 				userConsents = userConsents.filter(
-					(consent: EntityOutputFields<'consent'>) =>
-						consent.domainId === params.domain
+					(consent) => consent.domainId === params.domain
 				);
 			}
 
 			// Sort consents by givenAt date
-			userConsents.sort(
-				(a: EntityOutputFields<'consent'>, b: EntityOutputFields<'consent'>) =>
-					(b.givenAt as Date).getTime() - (a.givenAt as Date).getTime()
-			);
+			userConsents.sort((a, b) => b.givenAt.getTime() - a.givenAt.getTime());
 
 			// Apply pagination
 			const start = params.offset;
@@ -69,24 +64,22 @@ export const getConsentHistory = createAuthEndpoint(
 						id: consent.id,
 						domainId: consent.domainId,
 						status: consent.status as string,
-						givenAt: (consent.givenAt as Date).toISOString(),
-						withdrawals: withdrawals.map(
-							(withdrawal: EntityOutputFields<'withdrawal'>) => ({
-								id: withdrawal.id,
-								createdAt: (withdrawal.createdAt as Date).toISOString(),
-								reason: withdrawal.withdrawalReason || '',
-								method: withdrawal.withdrawalMethod || '',
-								actor:
-									(withdrawal.metadata as Record<string, unknown>)?.actor ||
-									'system',
-								metadata: withdrawal.metadata as Record<string, unknown>,
-							})
-						),
+						givenAt: consent.givenAt.toISOString(),
+						withdrawals: withdrawals.map((withdrawal) => ({
+							id: withdrawal.id,
+							createdAt: withdrawal.createdAt.toISOString(),
+							reason: withdrawal.withdrawalReason,
+							method: withdrawal.withdrawalMethod,
+							actor:
+								(withdrawal.metadata as Record<string, unknown>)?.actor ||
+								'system',
+							metadata: withdrawal.metadata,
+						})),
 						records: records.map((record: EntityOutputFields<'record'>) => ({
 							id: record.id,
-							createdAt: (record.createdAt as Date).toISOString(),
-							type: record.actionType as string,
-							details: record.details as Record<string, unknown>,
+							createdAt: record.createdAt.toISOString(),
+							type: record.actionType,
+							details: record.id,
 						})),
 					};
 				})
@@ -103,7 +96,7 @@ export const getConsentHistory = createAuthEndpoint(
 				const logs = await registry.findAuditLogs(params.userId);
 				auditLogs = logs.map((log: EntityOutputFields<'auditLog'>) => ({
 					id: log.id,
-					createdAt: (log.createdAt as Date).toISOString(),
+					createdAt: log.createdAt.toISOString(),
 					actionType: log.actionType as string,
 					details: log.changes as Record<string, unknown>,
 				}));

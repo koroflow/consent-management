@@ -22,7 +22,7 @@ import { z } from 'zod';
  * ```
  */
 export const userSchema = z.object({
-	id: z.string().uuid(),
+	id: z.string(),
 	isIdentified: z.boolean().default(false),
 	externalId: z.string().optional(),
 	identityProvider: z.string().optional(),

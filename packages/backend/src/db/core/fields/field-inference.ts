@@ -4,6 +4,8 @@ import type {
 	Primitive,
 	InferValueType as BaseInferValueType,
 } from './field-types';
+import type { z } from 'zod';
+import { createFieldValueSchema, validateField } from './zod-fields';
 
 /**
  * Infers the JavaScript type from a field type.
@@ -349,3 +351,19 @@ export type TransformInputFn<TFieldType extends FieldType> = (
 export type TransformOutputFn<TFieldType extends FieldType> = (
 	value: InferValueType<TFieldType>
 ) => Primitive | Promise<Primitive>;
+
+/**
+ * Creates a Zod schema for a field's value based on its type.
+ * This is a convenience function that uses the field's configuration
+ * to create an appropriate Zod schema for validation.
+ *
+ * @template TFieldType - The field type to create a schema for
+ * @param field - The field configuration to create a schema from
+ * @returns A Zod schema that validates values for this field
+ */
+export function createFieldSchema<TFieldType extends FieldType>(
+	field: Field<TFieldType>
+): z.ZodType<InferValueType<TFieldType>> {
+	const validatedField = validateField(field);
+	return createFieldValueSchema(validatedField);
+}

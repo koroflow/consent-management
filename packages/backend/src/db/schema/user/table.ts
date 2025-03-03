@@ -41,7 +41,7 @@ export function getUserTable(
 		entityPrefix: userConfig?.entityPrefix || 'usr',
 
 		/**
-		 * The schema for the user table
+		 * The Zod schema for the user table
 		 */
 		schema: userSchema,
 

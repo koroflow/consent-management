@@ -6,6 +6,7 @@ import {
 	createRouter,
 } from 'better-call';
 import type { C15TOptions, C15TPlugin, C15TContext } from '~/types';
+import { getIp } from '~/utils/ip';
 
 import { originCheckMiddleware } from './middlewares/origin-check';
 import { validateContextMiddleware } from './middlewares/validate-context';
@@ -198,17 +199,20 @@ export const router = <
 			},
 			...middlewares,
 		],
-		// async onRequest(req) {
-		// 	for (const plugin of ctx.options.plugins || []) {
-		// 		if (plugin.onRequest) {
-		// 			const response = await plugin.onRequest(req, ctx);
-		// 			if (response && "response" in response) {
-		// 				return response.response;
-		// 			}
-		// 		}
-		// 	}
-		// 	return onRequestRateLimit(req, ctx);
-		// },
+		async onRequest(req) {
+			// Add IP address to context
+			(ctx as C15TContext).ipAddress = getIp(req, options);
+
+			for (const plugin of ctx.options.plugins || []) {
+				if (plugin.onRequest) {
+					const response = await plugin.onRequest(req, ctx);
+					if (response && 'response' in response) {
+						return response.response;
+					}
+				}
+			}
+			return req;
+		},
 
 		/**
 		 * Handle response processing through plugins

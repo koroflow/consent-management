@@ -100,10 +100,10 @@ export function shouldUseSuperJson(
  * @param dbType - The database type (defaults to current global setting)
  * @returns Transformed value appropriate for the database
  */
-export function transformForDb(
-	value: unknown,
+export function transformForDb<T>(
+	value: T,
 	dbType: DatabaseType = currentDatabaseType
-): unknown {
+): T | string {
 	// For SQLite, always use SuperJSON
 	if (dbType === 'sqlite') {
 		return superjson.stringify(value);
@@ -129,7 +129,7 @@ export function transformForDb(
  * @param value - The value from the database
  * @returns Parsed value
  */
-export function parseFromDb(value: unknown): unknown {
+export function parseFromDb(value: unknown) {
 	// If the value is a string and might be SuperJSON format
 	if (typeof value === 'string' && isSuperJsonString(value)) {
 		try {

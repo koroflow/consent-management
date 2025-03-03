@@ -16,7 +16,7 @@ const withdrawByConsentIdSchema = z.object({
 });
 
 const withdrawByUserIdSchema = z.object({
-	userId: z.string().uuid(),
+	userId: z.string(),
 	domain: z.string(),
 	identifierType: z.literal('userId'),
 	reason: z.string().optional(),
@@ -168,7 +168,7 @@ export const withdrawConsent = createAuthEndpoint(
 				| Record<string, string>
 				| undefined;
 			const deviceInfo = requestHeaders?.['user-agent'] || '';
-			// @ts-ignore
+			// @ts-expect-error
 			const ipAddress = ctx.request?.ip || '';
 
 			// Process each consent record to withdraw
@@ -191,7 +191,7 @@ export const withdrawConsent = createAuthEndpoint(
 
 				// Add consent record for the withdrawal
 				await registry.createRecord({
-					userId: record.userId as string,
+					userId: record.userId,
 					consentId: record.id,
 					actionType: 'withdraw_consent',
 					details: {
@@ -204,7 +204,7 @@ export const withdrawConsent = createAuthEndpoint(
 
 				// Log the action in the audit log
 				await registry.createAuditLog({
-					userId: record.userId as string,
+					userId: record.userId,
 					entityType: 'consent',
 					entityId: record.id,
 					actionType: 'withdraw_consent',

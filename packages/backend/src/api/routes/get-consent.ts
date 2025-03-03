@@ -6,7 +6,7 @@ import type { EntityOutputFields } from '~/db/schema/definition';
 
 // Define schemas for the different identification methods
 const getByUserIdSchema = z.object({
-	userId: z.string().uuid(),
+	userId: z.string(),
 	domain: z.string().optional(),
 	identifierType: z.literal('userId'),
 });
@@ -163,7 +163,7 @@ export const getConsent = createAuthEndpoint(
 						userId: user.id,
 						// domain: consent.domainId,
 						// status: consent.status,
-						givenAt: (consent.givenAt as Date).toISOString(),
+						givenAt: consent.givenAt.toISOString(),
 						// policyId: consent.policyId || '',
 						//@ts-expect-error
 						preferences: consent.preferences || {},

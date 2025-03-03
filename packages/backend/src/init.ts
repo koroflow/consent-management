@@ -32,7 +32,7 @@ import {
 } from './error';
 import { type C15TResult, fail, ok } from './error/results';
 import { defu } from 'defu';
-import { generateId } from './db/core/fields';
+import { generateId } from './db/core/fields/id-generator';
 
 /**
  * Helper function to convert a Promise to a C15T-specific ResultAsync

@@ -6,11 +6,11 @@ import type {
 	EntityInput,
 	EntityOutput,
 } from '~/db/core/types';
-import type { TableFields } from '~/db/schema/definition';
+
 import { generateId, type Field, type Primitive } from '~/db/core/fields';
 
 import { applyDefaultValue } from '../utils';
-import type { Adapter, Where } from '../types';
+import type { Adapter, TableFields, Where } from '../types';
 
 /**
  * In-memory database structure for the memory adapter

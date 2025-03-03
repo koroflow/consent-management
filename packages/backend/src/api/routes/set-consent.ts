@@ -5,7 +5,7 @@ import type { C15TContext } from '../../types';
 
 // Define the schema for validating request body
 const setConsentSchema = z.object({
-	userId: z.string().uuid(),
+	userId: z.string(),
 	domain: z.string(),
 	// Preferences now use timestamps directly (null = disabled)
 	preferences: z
