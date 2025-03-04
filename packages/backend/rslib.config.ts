@@ -97,7 +97,7 @@ export default defineConfig({
 		},
 	],
 	output: {
-		target: 'web',
+		target: 'node',
 		cleanDistPath: true,
 		externals,
 	},
