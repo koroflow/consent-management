@@ -38,9 +38,18 @@ export function getWithHooks(adapter: Adapter, ctx: HookContext) {
 		createWithHooks: <
 			TInputData extends Record<string, unknown>,
 			TOutputData extends Record<string, unknown> = TInputData,
-		>(
-			props: CreateWithHooksProps<TInputData>
-		) => createWithHook<TInputData, TOutputData>(adapter, ctx, props),
+		>({
+			data,
+			model,
+			customFn,
+			context,
+		}: CreateWithHooksProps<TInputData>) =>
+			createWithHook<TInputData, TOutputData>(adapter, ctx, {
+				data,
+				model,
+				customFn,
+				context,
+			}),
 
 		updateWithHooks: <
 			TInputData extends Record<string, unknown>,

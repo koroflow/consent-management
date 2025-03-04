@@ -22,6 +22,17 @@ import { z } from 'zod';
  *
  * // Validate and parse the purpose data
  * const validPurpose = purposeSchema.parse(purposeData);
+ *
+ * // Example with missing fields (defaults will be applied)
+ * const minimalPurposeData = {
+ *   id: '123e4567-e89b-12d3-a456-426614174000',
+ *   code: 'marketing',
+ *   name: 'Marketing Communications',
+ *   description: 'Allow us to send you marketing materials',
+ * };
+ *
+ * // isEssential will default to false, isActive to true, etc.
+ * const purposeWithDefaults = purposeSchema.parse(minimalPurposeData);
  * ```
  */
 export const purposeSchema = z.object({

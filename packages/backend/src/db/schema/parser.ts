@@ -68,20 +68,83 @@ export function parseEntityOutputData<
 }
 
 /**
+ * Type representing a field conflict resolution strategy
+ */
+export type FieldConflictResolution = {
+	/**
+	 * How to handle conflicting field definitions
+	 * - 'error': Throw an error when conflicts are detected
+	 * - 'warn': Log a warning and use the last definition
+	 * - 'silent': Silently use the last definition
+	 */
+	strategy: 'error' | 'warn' | 'silent';
+
+	/**
+	 * Optional callback for logging warnings
+	 * Only used when strategy is 'warn'
+	 */
+	onWarning?: (message: string) => void;
+};
+
+/**
  * Retrieves all fields for a specific table, combining base configuration and plugin fields
  *
  * @param options - The C15T configuration options
  * @param table - The table name to get fields for
+ * @param conflictResolution - How to handle conflicting field definitions
  * @returns Combined fields from configuration and plugins
+ *
+ * @throws {APIError} When field conflicts are detected and strategy is 'error'
+ *
+ * @example
+ * ```typescript
+ * // Get fields with conflict resolution
+ * const fields = getAllFields(options, 'user', {
+ *   strategy: 'warn',
+ *   onWarning: (msg) => console.warn(msg)
+ * });
+ * ```
  */
-export function getAllFields(options: C15TOptions, table: string) {
-	let schema: Record<string, Field> = {};
+export function getAllFields(
+	options: C15TOptions,
+	table: string,
+	conflictResolution: FieldConflictResolution = { strategy: 'error' }
+) {
+	const schema: Record<string, Field> = {};
+	const fieldOrigins = new Map<string, string[]>();
+
+	// Helper to track field origins and handle conflicts
+	const addFields = (fields: Record<string, Field>, source: string) => {
+		for (const [key, field] of Object.entries(fields)) {
+			if (schema[key]) {
+				const origins = fieldOrigins.get(key) || [];
+				origins.push(source);
+				fieldOrigins.set(key, origins);
+
+				// Handle conflict based on strategy
+				if (conflictResolution.strategy === 'error') {
+					throw new APIError('BAD_REQUEST', {
+						message: `Field conflict detected for '${key}' in table '${table}'. Defined in: ${origins.join(', ')}`,
+					});
+				}
+				if (
+					conflictResolution.strategy === 'warn' &&
+					conflictResolution.onWarning
+				) {
+					conflictResolution.onWarning(
+						`Field conflict detected for '${key}' in table '${table}'. Using last definition from ${source}.`
+					);
+				}
+			}
+			schema[key] = field;
+		}
+	};
 
 	// Get additional fields from the tables configuration if available
 	if (options.tables && table in options.tables) {
 		const tableConfig = options.tables[table as keyof typeof options.tables];
 		if (tableConfig?.additionalFields) {
-			schema = { ...schema, ...tableConfig.additionalFields };
+			addFields(tableConfig.additionalFields, 'table configuration');
 		}
 	}
 
@@ -89,15 +152,41 @@ export function getAllFields(options: C15TOptions, table: string) {
 	for (const plugin of options.plugins || []) {
 		const pluginSchema = plugin.schema as C15TPluginSchema | undefined;
 		if (pluginSchema?.[table]) {
-			schema = {
-				...schema,
-				...pluginSchema[table].fields,
-			};
+			addFields(
+				pluginSchema[table].fields,
+				`plugin: ${plugin.name || 'unnamed'}`
+			);
 		}
 	}
 
 	return schema;
 }
+
+/**
+ * Configuration for handling extra fields in input data
+ */
+export type ExtraFieldsConfig = {
+	/**
+	 * How to handle fields not defined in the schema
+	 * - 'error': Throw an error when extra fields are detected
+	 * - 'warn': Log a warning and include the fields
+	 * - 'silent': Silently include the fields
+	 * - 'drop': Silently drop the fields
+	 */
+	strategy: 'error' | 'warn' | 'silent' | 'drop';
+
+	/**
+	 * Optional callback for logging warnings
+	 * Only used when strategy is 'warn'
+	 */
+	onWarning?: (message: string) => void;
+
+	/**
+	 * Optional list of field names that are always allowed
+	 * regardless of schema definition
+	 */
+	allowedExtraFields?: string[];
+};
 
 /**
  * Parses and validates input data according to schema field definitions.
@@ -115,17 +204,20 @@ export function getAllFields(options: C15TOptions, table: string) {
  * @param schema - The schema to validate against
  * @param schema.fields - Record of field definitions
  * @param schema.action - The current operation ('create' or 'update')
+ * @param extraFieldsConfig - How to handle fields not defined in the schema
  *
  * @returns The validated and transformed data
  *
  * @throws {APIError} When a required field is missing during creation
+ * @throws {APIError} When extra fields are detected and strategy is 'error'
  *
  * @example
  * ```typescript
  * // Input data from client
  * const inputData = {
  *   email: 'user@example.com',
- *   role: 'user'
+ *   role: 'user',
+ *   extraField: 'value' // Field not in schema
  * };
  *
  * // Schema with field definitions
@@ -159,14 +251,12 @@ export function getAllFields(options: C15TOptions, table: string) {
  *   action: 'create'
  * };
  *
- * // Process the data
- * const validatedData = parseInputData(inputData, userSchema);
- * // Result: {
- * //   id: 'generated-uuid',
- * //   email: 'user@example.com',
- * //   role: 'user',
- * //   createdAt: Date
- * // }
+ * // Process the data with extra fields config
+ * const validatedData = parseInputData(inputData, userSchema, {
+ *   strategy: 'warn',
+ *   onWarning: (msg) => console.warn(msg),
+ *   allowedExtraFields: ['metadata']
+ * });
  * ```
  *
  * @remarks
@@ -180,11 +270,17 @@ export function parseInputData<EntityType extends Record<string, unknown>>(
 	schema: {
 		fields: Record<string, Field>;
 		action?: 'create' | 'update';
-	}
+	},
+	extraFieldsConfig: ExtraFieldsConfig = { strategy: 'error' }
 ) {
 	const action = schema.action || 'create';
 	const fields = schema.fields;
 	const parsedData: Record<string, unknown> = {};
+
+	// Track extra fields for potential errors/warnings
+	const extraFields = new Set<string>();
+
+	// Process schema-defined fields
 	for (const key in fields) {
 		if (Object.hasOwn(fields, key)) {
 			if (key in data) {
@@ -242,5 +338,61 @@ export function parseInputData<EntityType extends Record<string, unknown>>(
 			}
 		}
 	}
+
+	// Handle extra fields
+	for (const key in data) {
+		if (Object.hasOwn(data, key) && !(key in fields)) {
+			extraFields.add(key);
+		}
+	}
+
+	// Process extra fields based on configuration
+	if (extraFields.size > 0) {
+		const allowedFields = new Set(extraFieldsConfig.allowedExtraFields || []);
+		const unallowedFields = Array.from(extraFields).filter(
+			(field) => !allowedFields.has(field)
+		);
+
+		if (unallowedFields.length > 0) {
+			switch (extraFieldsConfig.strategy) {
+				case 'error':
+					throw new APIError('BAD_REQUEST', {
+						message: `Unexpected fields found: ${unallowedFields.join(', ')}`,
+					});
+				case 'warn': {
+					if (extraFieldsConfig.onWarning) {
+						extraFieldsConfig.onWarning(
+							`Unexpected fields found: ${unallowedFields.join(', ')}`
+						);
+					}
+					// Include all extra fields
+					for (const key of extraFields) {
+						parsedData[key] = data[key];
+					}
+					break;
+				}
+				case 'silent':
+					// Include all extra fields
+					for (const key of extraFields) {
+						parsedData[key] = data[key];
+					}
+					break;
+				case 'drop':
+					// Fields are already dropped, no action needed
+					break;
+				default:
+					// Default to error strategy for type safety
+					throw new APIError('BAD_REQUEST', {
+						message: `Unexpected fields found: ${unallowedFields.join(', ')}`,
+					});
+			}
+		} else {
+			// Include allowed extra fields
+			for (const key of extraFields) {
+				parsedData[key] = data[key];
+			}
+		}
+	}
+
 	return parsedData as Partial<EntityType>;
 }

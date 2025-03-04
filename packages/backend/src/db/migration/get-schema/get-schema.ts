@@ -15,6 +15,13 @@ import type { SchemaDefinition } from './types';
  *
  * @example
  * ```typescript
+ * import type { C15TOptions } from '~/types';
+ *
+ * // Your configuration
+ * const c15tConfig: C15TOptions = {
+ *   // configuration properties
+ * };
+ *
  * const schema = getSchema(c15tConfig);
  * // Use schema for migrations or database operations
  * ```

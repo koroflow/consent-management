@@ -25,8 +25,15 @@ export const purposeJunctionSchema = z.object({
 	id: z.string(),
 	consentId: z.string(),
 	purposeId: z.string(),
-	status: z.enum(['active', 'withdrawn']).default('active'),
-	metadata: z.record(z.unknown()).optional(),
+	status: z
+		.enum(['active', 'withdrawn'], {
+			errorMap: () => ({
+				message: "Status must be either 'active' or 'withdrawn'",
+			}),
+		})
+		.default('active'),
+
+	metadata: z.record(z.union([z.string(), z.number(), z.boolean()])).optional(),
 	createdAt: z.date().default(() => new Date()),
 	updatedAt: z.date().optional(),
 });

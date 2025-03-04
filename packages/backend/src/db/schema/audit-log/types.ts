@@ -7,15 +7,18 @@ import type { BaseEntityConfig } from '../types';
 
 /**
  * Audit log entity configuration
- * @default entityName: "auditLog", entityPrefix: "log"
+ * @default {entityName: "auditLog", entityPrefix: "log"}
+ *
+ * These defaults are applied when creating an audit log entity if not explicitly specified.
+ * See the entity creation utilities for implementation details.
  */
 export interface AuditLogEntityConfig extends BaseEntityConfig {
 	fields?: Record<string, string> & {
 		id?: string;
-		timestamp?: string;
-		action?: string;
+		timestamp: string;
+		action: string;
 		userId?: string;
-		resourceType?: string;
+		resourceType: string;
 		resourceId?: string;
 		actor?: string;
 		changes?: string;

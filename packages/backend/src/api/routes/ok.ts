@@ -20,6 +20,12 @@ export const ok = createAuthEndpoint(
 										ok: {
 											type: 'boolean',
 										},
+										version: {
+											type: 'string',
+										},
+										timestamp: {
+											type: 'string',
+										},
 									},
 								},
 							},
@@ -32,6 +38,8 @@ export const ok = createAuthEndpoint(
 	async (ctx) => {
 		return ctx.json({
 			ok: true,
+			version: process.env.API_VERSION || '1.0.0',
+			timestamp: new Date().toISOString(),
 		});
 	}
 );

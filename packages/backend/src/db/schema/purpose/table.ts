@@ -111,7 +111,7 @@ export function getPurposeTable(
 			 */
 			isActive: {
 				type: 'boolean',
-				defaultValue: () => true,
+				defaultValue: true,
 				required: true,
 				fieldName: purposeConfig?.fields?.isActive || 'isActive',
 			},

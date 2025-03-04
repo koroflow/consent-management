@@ -109,7 +109,7 @@ export function getConsentPolicyTable(
 			 */
 			isActive: {
 				type: 'boolean',
-				defaultValue: () => true,
+				defaultValue: true,
 				required: true,
 				fieldName: consentPolicyConfig?.fields?.isActive || 'isActive',
 			},

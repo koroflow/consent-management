@@ -1,31 +1,12 @@
 import { defineConfig } from '@rslib/core';
 
 const externals = [
+	// Database packages
 	'prisma',
 	'@prisma/client',
 	'better-sqlite3',
-	'react',
-	'vue',
-	'solid-js',
-	'solid-js/store',
-	'next/headers',
-	'$app/environment',
-	'vitest',
-	'@vitest/runner',
-	'@vitest/utils',
-	'@vitest/expect',
-	'@vitest/snapshot',
-	'@vitest/spy',
-	'chai',
 	'mongodb',
 	'drizzle-orm',
-	'pathe',
-	'std-env',
-	'magic-string',
-	'pretty-format',
-	'p-limit',
-	'tinyspy',
-	'next/dist/compiled/@edge-runtime/cookies',
 	'bson',
 	'mongodb-connection-string-url',
 	'@mongodb-js/saslprep',
@@ -33,16 +14,42 @@ const externals = [
 	'@mongodb-js/zstd',
 	'@aws-sdk/credential-providers',
 	'mongodb-client-encryption',
+
+	// UI frameworks
+	'react',
+	'vue',
+	'solid-js',
+	'solid-js/store',
+	'next/headers',
+	'$app/environment',
 	'@vue/runtime-dom',
 	'@vue/runtime-core',
 	'@vue/shared',
 	'@vue/reactivity',
 	'@vue/compiler-dom',
 	'@vue/compiler-core',
+	'csstype',
+
+	// Testing libraries
+	'vitest',
+	'@vitest/runner',
+	'@vitest/utils',
+	'@vitest/expect',
+	'@vitest/snapshot',
+	'@vitest/spy',
+	'chai',
+	'tinyspy',
+
+	// Utilities and others
+	'pathe',
+	'std-env',
+	'magic-string',
+	'pretty-format',
+	'p-limit',
+	'next/dist/compiled/@edge-runtime/cookies',
 	'@babel/types',
 	'@babel/parser',
 	'punycode',
-	'csstype',
 ];
 
 export default defineConfig({

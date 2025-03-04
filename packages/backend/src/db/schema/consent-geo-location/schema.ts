@@ -31,9 +31,12 @@ export const consentGeoLocationSchema = z.object({
 	country: z.string().optional(),
 	region: z.string().optional(),
 	city: z.string().optional(),
-	latitude: z.number().optional(),
-	longitude: z.number().optional(),
-	timezone: z.string().optional(),
+	latitude: z.number().min(-90).max(90).optional(),
+	longitude: z.number().min(-180).max(180).optional(),
+	timezone: z
+		.string()
+		.regex(/^[A-Za-z_]+\/[A-Za-z_]+$/)
+		.optional(), // Basic IANA timezone format check
 	createdAt: z.date().default(() => new Date()),
 });
 

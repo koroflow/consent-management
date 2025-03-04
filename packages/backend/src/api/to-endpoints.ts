@@ -109,7 +109,35 @@ export function toEndpoints<EndpointMap extends Record<string, C15TEndpoint>>(
 				}
 				internalContext = defu(rest, internalContext);
 			} else if (before) {
-				/* Return before hook response if it's anything other than a context return */
+				/**
+				 * Short-circuit behavior:
+				 * If a before hook returns anything other than a context object,
+				 * that value is immediately returned and all subsequent processing
+				 * (remaining hooks and endpoint execution) is bypassed.
+				 *
+				 * This allows hooks to:
+				 * - Return early with a cached response
+				 * - Block requests by returning an error
+				 * - Transform the request flow entirely
+				 *
+				 * @example
+				 * ```typescript
+				 * // Hook that returns early with cached data
+				 * const cacheHook: C15TMiddleware = async (ctx) => {
+				 *   const cached = await cache.get(ctx.path);
+				 *   if (cached) return { data: cached }; // Short-circuits
+				 *   return { context: {} }; // Continues processing
+				 * };
+				 *
+				 * // Hook that blocks unauthorized requests
+				 * const authHook: C15TMiddleware = async (ctx) => {
+				 *   if (!ctx.headers.get('Authorization')) {
+				 *     return new APIError('UNAUTHORIZED', 'Missing auth token');
+				 *   }
+				 *   return { context: {} };
+				 * };
+				 * ```
+				 */
 				return before;
 			}
 

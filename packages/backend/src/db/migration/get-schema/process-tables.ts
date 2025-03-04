@@ -27,7 +27,15 @@ export function processTablesIntoSchema(
 		// Process the fields for this table
 		let actualFields: Record<string, Field>;
 		try {
-			actualFields = processFields(table.fields || {}, tables);
+			const fields = table.fields;
+			if (typeof fields !== 'object' || fields === null) {
+				// biome-ignore lint/suspicious/noConsole: its okay
+				console.warn(
+					`Invalid fields for table ${key}: Expected object, got ${typeof fields}`
+				);
+				continue;
+			}
+			actualFields = processFields(fields, tables);
 		} catch (error) {
 			// biome-ignore lint/suspicious/noConsole: its okay
 			console.error(`Error processing fields for table ${key}:`, error);
@@ -43,7 +51,7 @@ export function processTablesIntoSchema(
 			schema[EntityName] = {
 				...schema[EntityName],
 				fields: {
-					...schema[EntityName].fields,
+					...schema[EntityName]?.fields,
 					...actualFields,
 				},
 			};

@@ -4,7 +4,8 @@
  * This module provides functionality to generate and execute database migrations
  * based on schema definitions.
  *
- * this is inspired by better-auth migration system
+ * This is inspired by the better-auth migration system
+ * (https://github.com/betterauth/better-auth or relevant link)
  *
  * @module migration
  */

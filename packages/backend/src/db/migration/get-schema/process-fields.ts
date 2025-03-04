@@ -16,7 +16,7 @@ import type { EntityName } from '~/db/core/types';
 export function processFields<T extends EntityName>(
 	fields: C15TDBSchema[T]['fields'],
 	tables: C15TDBSchema
-) {
+): Record<string, Field> {
 	const actualFields: Record<string, Field> = {};
 
 	// Process each field in the fields collection

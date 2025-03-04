@@ -11,6 +11,7 @@ export interface GeoLocationEntityConfig extends BaseEntityConfig {
 		countryName?: string;
 		regionCode?: string;
 		regionName?: string;
+		// For comma-separated values
 		regulatoryZones?: string;
 		createdAt?: string;
 	};

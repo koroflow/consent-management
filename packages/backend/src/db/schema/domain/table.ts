@@ -84,7 +84,7 @@ export function getDomainTable(
 			 */
 			isVerified: {
 				type: 'boolean',
-				defaultValue: () => true,
+				defaultValue: true,
 				required: true,
 				fieldName: domainConfig?.fields?.isVerified || 'isVerified',
 			},
@@ -95,7 +95,7 @@ export function getDomainTable(
 			 */
 			isActive: {
 				type: 'boolean',
-				defaultValue: () => true,
+				defaultValue: true,
 				required: true,
 				fieldName: domainConfig?.fields?.isActive || 'isActive',
 			},

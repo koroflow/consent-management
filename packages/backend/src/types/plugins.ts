@@ -111,6 +111,11 @@ export interface C15TPlugin {
 	id: LiteralString;
 
 	/**
+	 * Name of the plugin
+	 */
+	name: string;
+
+	/**
 	 * Type of plugin for classification and type guards
 	 */
 	type: string;

@@ -90,7 +90,7 @@ export const validateContextMiddleware = createAuthMiddleware(async (ctx) => {
 
 	// Basic context validation
 	if (!context || typeof context !== 'object') {
-		throw new APIError('FORBIDDEN', {
+		throw new APIError('BAD_REQUEST', {
 			message: BASE_ERROR_CODES.INVALID_CONFIGURATION,
 			status: 400,
 			data: redactContext(context),
@@ -102,7 +102,7 @@ export const validateContextMiddleware = createAuthMiddleware(async (ctx) => {
 
 	// Validate required configuration
 	if (!typedContext.options) {
-		throw new APIError('FORBIDDEN', {
+		throw new APIError('BAD_REQUEST', {
 			message: BASE_ERROR_CODES.INVALID_CONFIGURATION,
 			status: 400,
 			data: { error: 'Missing required configuration' },

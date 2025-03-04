@@ -28,6 +28,28 @@ import type { Database as KyselyDatabase } from '~/db/adapters/kysely-adapter/ty
  */
 export interface Database extends EntityTypeMap {
 	// Add any adapter-specific table types here if needed
+	// These are tables that are created and managed by the adapter itself
+	// rather than being part of the core schema
+
+	/**
+	 * Migration history table used by the adapter to track schema changes
+	 */
+	migrations: {
+		id: string;
+		name: string;
+		applied_at: Date;
+		batch: number;
+	};
+
+	/**
+	 * Temporary tables used during migrations
+	 * These are created and dropped during the migration process
+	 */
+	_migration_temp: {
+		id: string;
+		table_name: string;
+		created_at: Date;
+	};
 }
 
 /**
@@ -160,9 +182,23 @@ export interface DialectConfig {
 	/**
 	 * Casing style for table names in the database
 	 *
+	 * This affects how table names are transformed when interacting with the database.
+	 * For example, with 'camel' casing, 'userProfile' becomes 'user_profile' in the database.
+	 * With 'snake' casing, it remains as 'user_profile'.
+	 *
 	 * @default "camel"
 	 */
 	casing?: 'snake' | 'camel';
+
+	/**
+	 * Whether to apply the casing transformation to column names as well
+	 *
+	 * When true, column names will be transformed according to the casing setting.
+	 * When false, column names will remain in their original case.
+	 *
+	 * @default true
+	 */
+	applyCasingToColumns?: boolean;
 }
 
 /**
@@ -220,9 +256,23 @@ export interface KyselyInstanceConfig {
 	/**
 	 * Casing style for table names in the database
 	 *
+	 * This affects how table names are transformed when interacting with the database.
+	 * For example, with 'camel' casing, 'userProfile' becomes 'user_profile' in the database.
+	 * With 'snake' casing, it remains as 'user_profile'.
+	 *
 	 * @default "camel"
 	 */
 	casing?: 'snake' | 'camel';
+
+	/**
+	 * Whether to apply the casing transformation to column names as well
+	 *
+	 * When true, column names will be transformed according to the casing setting.
+	 * When false, column names will remain in their original case.
+	 *
+	 * @default true
+	 */
+	applyCasingToColumns?: boolean;
 }
 
 /**

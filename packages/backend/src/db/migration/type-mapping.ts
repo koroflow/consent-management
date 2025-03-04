@@ -38,7 +38,7 @@ const postgresMap = {
  * Maps c15t field types to MySQL-specific column types
  */
 const mysqlMap = {
-	string: ['varchar', 'text'],
+	string: ['varchar(255)', 'varchar(36)', 'text'], // Common MySQL string variants
 	number: [
 		'integer',
 		'int',
@@ -51,7 +51,7 @@ const mysqlMap = {
 	boolean: ['boolean', 'tinyint'],
 	date: ['timestamp', 'datetime', 'date'],
 	json: ['json'],
-	timezone: ['varchar', 'text'], // Timezone stored as text in MySQL
+	timezone: ['varchar(50)'], // Fixed length for timezone strings
 };
 
 /**

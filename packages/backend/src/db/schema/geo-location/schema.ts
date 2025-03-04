@@ -25,11 +25,13 @@ import { z } from 'zod';
  */
 export const geoLocationSchema = z.object({
 	id: z.string(),
-	countryCode: z.string(),
+	countryCode: z.string().length(2).toUpperCase(),
 	countryName: z.string(),
 	regionCode: z.string().optional(),
 	regionName: z.string().optional(),
-	regulatoryZones: z.array(z.string()).optional(),
+	regulatoryZones: z
+		.array(z.enum(['GDPR', 'CCPA', 'CPRA', 'LGPD', 'PIPEDA']))
+		.optional(), // Add your actual regulatory zones
 	createdAt: z.date().default(() => new Date()),
 });
 

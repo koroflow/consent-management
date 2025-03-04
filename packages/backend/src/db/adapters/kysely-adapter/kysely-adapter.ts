@@ -990,7 +990,6 @@ export const kyselyAdapter =
 				const tableName = getEntityName(model);
 				let query = db
 					.selectFrom(tableName as unknown as keyof Database)
-					//@ts-expect-error
 					.select((eb) => eb.fn.count<number>('id').as('count'));
 
 				if (and) {

@@ -92,7 +92,7 @@ export const getConsentHistory = createAuthEndpoint(
 				actionType: string;
 				details: Record<string, unknown>;
 			}> = [];
-			if ('getAuditLogs' in registry) {
+			if ('findAuditLogs' in registry) {
 				const logs = await registry.findAuditLogs(params.userId);
 				auditLogs = logs.map((log: EntityOutputFields<'auditLog'>) => ({
 					id: log.id,
