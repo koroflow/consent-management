@@ -157,9 +157,16 @@ export const c15tInstance = <
 
 		// Map the Result to a ResultAsync for proper chaining
 		return contextResult.asyncAndThen((ctx: C15TContext) => {
-			const basePath = ctx.options.basePath || '/api/auth';
+			const basePath = ctx.options.basePath || '/api/c15t';
 			const url = new URL(request.url);
-			if (!ctx.options.baseURL) {
+			if (ctx.options.baseURL) {
+				// If baseURL is provided but doesn't include the basePath, add it
+				const baseURL = new URL(ctx.options.baseURL);
+				if (!baseURL.pathname || baseURL.pathname === '/') {
+					ctx.options.baseURL = `${baseURL.origin}${basePath}`;
+					ctx.baseURL = ctx.options.baseURL;
+				}
+			} else {
 				const baseURL =
 					getBaseURL(undefined, basePath) || `${url.origin}${basePath}`;
 				ctx.options.baseURL = baseURL;

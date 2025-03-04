@@ -30,7 +30,7 @@ const libsql = new LibsqlDialect({
  */
 export const c15t = c15tInstance({
 	appName: 'Next.js Example App',
-	basePath: '/api/c15t',
+	// basePath: '/api/c15t',
 	// Add any trusted origins if needed
 	trustedOrigins: ['http://localhost:3000'],
 	// Configure storage adapter

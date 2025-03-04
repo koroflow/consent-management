@@ -52,8 +52,8 @@ export const status = createAuthEndpoint(
 			version: '1.0.0',
 			timestamp: new Date().toISOString(),
 			storage: {
-				type: ctx.context?.storage?.constructor.name ?? 'Unavailable',
-				available: !!ctx.context?.storage,
+				type: ctx.context?.adapter?.id ?? 'Unavailable',
+				available: !!ctx.context?.adapter,
 			},
 		};
 

@@ -114,7 +114,8 @@
 		"check-types": "tsc --noEmit",
 		"fmt": "pnpm biome format --write .",
 		"knip": "knip",
-		"lint": "pnpm biome lint ./src"
+		"lint": "pnpm biome lint ./src",
+		"test": "vitest"
 	},
 	"dependencies": {
 		"@better-fetch/fetch": "^1.1.15",

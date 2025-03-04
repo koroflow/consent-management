@@ -171,9 +171,14 @@ export const router = <
 	let basePath = '';
 	try {
 		if (ctx.baseURL) {
-			basePath = new URL(ctx.baseURL).pathname;
+			const url = new URL(ctx.baseURL);
+			basePath = url.pathname;
 		}
 	} catch {
+		basePath = '/api/c15t';
+	}
+	// Ensure we have a valid basePath
+	if (!basePath || basePath === '/') {
 		basePath = '/api/c15t';
 	}
 

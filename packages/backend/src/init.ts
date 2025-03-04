@@ -191,7 +191,7 @@ function runPluginInit(ctx: C15TContext): C15TResult<C15TContext> {
 				const result = plugin.init(ctx);
 				if (typeof result === 'object') {
 					if (result.options) {
-						options = defu(options, result.options);
+						options = defu(result.options, options);
 					}
 					if (result.context) {
 						context = {
