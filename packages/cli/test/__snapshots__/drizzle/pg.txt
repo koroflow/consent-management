@@ -1,0 +1,132 @@
+import { pgTable, text, integer, timestamp, boolean, json } from "drizzle-orm/pg-core";
+
+export const user = pgTable("user", {
+  id: text("id").primaryKey(),
+  isIdentified: boolean('is_identified').notNull(),
+  externalId: text('external_id'),
+  identityProvider: text('identity_provider'),
+  lastIpAddress: text('last_ip_address'),
+  createdAt: timestamp('created_at').notNull(),
+  updatedAt: timestamp('updated_at').notNull(),
+  userTimezone: text('user_timezone')
+});
+
+export const purpose = pgTable("purpose", {
+  id: text("id").primaryKey(),
+  code: text('code').notNull(),
+  name: text('name').notNull(),
+  description: text('description').notNull(),
+  isEssential: boolean('is_essential').notNull(),
+  dataCategory: text('data_category'),
+  legalBasis: text('legal_basis'),
+  isActive: boolean('is_active').notNull(),
+  createdAt: timestamp('created_at').notNull(),
+  updatedAt: timestamp('updated_at').notNull()
+});
+
+export const consentPolicy = pgTable("consent_policy", {
+  id: text("id").primaryKey(),
+  version: text('version').notNull(),
+  name: text('name').notNull(),
+  effectiveDate: timestamp('effective_date').notNull(),
+  expirationDate: timestamp('expiration_date'),
+  content: text('content').notNull(),
+  contentHash: text('content_hash').notNull(),
+  isActive: boolean('is_active').notNull(),
+  createdAt: timestamp('created_at').notNull()
+});
+
+export const domain = pgTable("domain", {
+  id: text("id").primaryKey(),
+  name: text('name').notNull().unique(),
+  description: text('description'),
+  allowedOrigins: json('allowed_origins'),
+  isVerified: boolean('is_verified').notNull(),
+  isActive: boolean('is_active').notNull(),
+  createdAt: timestamp('created_at').notNull(),
+  updatedAt: timestamp('updated_at')
+});
+
+export const consent = pgTable("consent", {
+  id: text("id").primaryKey(),
+  userId: text('user_id').notNull().references(()=> user.id, { onDelete: 'cascade' }),
+  domainId: text('domain_id').notNull().references(()=> domain.id, { onDelete: 'cascade' }),
+  purposeIds: json('purpose_ids').notNull().references(()=> purpose.id, { onDelete: 'cascade' }),
+  metadata: json('metadata'),
+  policyId: text('policy_id').references(()=> consentPolicy.id, { onDelete: 'cascade' }),
+  ipAddress: text('ip_address'),
+  userAgent: text('user_agent'),
+  status: text('status').notNull(),
+  withdrawalReason: text('withdrawal_reason'),
+  givenAt: timestamp('given_at').notNull(),
+  validUntil: timestamp('valid_until'),
+  isActive: boolean('is_active').notNull()
+});
+
+export const purposeJunction = pgTable("purpose_junction", {
+  id: text("id").primaryKey(),
+  consentId: text('consent_id').notNull().references(()=> consent.id, { onDelete: 'cascade' }),
+  purposeId: text('purpose_id').notNull().references(()=> purpose.id, { onDelete: 'cascade' }),
+  status: text('status').notNull(),
+  metadata: json('metadata'),
+  createdAt: timestamp('created_at').notNull(),
+  updatedAt: timestamp('updated_at')
+});
+
+export const record = pgTable("record", {
+  id: text("id").primaryKey(),
+  userId: text('user_id').notNull().references(()=> user.id, { onDelete: 'cascade' }),
+  consentId: text('consent_id').references(()=> consent.id, { onDelete: 'cascade' }),
+  actionType: text('action_type').notNull(),
+  details: json('details'),
+  createdAt: timestamp('created_at').notNull()
+});
+
+export const consentGeoLocation = pgTable("consent_geo_location", {
+  id: text("id").primaryKey(),
+  consentId: text('consent_id').notNull().references(()=> consent.id, { onDelete: 'cascade' }),
+  ip: text('ip').notNull(),
+  country: text('country'),
+  region: text('region'),
+  city: text('city'),
+  latitude: integer('latitude'),
+  longitude: integer('longitude'),
+  timezone: text('timezone'),
+  createdAt: timestamp('created_at').notNull()
+});
+
+export const withdrawal = pgTable("withdrawal", {
+  id: text("id").primaryKey(),
+  consentId: text('consent_id').notNull().references(()=> consent.id, { onDelete: 'cascade' }),
+  userId: text('user_id').notNull().references(()=> user.id, { onDelete: 'cascade' }),
+  withdrawalReason: text('withdrawal_reason'),
+  withdrawalMethod: text('withdrawal_method').notNull(),
+  ipAddress: text('ip_address'),
+  userAgent: text('user_agent'),
+  metadata: json('metadata'),
+  createdAt: timestamp('created_at').notNull()
+});
+
+export const auditLog = pgTable("audit_log", {
+  id: text("id").primaryKey(),
+  entityType: text('entity_type').notNull(),
+  entityId: text('entity_id').notNull(),
+  actionType: text('action_type').notNull(),
+  userId: text('user_id').references(()=> user.id, { onDelete: 'cascade' }),
+  ipAddress: text('ip_address'),
+  userAgent: text('user_agent'),
+  changes: json('changes'),
+  metadata: json('metadata'),
+  createdAt: timestamp('created_at').notNull(),
+  eventTimezone: text('event_timezone').notNull()
+});
+
+export const geoLocation = pgTable("geo_location", {
+  id: text("id").primaryKey(),
+  countryCode: text('country_code').notNull(),
+  countryName: text('country_name').notNull(),
+  regionCode: text('region_code'),
+  regionName: text('region_name'),
+  regulatoryZones: json('regulatory_zones'),
+  createdAt: timestamp('created_at').notNull()
+});

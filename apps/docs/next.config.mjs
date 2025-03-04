@@ -6,7 +6,14 @@ const withMDX = createMDX({
 
 /** @type {import('next').NextConfig} */
 const config = {
-	serverExternalPackages: ['oxc-transform', 'shiki', 'ts-morph'],
+	serverExternalPackages: [
+		'oxc-transform',
+		'shiki',
+		'ts-morph',
+		'@libsql/kysely-libsql',
+		'libsql',
+	],
+
 	images: {
 		formats: ['image/avif', 'image/webp'],
 		remotePatterns: [

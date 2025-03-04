@@ -50,9 +50,9 @@ Using this hook helps your application comply with these WCAG 2.1 requirements:
 - [2.1.2: No Keyboard Trap](https://www.w3.org/WAI/WCAG21/Understanding/no-keyboard-trap.html) - While this criterion warns against trapping keyboard focus, modal dialogs are an exception when implemented properly
 - [2.4.3: Focus Order](https://www.w3.org/WAI/WCAG21/Understanding/focus-order.html) - Ensures focus moves in a meaningful sequence
 
-## Usage with C15t Components
+## Usage with c15t Components
 
-Many C15t components like `CookieBannerCard` and `ConsentManagerDialog` use this hook internally, so you don't need to implement it yourself when using these components. The `trapFocus` prop can be used to control this behavior:
+Many c15t components like `CookieBannerCard` and `ConsentManagerDialog` use this hook internally, so you don't need to implement it yourself when using these components. The `trapFocus` prop can be used to control this behavior:
 
 ```tsx
 // The dialog will automatically trap focus when open

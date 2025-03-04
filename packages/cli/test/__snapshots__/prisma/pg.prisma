@@ -1,0 +1,166 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String       @id
+  isIdentified     Boolean
+  externalId       String?
+  identityProvider String?
+  lastIpAddress    String?
+  createdAt        DateTime
+  updatedAt        DateTime
+  userTimezone     String
+  consents         Consent[]
+  records          Record[]
+  withdrawals      Withdrawal[]
+  auditlogs        AuditLog[]
+}
+
+model Purpose {
+  id               String            @id
+  code             String
+  name             String
+  description      String
+  isEssential      Boolean
+  dataCategory     String?
+  legalBasis       String?
+  isActive         Boolean
+  createdAt        DateTime
+  updatedAt        DateTime
+  consents         Consent[]
+  purposejunctions PurposeJunction[]
+}
+
+model ConsentPolicy {
+  id             String    @id
+  version        String
+  name           String
+  effectiveDate  DateTime
+  expirationDate DateTime?
+  content        String
+  contentHash    String
+  isActive       Boolean
+  createdAt      DateTime
+  consents       Consent[]
+}
+
+model Domain {
+  id             String    @id
+  name           String
+  description    String?
+  allowedOrigins Json?
+  isVerified     Boolean
+  isActive       Boolean
+  createdAt      DateTime
+  updatedAt      DateTime?
+  consents       Consent[]
+
+  @@unique([name])
+}
+
+model Consent {
+  id                  String               @id
+  userId              String
+  user                User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  domainId            String
+  domain              Domain               @relation(fields: [domainId], references: [id], onDelete: Cascade)
+  purposeIds          Json
+  purpose             Purpose              @relation(fields: [purposeIds], references: [id], onDelete: Cascade)
+  metadata            Json?
+  policyId            String?
+  consentpolicy       ConsentPolicy        @relation(fields: [policyId], references: [id], onDelete: Cascade)
+  ipAddress           String?
+  userAgent           String?
+  status              String
+  withdrawalReason    String?
+  givenAt             DateTime
+  validUntil          DateTime?
+  isActive            Boolean
+  purposejunctions    PurposeJunction[]
+  records             Record[]
+  consentgeolocations ConsentGeoLocation[]
+  withdrawals         Withdrawal[]
+}
+
+model PurposeJunction {
+  id        String    @id
+  consentId String
+  consent   Consent   @relation(fields: [consentId], references: [id], onDelete: Cascade)
+  purposeId String
+  purpose   Purpose   @relation(fields: [purposeId], references: [id], onDelete: Cascade)
+  status    String
+  metadata  Json?
+  createdAt DateTime
+  updatedAt DateTime?
+}
+
+model Record {
+  id         String   @id
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  consentId  String?
+  consent    Consent  @relation(fields: [consentId], references: [id], onDelete: Cascade)
+  actionType String
+  details    Json?
+  createdAt  DateTime
+}
+
+model ConsentGeoLocation {
+  id        String   @id
+  consentId String
+  consent   Consent  @relation(fields: [consentId], references: [id], onDelete: Cascade)
+  ip        String
+  country   String?
+  region    String?
+  city      String?
+  latitude  Int?
+  longitude Int?
+  timezone  String?
+  createdAt DateTime
+}
+
+model Withdrawal {
+  id               String   @id
+  consentId        String
+  consent          Consent  @relation(fields: [consentId], references: [id], onDelete: Cascade)
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  withdrawalReason String?
+  withdrawalMethod String
+  ipAddress        String?
+  userAgent        String?
+  metadata         Json?
+  createdAt        DateTime
+}
+
+model AuditLog {
+  id            String   @id
+  entityType    String
+  entityId      String
+  actionType    String
+  userId        String?
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ipAddress     String?
+  userAgent     String?
+  changes       Json?
+  metadata      Json?
+  createdAt     DateTime
+  eventTimezone String
+}
+
+model GeoLocation {
+  id              String   @id
+  countryCode     String
+  countryName     String
+  regionCode      String?
+  regionName      String?
+  regulatoryZones Json?
+  createdAt       DateTime
+}

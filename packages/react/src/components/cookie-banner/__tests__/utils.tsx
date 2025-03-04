@@ -17,7 +17,7 @@ async function testComponentStyles({
 	component,
 	testCases,
 	noStyle = false,
-}: ComponentStyles): Promise<void> {
+}: ComponentStyles) {
 	const { getByTestId } = render(
 		<ConsentManagerProvider>{component}</ConsentManagerProvider>
 	);
