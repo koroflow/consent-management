@@ -1,92 +1,164 @@
-# Consent Management System (c15t)
+# C15T Backend
 
-This package contains the database schema and logic for handling consent management in compliance with privacy regulations like GDPR, CCPA, and other international privacy laws.
+A robust consent management system backend that provides flexible database adapters, comprehensive audit logging, and a powerful plugin system.
 
-## Schema Overview
+## Features
 
-The consent management system is built on a PostgreSQL database with the following key components:
+### Database Adapters
+- **Memory Adapter**: In-memory storage for development and testing
+- **Kysely Adapter**: Type-safe SQL query builder with support for multiple databases
+- **Prisma Adapter**: Integration with Prisma ORM
+- **Drizzle Adapter**: Integration with Drizzle ORM
 
-### Core Entities
+### Core Functionality
+- **Consent Management**: Track and manage user consent preferences
+- **Audit Logging**: Comprehensive logging of all consent-related actions
+- **Geo-location Support**: Track user locations for compliance
+- **Domain Management**: Handle multiple domains and subdomains
+- **Policy Management**: Version and manage consent policies
 
-- **Users**: Individuals interacting with the system, either identified or anonymous
-- **Domains**: Sites or applications to which consent applies
-- **Consent Purposes**: Different reasons for processing personal data
-- **Consent Policies**: Versioned privacy policies shown to users
+### API Endpoints
+- `/api/c15t/status`: System status and configuration
+- `/api/c15t/consent`: Consent management endpoints
+- `/api/c15t/policy`: Policy management endpoints
+- `/api/c15t/audit`: Audit log access
+- `/api/c15t/domain`: Domain management
+- `/api/c15t/geo-location`: Geo-location tracking
 
-### Core Processes
+## Getting Started
 
-- **Consent Collection**: Recording user preferences for data processing
-- **Consent Withdrawal**: Tracking when a user revokes their consent
-- **Audit Trail**: Maintaining a comprehensive log of all consent-related activities
+### Installation
 
-## Key Terminology
-
-- **Consent**: A record of a user's permission to process their data for specific purposes
-- **Withdrawal/Revocation**: When a user revokes a previously granted consent
-- **Policy Version**: The specific version of the privacy policy the user agreed to
-- **Consent Record**: Evidence that captures how consent was obtained
-- **Audit Log**: Immutable record of all actions taken on consent data
-
-## Database Schema
-
-The database schema includes the following tables:
-
-- `users`: Stores user identity information
-- `consents`: Core table containing user consent records
-- `consent_withdrawals`: Tracks when and why consent was revoked
-- `consent_purposes`: Defines different purposes for data processing
-- `consent_purpose_junction`: Maps purposes to consent records
-- `domains`: Sites or applications to which consent applies
-- `consent_policies`: Versioned privacy policy documents
-- `consent_records`: Evidence of consent actions (submissions, interactions)
-- `geo_locations`: Geographic locations for regulatory compliance
-- `consent_geo_locations`: Links consents to geographic locations
-- `consent_audit_logs`: Comprehensive audit trail of all consent operations
-
-## Data Integrity
-
-The system maintains data integrity through:
-
-1. Foreign key relationships with cascading deletions where appropriate
-2. Constraints ensuring consent status consistency
-3. Triggers that automatically:
-   - Mark consents as inactive when withdrawn
-   - Create audit log entries for key operations
-
-## Usage Guidelines
-
-### Recording Consent
-
-When recording new consent, ensure you:
-1. Check if the user already has active consent for the domain
-2. Store all required contextual information (IP, timestamp, etc.)
-3. Record appropriate evidence in the `consent_records` table
-
-### Withdrawing Consent
-
-When processing a withdrawal request:
-1. Create a record in the `consent_withdrawals` table
-2. The system will automatically:
-   - Set the related consent to inactive
-   - Create an audit log entry
-   - Maintain the original consent record for compliance purposes
-
-### Querying Active Consent
-
-To determine if a user has given consent:
-```sql
-SELECT * FROM consents 
-WHERE user_id = ? AND domain_id = ? AND is_active = true;
+```bash
+npm install @c15t/backend
 ```
 
-## Legal Considerations
+### Basic Usage
 
-This system is designed to help with regulatory compliance but should be reviewed by legal counsel to ensure it meets the specific requirements of your jurisdiction and use case.
+```typescript
+import { c15tInstance } from '@c15t/backend';
+import { memoryAdapter } from '@c15t/backend/db/adapters/memory';
 
-## Maintenance
+const instance = c15tInstance({
+  baseURL: 'http://localhost:3000',
+  database: memoryAdapter({}),
+});
 
-When updating the schema:
-1. Add appropriate documentation for new fields
-2. Maintain foreign key relationships and constraints
-3. Update audit logging for new operations
-4. Test cascading behavior to prevent orphaned records 
+// Handle requests
+const response = await instance.handler(request);
+```
+
+### Database Configuration
+
+```typescript
+// Using Kysely adapter
+import { kyselyAdapter } from '@c15t/backend/db/adapters/kysely';
+
+const instance = c15tInstance({
+  baseURL: 'http://localhost:3000',
+  database: kyselyAdapter({
+    dialect: 'postgres',
+    connection: {
+      host: 'localhost',
+      port: 5432,
+      database: 'c15t',
+      user: 'postgres',
+      password: 'password',
+    },
+  }),
+});
+```
+
+### Plugin System
+
+```typescript
+const customPlugin = {
+  id: 'custom-plugin',
+  name: 'Custom Plugin',
+  type: 'test',
+  init: () => ({
+    context: {
+      customField: 'value',
+    },
+  }),
+  onRequest: async (request, ctx) => {
+    // Modify request
+    return { request: modifiedRequest };
+  },
+  onResponse: async (response, ctx) => {
+    // Modify response
+    return { response: modifiedResponse };
+  },
+};
+
+const instance = c15tInstance({
+  baseURL: 'http://localhost:3000',
+  database: memoryAdapter({}),
+  plugins: [customPlugin],
+});
+```
+
+## API Documentation
+
+### Core Instance
+
+```typescript
+interface C15TInstance {
+  options: C15TOptions;
+  $context: Promise<Result<C15TContext, C15TError>>;
+  handler: (request: Request) => Promise<Result<Response, C15TError>>;
+  getApi: () => Promise<Result<Record<string, unknown>, C15TError>>;
+}
+```
+
+### Database Adapters
+
+Each adapter provides a consistent interface for database operations:
+
+```typescript
+interface DatabaseAdapter {
+  create: <T extends Record<string, unknown>>(table: string, data: T) => Promise<T>;
+  find: <T extends Record<string, unknown>>(table: string, query: Query) => Promise<T[]>;
+  update: <T extends Record<string, unknown>>(table: string, query: Query, data: Partial<T>) => Promise<T>;
+  delete: (table: string, query: Query) => Promise<void>;
+}
+```
+
+### Plugin System
+
+Plugins can extend the system's functionality:
+
+```typescript
+interface C15TPlugin {
+  id: string;
+  name: string;
+  type: string;
+  init?: () => Promise<{ context: Record<string, unknown> }>;
+  onRequest?: (request: Request, ctx: C15TContext) => Promise<{ request: Request } | { response: Response } | undefined>;
+  onResponse?: (response: Response, ctx: C15TContext) => Promise<{ response: Response } | undefined>;
+}
+```
+
+## Error Handling
+
+The system uses a Result type for error handling:
+
+```typescript
+type Result<T, E> = { isOk: true; value: T } | { isOk: false; error: E };
+```
+
+## Security Features
+
+- Origin validation for CORS
+- Request validation
+- Audit logging
+- Secure ID generation
+- Input sanitization
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a new Pull Request
