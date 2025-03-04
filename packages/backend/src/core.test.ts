@@ -77,6 +77,7 @@ describe('c15tInstance', () => {
 			);
 
 			// Check version format (semver)
+			// biome-ignore lint/performance/useTopLevelRegex: <explanation>
 			expect(responseData.version).toMatch(/^\d+\.\d+\.\d+$/);
 		}
 	});
@@ -209,6 +210,63 @@ describe('c15tInstance', () => {
 		expect(context.isErr()).toBe(true);
 		if (context.isErr()) {
 			expect(context.error.message).toContain('Plugin initialization failed');
+		}
+	});
+
+	it('should handle base URL with trailing slash', async () => {
+		const instance = c15tInstance({
+			baseURL: 'http://localhost:3000/',
+			database: memoryAdapter({}),
+		});
+
+		const request = new Request('http://localhost:3000/api/c15t/status', {
+			method: 'GET',
+			headers: {
+				Accept: 'application/json',
+				Origin: 'http://localhost:3000',
+			},
+		});
+		const response = await instance.handler(request);
+		expect(response.isOk()).toBe(true);
+		if (response.isOk()) {
+			expect(response.value.status).toBe(200);
+		}
+	});
+
+	it('should handle plugin response modification', async () => {
+		const responsePlugin: C15TPlugin = {
+			id: 'response-plugin',
+			name: 'Response Plugin',
+			type: 'test',
+			onResponse: async (response, ctx) => {
+				const data = await response.clone().json();
+				return {
+					response: new Response(JSON.stringify({ ...data, modified: true }), {
+						status: response.status,
+						headers: response.headers,
+					}),
+				};
+			},
+		};
+
+		const instance = c15tInstance({
+			baseURL: 'http://localhost:3000',
+			database: memoryAdapter({}),
+			plugins: [responsePlugin],
+		});
+
+		const request = new Request('http://localhost:3000/api/c15t/status', {
+			method: 'GET',
+			headers: {
+				Accept: 'application/json',
+				Origin: 'http://localhost:3000',
+			},
+		});
+		const response = await instance.handler(request);
+		expect(response.isOk()).toBe(true);
+		if (response.isOk()) {
+			const data = await response.value.clone().json();
+			expect(data.modified).toBe(true);
 		}
 	});
 });
