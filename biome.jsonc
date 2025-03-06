@@ -8,7 +8,8 @@
 	},
 	"formatter": {
 		"indentStyle": "tab",
-		"indentWidth": 2
+		"indentWidth": 2,
+		"ignore": ["node_modules", "wrangler.jsonc", ".next", "dist", ".wrangler"]
 	},
 	"javascript": {
 		"formatter": {
