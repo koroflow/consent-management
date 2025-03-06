@@ -49,9 +49,7 @@
 	"main": "./dist/index.cjs",
 	"module": "./dist/index.js",
 	"types": "./dist/index.d.ts",
-	"files": [
-		"dist"
-	],
+	"files": ["dist"],
 	"scripts": {
 		"build": "rslib build",
 		"check-types": "tsc --noEmit",
@@ -62,11 +60,7 @@
 		"test:coverage": "vitest run --coverage",
 		"test:watch": "vitest"
 	},
-	"browserslist": [
-		">0.2%",
-		"not dead",
-		"not op_mini all"
-	],
+	"browserslist": [">0.2%", "not dead", "not op_mini all"],
 	"dependencies": {
 		"@radix-ui/react-accordion": "1.2.3",
 		"@radix-ui/react-slot": "1.1.2",

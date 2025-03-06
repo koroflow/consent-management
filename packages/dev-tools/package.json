@@ -13,11 +13,7 @@
 		"fmt": "pnpm biome format --write .",
 		"lint": "pnpm biome lint ./src"
 	},
-	"browserslist": [
-		">0.2%",
-		"not dead",
-		"not op_mini all"
-	],
+	"browserslist": [">0.2%", "not dead", "not op_mini all"],
 	"dependencies": {
 		"@radix-ui/react-accordion": "1.2.3",
 		"@radix-ui/react-scroll-area": "^1.2.3",
