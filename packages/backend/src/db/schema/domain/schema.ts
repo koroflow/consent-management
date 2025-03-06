@@ -30,7 +30,7 @@ export const domainSchema = z.object({
 	isVerified: z.boolean().default(true),
 	isActive: z.boolean().default(true),
 	createdAt: z.date().default(() => new Date()),
-	updatedAt: z.date().optional(),
+	updatedAt: z.date().default(() => new Date()),
 });
 
 /**

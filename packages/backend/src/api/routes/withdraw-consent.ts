@@ -200,6 +200,8 @@ export const withdrawConsent = createAuthEndpoint(
 						identifierType: params.identifierType,
 						withdrawnAt: currentTime.toISOString(),
 					},
+					createdAt: currentTime,
+					updatedAt: currentTime,
 				});
 
 				// Log the action in the audit log

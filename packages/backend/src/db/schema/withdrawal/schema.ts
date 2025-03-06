@@ -35,6 +35,7 @@ export const withdrawalSchema = z.object({
 	userAgent: z.string().optional(),
 	metadata: z.record(z.unknown()).optional(),
 	createdAt: z.date().default(() => new Date()),
+	updatedAt: z.date().default(() => new Date()),
 });
 
 /**

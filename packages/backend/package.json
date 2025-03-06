@@ -112,6 +112,7 @@
 	"scripts": {
 		"build": "rslib build",
 		"check-types": "tsc --noEmit",
+		"dev": "rslib build --watch",
 		"fmt": "pnpm biome format --write .",
 		"knip": "knip",
 		"lint": "pnpm biome lint ./src",

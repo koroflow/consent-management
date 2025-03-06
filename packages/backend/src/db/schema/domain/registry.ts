@@ -3,6 +3,7 @@ import type { Domain } from './schema';
 import { getWithHooks } from '~/db/hooks';
 import { validateEntityOutput } from '../definition';
 import type { Where } from '~/db/adapters/types';
+import { APIError } from 'better-call';
 
 export interface FindDomainParams {
 	name?: string;
@@ -49,13 +50,14 @@ export function domainRegistry({ adapter, ...ctx }: RegistryContext) {
 		 * @throws May throw an error if hooks prevent creation or if database operations fail
 		 */
 		createDomain: async (
-			domain: Omit<Domain, 'id' | 'createdAt'> & Partial<Domain>,
+			domain: Omit<Domain, 'id' | 'createdAt' | 'updatedAt'> & Partial<Domain>,
 			context?: GenericEndpointContext
 		) => {
 			const createdDomain = await createWithHooks({
 				data: {
-					createdAt: new Date(),
 					...domain,
+					createdAt: new Date(),
+					updatedAt: new Date(),
 				},
 				model: 'domain',
 				customFn: undefined,
@@ -67,6 +69,46 @@ export function domainRegistry({ adapter, ...ctx }: RegistryContext) {
 			}
 
 			return createdDomain as Domain;
+		},
+
+		/**
+		 * Finds an existing domain or creates a new one if needed.
+		 *
+		 * @param name - The domain name to find or create
+		 * @param context - Optional endpoint context for hooks
+		 * @returns The existing or newly created domain
+		 * @throws APIError if domain creation fails
+		 */
+		findOrCreateDomain: async function (
+			name: string,
+			context?: GenericEndpointContext
+		) {
+			// Try to find existing domain
+			const existingDomain = await this.findDomainByName(name);
+			if (existingDomain) {
+				return existingDomain;
+			}
+
+			// Create new domain if not found
+			const domain = await this.createDomain(
+				{
+					name,
+					description: `Auto-created domain for ${name}`,
+					isActive: true,
+					isVerified: true,
+					allowedOrigins: [],
+				},
+				context
+			);
+
+			if (!domain) {
+				throw new APIError('INTERNAL_SERVER_ERROR', {
+					message: 'Failed to create domain',
+					status: 503,
+				});
+			}
+
+			return domain;
 		},
 
 		/**

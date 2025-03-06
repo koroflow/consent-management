@@ -35,7 +35,7 @@ export const purposeJunctionSchema = z.object({
 
 	metadata: z.record(z.union([z.string(), z.number(), z.boolean()])).optional(),
 	createdAt: z.date().default(() => new Date()),
-	updatedAt: z.date().optional(),
+	updatedAt: z.date().default(() => new Date()),
 });
 
 /**

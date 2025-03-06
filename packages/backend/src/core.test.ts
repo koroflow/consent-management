@@ -12,6 +12,7 @@ describe('c15tInstance', () => {
 		const instance = c15tInstance({
 			baseURL: 'http://localhost:3000',
 			database: memoryAdapter({}),
+			secret: 'test-secret',
 		});
 
 		expect(instance.options.baseURL).toBe('http://localhost:3000');
@@ -26,6 +27,7 @@ describe('c15tInstance', () => {
 		const instance = c15tInstance({
 			baseURL: 'http://localhost:8080',
 			database: memoryAdapter({}),
+			// secret: 'test-secret',
 		});
 
 		const request = new Request('http://localhost:8080/api/c15t/status', {
@@ -42,10 +44,11 @@ describe('c15tInstance', () => {
 		}
 	});
 
-	it('should return correct status response structure', async () => {
+	it('should return correct health response structure', async () => {
 		const instance = c15tInstance({
 			baseURL: 'http://localhost:8080',
 			database: memoryAdapter({}),
+			secret: 'test-secret',
 		});
 
 		const request = new Request('http://localhost:8080/api/c15t/status', {
@@ -61,23 +64,19 @@ describe('c15tInstance', () => {
 		if (response.isOk()) {
 			const responseData = await response.value.json();
 
-			// Check response structure
 			expect(responseData).toHaveProperty('status', 'ok');
 			expect(responseData).toHaveProperty('version');
 			expect(responseData).toHaveProperty('timestamp');
+			console.log(responseData);
 			expect(responseData).toHaveProperty('storage');
 
-			// Check storage object structure
 			expect(responseData.storage).toHaveProperty('type', 'memory');
 			expect(responseData.storage).toHaveProperty('available', true);
 
-			// Check timestamp format
 			expect(new Date(responseData.timestamp).toISOString()).toBe(
 				responseData.timestamp
 			);
 
-			// Check version format (semver)
-			// biome-ignore lint/performance/useTopLevelRegex: <explanation>
 			expect(responseData.version).toMatch(/^\d+\.\d+\.\d+$/);
 		}
 	});
@@ -87,6 +86,7 @@ describe('c15tInstance', () => {
 			baseURL: 'http://localhost:3000',
 			basePath: '/custom-path',
 			database: memoryAdapter({}),
+			secret: 'test-secret',
 		});
 
 		const request = new Request('http://localhost:3000/custom-path/status');
@@ -114,6 +114,7 @@ describe('c15tInstance', () => {
 			baseURL: 'http://localhost:3000',
 			database: memoryAdapter({}),
 			plugins: [testPlugin],
+			secret: 'test-secret',
 		});
 
 		const context = await instance.$context;
@@ -127,6 +128,7 @@ describe('c15tInstance', () => {
 		const instance = c15tInstance({
 			baseURL: 'http://localhost:3000',
 			database: memoryAdapter({}),
+			secret: 'test-secret',
 		});
 
 		const api = await instance.getApi();
@@ -141,6 +143,7 @@ describe('c15tInstance', () => {
 		const instance = c15tInstance({
 			baseURL: 'http://localhost:3000',
 			database: memoryAdapter({}),
+			secret: 'test-secret',
 		});
 
 		const request = new Request(
@@ -159,6 +162,7 @@ describe('c15tInstance', () => {
 			baseURL: 'http://localhost:3000',
 			database: memoryAdapter({}),
 			trustedOrigins: ['http://trusted.test'],
+			secret: 'test-secret',
 		});
 
 		const context = await instance.$context;
@@ -174,9 +178,10 @@ describe('c15tInstance', () => {
 			baseURL: 'http://localhost:3000',
 			database: memoryAdapter({}),
 			trustedOrigins: (request) => [request.headers.get('origin') || ''],
+			secret: 'test-secret',
 		});
 
-		const request = new Request('http://localhost:3000/api/c15t/health', {
+		const request = new Request('http://localhost:3000/api/c15t/status', {
 			headers: { origin: 'http://dynamic.test' },
 		});
 
@@ -204,6 +209,7 @@ describe('c15tInstance', () => {
 			baseURL: 'http://localhost:3000',
 			database: memoryAdapter({}),
 			plugins: [errorPlugin],
+			secret: 'test-secret',
 		});
 
 		const context = await instance.$context;
@@ -217,6 +223,7 @@ describe('c15tInstance', () => {
 		const instance = c15tInstance({
 			baseURL: 'http://localhost:3000/',
 			database: memoryAdapter({}),
+			secret: 'test-secret',
 		});
 
 		const request = new Request('http://localhost:3000/api/c15t/status', {
@@ -245,6 +252,7 @@ describe('c15tInstance', () => {
 						status: response.status,
 						headers: response.headers,
 					}),
+					context: ctx,
 				};
 			},
 		};
@@ -253,6 +261,7 @@ describe('c15tInstance', () => {
 			baseURL: 'http://localhost:3000',
 			database: memoryAdapter({}),
 			plugins: [responsePlugin],
+			secret: 'test-secret',
 		});
 
 		const request = new Request('http://localhost:3000/api/c15t/status', {
@@ -265,7 +274,7 @@ describe('c15tInstance', () => {
 		const response = await instance.handler(request);
 		expect(response.isOk()).toBe(true);
 		if (response.isOk()) {
-			const data = await response.value.clone().json();
+			const data = await response.value.json();
 			expect(data.modified).toBe(true);
 		}
 	});

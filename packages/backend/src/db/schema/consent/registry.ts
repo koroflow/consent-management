@@ -1,6 +1,5 @@
 import type { GenericEndpointContext, RegistryContext } from '~/types';
 import type { Consent } from './schema';
-import type {} from '~/db/hooks/types';
 import { getWithHooks } from '~/db/hooks';
 import { validateEntityOutput } from '../definition';
 import type { Where } from '~/db/adapters/types';
@@ -10,6 +9,7 @@ export interface FindConsentsParams {
 	domainId?: string;
 	status?: string;
 	purposeIds?: string[];
+	includeInactive?: boolean;
 }
 
 export interface RevokeConsentParams {
@@ -77,7 +77,7 @@ export function consentRegistry({ adapter, ...ctx }: RegistryContext) {
 				throw new Error('Failed to create consent - operation returned null');
 			}
 
-			return createdConsent;
+			return createdConsent as Consent;
 		},
 
 		/**
@@ -87,8 +87,15 @@ export function consentRegistry({ adapter, ...ctx }: RegistryContext) {
 		 * @param params - Filter parameters
 		 * @returns Array of consents matching the criteria
 		 */
-		findConsents: async (params: FindConsentsParams) => {
+		findConsents: async (params: FindConsentsParams = {}) => {
 			const whereConditions: Where<'consent'> = [];
+
+			if (!params.includeInactive) {
+				whereConditions.push({
+					field: 'isActive',
+					value: true,
+				});
+			}
 
 			if (params.userId) {
 				whereConditions.push({
@@ -182,6 +189,32 @@ export function consentRegistry({ adapter, ...ctx }: RegistryContext) {
 		},
 
 		/**
+		 * Finds all consents for a specific domain.
+		 * Returns consents with processed output fields according to the schema configuration.
+		 *
+		 * @param domainId - The domain ID to find consents for
+		 * @returns Array of consents associated with the domain
+		 */
+		findConsentsByDomainId: async (domainId: string) => {
+			const consents = await adapter.findMany({
+				model: 'consent',
+				where: [
+					{
+						field: 'domainId',
+						value: domainId,
+					},
+				],
+				sortBy: {
+					field: 'givenAt',
+					direction: 'desc',
+				},
+			});
+			return consents.map((consent) =>
+				validateEntityOutput('consent', consent, ctx.options)
+			);
+		},
+
+		/**
 		 * Updates an existing consent record by ID.
 		 * Applies any configured hooks during the update process and
 		 * processes the output according to schema configuration.
@@ -199,7 +232,6 @@ export function consentRegistry({ adapter, ...ctx }: RegistryContext) {
 			const consent = await updateWithHooks<Consent>({
 				data: {
 					...data,
-					updatedAt: new Date(),
 				},
 				where: [
 					{
@@ -231,7 +263,6 @@ export function consentRegistry({ adapter, ...ctx }: RegistryContext) {
 		) => {
 			const updateData: Partial<Consent> = {
 				status: 'withdrawn',
-				updatedAt: new Date(),
 			};
 
 			if (withdrawalReason) {
@@ -255,6 +286,12 @@ export function consentRegistry({ adapter, ...ctx }: RegistryContext) {
 				: null;
 		},
 
+		/**
+		 * Revokes a consent and records the revocation details.
+		 *
+		 * @param params - Revocation parameters including reason and actor
+		 * @returns The updated consent with revocation details
+		 */
 		revokeConsent: async ({
 			consentId,
 			reason,
@@ -270,7 +307,6 @@ export function consentRegistry({ adapter, ...ctx }: RegistryContext) {
 			const updateData: Partial<Consent> = {
 				status: 'withdrawn',
 				withdrawalReason: reason,
-				updatedAt: new Date(),
 				metadata: {
 					...(consent.metadata as Record<string, unknown>),
 					withdrawal: {
@@ -284,6 +320,12 @@ export function consentRegistry({ adapter, ...ctx }: RegistryContext) {
 			return registry.updateConsent(consentId, updateData, context);
 		},
 
+		/**
+		 * Gets all records associated with a consent.
+		 *
+		 * @param consentId - The ID of the consent
+		 * @returns Array of records associated with the consent
+		 */
 		getRecords: async (consentId: string) => {
 			const records = await adapter.findMany({
 				model: 'record',
@@ -304,6 +346,12 @@ export function consentRegistry({ adapter, ...ctx }: RegistryContext) {
 			);
 		},
 
+		/**
+		 * Gets all withdrawals associated with a consent.
+		 *
+		 * @param consentId - The ID of the consent
+		 * @returns Array of withdrawals associated with the consent
+		 */
 		getWithdrawals: async (consentId: string) => {
 			const withdrawals = await adapter.findMany({
 				model: 'withdrawal',

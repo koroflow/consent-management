@@ -2,95 +2,104 @@ import { createAuthEndpoint } from '../call';
 import { APIError } from 'better-call';
 import { z } from 'zod';
 import type { C15TContext } from '../../types';
+import type { Consent } from '~/db/schema';
 
-// Define the schema for validating request body
-const setConsentSchema = z.object({
-	userId: z.string(),
+const ConsentType = z.enum([
+	'cookie_banner',
+	'privacy_policy',
+	'dpa',
+	'terms_of_service',
+	'marketing_communications',
+	'age_verification',
+	'other',
+]);
+
+// Base schema for all consent types
+const baseConsentSchema = z.object({
+	userId: z.string().optional(),
+	externalUserId: z.string().optional(),
 	domain: z.string(),
-	// Preferences now use timestamps directly (null = disabled)
-	preferences: z
-		.object({
-			analytics: z.string().datetime().nullable(),
-			marketing: z.string().datetime().nullable(),
-			preferences: z.string().datetime().nullable(),
-		})
-		.strict(),
-	policyVersion: z.string().optional(),
-	metadata: z.record(z.any()).optional(),
+	type: ConsentType,
+	metadata: z.record(z.unknown()).optional(),
 });
+
+// Cookie banner needs preferences
+const cookieBannerSchema = baseConsentSchema.extend({
+	type: z.literal('cookie_banner'),
+	preferences: z.record(z.boolean()),
+});
+
+// Policy based consent just needs the policy ID
+const policyBasedSchema = baseConsentSchema.extend({
+	type: z.enum(['privacy_policy', 'dpa', 'terms_of_service']),
+	policyId: z.string().optional(),
+	preferences: z.record(z.boolean()).optional(),
+});
+
+// Other consent types just need the base fields
+const otherConsentSchema = baseConsentSchema.extend({
+	type: z.enum(['marketing_communications', 'age_verification', 'other']),
+	preferences: z.record(z.boolean()).optional(),
+});
+
+const setConsentSchema = z.discriminatedUnion('type', [
+	cookieBannerSchema,
+	policyBasedSchema,
+	otherConsentSchema,
+]);
 
 export interface SetConsentResponse {
 	success: boolean;
 	consentId: string;
-	preferences: {
-		analytics: string | null;
-		marketing: string | null;
-		preferences: string | null;
-	};
 	timestamp: string;
 }
 
 /**
- * Endpoint for setting user consent preferences.
+ * Endpoint for creating a new consent record.
  *
- * This endpoint allows clients to save a user's consent preferences. It validates
- * that the provided preferences contain all required fields before saving them.
- * The required fields are:
- * - analytics: Controls if analytics tracking is allowed
- * - marketing: Controls if marketing communications are allowed
- * - preferences: Controls if preference/functional cookies are allowed
+ * This endpoint allows clients to create a new consent record for a user. It supports
+ * different types of consent:
+ * - cookie_banner: For cookie preferences
+ * - privacy_policy: For privacy policy acceptance
+ * - dpa: For data processing agreement acceptance
+ * - terms_of_service: For terms of service acceptance
+ * - marketing_communications: For marketing preferences
+ * - age_verification: For age verification
+ * - other: For other types of consent
  *
- * Each preference is stored as a timestamp value (when consent was given) or null (when disabled).
- * This approach provides better audit capabilities and usage tracking.
- *
- * Upon successful processing, it returns the saved preferences and a success indicator.
- * If validation fails or an error occurs during processing, it returns a BAD_REQUEST
- * error with details about what went wrong.
- *
- * @endpoint POST /consent/set
+ * @endpoint POST /consents
  * @requestExample
  * ```json
+ * // Cookie Banner
  * {
- *   "userId": "550e8400-e29b-41d4-a716-446655440000",
+ *   "type": "cookie_banner",
  *   "domain": "example.com",
  *   "preferences": {
- *     "analytics": "2023-04-01T12:34:56.789Z",
- *     "marketing": null,
- *     "preferences": "2023-04-01T12:34:56.789Z"
+ *     "experience": true,
+ *     "functionality": true,
+ *     "marketing": true,
+ *     "measurement": false,
+ *     "necessary": true
  *   },
- *   "policyVersion": "1.0",
  *   "metadata": {
- *     "source": "cookie_banner",
- *     "bannerVersion": "2.5.0"
+ *     "source": "banner",
+ *     "displayedTo": "user",
+ *     "language": "en-US"
+ *   }
+ * }
+ *
+ * // Privacy Policy
+ * {
+ *   "type": "privacy_policy",
+ *   "userId": "550e8400-e29b-41d4-a716-446655440000",
+ *   "domain": "example.com",
+ *   "policyId": "pol_xyz789",
+ *   "metadata": {
+ *     "source": "account_creation",
+ *     "acceptanceMethod": "checkbox"
  *   }
  * }
  * ```
- *
- * @responseExample
- * ```json
- * {
- *   "success": true,
- *   "consentId": 123,
- *   "preferences": {
- *     "analytics": "2023-04-01T12:34:56.789Z",
- *     "marketing": null,
- *     "preferences": "2023-04-01T12:34:56.789Z"
- *   },
- *   "timestamp": "2023-04-01T12:34:56.789Z"
- * }
- * ```
- *
- * @returns {Object} Result of setting consent preferences
- * @returns {boolean} success - Whether the preferences were successfully saved
- * @returns {number} consentId - The ID of the newly created consent record
- * @returns {Object} preferences - The saved consent preferences
- * @returns {string|null} preferences.analytics - When analytics tracking was enabled (null if disabled)
- * @returns {string|null} preferences.marketing - When marketing was enabled (null if disabled)
- * @returns {string|null} preferences.preferences - When preference cookies were enabled (null if disabled)
- * @returns {string} timestamp - ISO timestamp of when the preferences were saved
- *
- * @throws {APIError} BAD_REQUEST - When preferences are invalid or cannot be saved
- * @throws {APIError} NOT_FOUND - When user or domain doesn't exist
  */
 export const setConsent = createAuthEndpoint(
 	'/consent/set',
@@ -100,90 +109,161 @@ export const setConsent = createAuthEndpoint(
 	},
 	async (ctx) => {
 		try {
-			const validatedData = setConsentSchema.safeParse(ctx.body);
-
-			if (!validatedData.success) {
-				throw new APIError('BAD_REQUEST', {
-					message: 'Invalid consent data provided',
-					details: validatedData.error.errors,
-				});
-			}
-
-			const params = validatedData.data;
+			const body = setConsentSchema.parse(ctx.body);
+			const { type, userId, externalUserId, domain, metadata } = body;
 			const { registry } = ctx.context as C15TContext;
 
-			if (!registry) {
-				throw new APIError('INTERNAL_SERVER_ERROR', {
-					message: 'Registry not available',
-					status: 503,
-				});
-			}
-
-			// Check if user exists, create if not
-			let user = await registry.findUserByExternalId(params.userId);
+			// Find or create user
+			const user = await registry.findOrCreateUser({
+				userId,
+				externalUserId,
+				ipAddress: ctx.context.ipAddress || 'unknown',
+			});
 
 			if (!user) {
-				user = await registry.createUser({
-					externalId: params.userId,
-					isIdentified: false,
-					createdAt: new Date(),
-				});
-
-				if (!user) {
-					throw new APIError('INTERNAL_SERVER_ERROR', {
-						message: 'Failed to create user',
-						status: 503,
-					});
-				}
+				throw new APIError('BAD_REQUEST', { message: 'User ID is required' });
 			}
 
+			// Find or create domain
+			const domainRecord = await registry.findOrCreateDomain(domain);
+
 			const now = new Date();
+			let policyId: string | undefined;
+			let purposeIds: string[] = [];
+
+			// Handle policy creation/finding
+			if ('policyId' in body) {
+				const { policyId: pid } = body;
+				policyId = pid;
+
+				if (!policyId) {
+					throw new APIError('BAD_REQUEST', {
+						message: 'Policy ID is required',
+					});
+				}
+
+				// Verify the policy exists and is active
+				const policy = await registry.findConsentPolicyById(policyId);
+				if (!policy) {
+					throw new APIError('NOT_FOUND', {
+						message: 'Consent policy not found',
+					});
+				}
+				if (!policy.isActive) {
+					throw new APIError('BAD_REQUEST', {
+						message: 'Consent policy is no longer active',
+					});
+				}
+			} else {
+				const policy = await registry.findOrCreatePolicy(
+					type.replace('_', ' ')
+				);
+				policyId = policy.id;
+			}
+
+			// Handle purposes if they exist
+			if ('preferences' in body && body.preferences) {
+				purposeIds = await Promise.all(
+					Object.entries(body.preferences)
+						.filter(([_, isConsented]) => isConsented)
+						.map(async ([purposeCode]) => {
+							let existingPurpose =
+								await registry.findPurposeByCode(purposeCode);
+							if (!existingPurpose) {
+								existingPurpose = await registry.createPurpose({
+									code: purposeCode,
+									name: purposeCode,
+									description: `Auto-created purpose for ${purposeCode}`,
+									isActive: true,
+									isEssential: false,
+									dataCategory: 'functional',
+									legalBasis: 'consent',
+									createdAt: now,
+									updatedAt: now,
+								});
+							}
+							return existingPurpose.id;
+						})
+				);
+			}
 
 			// Create consent record
-			const consent = await registry.createRecord({
+			const consentRecord = await registry.createConsent({
 				userId: user.id,
-				actionType: 'set_consent',
-				details: {
-					preferences: params.preferences,
-					policyVersion: params.policyVersion,
+				domainId: domainRecord.id,
+				policyId,
+				status: 'active',
+				givenAt: now,
+				isActive: true,
+				purposeIds,
+				ipAddress: ctx.context.ipAddress || 'unknown',
+				userAgent: ctx.context.userAgent || 'unknown',
+				metadata: {
+					...metadata,
+					consentType: type,
 				},
-				// metadata: params.metadata,
-				//@ts-expect-error
-				ipAddress: ctx.request?.ip || '1.1.1',
-				//@ts-expect-error
-				userAgent: ctx.request?.headers?.['user-agent'] || 'test',
-				createdAt: now,
+				history: [
+					{
+						actionType: 'given',
+						timestamp: now,
+						details: {
+							ipAddress: ctx.context.ipAddress || 'unknown',
+							userAgent: ctx.context.userAgent || 'unknown',
+							consentType: type,
+							...metadata,
+						},
+					},
+				],
 			});
 
-			// Create audit log
-			await registry.createAuditLog({
+			const consent = consentRecord as Consent;
+
+			// Create consent record entry
+			const record = await registry.createRecord({
 				userId: user.id,
+				consentId: consent.id,
+				actionType: 'given',
+				details: {
+					ipAddress: ctx.context.ipAddress || 'unknown',
+					userAgent: ctx.context.userAgent || 'unknown',
+					consentType: type,
+					...metadata,
+				},
+				createdAt: now,
+				updatedAt: now,
+			});
+
+			// Create audit log entry
+			await registry.createAuditLog({
+				actionType: 'consent_created',
 				entityType: 'consent',
 				entityId: consent.id,
-				actionType: 'create_consent',
-				changes: {
-					preferences: params.preferences,
-					policyVersion: params.policyVersion,
-				},
+				userId: user.id,
 				metadata: {
-					source: 'api',
-					...params.metadata,
+					consentId: consent.id,
+					recordId: record.id,
+					domainId: domainRecord.id,
+					ipAddress: ctx.context.ipAddress || 'unknown',
+					userAgent: ctx.context.userAgent || 'unknown',
+					consentType: type,
+					...metadata,
 				},
-				//@ts-expect-error
-				ipAddress: ctx.request?.ip || '1.1.1',
-				//@ts-expect-error
-				userAgent: ctx.request?.headers?.['user-agent'] || 'test',
 				createdAt: now,
 			});
 
-			const response: SetConsentResponse = {
-				success: true,
-				consentId: consent.id,
-				preferences: params.preferences,
-				timestamp: now.toISOString(),
+			// Return response
+			return {
+				id: consent.id,
+				userId: user.id,
+				externalUserId: user.externalId ?? undefined,
+				domainId: domainRecord.id,
+				domain: domainRecord.name,
+				type,
+				status: consent.status,
+				recordId: record.id,
+				metadata,
+				givenAt: consent.givenAt.toISOString(),
 			};
-
-			return response;
 		} catch (error) {
 			const context = ctx.context as C15TContext;
 			context.logger?.error?.('Error setting consent:', error);
@@ -199,8 +279,7 @@ export const setConsent = createAuthEndpoint(
 			}
 
 			throw new APIError('INTERNAL_SERVER_ERROR', {
-				message: 'Failed to set consent preferences',
-				status: 503,
+				message: 'Failed to set consent',
 				details:
 					error instanceof Error ? { message: error.message } : { error },
 			});

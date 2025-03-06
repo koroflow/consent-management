@@ -29,6 +29,7 @@ export const recordSchema = z.object({
 	actionType: z.string(),
 	details: z.record(z.unknown()).optional(),
 	createdAt: z.date().default(() => new Date()),
+	updatedAt: z.date().default(() => new Date()),
 });
 
 /**

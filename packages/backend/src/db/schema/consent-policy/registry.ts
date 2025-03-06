@@ -220,6 +220,40 @@ export function policyRegistry({ adapter, ...ctx }: RegistryContext) {
 				? validateEntityOutput('consentPolicy', policy, ctx.options)
 				: null;
 		},
+
+		/**
+		 * Finds the latest active policy or creates a new one if none exists.
+		 *
+		 * @param name - The name of the policy to find/create
+		 * @returns The policy object
+		 */
+		findOrCreatePolicy: async (name: string) => {
+			const now = new Date();
+			const policies = await registry.findPolicies({
+				includeInactive: false,
+			});
+
+			const latestPolicy = policies
+				.filter((p) => p.name.toLowerCase().includes(name.toLowerCase()))
+				.sort(
+					(a, b) => b.effectiveDate.getTime() - a.effectiveDate.getTime()
+				)[0];
+
+			if (latestPolicy) {
+				return latestPolicy;
+			}
+
+			return registry.createConsentPolicy({
+				version: '1.0.0',
+				name: `${name.replace(/\b\w/g, (l) => l.toUpperCase())} ${now.getFullYear()}`,
+				effectiveDate: now,
+				content: `Default ${name} content`,
+				contentHash: 'default-hash',
+				isActive: true,
+				updatedAt: now,
+				expirationDate: null,
+			});
+		},
 	};
 
 	return registry;

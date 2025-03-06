@@ -83,7 +83,7 @@ export function getConsentTable(
 			 */
 			purposeIds: {
 				type: 'json',
-				required: true,
+				required: false,
 				fieldName: consentConfig?.fields?.purposeIds || 'purposeIds',
 				references: {
 					model: purposeConfig?.entityName || 'purpose',

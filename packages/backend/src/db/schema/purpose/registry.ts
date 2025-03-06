@@ -123,6 +123,31 @@ export function purposeRegistry({ adapter, ...ctx }: RegistryContext) {
 		},
 
 		/**
+		 * Finds a consent purpose by its unique ID.
+		 * Returns the purpose with processed output fields according to the schema configuration.
+		 *
+		 * @param purposeId - The unique identifier of the purpose
+		 * @returns The purpose object if found, null otherwise
+		 */
+		findPurposeByCode: async (code: string) => {
+			const purpose = await adapter.findOne({
+				model: 'purpose',
+				where: [
+					{
+						field: 'code',
+						value: code,
+					},
+				],
+			});
+			return purpose
+				? validateEntityOutput('purpose', purpose, ctx.options)
+				: null;
+		},
+
+		/**
+     * 
+		/**
+     * 
 		 * Updates an existing consent purpose record by ID.
 		 * Applies any configured hooks during the update process and
 		 * processes the output according to schema configuration.

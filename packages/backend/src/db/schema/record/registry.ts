@@ -44,12 +44,13 @@ export function recordRegistry({ adapter, ...ctx }: RegistryContext) {
 		 * @throws May throw an error if hooks prevent creation or if database operations fail
 		 */
 		createRecord: async (
-			record: Omit<Record, 'id' | 'createdAt'> & Partial<Record>,
+			record: Omit<Record, 'id' | 'createdAt' | 'updatedAt'> & Partial<Record>,
 			context?: GenericEndpointContext
 		) => {
 			const createdRecord = await createWithHooks({
 				data: {
-					createdAt: new Date(),
+					createdAt: record.createdAt || new Date(),
+					updatedAt: record.updatedAt || new Date(),
 					...record,
 				},
 				model: 'record',

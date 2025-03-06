@@ -2,6 +2,14 @@ import type { GenericEndpointContext, RegistryContext } from '~/types';
 import type { User } from './schema';
 import { getWithHooks } from '~/db/hooks';
 import { validateEntityOutput } from '../definition';
+import { APIError } from '~/api';
+
+export interface FindOrCreateUserParams {
+	userId?: string;
+	externalUserId?: string;
+	ipAddress?: string;
+	context?: GenericEndpointContext;
+}
 
 /**
  * Creates and returns a set of user-related adapter methods to interact with the database.
@@ -62,6 +70,91 @@ export function userRegistry({ adapter, ...ctx }: RegistryContext) {
 			return createdUser
 				? validateEntityOutput('user', createdUser, ctx.options)
 				: null;
+		},
+
+		/**
+		 * Finds an existing user or creates a new one if needed.
+		 * If both userId and externalUserId are provided, validates they match the same user.
+		 * Creates a new anonymous user only if no identifiers are provided.
+		 *
+		 * @param params - Parameters for finding or creating the user
+		 * @returns The existing or newly created user
+		 * @throws APIError if user validation fails or creation fails
+		 */
+		findOrCreateUser: async function ({
+			userId,
+			externalUserId,
+			ipAddress = 'unknown',
+			context,
+		}: FindOrCreateUserParams) {
+			// If both userId and externalUserId are provided, validate they match
+			if (userId && externalUserId) {
+				const userById = await this.findUserById(userId);
+				const userByExternalId =
+					await this.findUserByExternalId(externalUserId);
+
+				if (!userById || !userByExternalId) {
+					throw new APIError('NOT_FOUND', {
+						message: 'One or both users not found',
+						status: 404,
+					});
+				}
+
+				if (userById.id !== userByExternalId.id) {
+					throw new APIError('BAD_REQUEST', {
+						message:
+							'Provided userId and externalUserId do not match the same user',
+						status: 400,
+					});
+				}
+
+				return userById;
+			}
+
+			// Try to find user by userId if provided
+			if (userId) {
+				const user = await this.findUserById(userId);
+				if (user) {
+					return user;
+				}
+				throw new APIError('NOT_FOUND', {
+					message: 'User not found',
+					status: 404,
+				});
+			}
+
+			// If no user found and externalUserId provided, try that
+			if (externalUserId) {
+				const user = await this.findUserByExternalId(externalUserId);
+				if (user) {
+					return user;
+				}
+				throw new APIError('NOT_FOUND', {
+					message: 'User not found with provided external ID',
+					status: 404,
+				});
+			}
+
+			// If no identifiers provided, create a new anonymous user
+			ctx.logger?.info('Creating new anonymous user');
+			const user = await this.createUser(
+				{
+					externalId: externalUserId || null,
+					identityProvider: 'anonymous',
+					lastIpAddress: ipAddress,
+					isIdentified: false,
+				},
+				context
+			);
+
+			if (!user) {
+				throw new APIError('INTERNAL_SERVER_ERROR', {
+					message: 'Failed to create user',
+					status: 503,
+				});
+			}
+
+			return user;
 		},
 
 		/**

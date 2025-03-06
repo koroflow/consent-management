@@ -38,6 +38,7 @@ export const consentGeoLocationSchema = z.object({
 		.regex(/^[A-Za-z_]+\/[A-Za-z_]+$/)
 		.optional(), // Basic IANA timezone format check
 	createdAt: z.date().default(() => new Date()),
+	updatedAt: z.date().default(() => new Date()),
 });
 
 /**

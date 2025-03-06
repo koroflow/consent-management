@@ -171,6 +171,11 @@ export interface BaseC15TContext {
 	 * IP address of the client
 	 */
 	ipAddress?: string | null;
+
+	/**
+	 * User agent of the client
+	 */
+	userAgent?: string | null;
 }
 
 /**
