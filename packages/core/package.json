@@ -22,7 +22,7 @@
 	},
 	"devDependencies": {
 		"@c15t/typescript-config": "workspace:*",
-		"happy-dom": "^17.1.4"
+		"happy-dom": "^17.2.2"
 	},
 	"publishConfig": {
 		"access": "public"
