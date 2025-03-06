@@ -29,7 +29,7 @@ export function toNextJsHandler(instance: C15TInstance) {
 	const handler = async (initialRequest: Request) => {
 		try {
 			let request = initialRequest;
-			
+
 			// For POST requests, validate JSON body
 			if (request.method === 'POST') {
 				try {
