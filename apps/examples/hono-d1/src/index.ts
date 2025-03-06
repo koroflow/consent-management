@@ -16,7 +16,7 @@ app.on(['POST', 'GET'], '/api/c15t/*', async (c) => {
 
 		const c15t = c15tInstance({
 			database: new D1Dialect({
-				database: DB
+				database: DB,
 			}),
 			basePath: '/api/c15t',
 		});
