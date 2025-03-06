@@ -67,7 +67,6 @@ describe('c15tInstance', () => {
 			expect(responseData).toHaveProperty('status', 'ok');
 			expect(responseData).toHaveProperty('version');
 			expect(responseData).toHaveProperty('timestamp');
-			console.log(responseData);
 			expect(responseData).toHaveProperty('storage');
 
 			expect(responseData.storage).toHaveProperty('type', 'memory');
@@ -77,6 +76,7 @@ describe('c15tInstance', () => {
 				responseData.timestamp
 			);
 
+			// biome-ignore lint/performance/useTopLevelRegex: <explanation>
 			expect(responseData.version).toMatch(/^\d+\.\d+\.\d+$/);
 		}
 	});

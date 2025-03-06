@@ -26,16 +26,16 @@ import { BASE_ERROR_CODES } from '~/error/codes';
  * @returns Next.js API route handler functions for GET and POST
  */
 export function toNextJsHandler(instance: C15TInstance) {
-	const handler = async (request: Request) => {
+	const handler = async (initialRequest: Request) => {
 		try {
+			let request = initialRequest;
+			
 			// For POST requests, validate JSON body
 			if (request.method === 'POST') {
 				try {
-					// Clone request to read body
 					const clonedRequest = request.clone();
 					const body = await clonedRequest.json();
 
-					// Create new request with validated JSON
 					request = new Request(request.url, {
 						method: request.method,
 						headers: request.headers,
