@@ -169,7 +169,7 @@ export function consentRegistry({ adapter, ...ctx }: RegistryContext) {
 		 * @param subjectId - The subject ID to find consents for
 		 * @returns Array of consents associated with the subject
 		 */
-		findConsentsByUserId: async (subjectId: string) => {
+		findConsentsBySubjectId: async (subjectId: string) => {
 			const consents = await adapter.findMany({
 				model: 'consent',
 				where: [

@@ -15,7 +15,7 @@ const withdrawByConsentIdSchema = z.object({
 	metadata: z.record(z.any()).optional(),
 });
 
-const withdrawByUserIdSchema = z.object({
+const withdrawBySubjectIdSchema = z.object({
 	subjectId: z.string(),
 	domain: z.string(),
 	identifierType: z.literal('subjectId'),
@@ -38,7 +38,7 @@ const withdrawByExternalIdSchema = z.object({
 // Combined schema using discriminated union
 const withdrawConsentSchema = z.discriminatedUnion('identifierType', [
 	withdrawByConsentIdSchema,
-	withdrawByUserIdSchema,
+	withdrawBySubjectIdSchema,
 	withdrawByExternalIdSchema,
 ]);
 

@@ -5,7 +5,7 @@ import type { C15TContext } from '../../types';
 import { createAuthEndpoint } from '../call';
 
 // Define schemas for the different identification methods
-const getByUserIdSchema = z.object({
+const getBySubjectIdSchema = z.object({
 	subjectId: z.string(),
 	domain: z.string().optional(),
 	identifierType: z.literal('subjectId'),
@@ -25,7 +25,7 @@ const getByIpAddressSchema = z.object({
 
 // Combined schema using discriminated union
 const getConsentSchema = z.discriminatedUnion('identifierType', [
-	getByUserIdSchema,
+	getBySubjectIdSchema,
 	getByExternalIdSchema,
 	getByIpAddressSchema,
 ]);

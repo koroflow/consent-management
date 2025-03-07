@@ -12,14 +12,14 @@ const baseParamsSchema = z.object({
 });
 
 // Define schemas for the different identification methods (all optional)
-const userIdentifierSchema = z.object({
+const subjectIdentifierSchema = z.object({
 	subjectId: z.string().optional(),
 	externalId: z.string().optional(),
 	ipAddress: z.string().optional(),
 });
 
 // Combine the schemas
-const getPolicySchema = baseParamsSchema.merge(userIdentifierSchema);
+const getPolicySchema = baseParamsSchema.merge(subjectIdentifierSchema);
 
 export interface GetPolicyResponse {
 	success: boolean;
