@@ -3,7 +3,7 @@ import type { C15TOptions } from '~/types';
 import { consentWithdrawalSchema } from './schema';
 
 /**
- * Generates the database table configuration for the consent consentWithdrawal entity.
+ * Generates the database table configuration for the consent withdrawal entity.
  *
  * This function creates a schema definition that includes all standard consentWithdrawal fields
  * and any additional fields from plugins or configuration. The resulting schema is used
@@ -41,12 +41,12 @@ export function getConsentWithdrawalTable(
 		entityPrefix: consentWithdrawalConfig?.entityPrefix || 'wdr',
 
 		/**
-		 * The schema for the consent consentWithdrawal table
+		 * The schema for the consent withdrawal table
 		 */
 		schema: consentWithdrawalSchema,
 
 		/**
-		 * Field definitions for the consent consentWithdrawal table
+		 * Field definitions for the consent withdrawal table
 		 */
 		fields: {
 			/**
@@ -163,7 +163,7 @@ export function getConsentWithdrawalTable(
 		 */
 		indexes: [
 			{
-				name: 'user_id_index',
+				name: 'subject_id_index',
 				fields: ['subjectId'],
 			},
 			{

@@ -38,7 +38,7 @@ export type LiteralString = '' | (string & Record<never, never>);
  * }
  *
  * // RequiredKeysOf<Subject> will be 'id' | 'name'
- * type RequiredUserFields = RequiredKeysOf<Subject>;
+ * type RequiredsubjectFields = RequiredKeysOf<Subject>;
  * ```
  */
 export type RequiredKeysOf<BaseType extends object> = Exclude<

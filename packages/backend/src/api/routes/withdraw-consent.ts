@@ -135,9 +135,9 @@ export const withdrawConsent = createAuthEndpoint(
 				// Find subject
 				let subjectRecord: EntityOutputFields<'subject'> | null = null;
 				if (params.identifierType === 'subjectId') {
-					subjectRecord = await registry.findUserById(params.subjectId);
+					subjectRecord = await registry.findSubjectById(params.subjectId);
 				} else {
-					subjectRecord = await registry.findUserByExternalId(params.externalId);
+					subjectRecord = await registry.findSubjectByExternalId(params.externalId);
 				}
 
 				if (!subjectRecord) {
@@ -242,7 +242,7 @@ export const withdrawConsent = createAuthEndpoint(
 				});
 
 				withdrawalResults.push({
-					id: withdrawalResult?.id || `consentWithdrawal-${record.id}`,
+					id: withdrawalResult?.id || `wdr_${record.id}`,
 					consentId: record.id,
 					revokedAt: currentTime.toISOString(),
 				});

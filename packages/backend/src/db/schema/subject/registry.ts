@@ -89,8 +89,8 @@ export function subjectRegistry({ adapter, ...ctx }: RegistryContext) {
 			// If both subjectId and externalSubjectId are provided, validate they match
 			if (subjectId && externalSubjectId) {
 				const [userById, userByExternalId] = await Promise.all([
-					this.findUserById(subjectId),
-					this.findUserByExternalId(externalSubjectId),
+					this.findSubjectById(subjectId),
+					this.findSubjectByExternalId(externalSubjectId),
 				]);
 
 				if (!userById || !userByExternalId) {
@@ -146,7 +146,7 @@ export function subjectRegistry({ adapter, ...ctx }: RegistryContext) {
 
 			// Try to find subject by subjectId if provided
 			if (subjectId) {
-				const subject = await this.findUserById(subjectId);
+				const subject = await this.findSubjectById(subjectId);
 				if (subject) {
 					return subject;
 				}
@@ -159,7 +159,7 @@ export function subjectRegistry({ adapter, ...ctx }: RegistryContext) {
 			// If externalSubjectId provided, try to find or create with upsert
 			if (externalSubjectId) {
 				try {
-					const subject = await this.findUserByExternalId(externalSubjectId);
+					const subject = await this.findSubjectByExternalId(externalSubjectId);
 					if (subject) {
 						ctx.logger?.debug('Found existing subject by external ID', {
 							externalSubjectId,
@@ -190,7 +190,7 @@ export function subjectRegistry({ adapter, ...ctx }: RegistryContext) {
 							'Handling duplicate key violation for external ID',
 							{ externalSubjectId }
 						);
-						const subject = await this.findUserByExternalId(externalSubjectId);
+						const subject = await this.findSubjectByExternalId(externalSubjectId);
 						if (subject) {
 							return subject;
 						}
@@ -250,7 +250,7 @@ export function subjectRegistry({ adapter, ...ctx }: RegistryContext) {
 		 * @param subjectId - The unique identifier of the subject
 		 * @returns The subject object if found, null otherwise
 		 */
-		findUserById: async (subjectId: string) => {
+		findSubjectById: async (subjectId: string) => {
 			const subject = await adapter.findOne({
 				model: 'subject',
 				where: [
@@ -274,7 +274,7 @@ export function subjectRegistry({ adapter, ...ctx }: RegistryContext) {
 		 * @param externalId - The external identifier of the subject
 		 * @returns The subject object if found, null otherwise
 		 */
-		findUserByExternalId: async (externalId: string) => {
+		findSubjectByExternalId: async (externalId: string) => {
 			const subject = await adapter.findOne({
 				model: 'subject',
 				where: [

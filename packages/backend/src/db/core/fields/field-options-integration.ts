@@ -18,7 +18,7 @@ import type { Field } from './field-types';
  *     plugins: {
  *       consent: {
  *         enabled: true,
- *         userFields: {
+ *         subjectFields: {
  *           acceptedTerms: {
  *             type: 'boolean',
  *             required: true
@@ -30,7 +30,7 @@ import type { Field } from './field-types';
  * }
  *
  * // Infer the output types for subject fields from plugins
- * type UserPluginFields = InferFieldsFromPlugins<MyOptions, 'userFields', 'output'>;
+ * type UserPluginFields = InferFieldsFromPlugins<MyOptions, 'subjectFields', 'output'>;
  * // Results in { acceptedTerms: boolean }
  * ```
  *
@@ -62,7 +62,7 @@ export type InferFieldsFromPlugins<
  * // Configuration with additional subject fields
  * interface MyOptions extends C15TOptions {
  *   auth: {
- *     userFields: {
+ *     subjectFields: {
  *       profile: {
  *         type: 'string',
  *         required: false
@@ -72,14 +72,14 @@ export type InferFieldsFromPlugins<
  * }
  *
  * // Infer the output types for subject fields from options
- * type UserAdditionalFields = InferFieldsFromOptions<MyOptions, 'auth', 'userFields', 'output'>;
+ * type UserAdditionalFields = InferFieldsFromOptions<MyOptions, 'auth', 'subjectFields', 'output'>;
  * // Results in { profile?: string | null | undefined }
  * ```
  *
  * @remarks
  * TSchemaKey can be one of:
- * - Single string key like 'userFields' to access TOptions[T]['userFields']
- * - Array of strings for a nested path like ['auth', 'userFields']
+ * - Single string key like 'subjectFields' to access TOptions[T]['subjectFields']
+ * - Array of strings for a nested path like ['auth', 'subjectFields']
  *
  * This type helper extracts custom fields defined directly in the options object,
  * rather than those defined in plugins.

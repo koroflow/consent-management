@@ -32,13 +32,7 @@ interface SchemaEntry {
  * const schema = getSchema(config);
  *
  * // Access subject entity definition
- * const userFields = schema.subject.fields;
- *
- * // Check field reference
- * const emailField = userFields.email;
- * if (emailField.references) {
- *   console.log(`Email references ${emailField.references.entity}`);
- * }
+ * const subjectFields = schema.subject.fields;
  * ```
  */
 export function getSchema(config: C15TOptions) {

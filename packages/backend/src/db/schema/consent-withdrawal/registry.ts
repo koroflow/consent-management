@@ -6,13 +6,13 @@ import { validateEntityOutput } from '../definition';
 import type { Withdrawal } from './schema';
 
 /**
- * Creates and returns a set of consent consentWithdrawal adapter methods to interact with the database.
+ * Creates and returns a set of consent withdrawal adapter methods to interact with the database.
  * These methods provide a consistent interface for creating and querying consentWithdrawal records
  * while applying hooks and enforcing data validation rules.
  *
  * @param adapter - The database adapter used for direct database operations
  * @param ctx - The context object containing the database adapter, hooks, and options
- * @returns An object containing type-safe consent consentWithdrawal operations
+ * @returns An object containing type-safe consent withdrawal operations
  *
  * @example
  * ```typescript
@@ -38,7 +38,7 @@ export function consentWithdrawalRegistry({
 	const { createWithHooks } = getWithHooks(adapter, ctx);
 	return {
 		/**
-		 * Creates a new consent consentWithdrawal record in the database.
+		 * Creates a new consent withdrawal record in the database.
 		 * Automatically sets creation timestamp and applies any
 		 * configured hooks during the creation process.
 		 *
@@ -64,7 +64,7 @@ export function consentWithdrawalRegistry({
 
 			if (!createdWithdrawal) {
 				throw new Error(
-					'Failed to create consent consentWithdrawal - operation returned null'
+					'Failed to create consent withdrawal - operation returned null'
 				);
 			}
 
@@ -158,7 +158,7 @@ export function consentWithdrawalRegistry({
 		 * @param limit - Optional maximum number of records to return
 		 * @returns Array of consentWithdrawal records associated with the subject
 		 */
-		findConsentWithdrawalsByUserId: async (
+		findConsentWithdrawalsBySubjectId: async (
 			subjectId: string,
 			limit?: number
 		) => {

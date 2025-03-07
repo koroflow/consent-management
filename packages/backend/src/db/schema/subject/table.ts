@@ -11,7 +11,7 @@ import { subjectSchema } from './schema';
  * for database migrations, schema validation, and query building.
  *
  * @param options - C15T configuration options that may contain subject table customizations
- * @param userFields - Additional fields from plugins to include in the subject table
+ * @param subjectFields - Additional fields from plugins to include in the subject table
  * @returns A complete table schema definition with fields, model name, and metadata
  *
  * @example
@@ -23,7 +23,7 @@ import { subjectSchema } from './schema';
  */
 export function getSubjectTable(
 	options: C15TOptions,
-	userFields?: Record<string, Field>
+	subjectFields?: Record<string, Field>
 ) {
 	// Get subject config, supporting both the new tables.subject and legacy subject format
 	const subjectConfig = options.tables?.subject;
@@ -124,7 +124,7 @@ export function getSubjectTable(
 			},
 
 			// Include additional fields from plugins
-			...(userFields || {}),
+			...(subjectFields || {}),
 
 			// Include additional fields from configuration
 			...(subjectConfig?.additionalFields || {}),

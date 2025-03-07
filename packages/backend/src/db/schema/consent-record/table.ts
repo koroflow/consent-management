@@ -89,7 +89,7 @@ export function getConsentRecordTable(
 
 			/**
 			 * Additional details about the consent action
-			 * May include IP address, subject agent, reason for consentWithdrawal, etc.
+			 * May include IP address, subject agent, reason for withdrawal, etc.
 			 */
 			details: {
 				type: 'json',

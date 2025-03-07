@@ -167,7 +167,7 @@ export function getAuditLogTable(
 				fields: ['actionType'],
 			},
 			{
-				name: 'user_id_index',
+				name: 'subject_id_index',
 				fields: ['subjectId'],
 			},
 			{

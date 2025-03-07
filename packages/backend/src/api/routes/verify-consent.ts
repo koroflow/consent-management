@@ -104,7 +104,7 @@ export const verifyConsent = createAuthEndpoint(
 
 			// Try to find subject by subjectId (most precise)
 			if (params.subjectId) {
-				subjectRecord = await registry.findUserById(params.subjectId);
+				subjectRecord = await registry.findSubjectById(params.subjectId);
 				if (subjectRecord) {
 					identifierUsed = 'subjectId';
 				}
@@ -112,7 +112,7 @@ export const verifyConsent = createAuthEndpoint(
 
 			// If not found and externalId provided, try that
 			if (!subjectRecord && params.externalId) {
-				subjectRecord = await registry.findUserByExternalId(params.externalId);
+				subjectRecord = await registry.findSubjectByExternalId(params.externalId);
 				if (subjectRecord) {
 					identifierUsed = 'externalId';
 				}

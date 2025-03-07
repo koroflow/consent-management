@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 /**
- * Zod schema for validating consent consentWithdrawal entities.
+ * Zod schema for validating consent withdrawal entities.
  *
  * This defines the structure and validation rules for consentWithdrawal records:
  * - Required fields: consentId, subjectId
@@ -41,7 +41,7 @@ export const consentWithdrawalSchema = z.object({
 /**
  * Type definition for Withdrawal
  *
- * This type represents the structure of a consent consentWithdrawal record
+ * This type represents the structure of a consent withdrawal record
  * as defined by the consentWithdrawalSchema. It includes all fields
  * that are part of the consentWithdrawal entity.
  */

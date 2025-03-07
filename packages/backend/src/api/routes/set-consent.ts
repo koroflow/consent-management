@@ -94,7 +94,7 @@ export interface SetConsentResponse {
  * // Privacy Policy
  * {
  *   "type": "privacy_policy",
- *   "subjectId": "550e8400-e29b-41d4-a716-446655440000",
+ *   "subjectId": "sub_x1pftyoufsm7xgo1kv",
  *   "domain": "example.com",
  *   "policyId": "pol_xyz789",
  *   "metadata": {

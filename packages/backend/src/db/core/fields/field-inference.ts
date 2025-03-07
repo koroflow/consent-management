@@ -73,14 +73,6 @@ export type InferFieldOutput<TField extends Field> =
  *
  * @example
  * ```typescript
- * // A required input field
- * const emailField: Field<'string'> = {
- *   type: 'string',
- *   required: true,
- *   input: true
- * };
- * type EmailInput = InferFieldInput<typeof emailField>;  // string
- *
  * // A non-input field (system-generated)
  * const createdAtField: Field<'date'> = {
  *   type: 'date',

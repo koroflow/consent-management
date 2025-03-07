@@ -25,7 +25,7 @@ import { z } from 'zod';
 export const consentPurposeJunctionSchema = z.object({
 	id: z.string(),
 	consentId: z.string(),
-	purposeId: z.string(),
+	consentPurposeId: z.string(),
 	status: z
 		.enum(['active', 'withdrawn'], {
 			errorMap: () => ({
