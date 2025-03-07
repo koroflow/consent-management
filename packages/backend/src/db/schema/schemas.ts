@@ -3,14 +3,14 @@ import {
 	auditLogSchema,
 	consentGeoLocationSchema,
 	consentPolicySchema,
+	consentPurposeJunctionSchema,
+	consentRecordSchema,
 	consentSchema,
+	consentWithdrawalSchema,
 	domainSchema,
 	geoLocationSchema,
-	consentPurposeJunctionSchema,
 	purposeSchema,
-	consentRecordSchema,
 	subjectSchema,
-	consentWithdrawalSchema,
 } from './index';
 
 // Export all schemas

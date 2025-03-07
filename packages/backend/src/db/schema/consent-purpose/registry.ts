@@ -66,7 +66,11 @@ export function consentPurposeRegistry({ adapter, ...ctx }: RegistryContext) {
 				);
 			}
 
-			return validateEntityOutput('consentPurpose', createdPurpose, ctx.options);
+			return validateEntityOutput(
+				'consentPurpose',
+				createdPurpose,
+				ctx.options
+			);
 		},
 
 		/**

@@ -44,7 +44,8 @@ export function consentRecordRegistry({ adapter, ...ctx }: RegistryContext) {
 		 * @throws May throw an error if hooks prevent creation or if database operations fail
 		 */
 		createConsentRecord: async (
-			record: Omit<ConsentRecord, 'id' | 'createdAt' | 'updatedAt'> & Partial<ConsentRecord>,
+			record: Omit<ConsentRecord, 'id' | 'createdAt' | 'updatedAt'> &
+				Partial<ConsentRecord>,
 			context?: GenericEndpointContext
 		) => {
 			const createdRecord = await createWithHooks({
@@ -151,7 +152,10 @@ export function consentRecordRegistry({ adapter, ...ctx }: RegistryContext) {
 		 * @param limit - Optional maximum number of records to return
 		 * @returns Array of consent records associated with the subject
 		 */
-		findConsentRecordsBySubjectId: async (subjectId: string, limit?: number) => {
+		findConsentRecordsBySubjectId: async (
+			subjectId: string,
+			limit?: number
+		) => {
 			const records = await adapter.findMany({
 				model: 'consentRecord',
 				where: [
@@ -179,7 +183,10 @@ export function consentRecordRegistry({ adapter, ...ctx }: RegistryContext) {
 		 * @param limit - Optional maximum number of records to return
 		 * @returns Array of consent records associated with the consent
 		 */
-		findConsentRecordsByConsentId: async (consentId: string, limit?: number) => {
+		findConsentRecordsByConsentId: async (
+			consentId: string,
+			limit?: number
+		) => {
 			const records = await adapter.findMany({
 				model: 'consentRecord',
 				where: [

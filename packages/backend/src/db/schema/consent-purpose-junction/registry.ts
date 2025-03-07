@@ -30,7 +30,10 @@ import { validateEntityOutput } from '../definition';
  * });
  * ```
  */
-export function consentPurposeJunctionRegistry({ adapter, ...ctx }: RegistryContext) {
+export function consentPurposeJunctionRegistry({
+	adapter,
+	...ctx
+}: RegistryContext) {
 	const { createWithHooks, updateWithHooks } = getWithHooks(adapter, ctx);
 	return {
 		/**
@@ -178,7 +181,10 @@ export function consentPurposeJunctionRegistry({ adapter, ...ctx }: RegistryCont
 				});
 				return true;
 			} catch (error) {
-				ctx.logger.error('Error deleting consent-consentPurpose junctions:', error);
+				ctx.logger.error(
+					'Error deleting consent-consentPurpose junctions:',
+					error
+				);
 				return false;
 			}
 		},

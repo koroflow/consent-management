@@ -77,7 +77,8 @@ export function getSubjectTable(
 			identityProvider: {
 				type: 'string',
 				required: false,
-				fieldName: subjectConfig?.fields?.identityProvider || 'identityProvider',
+				fieldName:
+					subjectConfig?.fields?.identityProvider || 'identityProvider',
 			},
 
 			/**

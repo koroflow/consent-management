@@ -3,15 +3,15 @@ import type { RegistryContext } from '~/types/context';
 import {
 	auditLogRegistry,
 	consentGeoLocationRegistry,
-	consentRegistry,
-	domainRegistry,
-	geoLocationRegistry,
-	policyRegistry,
 	consentPurposeJunctionRegistry,
 	consentPurposeRegistry,
 	consentRecordRegistry,
-	subjectRegistry,
+	consentRegistry,
 	consentWithdrawalRegistry,
+	domainRegistry,
+	geoLocationRegistry,
+	policyRegistry,
+	subjectRegistry,
 } from './schema/index';
 
 export const createRegistry = (ctx: RegistryContext) => {

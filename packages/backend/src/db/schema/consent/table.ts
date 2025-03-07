@@ -215,6 +215,6 @@ export function getConsentTable(
 		 * Execution order during migrations (lower numbers run first)
 		 * Consent table needs to be created after the subject, domain, and policy tables it references
 		 */
-		order:3,
+		order: 3,
 	};
 }

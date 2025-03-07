@@ -39,7 +39,9 @@ export const getConsentHistory = createAuthEndpoint(
 				});
 			}
 
-			let userConsents = await registry.findConsents({ subjectId: params.subjectId });
+			let userConsents = await registry.findConsents({
+				subjectId: params.subjectId,
+			});
 			if (params.domain) {
 				userConsents = userConsents.filter(
 					(consent) => consent.domainId === params.domain
@@ -71,16 +73,18 @@ export const getConsentHistory = createAuthEndpoint(
 							reason: consentWithdrawal.withdrawalReason,
 							method: consentWithdrawal.withdrawalMethod,
 							actor:
-								(consentWithdrawal.metadata as Record<string, unknown>)?.actor ||
-								'system',
+								(consentWithdrawal.metadata as Record<string, unknown>)
+									?.actor || 'system',
 							metadata: consentWithdrawal.metadata,
 						})),
-						consentRecords: records.map((record: EntityOutputFields<'consentRecord'>) => ({
-							id: record.id,
-							createdAt: record.createdAt.toISOString(),
-							type: record.actionType,
-							details: record.id,
-						})),
+						consentRecords: records.map(
+							(record: EntityOutputFields<'consentRecord'>) => ({
+								id: record.id,
+								createdAt: record.createdAt.toISOString(),
+								type: record.actionType,
+								details: record.id,
+							})
+						),
 					};
 				})
 			);

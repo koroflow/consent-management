@@ -10,15 +10,15 @@ import type { Field } from '~/db/core/fields';
 import type { AuditLogEntityConfig } from './audit-log/types';
 import type { ConsentGeoLocationEntityConfig } from './consent-geo-location/types';
 import type { ConsentPolicyEntityConfig } from './consent-policy/types';
-import type { ConsentEntityConfig } from './consent/types';
-import type { DomainEntityConfig } from './domain/types';
-import type { GeoLocationEntityConfig } from './geo-location/types';
 import type { ConsentPurposeJunctionEntityConfig } from './consent-purpose-junction/types';
 import type { ConsentPurposeEntityConfig } from './consent-purpose/types';
 import type { ConsentRecordEntityConfig } from './consent-record/types';
+import type { ConsentWithdrawalEntityConfig } from './consent-withdrawal/types';
+import type { ConsentEntityConfig } from './consent/types';
+import type { DomainEntityConfig } from './domain/types';
+import type { GeoLocationEntityConfig } from './geo-location/types';
 // Import entity-specific types from their respective directories
 import type { UserEntityConfig } from './subject/types';
-import type { ConsentWithdrawalEntityConfig } from './consent-withdrawal/types';
 
 /**
  * Base entity configuration shared by all entities
@@ -75,71 +75,71 @@ export interface ActiveEntityConfig extends TimestampedEntityConfig {
  * Contains all entity table configurations in one unified object
  */
 export interface TablesConfig {
-  /**
-   * Subject entity configuration
-   * @default entityName: "subject", entityPrefix: "usr"
-   */
-  subject?: UserEntityConfig;
+	/**
+	 * Subject entity configuration
+	 * @default entityName: "subject", entityPrefix: "usr"
+	 */
+	subject?: UserEntityConfig;
 
-  /**
-   * Domain configuration
-   * @default entityName: "domain", entityPrefix: "dom"
-   */
-  domain?: DomainEntityConfig;
+	/**
+	 * Domain configuration
+	 * @default entityName: "domain", entityPrefix: "dom"
+	 */
+	domain?: DomainEntityConfig;
 
-  /**
-   * Geo location configuration
-   * @default entityName: "geoLocation", entityPrefix: "geo"
-   */
-  geoLocation?: GeoLocationEntityConfig;
+	/**
+	 * Geo location configuration
+	 * @default entityName: "geoLocation", entityPrefix: "geo"
+	 */
+	geoLocation?: GeoLocationEntityConfig;
 
-  /**
-   * ConsentPurpose entity configuration
-   * @default entityName: "consentPurpose", entityPrefix: "pur"
-   */
-  consentPurpose?: ConsentPurposeEntityConfig;
+	/**
+	 * ConsentPurpose entity configuration
+	 * @default entityName: "consentPurpose", entityPrefix: "pur"
+	 */
+	consentPurpose?: ConsentPurposeEntityConfig;
 
-  /**
-   * Consent policy configuration
-   * @default entityName: "consentPolicy", entityPrefix: "pol"
-   */
-  consentPolicy?: ConsentPolicyEntityConfig;
+	/**
+	 * Consent policy configuration
+	 * @default entityName: "consentPolicy", entityPrefix: "pol"
+	 */
+	consentPolicy?: ConsentPolicyEntityConfig;
 
-  /**
-   * Consent configuration
-   * @default entityName: "consent", entityPrefix: "cns"
-   */
-  consent?: ConsentEntityConfig;
+	/**
+	 * Consent configuration
+	 * @default entityName: "consent", entityPrefix: "cns"
+	 */
+	consent?: ConsentEntityConfig;
 
-  /**
-   * ConsentPurpose junction configuration
-   * @default entityName: "consentPurposeJunction", entityPrefix: "pjx"
-   */
-  consentPurposeJunction?: ConsentPurposeJunctionEntityConfig;
+	/**
+	 * ConsentPurpose junction configuration
+	 * @default entityName: "consentPurposeJunction", entityPrefix: "pjx"
+	 */
+	consentPurposeJunction?: ConsentPurposeJunctionEntityConfig;
 
-  /**
-   * Consent geo location configuration
-   * @default entityName: "consentGeoLocation", entityPrefix: "cgl"
-   */
-  consentGeoLocation?: ConsentGeoLocationEntityConfig;
+	/**
+	 * Consent geo location configuration
+	 * @default entityName: "consentGeoLocation", entityPrefix: "cgl"
+	 */
+	consentGeoLocation?: ConsentGeoLocationEntityConfig;
 
-  /**
-   * Record entity configuration
-   * @default entityName: "record", entityPrefix: "rec"
-   */
-  record?: ConsentRecordEntityConfig;
+	/**
+	 * Record entity configuration
+	 * @default entityName: "record", entityPrefix: "rec"
+	 */
+	record?: ConsentRecordEntityConfig;
 
-  /**
-   * Withdrawal configuration
-   * @default entityName: "consentWithdrawal", entityPrefix: "wdr"
-   */
-  consentWithdrawal?: ConsentWithdrawalEntityConfig;
+	/**
+	 * Withdrawal configuration
+	 * @default entityName: "consentWithdrawal", entityPrefix: "wdr"
+	 */
+	consentWithdrawal?: ConsentWithdrawalEntityConfig;
 
-  /**
-   * Audit log configuration
-   * @default entityName: "auditLog", entityPrefix: "log"
-   */
-  auditLog?: AuditLogEntityConfig;
+	/**
+	 * Audit log configuration
+	 * @default entityName: "auditLog", entityPrefix: "log"
+	 */
+	auditLog?: AuditLogEntityConfig;
 }
 
 export type { AuditLogEntityConfig } from './audit-log/types';

@@ -82,7 +82,8 @@ export function getConsentWithdrawalTable(
 				type: 'string',
 				required: false,
 				fieldName:
-					consentWithdrawalConfig?.fields?.withdrawalReason || 'withdrawalReason',
+					consentWithdrawalConfig?.fields?.withdrawalReason ||
+					'withdrawalReason',
 			},
 
 			/**
@@ -94,7 +95,8 @@ export function getConsentWithdrawalTable(
 				defaultValue: () => 'subject-initiated',
 				required: true,
 				fieldName:
-					consentWithdrawalConfig?.fields?.withdrawalMethod || 'withdrawalMethod',
+					consentWithdrawalConfig?.fields?.withdrawalMethod ||
+					'withdrawalMethod',
 			},
 
 			/**

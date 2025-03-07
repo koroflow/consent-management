@@ -31,7 +31,10 @@ import type { Withdrawal } from './schema';
  * });
  * ```
  */
-export function consentWithdrawalRegistry({ adapter, ...ctx }: RegistryContext) {
+export function consentWithdrawalRegistry({
+	adapter,
+	...ctx
+}: RegistryContext) {
 	const { createWithHooks } = getWithHooks(adapter, ctx);
 	return {
 		/**
@@ -45,7 +48,8 @@ export function consentWithdrawalRegistry({ adapter, ...ctx }: RegistryContext) 
 		 * @throws May throw an error if hooks prevent creation or if database operations fail
 		 */
 		createConsentWithdrawal: async (
-			consentWithdrawal: Omit<Withdrawal, 'id' | 'createdAt'> & Partial<Withdrawal>,
+			consentWithdrawal: Omit<Withdrawal, 'id' | 'createdAt'> &
+				Partial<Withdrawal>,
 			context?: GenericEndpointContext
 		) => {
 			const createdWithdrawal = await createWithHooks({
@@ -64,7 +68,11 @@ export function consentWithdrawalRegistry({ adapter, ...ctx }: RegistryContext) 
 				);
 			}
 
-			return validateEntityOutput('consentWithdrawal', createdWithdrawal, ctx.options);
+			return validateEntityOutput(
+				'consentWithdrawal',
+				createdWithdrawal,
+				ctx.options
+			);
 		},
 
 		/**
@@ -108,7 +116,11 @@ export function consentWithdrawalRegistry({ adapter, ...ctx }: RegistryContext) 
 			});
 
 			return consentWithdrawals.map((consentWithdrawal) =>
-				validateEntityOutput('consentWithdrawal', consentWithdrawal, ctx.options)
+				validateEntityOutput(
+					'consentWithdrawal',
+					consentWithdrawal,
+					ctx.options
+				)
 			);
 		},
 
@@ -130,7 +142,11 @@ export function consentWithdrawalRegistry({ adapter, ...ctx }: RegistryContext) 
 				],
 			});
 			return consentWithdrawal
-				? validateEntityOutput('consentWithdrawal', consentWithdrawal, ctx.options)
+				? validateEntityOutput(
+						'consentWithdrawal',
+						consentWithdrawal,
+						ctx.options
+					)
 				: null;
 		},
 
@@ -142,7 +158,10 @@ export function consentWithdrawalRegistry({ adapter, ...ctx }: RegistryContext) 
 		 * @param limit - Optional maximum number of records to return
 		 * @returns Array of consentWithdrawal records associated with the subject
 		 */
-		findConsentWithdrawalsByUserId: async (subjectId: string, limit?: number) => {
+		findConsentWithdrawalsByUserId: async (
+			subjectId: string,
+			limit?: number
+		) => {
 			const consentWithdrawals = await adapter.findMany({
 				model: 'consentWithdrawal',
 				where: [
@@ -158,7 +177,11 @@ export function consentWithdrawalRegistry({ adapter, ...ctx }: RegistryContext) 
 				limit,
 			});
 			return consentWithdrawals.map((consentWithdrawal) =>
-				validateEntityOutput('consentWithdrawal', consentWithdrawal, ctx.options)
+				validateEntityOutput(
+					'consentWithdrawal',
+					consentWithdrawal,
+					ctx.options
+				)
 			);
 		},
 
@@ -185,7 +208,11 @@ export function consentWithdrawalRegistry({ adapter, ...ctx }: RegistryContext) 
 				// },
 			});
 			return consentWithdrawal
-				? validateEntityOutput('consentWithdrawal', consentWithdrawal, ctx.options)
+				? validateEntityOutput(
+						'consentWithdrawal',
+						consentWithdrawal,
+						ctx.options
+					)
 				: null;
 		},
 	};

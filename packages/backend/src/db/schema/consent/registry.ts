@@ -368,7 +368,11 @@ export function consentRegistry({ adapter, ...ctx }: RegistryContext) {
 			});
 
 			return consentWithdrawals.map((consentWithdrawal) =>
-				validateEntityOutput('consentWithdrawal', consentWithdrawal, ctx.options)
+				validateEntityOutput(
+					'consentWithdrawal',
+					consentWithdrawal,
+					ctx.options
+				)
 			);
 		},
 	};

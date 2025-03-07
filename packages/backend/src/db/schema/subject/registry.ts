@@ -47,7 +47,8 @@ export function subjectRegistry({ adapter, ...ctx }: RegistryContext) {
 		 * @throws May throw an error if hooks prevent creation or if database operations fail
 		 */
 		createSubject: async (
-			subject: Omit<Subject, 'id' | 'createdAt' | 'updatedAt'> & Partial<Subject>,
+			subject: Omit<Subject, 'id' | 'createdAt' | 'updatedAt'> &
+				Partial<Subject>,
 			context?: GenericEndpointContext
 		) => {
 			const createdUser = await createWithHooks({
@@ -194,10 +195,13 @@ export function subjectRegistry({ adapter, ...ctx }: RegistryContext) {
 							return subject;
 						}
 					}
-					ctx.logger?.error('Failed to create or find subject with external ID', {
-						externalUserId,
-						error: error instanceof Error ? error.message : 'Unknown error',
-					});
+					ctx.logger?.error(
+						'Failed to create or find subject with external ID',
+						{
+							externalUserId,
+							error: error instanceof Error ? error.message : 'Unknown error',
+						}
+					);
 					throw new C15TError(
 						'Failed to create or find subject with external ID',
 						{
@@ -256,7 +260,9 @@ export function subjectRegistry({ adapter, ...ctx }: RegistryContext) {
 					},
 				],
 			});
-			return subject ? validateEntityOutput('subject', subject, ctx.options) : null;
+			return subject
+				? validateEntityOutput('subject', subject, ctx.options)
+				: null;
 		},
 
 		/**
@@ -278,7 +284,9 @@ export function subjectRegistry({ adapter, ...ctx }: RegistryContext) {
 					},
 				],
 			});
-			return subject ? validateEntityOutput('subject', subject, ctx.options) : null;
+			return subject
+				? validateEntityOutput('subject', subject, ctx.options)
+				: null;
 		},
 
 		/**
@@ -312,7 +320,9 @@ export function subjectRegistry({ adapter, ...ctx }: RegistryContext) {
 				customFn: undefined,
 				context,
 			});
-			return subject ? validateEntityOutput('subject', subject, ctx.options) : null;
+			return subject
+				? validateEntityOutput('subject', subject, ctx.options)
+				: null;
 		},
 
 		/**

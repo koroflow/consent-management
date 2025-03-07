@@ -255,7 +255,9 @@ export const getConsentPolicy = createAuthEndpoint(
 
 				// If not found and externalId provided, try that
 				if (!subjectRecord && params.externalId) {
-					subjectRecord = await registry.findUserByExternalId(params.externalId);
+					subjectRecord = await registry.findUserByExternalId(
+						params.externalId
+					);
 					if (subjectRecord) {
 						identifierUsed = 'externalId';
 					}
