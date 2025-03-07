@@ -29,7 +29,7 @@ import type { Field } from '../core/fields';
  * };
  *
  * // Process the data - password will be excluded
- * const processedData = parseEntityOutputData(userData, subjectSchema);
+ * const processedData = parseEntityOutputData(subjectData, subjectSchema);
  * // Result: { id: 'sub_x1pftyoufsm7xgo1kv',}
  * ```
  *

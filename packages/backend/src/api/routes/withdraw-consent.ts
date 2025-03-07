@@ -157,12 +157,12 @@ export const withdrawConsent = createAuthEndpoint(
 				}
 
 				// Find all active consents for this subject and domain
-				const userConsents = await registry.findConsents({
+				const subjectConsents = await registry.findConsents({
 					subjectId: subjectRecord.id,
 				});
 
 				// Filter for active consents with matching domain
-				recordsToWithdraw = userConsents.filter(
+				recordsToWithdraw = subjectConsents.filter(
 					(consent) =>
 						consent.status === 'active' && consent.domainId === params.domain
 				);

@@ -148,7 +148,7 @@
 
 // 		/**
 // 		 * Consent purposes that are enabled by default in this jurisdiction
-// 		 * Users can still opt out of these purposes
+// 		 * Subjects can still opt out of these purposes
 // 		 */
 // 		defaultPurposes?: string[];
 // 	}>;

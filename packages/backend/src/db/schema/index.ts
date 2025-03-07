@@ -27,7 +27,7 @@
  * const tables = getConsentTables(options);
  *
  * // Validate input data against the subject table schema
- * const validUserData = parseInputData(
+ * const validSubjectData = parseInputData(
  *   inputData,
  *   { fields: tables.subject.fields }
  * );

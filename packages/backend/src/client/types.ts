@@ -117,7 +117,7 @@ export interface c15tClientOptions {
  * @example
  * ```typescript
  * // Basic GET request options
- * const getOptions: FetchOptions<UserConsent> = {
+ * const getOptions: FetchOptions<SubjectConsent> = {
  *   method: 'GET',
  *   query: { subjectId: 'sub_x1pftyoufsm7xgo1kv' }
  * };
@@ -290,7 +290,7 @@ export interface FetchOptions<ResponseType = unknown> {
  * @example
  * ```typescript
  * // Processing a response context
- * const response: ResponseContext<UserData> = await client.$fetch('/subject/123');
+ * const response: ResponseContext<SubjectData> = await client.$fetch('/subject/123');
  *
  * if (response.ok) {
  *   // Handle successful response

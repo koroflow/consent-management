@@ -266,25 +266,28 @@ export const getConsentPolicy = createAuthEndpoint(
 				// If we found a subject, get their consent status
 				if (subjectRecord) {
 					// Get subject's active consents for this domain
-					const userConsents = await registry.findConsents({
+					const subjectConsents = await registry.findConsents({
 						subjectId: subjectRecord.id,
 						domainId: domain.id,
 						status: 'active',
 					});
 
 					// Get the latest active consent
-					const userConsent = userConsents.length > 0 ? userConsents[0] : null;
+					const subjectConsent =
+						subjectConsents.length > 0 ? subjectConsents[0] : null;
 
 					// Add subject consent info to response
 					response.data.subjectConsentStatus = {
-						hasConsent: !!userConsent,
+						hasConsent: !!subjectConsent,
 						//@ts-expect-error
-						currentPreferences: userConsent ? userConsent.preferences : null,
-						consentedAt: userConsent
-							? userConsent.givenAt.toISOString() || null
+						currentPreferences: subjectConsent
+							? subjectConsent.preferences
 							: null,
-						needsRenewal: userConsent
-							? userConsent.policyId !== policy.id
+						consentedAt: subjectConsent
+							? subjectConsent.givenAt.toISOString() || null
+							: null,
+						needsRenewal: subjectConsent
+							? subjectConsent.policyId !== policy.id
 							: true,
 						identifiedBy: identifierUsed,
 					};

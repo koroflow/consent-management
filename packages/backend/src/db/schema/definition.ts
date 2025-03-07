@@ -166,14 +166,14 @@ export type EntityInputFields<TableName extends keyof C15TDBSchema> = Omit<
  * ```typescript
  * // Validate data retrieved from an external API
  * try {
- *   const validUserOutput = validateEntityOutput(
+ *   const validSubjectOutput = validateEntityOutput(
  *     'subject',
- *     fetchedUserData,
+ *     fetchedSubjectData,
  *     options
  *   );
  *
- *   // validUserOutput is now typed as EntityOutputFields<'subject'>
- *   displayUserProfile(validUserOutput);
+ *   // validSubjectOutput is now typed as EntityOutputFields<'subject'>
+ *   displaySubjectProfile(validSubjectOutput);
  * } catch (error) {
  *   console.error('Output validation failed:', error.message);
  * }

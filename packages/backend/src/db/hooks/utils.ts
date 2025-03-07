@@ -118,7 +118,7 @@ export async function processHooks<
  * ```typescript
  * // Process 'after update' hooks for multiple subjects
  * await processAfterHooksForMany(
- *   updatedUsers,
+ *   updatedSubjects,
  *   'subject',
  *   registeredHooks,
  *   { batchId: 'sub_x1pftyoufsm7xgo1kv' }

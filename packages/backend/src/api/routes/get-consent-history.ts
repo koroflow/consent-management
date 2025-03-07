@@ -39,22 +39,22 @@ export const getConsentHistory = createAuthEndpoint(
 				});
 			}
 
-			let userConsents = await registry.findConsents({
+			let subjectConsents = await registry.findConsents({
 				subjectId: params.subjectId,
 			});
 			if (params.domain) {
-				userConsents = userConsents.filter(
+				subjectConsents = subjectConsents.filter(
 					(consent) => consent.domainId === params.domain
 				);
 			}
 
 			// Sort consents by givenAt date
-			userConsents.sort((a, b) => b.givenAt.getTime() - a.givenAt.getTime());
+			subjectConsents.sort((a, b) => b.givenAt.getTime() - a.givenAt.getTime());
 
 			// Apply pagination
 			const start = params.offset;
 			const end = start + params.limit;
-			const paginatedConsents = userConsents.slice(start, end);
+			const paginatedConsents = subjectConsents.slice(start, end);
 
 			// Process each consent to include withdrawals and records
 			const processedConsents = await Promise.all(
@@ -112,7 +112,7 @@ export const getConsentHistory = createAuthEndpoint(
 					consents: processedConsents,
 					auditLogs,
 					pagination: {
-						total: userConsents.length,
+						total: subjectConsents.length,
 						offset: params.offset,
 						limit: params.limit,
 					},

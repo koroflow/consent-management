@@ -108,11 +108,11 @@ export const getConsent = createAuthEndpoint(
 					break;
 				}
 				case 'externalId': {
-					const externalUser = await registry.findSubjectByExternalId(
+					const externalSubject = await registry.findSubjectByExternalId(
 						params.externalId
 					);
-					if (externalUser) {
-						subjects = [externalUser];
+					if (externalSubject) {
+						subjects = [externalSubject];
 					}
 					break;
 				}
@@ -161,13 +161,13 @@ export const getConsent = createAuthEndpoint(
 
 			for (const subject of subjects) {
 				// Use the adapter to find subject consents
-				const userConsents = await registry.findConsents({
+				const subjectConsents = await registry.findConsents({
 					subjectId: subject.id,
 					domainId: params.domain,
 				});
 
 				// Filter for active consents only
-				const activeConsents = userConsents.filter(
+				const activeConsents = subjectConsents.filter(
 					(consent) => consent.status === 'active'
 				);
 

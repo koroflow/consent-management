@@ -23,7 +23,7 @@ import { processHooks } from './utils';
  * ```typescript
  * const subject = await createWithHook(
  *   mysqlAdapter,
- *   { hooks: userHooks, options: config },
+ *   { hooks: subjectHooks, options: config },
  *   {
  *     data: { name: 'Alice' },
  *     model: 'subject'

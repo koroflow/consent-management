@@ -57,27 +57,6 @@ export type RequiredKeysOf<BaseType extends object> = Exclude<
  * properties optional as well. Functions are preserved as-is.
  *
  * @typeParam T - The type to make deeply partial
- *
- * @example
- * ```ts
- * interface Subject {
- *   id: number;
- *   name: string;
- *   settings: {
- *     theme: string;
- *     notifications: boolean;
- *   }
- * }
- *
- * // All properties including nested ones are optional
- * const partialUser: DeepPartial<Subject> = {
- *   name: 'John',
- *   settings: {
- *     theme: 'dark'
- *     // notifications can be omitted
- *   }
- * };
- * ```
  */
 export type DeepPartial<T> = T extends (...args: unknown[]) => unknown
 	? T

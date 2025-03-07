@@ -220,7 +220,7 @@ type OptionalInputKeys<TSchema> = {
  * };
  *
  * // Infer the output type (for API responses)
- * type UserOutput = InferFieldsOutput<typeof subjectSchema>;
+ * type SubjectOutput = InferFieldsOutput<typeof subjectSchema>;
  * // Result: { id: string; name: string; email: string; age?: number | null | undefined }
  * // Note: 'password' is excluded because returned: false
  * ```
@@ -258,7 +258,7 @@ export type InferFieldsOutput<TSchema> = TSchema extends Record<string, Field>
  * };
  *
  * // Infer the input type (for create operations)
- * type UserInput = InferFieldsInput<typeof subjectSchema>;
+ * type SubjectInput = InferFieldsInput<typeof subjectSchema>;
  * // Result: { name: string; email: string; age?: number | null | undefined }
  * // Note: 'id' and 'createdAt' are excluded because input: false
  * ```

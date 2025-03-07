@@ -48,11 +48,11 @@ export type HookResult<TData> =
  *
  * @example
  * ```typescript
- * const userHook: ModelHook<'subject'> = {
+ * const subjectHook: ModelHook<'subject'> = {
  *   create: {
- *     before: (userData) => ({
+ *     before: (subjectData) => ({
  *       kind: 'transform',
- *       data: { ...userData, createdAt: new Date() }
+ *       data: { ...subjectData, createdAt: new Date() }
  *     })
  *   }
  * };

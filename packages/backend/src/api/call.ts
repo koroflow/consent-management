@@ -51,7 +51,7 @@ export const optionsMiddleware = createMiddleware(async () => {
  * @example
  * ```typescript
  * // Create a custom authentication middleware
- * const verifyUserMiddleware = createAuthMiddleware(async (context) => {
+ * const verifySubjectMiddleware = createAuthMiddleware(async (context) => {
  *   const { subjectId } = context.params;
  *
  *   // Verify the subject exists
@@ -72,7 +72,7 @@ export const optionsMiddleware = createMiddleware(async () => {
  * });
  *
  * // Apply the middleware to specific routes in router configuration
- * router.use('/subjects/**', verifyUserMiddleware);
+ * router.use('/subjects/**', verifySubjectMiddleware);
  * ```
  */
 export const createAuthMiddleware = createMiddleware.create({

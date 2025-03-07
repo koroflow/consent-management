@@ -26,7 +26,7 @@ const VALID_RELATIVE_URL_REGEX =
  * - callbackURL
  * - redirectTo
  * - errorCallbackURL
- * - newUserCallbackURL
+ * - newSubjectCallbackURL
  *
  * URLs are validated using exact matching for origins and wildcard pattern matching
  * for hostnames. Relative URLs are allowed for callback URLs but must match a safe
@@ -73,7 +73,7 @@ export const originCheckMiddleware = createAuthMiddleware(async (ctx) => {
 	const callbackURL = body?.callbackURL || query?.callbackURL;
 	const redirectURL = body?.redirectTo;
 	const errorCallbackURL = body?.errorCallbackURL;
-	const newUserCallbackURL = body?.newUserCallbackURL;
+	const newSubjectCallbackURL = body?.newSubjectCallbackURL;
 	const trustedOrigins: string[] = Array.isArray(context.options.trustedOrigins)
 		? context.trustedOrigins
 		: [
@@ -149,7 +149,8 @@ export const originCheckMiddleware = createAuthMiddleware(async (ctx) => {
 	callbackURL && validateURL(callbackURL, 'callbackURL');
 	redirectURL && validateURL(redirectURL, 'redirectURL');
 	errorCallbackURL && validateURL(errorCallbackURL, 'errorCallbackURL');
-	newUserCallbackURL && validateURL(newUserCallbackURL, 'newUserCallbackURL');
+	newSubjectCallbackURL &&
+		validateURL(newSubjectCallbackURL, 'newSubjectCallbackURL');
 });
 
 /**

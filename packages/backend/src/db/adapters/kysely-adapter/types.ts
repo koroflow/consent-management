@@ -183,8 +183,8 @@ export interface DialectConfig {
 	 * Casing style for table names in the database
 	 *
 	 * This affects how table names are transformed when interacting with the database.
-	 * For example, with 'camel' casing, 'userProfile' becomes 'user_profile' in the database.
-	 * With 'snake' casing, it remains as 'user_profile'.
+	 * For example, with 'camel' casing, 'subjectProfile' becomes 'subject_profile' in the database.
+	 * With 'snake' casing, it remains as 'subject_profile'.
 	 *
 	 * @default "camel"
 	 */
@@ -257,8 +257,8 @@ export interface KyselyInstanceConfig {
 	 * Casing style for table names in the database
 	 *
 	 * This affects how table names are transformed when interacting with the database.
-	 * For example, with 'camel' casing, 'userProfile' becomes 'user_profile' in the database.
-	 * With 'snake' casing, it remains as 'user_profile'.
+	 * For example, with 'camel' casing, 'subjectProfile' becomes 'subject_profile' in the database.
+	 * With 'snake' casing, it remains as 'subject_profile'.
 	 *
 	 * @default "camel"
 	 */

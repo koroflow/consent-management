@@ -30,7 +30,7 @@ import type { Field } from './field-types';
  * }
  *
  * // Infer the output types for subject fields from plugins
- * type UserPluginFields = InferFieldsFromPlugins<MyOptions, 'subjectFields', 'output'>;
+ * type SubjectPluginFields = InferFieldsFromPlugins<MyOptions, 'subjectFields', 'output'>;
  * // Results in { acceptedTerms: boolean }
  * ```
  *

@@ -335,7 +335,7 @@ export function subjectRegistry({ adapter, ...ctx }: RegistryContext) {
 		 * @param subjectId - The unique identifier of the subject to delete
 		 * @returns A promise that resolves when the deletion is complete
 		 */
-		deleteUser: async (subjectId: string) => {
+		deleteSubject: async (subjectId: string) => {
 			await adapter.transaction({
 				callback: async (tx: Adapter) => {
 					// Update the subject record

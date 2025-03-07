@@ -116,11 +116,11 @@ export function getSubjectTable(
 			/**
 			 * Subject's local timezone, stored as IANA timezone identifier
 			 */
-			userTimezone: {
+			subjectTimezone: {
 				type: 'timezone',
 				required: false,
 				defaultValue: COMMON_TIMEZONES.UTC,
-				fieldName: subjectConfig?.fields?.userTimezone || 'userTimezone',
+				fieldName: subjectConfig?.fields?.subjectTimezone || 'subjectTimezone',
 			},
 
 			// Include additional fields from plugins

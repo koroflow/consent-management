@@ -58,7 +58,7 @@ export interface VerifyConsentResponse {
  *
  * This endpoint allows checking if a subject has provided consent for a specific domain
  * and verifies if the consent meets specific criteria (required preferences, policy version).
- * Users can be identified by subjectId, externalId, or ipAddress.
+ * Subjects can be identified by subjectId, externalId, or ipAddress.
  *
  * @endpoint GET /consent/verify
  */
@@ -138,12 +138,12 @@ export const verifyConsent = createAuthEndpoint(
 			}
 
 			// Find active consents for this subject
-			const userConsents = await registry.findConsents({
+			const subjectConsents = await registry.findConsents({
 				subjectId: subjectRecord.id,
 			});
 
 			// Filter for active consents that match the domain
-			const activeConsents = userConsents.filter(
+			const activeConsents = subjectConsents.filter(
 				(consent) =>
 					consent.status === 'active' && consent.domainId === params.domain
 			);

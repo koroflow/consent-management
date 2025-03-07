@@ -206,7 +206,7 @@ export const COMMON_TIMEZONES = {
  * });
  *
  * // Define a timezone field with suggested values
- * const userTimezone = timezoneField({
+ * const subjectTimezone = timezoneField({
  *   required: true,
  *   suggestedValues: [
  *     COMMON_TIMEZONES.EASTERN,
