@@ -8,7 +8,7 @@ export const subject = mysqlTable("subject", {
   lastIpAddress: text('last_ip_address'),
   createdAt: timestamp('created_at').notNull(),
   updatedAt: timestamp('updated_at').notNull(),
-  userTimezone: text('user_timezone')
+  subjectTimezone: text('subject_timezone')
 });
 
 export const consentPurpose = mysqlTable("consent_purpose", {

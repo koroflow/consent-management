@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS "subject" (
   "lastIpAddress" text,
   "createdAt" timestamp with time zone NOT NULL,
   "updatedAt" timestamp with time zone NOT NULL,
-  "userTimezone" text
+  "subjectTimezone" text
 );
 
 CREATE TABLE IF NOT EXISTS "consentPurpose" (

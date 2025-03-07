@@ -16,7 +16,7 @@ model Subject {
   lastIpAddress      String?
   createdAt          DateTime
   updatedAt          DateTime
-  userTimezone       String
+  subjectTimezone    String
   consents           Consent[]
   consentrecords     ConsentRecord[]
   consentwithdrawals ConsentWithdrawal[]

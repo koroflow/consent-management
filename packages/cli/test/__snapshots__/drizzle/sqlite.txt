@@ -8,7 +8,7 @@ export const subject = sqliteTable("subject", {
   lastIpAddress: text('last_ip_address'),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
   updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull(),
-  userTimezone: text('user_timezone')
+  subjectTimezone: text('subject_timezone')
 });
 
 export const consentPurpose = sqliteTable("consent_purpose", {
