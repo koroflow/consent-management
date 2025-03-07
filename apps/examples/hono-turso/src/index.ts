@@ -18,7 +18,8 @@ app.on(['POST', 'GET'], '/api/c15t/*', async (c) => {
 			return new Response(
 				JSON.stringify({
 					error: true,
-					message: 'Missing required environment variables for database connection',
+					message:
+						'Missing required environment variables for database connection',
 				}),
 				{
 					status: 500,

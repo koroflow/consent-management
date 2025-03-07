@@ -36,7 +36,7 @@ const libsql = new LibsqlDialect({
  * @see {@link https://docs.c15t.dev/configuration} for more configuration options
  */
 export const c15t = c15tInstance({
-  appName: 'Hono D1 Example App',
+	appName: 'Hono D1 Example App',
 	basePath: '/api/c15t',
 	// Add any trusted origins if needed
 	trustedOrigins: ['http://localhost:3000'],
