@@ -3,7 +3,7 @@ import type { ConsentPolicy } from './schema';
 import { getWithHooks } from '~/db/hooks';
 import { validateEntityOutput } from '../definition';
 import type { Where } from '~/db/adapters/types';
-import { createHash } from 'crypto';
+import { createHash } from 'node:crypto';
 
 export interface FindPolicyParams {
 	domainId?: string;
@@ -236,7 +236,7 @@ export function policyRegistry({ adapter, ...ctx }: RegistryContext) {
 
 			// Normalize name for comparison
 			const normalizedSearchName = name.toLowerCase().trim();
-			
+
 			// Find latest policy with exact name match
 			const latestPolicy = policies
 				.filter((p) => p.name.toLowerCase() === normalizedSearchName)

@@ -34,7 +34,7 @@ export function toNextJsHandler(instance: C15TInstance) {
 			if (request.method === 'POST') {
 				try {
 					const clonedRequest = request.clone();
-          await clonedRequest.json();
+					await clonedRequest.json();
 				} catch (error) {
 					return new Response(
 						JSON.stringify({

@@ -214,7 +214,8 @@ describe('Consent Endpoints', () => {
 					status: 'BAD_REQUEST',
 					body: {
 						code: 'PROVIDED_USERID_AND_EXTERNALUSERID_DO_NOT_MATCH_THE_SAME_USER',
-						message: 'Provided userId and externalUserId do not match the same user',
+						message:
+							'Provided userId and externalUserId do not match the same user',
 					},
 				});
 			});
