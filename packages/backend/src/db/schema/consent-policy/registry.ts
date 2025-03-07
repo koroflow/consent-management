@@ -12,6 +12,19 @@ export interface FindPolicyParams {
 }
 
 /**
+ * Generates placeholder content for a policy with its hash.
+ *
+ * @param name - Policy name
+ * @param date - Generation date
+ * @returns Object containing content and contentHash
+ */
+function generatePolicyPlaceholder(name: string, date: Date) {
+	const content = `[PLACEHOLDER] This is an automatically generated version of the ${name} policy.\n\nThis placeholder content should be replaced with actual policy terms before being presented to users.\n\nGenerated on: ${date.toISOString()}`;
+	const contentHash = createHash('sha256').update(content).digest('hex');
+	return { content, contentHash };
+}
+
+/**
  * Creates and returns a set of consent policy-related adapter methods to interact with the database.
  * These methods provide a consistent interface for creating, finding, and updating
  * consent policy records while applying hooks and enforcing data validation rules.
@@ -247,30 +260,43 @@ export function policyRegistry({ adapter, ...ctx }: RegistryContext) {
 						...ctx,
 					});
 
-					const policies = await txRegistry.findPolicies({
-						includeInactive: false,
+					// Find latest policy with exact name match directly from database
+					const matchingPolicies = await txAdapter.findMany({
+						model: 'consentPolicy',
+						where: [
+							{ field: 'isActive', value: true },
+							{
+								field: 'name',
+								value: normalizedSearchName,
+								operator: 'caseInsensitiveEquals',
+							},
+						],
+						sortBy: {
+							field: 'effectiveDate',
+							direction: 'desc',
+						},
+						limit: 1,
 					});
 
-					// Find latest policy with exact name match
-					const latestPolicy = policies
-						.filter((p) => p.name.toLowerCase() === normalizedSearchName)
-						.sort(
-							(a, b) => b.effectiveDate.getTime() - a.effectiveDate.getTime()
-						)[0];
+					const latestPolicy = matchingPolicies[0]
+						? validateEntityOutput(
+								'consentPolicy',
+								matchingPolicies[0],
+								ctx.options
+							)
+						: null;
 
 					if (latestPolicy) {
 						return latestPolicy;
 					}
 
 					// Generate policy content and hash
-					const defaultContent = `[PLACEHOLDER] This is an automatically generated version of the ${name} policy.\n\nThis placeholder content should be replaced with actual policy terms before being presented to users.\n\nGenerated on: ${now.toISOString()}`;
-					const contentHash = createHash('sha256')
-						.update(defaultContent)
-						.digest('hex');
+					const { content: defaultContent, contentHash } =
+						generatePolicyPlaceholder(name, now);
 
 					return txRegistry.createConsentPolicy({
 						version: '1.0.0',
-						name: name.trim(),
+						name: normalizedSearchName,
 						effectiveDate: now,
 						content: defaultContent,
 						contentHash,
