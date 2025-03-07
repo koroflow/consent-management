@@ -190,7 +190,8 @@ export function subjectRegistry({ adapter, ...ctx }: RegistryContext) {
 							'Handling duplicate key violation for external ID',
 							{ externalSubjectId }
 						);
-						const subject = await this.findSubjectByExternalId(externalSubjectId);
+						const subject =
+							await this.findSubjectByExternalId(externalSubjectId);
 						if (subject) {
 							return subject;
 						}
