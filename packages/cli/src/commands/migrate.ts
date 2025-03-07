@@ -1,12 +1,12 @@
-import { Command } from 'commander';
-import { z } from 'zod';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
-import yoctoSpinner from 'yocto-spinner';
-import chalk from 'chalk';
-import prompts from 'prompts';
 import { logger } from '@c15t/backend';
 import { getAdapter, getMigrations } from '@c15t/backend/db';
+import chalk from 'chalk';
+import { Command } from 'commander';
+import prompts from 'prompts';
+import yoctoSpinner from 'yocto-spinner';
+import { z } from 'zod';
 import { getConfig } from '../utils/get-config';
 
 export async function migrateAction(opts: unknown) {

@@ -1,9 +1,9 @@
-import type { GenericEndpointContext } from '~/types';
-import type { AuditLog } from './schema';
+import type { Where } from '~/db/adapters/types';
 import { getWithHooks } from '~/db/hooks';
+import type { GenericEndpointContext } from '~/types';
 import type { RegistryContext } from '~/types/context';
 import { validateEntityOutput } from '../definition';
-import type { Where } from '~/db/adapters/types';
+import type { AuditLog } from './schema';
 /**
  * Creates and returns a set of consent audit log adapter methods to interact with the database.
  * These methods provide a consistent interface for creating and querying audit logs

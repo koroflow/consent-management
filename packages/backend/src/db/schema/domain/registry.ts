@@ -1,9 +1,9 @@
-import type { GenericEndpointContext, RegistryContext } from '~/types';
-import type { Domain } from './schema';
-import { getWithHooks } from '~/db/hooks';
-import { validateEntityOutput } from '../definition';
 import type { Where } from '~/db/adapters/types';
-import { C15TError, BASE_ERROR_CODES } from '~/error';
+import { getWithHooks } from '~/db/hooks';
+import { BASE_ERROR_CODES, C15TError } from '~/error';
+import type { GenericEndpointContext, RegistryContext } from '~/types';
+import { validateEntityOutput } from '../definition';
+import type { Domain } from './schema';
 
 export interface FindDomainParams {
 	name?: string;

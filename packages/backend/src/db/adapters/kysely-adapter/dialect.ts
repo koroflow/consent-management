@@ -8,11 +8,11 @@ import {
 } from 'kysely';
 import type { C15TOptions } from '~/types';
 import type {
-	DatabaseConfiguration,
-	KyselyInstanceConfig,
-	DialectConfig,
 	Database,
+	DatabaseConfiguration,
+	DialectConfig,
 	KyselyDatabaseType,
+	KyselyInstanceConfig,
 } from './types';
 
 /**

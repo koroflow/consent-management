@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 import { Command } from 'commander';
-import { migrate } from './commands/migrate';
 import { generate } from './commands/generate';
+import { migrate } from './commands/migrate';
 import 'dotenv/config';
 import { generateSecret } from './commands/secret';
 import { getPackageInfo } from './utils/get-package-info';

@@ -1,19 +1,19 @@
 import type { C15TOptions } from '~/types';
+import type { PluginSchema } from '../core/types';
 import {
-	getUserTable,
-	getPurposeTable,
+	getAuditLogTable,
 	getConsentGeoLocationTable,
 	getConsentPolicyTable,
-	getDomainTable,
 	getConsentTable,
+	getDomainTable,
+	getGeoLocationTable,
 	getPurposeJunctionTable,
+	getPurposeTable,
 	// getGeoLocationTable,
 	getRecordTable,
+	getUserTable,
 	getWithdrawalTable,
-	getAuditLogTable,
-	getGeoLocationTable,
 } from './index';
-import type { PluginSchema } from '../core/types';
 import type { InferTableShape } from './schemas';
 
 /**

@@ -1,13 +1,13 @@
 import {
 	APIError,
-	toResponse,
 	type EndpointContext,
 	type EndpointOptions,
 	type InputContext,
+	toResponse,
 } from 'better-call';
-import type { C15TEndpoint, C15TMiddleware } from './call';
 import defu from 'defu';
-import type { HookEndpointContext, C15TContext } from '~/types';
+import type { C15TContext, HookEndpointContext } from '~/types';
+import type { C15TEndpoint, C15TMiddleware } from './call';
 
 /**
  * Internal context type combining endpoint and input contexts with C15T-specific properties

@@ -1,6 +1,7 @@
 //@ts-nocheck
 
 import {
+	type SQL,
 	and,
 	asc,
 	count,
@@ -9,15 +10,14 @@ import {
 	inArray,
 	like,
 	or,
-	type SQL,
 } from 'drizzle-orm';
-import { getConsentTables } from '../..';
-import { C15TError, BASE_ERROR_CODES } from '~/error';
+import { BASE_ERROR_CODES, C15TError } from '~/error';
 import type { Adapter, C15TOptions, Where } from '~/types';
+import { getConsentTables } from '../..';
 
-import { applyDefaultValue } from '../utils';
-import type { EntityName } from '~/db/core/types';
 import { generateId } from '~/db/core/fields';
+import type { EntityName } from '~/db/core/types';
+import { applyDefaultValue } from '../utils';
 
 /**
  * Database interface for Drizzle ORM integration

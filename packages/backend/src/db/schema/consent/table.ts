@@ -1,6 +1,6 @@
 import type { Field } from '~/db/core/fields';
-import { consentSchema } from './schema';
 import type { C15TOptions } from '~/types';
+import { consentSchema } from './schema';
 /**
  * Generates the database table configuration for the consent entity.
  *

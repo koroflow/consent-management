@@ -1,17 +1,17 @@
 import type { RegistryContext } from '~/types/context';
 
 import {
-	userRegistry,
-	purposeRegistry,
-	recordRegistry,
 	auditLogRegistry,
+	consentGeoLocationRegistry,
 	consentRegistry,
 	domainRegistry,
-	purposeJunctionRegistry,
-	withdrawalRegistry,
 	geoLocationRegistry,
 	policyRegistry,
-	consentGeoLocationRegistry,
+	purposeJunctionRegistry,
+	purposeRegistry,
+	recordRegistry,
+	userRegistry,
+	withdrawalRegistry,
 } from './schema/index';
 
 export const createRegistry = (ctx: RegistryContext) => {

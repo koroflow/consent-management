@@ -1,11 +1,11 @@
-import { getConsentTables } from './index';
-import { C15TError, BASE_ERROR_CODES } from '~/error';
+import { BASE_ERROR_CODES, C15TError } from '~/error';
 import type { C15TOptions } from '~/types';
-import { createKyselyAdapter } from './adapters/kysely-adapter/dialect';
-import { kyselyAdapter } from './adapters/kysely-adapter';
-import { memoryAdapter } from './adapters/memory-adapter';
 import { logger } from '../utils';
+import { kyselyAdapter } from './adapters/kysely-adapter';
+import { createKyselyAdapter } from './adapters/kysely-adapter/dialect';
+import { memoryAdapter } from './adapters/memory-adapter';
 import type { Adapter } from './adapters/types';
+import { getConsentTables } from './index';
 
 export async function getAdapter(options: C15TOptions): Promise<Adapter> {
 	if (!options.database) {

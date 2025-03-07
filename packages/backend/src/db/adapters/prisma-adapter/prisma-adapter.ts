@@ -1,13 +1,13 @@
 //@ts-nocheck
 
-import { C15TError, BASE_ERROR_CODES } from '~/error';
+import { BASE_ERROR_CODES, C15TError } from '~/error';
 import type { C15TOptions } from '~/types';
 
-import { applyDefaultValue } from '../utils';
-import { generateId } from '~/db/core/fields';
 import { getConsentTables } from '~/db';
-import type { Where, Adapter } from '../types';
+import { generateId } from '~/db/core/fields';
 import type { EntityName } from '~/db/core/types';
+import type { Adapter, Where } from '../types';
+import { applyDefaultValue } from '../utils';
 
 /**
  * Configuration options for the Prisma adapter

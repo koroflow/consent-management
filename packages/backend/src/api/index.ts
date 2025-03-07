@@ -5,15 +5,15 @@ import {
 	type UnionToIntersection,
 	createRouter,
 } from 'better-call';
-import type { C15TOptions, C15TPlugin, C15TContext } from '~/types';
+import type { C15TContext, C15TOptions, C15TPlugin } from '~/types';
 import { getIp } from '~/utils/ip';
 
+import { logger } from '~/utils/logger';
 import { originCheckMiddleware } from './middlewares/origin-check';
 import { validateContextMiddleware } from './middlewares/validate-context';
 import { baseEndpoints } from './routes';
 import { ok } from './routes/ok';
 import { toEndpoints } from './to-endpoints';
-import { logger } from '~/utils/logger';
 
 /**
  * Retrieves and configures endpoints from plugins and core functionality

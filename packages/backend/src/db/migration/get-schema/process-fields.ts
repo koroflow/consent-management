@@ -1,6 +1,6 @@
 import type { Field } from '~/db/core/fields';
-import type { C15TDBSchema } from '~/db/schema/definition';
 import type { EntityName } from '~/db/core/types';
+import type { C15TDBSchema } from '~/db/schema/definition';
 
 /**
  * Processes field definitions for a table

@@ -1,7 +1,7 @@
 import type { C15TOptions } from '~/types';
-import type { KyselyAdapterConfig } from './kysely-adapter';
 import type { EntityInput, EntityName } from '../core/types';
 import type { C15TDBSchema } from '../schema/definition';
+import type { KyselyAdapterConfig } from './kysely-adapter';
 
 /**
  * Type representing the fields of a database table for a specific entity

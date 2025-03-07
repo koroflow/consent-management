@@ -1,8 +1,8 @@
-import type { EntityTypeMap } from '~/db/core/types';
-import type { Dialect, Kysely, MysqlPool, PostgresPool } from 'kysely';
 import type { Database as SQLiteDatabase } from 'better-sqlite3';
-import type { AdapterInstance } from '~/db/adapters/types';
+import type { Dialect, Kysely, MysqlPool, PostgresPool } from 'kysely';
 import type { Database as KyselyDatabase } from '~/db/adapters/kysely-adapter/types';
+import type { AdapterInstance } from '~/db/adapters/types';
+import type { EntityTypeMap } from '~/db/core/types';
 
 /**
  * Database interface for Kysely that uses the EntityTypeMap

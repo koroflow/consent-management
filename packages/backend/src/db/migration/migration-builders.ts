@@ -1,12 +1,12 @@
+import type { ColumnDataType, Expression, Kysely } from 'kysely';
 import type {
 	Database,
 	KyselyDatabaseType,
 } from '~/db/adapters/kysely-adapter/types';
-import type { MigrationOperation, TableToCreate, ColumnsToAdd } from './types';
-import { getType } from './type-mapping';
-import { createLogger } from '~/utils/logger';
-import type { ColumnDataType, Expression, Kysely } from 'kysely';
 import type { C15TOptions } from '~/types';
+import { createLogger } from '~/utils/logger';
+import { getType } from './type-mapping';
+import type { ColumnsToAdd, MigrationOperation, TableToCreate } from './types';
 
 /**
  * Builds migrations for adding columns to existing tables

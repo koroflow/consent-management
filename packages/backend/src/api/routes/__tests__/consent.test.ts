@@ -1,10 +1,10 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { setConsent } from '../set-consent';
-import type { C15TContext } from '~/types';
-import { memoryAdapter } from '~/db/adapters/memory-adapter';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { c15tInstance } from '~/core';
+import { memoryAdapter } from '~/db/adapters/memory-adapter';
 import type { ConsentPolicy } from '~/db/schema';
 import { BASE_ERROR_CODES } from '~/error';
+import type { C15TContext } from '~/types';
+import { setConsent } from '../set-consent';
 
 describe('Consent Endpoints', () => {
 	let context: C15TContext;

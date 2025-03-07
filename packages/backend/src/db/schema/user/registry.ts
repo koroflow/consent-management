@@ -1,9 +1,9 @@
-import type { GenericEndpointContext, RegistryContext } from '~/types';
-import type { User } from './schema';
-import { getWithHooks } from '~/db/hooks';
-import { validateEntityOutput } from '../definition';
-import { C15TError, BASE_ERROR_CODES } from '~/error';
 import type { Adapter } from '~/db/adapters/types';
+import { getWithHooks } from '~/db/hooks';
+import { BASE_ERROR_CODES, C15TError } from '~/error';
+import type { GenericEndpointContext, RegistryContext } from '~/types';
+import { validateEntityOutput } from '../definition';
+import type { User } from './schema';
 /**
  * Creates and returns a set of user-related adapter methods to interact with the database.
  *

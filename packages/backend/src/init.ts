@@ -1,3 +1,16 @@
+import { defu } from 'defu';
+import { getConsentTables } from './db';
+import { generateId } from './db/core/fields/id-generator';
+import type { EntityName } from './db/core/types';
+import { createRegistry } from './db/create-registry';
+import { getAdapter } from './db/utils';
+import {
+	BASE_ERROR_CODES,
+	type C15TError,
+	failAsync,
+	fromPromise,
+} from './error';
+import { type C15TResult, fail, ok } from './error/results';
 /**
  * c15t Initialization Module
  *
@@ -14,25 +27,12 @@
  * This is an internal module typically not used directly by consumers of the c15t library.
  */
 import type {
+	C15TContext,
 	C15TOptions,
 	C15TPlugin,
-	C15TContext,
 	RegistryContext,
 } from './types';
-import { getConsentTables } from './db';
-import { getAdapter } from './db/utils';
-import { createRegistry } from './db/create-registry';
-import type { EntityName } from './db/core/types';
-import { getBaseURL, createLogger, env, isProduction } from './utils';
-import {
-	failAsync,
-	fromPromise,
-	BASE_ERROR_CODES,
-	type C15TError,
-} from './error';
-import { type C15TResult, fail, ok } from './error/results';
-import { defu } from 'defu';
-import { generateId } from './db/core/fields/id-generator';
+import { createLogger, env, getBaseURL, isProduction } from './utils';
 
 /**
  * Helper function to convert a Promise to a C15T-specific ResultAsync

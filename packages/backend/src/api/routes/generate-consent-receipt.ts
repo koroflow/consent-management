@@ -1,9 +1,9 @@
-import { createAuthEndpoint } from '../call';
-import { C15TError, BASE_ERROR_CODES } from '~/error';
-import { z } from 'zod';
 import crypto from 'node:crypto';
-import type { C15TContext } from '../../types';
+import { z } from 'zod';
 import type { inferRecord as RecordType } from '~/db/schema/record/schema';
+import { BASE_ERROR_CODES, C15TError } from '~/error';
+import type { C15TContext } from '../../types';
+import { createAuthEndpoint } from '../call';
 
 // Define the schema for validating request parameters
 const generateConsentReceiptSchema = z.object({

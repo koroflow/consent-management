@@ -1,8 +1,8 @@
-import { createAuthEndpoint } from '../call';
 import { z } from 'zod';
 import type { EntityOutputFields } from '~/db/schema/definition';
-import { APIError } from '..';
 import { logger } from '~/utils';
+import { APIError } from '..';
+import { createAuthEndpoint } from '../call';
 
 // Define the schema for validating request parameters
 const getConsentHistorySchema = z.object({

@@ -1,6 +1,6 @@
-import type { Field } from '../core/fields';
+import { BASE_ERROR_CODES, C15TError } from '~/error';
 import type { C15TOptions, C15TPluginSchema } from '~/types';
-import { C15TError, BASE_ERROR_CODES } from '~/error';
+import type { Field } from '../core/fields';
 
 /**
  * Parses and transforms output data according to schema field definitions.

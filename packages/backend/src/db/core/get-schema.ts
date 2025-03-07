@@ -1,7 +1,7 @@
-import { getConsentTables } from '..';
-import type { C15TOptions } from '~/types';
 import type { Field } from '~/db/core/fields';
 import type { EntityName } from '~/db/core/types';
+import type { C15TOptions } from '~/types';
+import { getConsentTables } from '../index';
 
 /**
  * A schema entry representing a processed entity definition.

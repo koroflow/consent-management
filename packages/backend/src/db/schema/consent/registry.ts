@@ -1,8 +1,8 @@
-import type { GenericEndpointContext, RegistryContext } from '~/types';
-import type { Consent } from './schema';
-import { getWithHooks } from '~/db/hooks';
-import { validateEntityOutput } from '../definition';
 import type { Where } from '~/db/adapters/types';
+import { getWithHooks } from '~/db/hooks';
+import type { GenericEndpointContext, RegistryContext } from '~/types';
+import { validateEntityOutput } from '../definition';
+import type { Consent } from './schema';
 
 export interface FindConsentsParams {
 	userId?: string;

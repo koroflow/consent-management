@@ -1,9 +1,9 @@
+import type { Where } from '~/db/adapters/types';
+import { getWithHooks } from '~/db/hooks';
 import type { RegistryContext } from '~/types';
 import type { GenericEndpointContext } from '~/types';
-import type { Withdrawal } from './schema';
-import { getWithHooks } from '~/db/hooks';
 import { validateEntityOutput } from '../definition';
-import type { Where } from '~/db/adapters/types';
+import type { Withdrawal } from './schema';
 
 /**
  * Creates and returns a set of consent withdrawal adapter methods to interact with the database.

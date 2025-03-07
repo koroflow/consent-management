@@ -1,5 +1,5 @@
-import { type Field, getConsentTables } from '@c15t/backend/db';
 import { existsSync } from 'node:fs';
+import { type Field, getConsentTables } from '@c15t/backend/db';
 import type { SchemaGenerator } from './types';
 
 export function convertToSnakeCase(str: string) {

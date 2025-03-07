@@ -1,16 +1,16 @@
-import { getConsentTables } from '../..';
-import type { C15TOptions } from '~/types';
 import type {
-	EntityName,
-	EntityTypeMap,
 	EntityInput,
+	EntityName,
 	EntityOutput,
+	EntityTypeMap,
 } from '~/db/core/types';
+import type { C15TOptions } from '~/types';
+import { getConsentTables } from '../..';
 
-import { generateId, type Field, type Primitive } from '~/db/core/fields';
+import { type Field, type Primitive, generateId } from '~/db/core/fields';
 
-import { applyDefaultValue } from '../utils';
 import type { Adapter, TableFields, Where } from '../types';
+import { applyDefaultValue } from '../utils';
 
 /**
  * In-memory database structure for the memory adapter

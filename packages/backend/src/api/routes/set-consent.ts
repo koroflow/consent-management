@@ -1,9 +1,9 @@
-import { createAuthEndpoint } from '../call';
-import { C15TError, BASE_ERROR_CODES } from '~/error';
 import { z } from 'zod';
-import type { C15TContext } from '../../types';
-import type { Consent, inferRecord } from '~/db/schema';
 import type { Adapter } from '~/db/adapters/types';
+import type { Consent, inferRecord } from '~/db/schema';
+import { BASE_ERROR_CODES, C15TError } from '~/error';
+import type { C15TContext } from '../../types';
+import { createAuthEndpoint } from '../call';
 
 const ConsentType = z.enum([
 	'cookie_banner',

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { c15tInstance } from './core';
 import { memoryAdapter } from './db/adapters/memory-adapter';
 import type { C15TPlugin } from './types';

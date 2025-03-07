@@ -1,8 +1,8 @@
 import type {
-	FieldType,
-	Field,
-	Primitive,
 	InferValueType as BaseInferValueType,
+	Field,
+	FieldType,
+	Primitive,
 } from './field-types';
 
 /**

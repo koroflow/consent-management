@@ -1,6 +1,6 @@
-import { C15TError, BASE_ERROR_CODES } from '~/error';
-import { createAuthMiddleware } from '../call';
+import { BASE_ERROR_CODES, C15TError } from '~/error';
 import type { C15TContext, C15TPlugin } from '~/types';
+import { createAuthMiddleware } from '../call';
 
 import type { Adapter } from '~/db/adapters/types';
 

@@ -1,8 +1,8 @@
 'use client';
 
-import { cn } from '~/lib/cn';
 import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
+import { cn } from '~/lib/cn';
 
 interface MousePosition {
 	x: number;

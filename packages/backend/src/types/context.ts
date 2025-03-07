@@ -3,13 +3,13 @@ import type {
 	EndpointOptions,
 	InputContext,
 } from 'better-call';
-import type { C15TOptions } from './index';
-import type { createLogger } from '~/utils';
 import type { getConsentTables } from '~/db';
-import type { DatabaseHook } from '~/db/hooks/types';
-import type { createRegistry } from '~/db/create-registry';
-import type { EntityName } from '~/db/core/types';
 import type { Adapter } from '~/db/adapters/types';
+import type { EntityName } from '~/db/core/types';
+import type { createRegistry } from '~/db/create-registry';
+import type { DatabaseHook } from '~/db/hooks/types';
+import type { createLogger } from '~/utils';
+import type { C15TOptions } from './index';
 
 /**
  * Extended endpoint context for hooks

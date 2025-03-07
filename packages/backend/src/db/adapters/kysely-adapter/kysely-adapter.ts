@@ -1,12 +1,4 @@
 import type {
-	BinaryOperatorExpression,
-	OperandValueExpressionOrList,
-} from 'node_modules/kysely/dist/esm/parser/binary-operation-parser';
-import { getConsentTables } from '../..';
-import type { C15TOptions } from '../../../types';
-import { applyDefaultValue } from '../utils';
-import type { Database, KyselyDatabaseType } from './types';
-import type {
 	ExpressionBuilder,
 	ExpressionOrFactory,
 	InsertQueryBuilder,
@@ -17,16 +9,24 @@ import type {
 	UpdateQueryBuilder,
 } from 'kysely';
 import type {
-	EntityName,
-	EntityTypeMap,
-	EntityInput,
-	EntityOutput,
-} from '~/db/core/types';
-import type { TableReference } from 'node_modules/kysely/dist/esm/parser/table-parser';
-import { generateId, type Field, type Primitive } from '~/db/core/fields';
+	BinaryOperatorExpression,
+	OperandValueExpressionOrList,
+} from 'node_modules/kysely/dist/esm/parser/binary-operation-parser';
 import type { InsertExpression } from 'node_modules/kysely/dist/esm/parser/insert-values-parser';
-import type { Adapter, TableFields, Where } from '../types';
+import type { TableReference } from 'node_modules/kysely/dist/esm/parser/table-parser';
 import superjson from 'superjson';
+import { type Field, type Primitive, generateId } from '~/db/core/fields';
+import type {
+	EntityInput,
+	EntityName,
+	EntityOutput,
+	EntityTypeMap,
+} from '~/db/core/types';
+import { getConsentTables } from '../..';
+import type { C15TOptions } from '../../../types';
+import type { Adapter, TableFields, Where } from '../types';
+import { applyDefaultValue } from '../utils';
+import type { Database, KyselyDatabaseType } from './types';
 
 /**
  * Type alias for Kysely field references

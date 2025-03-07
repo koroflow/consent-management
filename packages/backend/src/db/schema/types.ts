@@ -7,18 +7,18 @@
  */
 import type { Field } from '~/db/core/fields';
 
-// Import entity-specific types from their respective directories
-import type { UserEntityConfig } from './user/types';
-import type { PurposeEntityConfig } from './purpose/types';
+import type { AuditLogEntityConfig } from './audit-log/types';
+import type { ConsentGeoLocationEntityConfig } from './consent-geo-location/types';
 import type { ConsentPolicyEntityConfig } from './consent-policy/types';
+import type { ConsentEntityConfig } from './consent/types';
 import type { DomainEntityConfig } from './domain/types';
 import type { GeoLocationEntityConfig } from './geo-location/types';
-import type { ConsentEntityConfig } from './consent/types';
 import type { PurposeJunctionEntityConfig } from './purpose-junction/types';
+import type { PurposeEntityConfig } from './purpose/types';
 import type { RecordEntityConfig } from './record/types';
-import type { ConsentGeoLocationEntityConfig } from './consent-geo-location/types';
+// Import entity-specific types from their respective directories
+import type { UserEntityConfig } from './user/types';
 import type { WithdrawalEntityConfig } from './withdrawal/types';
-import type { AuditLogEntityConfig } from './audit-log/types';
 
 /**
  * Base entity configuration shared by all entities

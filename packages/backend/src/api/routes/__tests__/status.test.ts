@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { status } from '../status';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { createMockContext } from '~/test/utils';
 import type { C15TContext } from '~/types';
+import { status } from '../status';
 
 describe('Status Endpoint', () => {
 	let mockContext: C15TContext;

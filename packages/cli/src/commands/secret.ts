@@ -1,7 +1,7 @@
+import Crypto from 'node:crypto';
 import { logger } from '@c15t/backend';
 import chalk from 'chalk';
 import { Command } from 'commander';
-import Crypto from 'node:crypto';
 
 export const generateSecret = new Command('secret').action(() => {
 	const secret = Crypto.randomBytes(32).toString('hex');

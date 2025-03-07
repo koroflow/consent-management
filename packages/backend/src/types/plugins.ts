@@ -1,3 +1,4 @@
+import type { UnionToIntersection } from '@better-fetch/fetch';
 /**
  * Plugin System for c15t Consent Management
  *
@@ -6,17 +7,16 @@
  * geolocation, custom consent flows, and more.
  */
 import type { Endpoint } from 'better-call';
+import type { Migration } from 'kysely';
 import type { C15TMiddleware } from '~/api/call';
+import type { Field } from '~/db/core/fields';
 import type {
-	C15TOptions,
 	C15TContext,
+	C15TOptions,
+	DeepPartial,
 	HookEndpointContext,
 	LiteralString,
-	DeepPartial,
 } from './index';
-import type { Field } from '~/db/core/fields';
-import type { Migration } from 'kysely';
-import type { UnionToIntersection } from '@better-fetch/fetch';
 
 /**
  * Context object provided to plugin hooks

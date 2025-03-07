@@ -1,8 +1,8 @@
-import { createAuthEndpoint } from '../call';
-import { C15TError, BASE_ERROR_CODES } from '~/error';
 import { z } from 'zod';
-import type { C15TContext } from '../../types';
 import type { EntityOutputFields } from '~/db/schema/definition';
+import { BASE_ERROR_CODES, C15TError } from '~/error';
+import type { C15TContext } from '../../types';
+import { createAuthEndpoint } from '../call';
 
 // Define schemas for the different identification methods
 const getByUserIdSchema = z.object({

@@ -1,8 +1,8 @@
-import { C15TError, BASE_ERROR_CODES } from '~/error';
-import { createAuthMiddleware } from '../call';
-import { wildcardMatch } from '~/utils/wildcard';
-import { getHost, getOrigin, getProtocol } from '~/utils/url';
+import { BASE_ERROR_CODES, C15TError } from '~/error';
 import type { GenericEndpointContext } from '~/types';
+import { getHost, getOrigin, getProtocol } from '~/utils/url';
+import { wildcardMatch } from '~/utils/wildcard';
+import { createAuthMiddleware } from '../call';
 
 /**
  * Regular expression for validating relative URLs
