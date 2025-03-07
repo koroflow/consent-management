@@ -1,6 +1,7 @@
 import { c15tInstance } from '@c15t/backend';
 
 import { LibsqlDialect } from '@libsql/kysely-libsql';
+
 const libsql = new LibsqlDialect({
 	url: process.env.TURSO_DATABASE_URL || '',
 	authToken: process.env.TURSO_AUTH_TOKEN || '',
@@ -29,7 +30,7 @@ const libsql = new LibsqlDialect({
  * @see {@link https://docs.c15t.dev/configuration} for more configuration options
  */
 export const c15t = c15tInstance({
-	appName: 'Next.js Example App',
+	appName: 'Hono Turso Example App',
 	basePath: '/api/c15t',
 	// Add any trusted origins if needed
 	trustedOrigins: ['http://localhost:3000'],

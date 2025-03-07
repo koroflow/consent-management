@@ -5,7 +5,8 @@
 	"scripts": {
 		"dev": "next dev",
 		"build": "next build",
-		"start": "next start"
+		"start": "next start",
+		"fmt": "pnpm biome format --write ."
 	},
 	"dependencies": {
 		"@c15t/backend": "workspace:*",
