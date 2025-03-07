@@ -80,14 +80,16 @@ export const generateConsentReceipt = createAuthEndpoint(
 			const userRecord = consentResult.user;
 
 			if (!userRecord) {
-				throw new C15TError('NOT_FOUND', {
-					code: BASE_ERROR_CODES.NOT_FOUND,
-					status: 404,
-					data: {
-						message: 'User associated with consent not found',
-						details: { consentId: params.consentId },
-					},
-				});
+				throw new C15TError(
+					'The user associated with this consent record could not be found. Please verify the user exists and is correctly linked.',
+					{
+						code: BASE_ERROR_CODES.NOT_FOUND,
+						status: 404,
+						data: {
+							consentId: params.consentId,
+						},
+					}
+				);
 			}
 
 			// Get consent records related to this consent
