@@ -1,6 +1,6 @@
 import type { Field } from '../core/fields';
 import type { C15TOptions, C15TPluginSchema } from '~/types';
-import { APIError } from 'better-call';
+import { C15TError, BASE_ERROR_CODES } from '~/error';
 
 /**
  * Parses and transforms output data according to schema field definitions.
@@ -94,7 +94,7 @@ export type FieldConflictResolution = {
  * @param conflictResolution - How to handle conflicting field definitions
  * @returns Combined fields from configuration and plugins
  *
- * @throws {APIError} When field conflicts are detected and strategy is 'error'
+ * @throws {C15TError} When field conflicts are detected and strategy is 'error'
  *
  * @example
  * ```typescript
@@ -123,9 +123,18 @@ export function getAllFields(
 
 				// Handle conflict based on strategy
 				if (conflictResolution.strategy === 'error') {
-					throw new APIError('BAD_REQUEST', {
-						message: `Field conflict detected for '${key}' in table '${table}'. Defined in: ${origins.join(', ')}`,
-					});
+					throw new C15TError(
+						'A field conflict was detected in the schema. Multiple definitions exist for the same field.',
+						{
+							code: BASE_ERROR_CODES.CONFLICT,
+							status: 500,
+							data: {
+								field: key,
+								table,
+								definedIn: origins.join(', '),
+							},
+						}
+					);
 				}
 				if (
 					conflictResolution.strategy === 'warn' &&
@@ -208,8 +217,8 @@ export type ExtraFieldsConfig = {
  *
  * @returns The validated and transformed data
  *
- * @throws {APIError} When a required field is missing during creation
- * @throws {APIError} When extra fields are detected and strategy is 'error'
+ * @throws {C15TError} When a required field is missing during creation
+ * @throws {C15TError} When extra fields are detected and strategy is 'error'
  *
  * @example
  * ```typescript
@@ -332,8 +341,12 @@ export function parseInputData<EntityType extends Record<string, unknown>>(
 			}
 
 			if (fields[key]?.required && action === 'create') {
-				throw new APIError('BAD_REQUEST', {
-					message: `${key} is required`,
+				throw new C15TError('Missing required field', {
+					code: BASE_ERROR_CODES.BAD_REQUEST,
+					status: 400,
+					data: {
+						message: `${key} is required`,
+					},
 				});
 			}
 		}
@@ -356,8 +369,12 @@ export function parseInputData<EntityType extends Record<string, unknown>>(
 		if (unallowedFields.length > 0) {
 			switch (extraFieldsConfig.strategy) {
 				case 'error':
-					throw new APIError('BAD_REQUEST', {
-						message: `Unexpected fields found: ${unallowedFields.join(', ')}`,
+					throw new C15TError('Unexpected fields found', {
+						code: BASE_ERROR_CODES.BAD_REQUEST,
+						status: 400,
+						data: {
+							message: `Unexpected fields found: ${unallowedFields.join(', ')}`,
+						},
 					});
 				case 'warn': {
 					if (extraFieldsConfig.onWarning) {
@@ -382,8 +399,12 @@ export function parseInputData<EntityType extends Record<string, unknown>>(
 					break;
 				default:
 					// Default to error strategy for type safety
-					throw new APIError('BAD_REQUEST', {
-						message: `Unexpected fields found: ${unallowedFields.join(', ')}`,
+					throw new C15TError('Unexpected fields found', {
+						code: BASE_ERROR_CODES.BAD_REQUEST,
+						status: 400,
+						data: {
+							message: `Unexpected fields found: ${unallowedFields.join(', ')}`,
+						},
 					});
 			}
 		} else {

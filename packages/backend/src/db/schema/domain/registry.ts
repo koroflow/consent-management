@@ -3,7 +3,7 @@ import type { Domain } from './schema';
 import { getWithHooks } from '~/db/hooks';
 import { validateEntityOutput } from '../definition';
 import type { Where } from '~/db/adapters/types';
-import { APIError } from 'better-call';
+import { C15TError, BASE_ERROR_CODES } from '~/error';
 
 export interface FindDomainParams {
 	name?: string;
@@ -102,8 +102,8 @@ export function domainRegistry({ adapter, ...ctx }: RegistryContext) {
 			);
 
 			if (!domain) {
-				throw new APIError('INTERNAL_SERVER_ERROR', {
-					message: 'Failed to create domain',
+				throw new C15TError('Failed to create domain', {
+					code: BASE_ERROR_CODES.INTERNAL_SERVER_ERROR,
 					status: 503,
 				});
 			}

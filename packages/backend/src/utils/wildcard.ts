@@ -50,7 +50,7 @@ function transform(
 
 	let separatorSplitter = '';
 	let separatorMatcher = '';
-	let wildcard = '.';
+	let wildcard = './';
 
 	if (separator === true) {
 		// In this case forward slashes in patterns match both forward and backslashes in samples:

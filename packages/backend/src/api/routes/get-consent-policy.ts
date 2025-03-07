@@ -1,5 +1,5 @@
 import { createAuthEndpoint } from '../call';
-import { APIError } from 'better-call';
+import { C15TError, BASE_ERROR_CODES } from '~/error';
 import { z } from 'zod';
 import type { C15TContext } from '../../types';
 import type { EntityOutputFields } from '~/db/schema/definition';
@@ -115,8 +115,8 @@ export interface GetPolicyResponse {
  * @returns {Object} data.policy - The consent policy information
  * @returns {Object} [data.userConsentStatus] - User's consent status if user identifiers were provided
  *
- * @throws {APIError} BAD_REQUEST - When request parameters are invalid
- * @throws {APIError} NOT_FOUND - When the domain or policy version doesn't exist
+ * @throws {C15TError} BAD_REQUEST - When request parameters are invalid
+ * @throws {C15TError} NOT_FOUND - When the domain or policy version doesn't exist
  */
 export const getConsentPolicy = createAuthEndpoint(
 	'/consent/policy',
@@ -129,9 +129,13 @@ export const getConsentPolicy = createAuthEndpoint(
 			const validatedData = getPolicySchema.safeParse(ctx.query);
 
 			if (!validatedData.success) {
-				throw new APIError('BAD_REQUEST', {
-					message: 'Invalid request data',
-					details: validatedData.error.errors,
+				throw new C15TError('BAD_REQUEST', {
+					code: BASE_ERROR_CODES.BAD_REQUEST,
+					status: 400,
+					data: {
+						message: 'Invalid request data',
+						details: validatedData.error.errors,
+					},
 				});
 			}
 
@@ -139,9 +143,12 @@ export const getConsentPolicy = createAuthEndpoint(
 			const { registry } = ctx.context as C15TContext;
 
 			if (!registry) {
-				throw new APIError('INTERNAL_SERVER_ERROR', {
-					message: 'Registry not available',
+				throw new C15TError('INTERNAL_SERVER_ERROR', {
+					code: BASE_ERROR_CODES.INTERNAL_SERVER_ERROR,
 					status: 503,
+					data: {
+						message: 'Registry not available',
+					},
 				});
 			}
 
@@ -152,21 +159,29 @@ export const getConsentPolicy = createAuthEndpoint(
 					domain = await registry.findDomain(params.domain);
 				}
 			} catch {
-				throw new APIError('NOT_FOUND', {
-					message: 'Domain not found',
-					details: {
-						domain: params.domain,
-					},
-				});
+				throw new C15TError(
+					'The specified domain could not be found. Please verify the domain name and try again.',
+					{
+						code: BASE_ERROR_CODES.NOT_FOUND,
+						status: 404,
+						data: {
+							domain: params.domain,
+						},
+					}
+				);
 			}
 
 			if (!domain) {
-				throw new APIError('NOT_FOUND', {
-					message: 'Domain not found',
-					details: {
-						domain: params.domain,
-					},
-				});
+				throw new C15TError(
+					'The specified domain could not be found. Please verify the domain name and try again.',
+					{
+						code: BASE_ERROR_CODES.NOT_FOUND,
+						status: 404,
+						data: {
+							domain: params.domain,
+						},
+					}
+				);
 			}
 
 			// Find the policy
@@ -176,27 +191,35 @@ export const getConsentPolicy = createAuthEndpoint(
 					policy = await registry.findPolicy(domain.id, params.version);
 				}
 			} catch {
-				throw new APIError('NOT_FOUND', {
-					message: params.version
-						? `Policy version ${params.version} not found for domain ${params.domain}`
-						: `No policy found for domain ${params.domain}`,
-					details: {
-						domain: params.domain,
-						version: params.version,
-					},
-				});
+				throw new C15TError(
+					params.version
+						? `The specified policy version ${params.version} for domain ${params.domain} could not be found. Please verify the version number and domain name, and try again.`
+						: `No policy could be found for the domain ${params.domain}. Please ensure the domain name is correct and try again.`,
+					{
+						code: BASE_ERROR_CODES.NOT_FOUND,
+						status: 404,
+						data: {
+							domain: params.domain,
+							version: params.version,
+						},
+					}
+				);
 			}
 
 			if (!policy) {
-				throw new APIError('NOT_FOUND', {
-					message: params.version
-						? `Policy version ${params.version} not found for domain ${params.domain}`
-						: `No policy found for domain ${params.domain}`,
-					details: {
-						domain: params.domain,
-						version: params.version,
-					},
-				});
+				throw new C15TError(
+					params.version
+						? `The specified policy version ${params.version} for domain ${params.domain} could not be found. Please verify the version number and domain name, and try again.`
+						: `No policy could be found for the domain ${params.domain}. Please ensure the domain name is correct and try again.`,
+					{
+						code: BASE_ERROR_CODES.NOT_FOUND,
+						status: 404,
+						data: {
+							domain: params.domain,
+							version: params.version,
+						},
+					}
+				);
 			}
 
 			// Format basic response
@@ -271,21 +294,28 @@ export const getConsentPolicy = createAuthEndpoint(
 			const context = ctx.context as C15TContext;
 			context.logger?.error?.('Error getting consent policy:', error);
 
-			if (error instanceof APIError) {
+			if (error instanceof C15TError) {
 				throw error;
 			}
 			if (error instanceof z.ZodError) {
-				throw new APIError('BAD_REQUEST', {
-					message: 'Invalid request data',
-					details: error.errors,
+				throw new C15TError('BAD_REQUEST', {
+					code: BASE_ERROR_CODES.BAD_REQUEST,
+					status: 400,
+					data: {
+						message: 'Invalid request data',
+						details: error.errors,
+					},
 				});
 			}
 
-			throw new APIError('INTERNAL_SERVER_ERROR', {
-				message: 'Failed to get consent policy',
+			throw new C15TError('INTERNAL_SERVER_ERROR', {
+				code: BASE_ERROR_CODES.INTERNAL_SERVER_ERROR,
 				status: 503,
-				details:
-					error instanceof Error ? { message: error.message } : { error },
+				data: {
+					message: 'Failed to get consent policy',
+					details:
+						error instanceof Error ? { message: error.message } : { error },
+				},
 			});
 		}
 	}

@@ -2,15 +2,8 @@ import type { GenericEndpointContext, RegistryContext } from '~/types';
 import type { User } from './schema';
 import { getWithHooks } from '~/db/hooks';
 import { validateEntityOutput } from '../definition';
-import { APIError } from '~/api';
-
-export interface FindOrCreateUserParams {
-	userId?: string;
-	externalUserId?: string;
-	ipAddress?: string;
-	context?: GenericEndpointContext;
-}
-
+import { C15TError, BASE_ERROR_CODES } from '~/error';
+import type { Adapter } from '~/db/adapters/types';
 /**
  * Creates and returns a set of user-related adapter methods to interact with the database.
  *
@@ -86,7 +79,12 @@ export function userRegistry({ adapter, ...ctx }: RegistryContext) {
 			externalUserId,
 			ipAddress = 'unknown',
 			context,
-		}: FindOrCreateUserParams) {
+		}: {
+			userId?: string;
+			externalUserId?: string;
+			ipAddress?: string;
+			context?: GenericEndpointContext;
+		}) {
 			// If both userId and externalUserId are provided, validate they match
 			if (userId && externalUserId) {
 				const [userById, userByExternalId] = await Promise.all([
@@ -104,10 +102,17 @@ export function userRegistry({ adapter, ...ctx }: RegistryContext) {
 							userByExternalIdFound: !!userByExternalId,
 						}
 					);
-					throw new APIError('NOT_FOUND', {
-						message: 'One or both users not found',
-						status: 404,
-					});
+					throw new C15TError(
+						'The specified user could not be found. Please verify the user identifiers and try again.',
+						{
+							code: BASE_ERROR_CODES.NOT_FOUND,
+							status: 404,
+							data: {
+								providedUserId: userId,
+								providedExternalId: externalUserId,
+							},
+						}
+					);
 				}
 
 				if (userById.id !== userByExternalId.id) {
@@ -120,11 +125,19 @@ export function userRegistry({ adapter, ...ctx }: RegistryContext) {
 							userByExternalIdId: userByExternalId.id,
 						}
 					);
-					throw new APIError('BAD_REQUEST', {
-						message:
-							'Provided userId and externalUserId do not match the same user',
-						status: 400,
-					});
+					throw new C15TError(
+						'The provided userId and externalUserId do not match the same user. Please ensure both identifiers refer to the same user.',
+						{
+							code: BASE_ERROR_CODES.CONFLICT,
+							status: 409,
+							data: {
+								providedUserId: userId,
+								providedExternalId: externalUserId,
+								userByIdId: userById.id,
+								userByExternalIdId: userByExternalId.id,
+							},
+						}
+					);
 				}
 
 				return userById;
@@ -136,8 +149,8 @@ export function userRegistry({ adapter, ...ctx }: RegistryContext) {
 				if (user) {
 					return user;
 				}
-				throw new APIError('NOT_FOUND', {
-					message: 'User not found',
+				throw new C15TError('User not found', {
+					code: BASE_ERROR_CODES.NOT_FOUND,
 					status: 404,
 				});
 			}
@@ -185,11 +198,16 @@ export function userRegistry({ adapter, ...ctx }: RegistryContext) {
 						externalUserId,
 						error: error instanceof Error ? error.message : 'Unknown error',
 					});
-					throw new APIError('INTERNAL_SERVER_ERROR', {
-						message: 'Failed to create or find user with external ID',
-						status: 500,
-						details: error instanceof Error ? error.message : 'Unknown error',
-					});
+					throw new C15TError(
+						'Failed to create or find user with external ID',
+						{
+							code: BASE_ERROR_CODES.INTERNAL_SERVER_ERROR,
+							status: 500,
+							data: {
+								error: error instanceof Error ? error.message : 'Unknown error',
+							},
+						}
+					);
 				}
 			}
 
@@ -210,10 +228,12 @@ export function userRegistry({ adapter, ...ctx }: RegistryContext) {
 					ipAddress,
 					error: error instanceof Error ? error.message : 'Unknown error',
 				});
-				throw new APIError('INTERNAL_SERVER_ERROR', {
-					message: 'Failed to create anonymous user',
+				throw new C15TError('Failed to create anonymous user', {
+					code: BASE_ERROR_CODES.INTERNAL_SERVER_ERROR,
 					status: 500,
-					details: error instanceof Error ? error.message : 'Unknown error',
+					data: {
+						error: error instanceof Error ? error.message : 'Unknown error',
+					},
 				});
 			}
 		},
@@ -305,26 +325,34 @@ export function userRegistry({ adapter, ...ctx }: RegistryContext) {
 		 * @returns A promise that resolves when the deletion is complete
 		 */
 		deleteUser: async (userId: string) => {
-			// Delete all consents associated with the user
-			await adapter.deleteMany({
-				model: 'consent',
-				where: [
-					{
-						field: 'userId',
-						value: userId,
-					},
-				],
-			});
+			await adapter.transaction({
+				callback: async (tx: Adapter) => {
+					// Update the user record
+					await tx.update({
+						model: 'user',
+						where: [
+							{
+								field: 'id',
+								value: userId,
+							},
+						],
+						update: {
+							status: 'deleted',
+							updatedAt: new Date(),
+						},
+					});
 
-			// Delete the user
-			await adapter.delete({
-				model: 'user',
-				where: [
-					{
-						field: 'id',
-						value: userId,
-					},
-				],
+					// Delete all related records
+					await tx.deleteMany({
+						model: 'consent',
+						where: [
+							{
+								field: 'userId',
+								value: userId,
+							},
+						],
+					});
+				},
 			});
 		},
 	};

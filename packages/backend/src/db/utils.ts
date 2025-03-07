@@ -1,5 +1,5 @@
-import { getConsentTables } from '.';
-import { C15TError } from '~/error';
+import { getConsentTables } from './index';
+import { C15TError, BASE_ERROR_CODES } from '~/error';
 import type { C15TOptions } from '~/types';
 import { createKyselyAdapter } from './adapters/kysely-adapter/dialect';
 import { kyselyAdapter } from './adapters/kysely-adapter';
@@ -31,7 +31,10 @@ export async function getAdapter(options: C15TOptions): Promise<Adapter> {
 
 	const { kysely, databaseType } = await createKyselyAdapter(options);
 	if (!kysely) {
-		throw new C15TError('Failed to initialize database adapter');
+		throw new C15TError('Failed to initialize database adapter', {
+			code: BASE_ERROR_CODES.INTERNAL_SERVER_ERROR,
+			status: 500,
+		});
 	}
 	return kyselyAdapter(kysely, {
 		type: databaseType || 'sqlite',

@@ -246,11 +246,26 @@ describe('c15tInstance', () => {
 			name: 'Response Plugin',
 			type: 'test',
 			onResponse: async (response, ctx) => {
-				const data = await response.clone().json();
+				const contentType = response.headers.get('content-type');
+				let data = {};
+
+				if (contentType?.includes('application/json')) {
+					try {
+						data = await response.clone().json();
+					} catch (error) {
+						// biome-ignore lint/suspicious/noConsoleLog: its okay as we are testing
+						// biome-ignore lint/suspicious/noConsole: its okay as we are testing
+						console.log('Failed to parse JSON response:', error);
+					}
+				}
+
 				return {
 					response: new Response(JSON.stringify({ ...data, modified: true }), {
 						status: response.status,
-						headers: response.headers,
+						headers: new Headers({
+							'Content-Type': 'application/json',
+							...Object.fromEntries(response.headers.entries()),
+						}),
 					}),
 					context: ctx,
 				};
@@ -271,11 +286,18 @@ describe('c15tInstance', () => {
 				Origin: 'http://localhost:3000',
 			},
 		});
+
 		const response = await instance.handler(request);
+
 		expect(response.isOk()).toBe(true);
+
 		if (response.isOk()) {
 			const data = await response.value.json();
 			expect(data.modified).toBe(true);
+		} else {
+			// biome-ignore lint/suspicious/noConsole: its okay as we are testing
+			console.error('Response error:', response.error);
+			expect.fail(`Response was not OK: ${JSON.stringify(response.error)}`);
 		}
 	});
 });

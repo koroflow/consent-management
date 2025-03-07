@@ -1,7 +1,7 @@
-import { APIError } from 'better-call';
+import { C15TError, BASE_ERROR_CODES } from '~/error';
 import { createAuthMiddleware } from '../call';
 import type { C15TContext, C15TPlugin } from '~/types';
-import { BASE_ERROR_CODES } from '~/error/codes';
+
 import type { Adapter } from '~/db/adapters/types';
 
 /**
@@ -67,7 +67,7 @@ function validatePlugins(
  * - Plugin initialization status
  * - Required services and dependencies
  *
- * @throws {APIError} Throws appropriate errors for:
+ * @throws {C15TError} Throws appropriate errors for:
  * - INVALID_CONFIGURATION: When context or options are invalid
  * - STORAGE_ERROR: When storage adapter is not available
  * - INITIALIZATION_FAILED: When required services failed to initialize
@@ -90,11 +90,14 @@ export const validateContextMiddleware = createAuthMiddleware(async (ctx) => {
 
 	// Basic context validation
 	if (!context || typeof context !== 'object') {
-		throw new APIError('BAD_REQUEST', {
-			message: BASE_ERROR_CODES.INVALID_CONFIGURATION,
-			status: 400,
-			data: redactContext(context),
-		});
+		throw new C15TError(
+			'The context configuration is incomplete. Please ensure all required configuration options are provided and properly formatted.',
+			{
+				code: BASE_ERROR_CODES.INVALID_CONFIGURATION,
+				status: 500,
+				data: redactContext(context),
+			}
+		);
 	}
 
 	// Ensure the context is properly typed
@@ -102,11 +105,13 @@ export const validateContextMiddleware = createAuthMiddleware(async (ctx) => {
 
 	// Validate required configuration
 	if (!typedContext.options) {
-		throw new APIError('BAD_REQUEST', {
-			message: BASE_ERROR_CODES.INVALID_CONFIGURATION,
-			status: 400,
-			data: { error: 'Missing required configuration' },
-		});
+		throw new C15TError(
+			'The context configuration is missing required options. Please ensure the options object is properly configured.',
+			{
+				code: BASE_ERROR_CODES.INVALID_CONFIGURATION,
+				status: 500,
+			}
+		);
 	}
 
 	// Optional storage adapter validation
@@ -127,11 +132,16 @@ export const validateContextMiddleware = createAuthMiddleware(async (ctx) => {
 
 	// Validate logger (make it optional for memory adapter in development)
 	if (!typedContext.logger && process.env.NODE_ENV === 'production') {
-		throw new APIError('INTERNAL_SERVER_ERROR', {
-			message: BASE_ERROR_CODES.INITIALIZATION_FAILED,
-			status: 503,
-			data: { error: 'Logger not initialized' },
-		});
+		throw new C15TError(
+			'Logger is required in production environment. Please configure a logger for your application.',
+			{
+				code: BASE_ERROR_CODES.INVALID_CONFIGURATION,
+				status: 500,
+				data: {
+					environment: process.env.NODE_ENV,
+				},
+			}
+		);
 	}
 
 	// Validate plugins if any are configured
@@ -140,15 +150,16 @@ export const validateContextMiddleware = createAuthMiddleware(async (ctx) => {
 		typedContext.plugins as C15TPlugin[] | undefined
 	);
 	if (failedPlugins) {
-		throw new APIError('INTERNAL_SERVER_ERROR', {
-			message: BASE_ERROR_CODES.PLUGIN_INITIALIZATION_FAILED,
-			status: 503,
-			data: {
-				error: 'Plugin initialization failed',
-				failedPlugins,
-				totalPlugins: typedContext.options.plugins?.length ?? 0,
-			},
-		});
+		throw new C15TError(
+			'Plugin initialization failed. Some plugins could not be initialized properly. Please check your plugin configuration.',
+			{
+				code: BASE_ERROR_CODES.PLUGIN_INITIALIZATION_FAILED,
+				status: 500,
+				data: {
+					failedPlugins,
+				},
+			}
+		);
 	}
 
 	// Log successful validation if logger exists

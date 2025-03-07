@@ -1,12 +1,12 @@
 //@ts-nocheck
 
-import { C15TError } from '~/error';
+import { C15TError, BASE_ERROR_CODES } from '~/error';
 import type { C15TOptions } from '~/types';
 
 import { applyDefaultValue } from '../utils';
 import { generateId } from '~/db/core/fields';
 import { getConsentTables } from '~/db';
-import type { Where } from '../types';
+import type { Where, Adapter } from '../types';
 import type { EntityName } from '~/db/core/types';
 
 /**
@@ -353,7 +353,17 @@ export const prismaAdapter =
 				const transformed = transformInput(values, model, 'create');
 				if (!db[getEntityName(model)]) {
 					throw new C15TError(
-						`Model ${model} does not exist in the database. If you haven't generated the Prisma client, you need to run 'npx prisma generate'`
+						`The model "${model}" does not exist in the Prisma client. Please verify the model name and ensure it is defined in your Prisma schema.`,
+						{
+							code: BASE_ERROR_CODES.DATABASE_QUERY_ERROR,
+							status: 500,
+							data: {
+								model,
+								availableModels: Object.keys(prisma).filter(
+									(key) => !key.startsWith('$') && !key.startsWith('_')
+								),
+							},
+						}
 					);
 				}
 				const result = await db[getEntityName(model)].create({
@@ -375,7 +385,17 @@ export const prismaAdapter =
 				const whereClause = convertWhereClause(model, where);
 				if (!db[getEntityName(model)]) {
 					throw new C15TError(
-						`Model ${model} does not exist in the database. If you haven't generated the Prisma client, you need to run 'npx prisma generate'`
+						`The model "${model}" does not exist in the Prisma client. Please verify the model name and ensure it is defined in your Prisma schema.`,
+						{
+							code: BASE_ERROR_CODES.DATABASE_QUERY_ERROR,
+							status: 500,
+							data: {
+								model,
+								availableModels: Object.keys(prisma).filter(
+									(key) => !key.startsWith('$') && !key.startsWith('_')
+								),
+							},
+						}
 					);
 				}
 				const result = await db[getEntityName(model)].findFirst({
@@ -397,7 +417,17 @@ export const prismaAdapter =
 				const whereClause = convertWhereClause(model, where);
 				if (!db[getEntityName(model)]) {
 					throw new C15TError(
-						`Model ${model} does not exist in the database. If you haven't generated the Prisma client, you need to run 'npx prisma generate'`
+						`The model "${model}" does not exist in the Prisma client. Please verify the model name and ensure it is defined in your Prisma schema.`,
+						{
+							code: BASE_ERROR_CODES.DATABASE_QUERY_ERROR,
+							status: 500,
+							data: {
+								model,
+								availableModels: Object.keys(prisma).filter(
+									(key) => !key.startsWith('$') && !key.startsWith('_')
+								),
+							},
+						}
 					);
 				}
 
@@ -429,7 +459,17 @@ export const prismaAdapter =
 				const whereClause = convertWhereClause(model, where);
 				if (!db[getEntityName(model)]) {
 					throw new C15TError(
-						`Model ${model} does not exist in the database. If you haven't generated the Prisma client, you need to run 'npx prisma generate'`
+						`The model "${model}" does not exist in the Prisma client. Please verify the model name and ensure it is defined in your Prisma schema.`,
+						{
+							code: BASE_ERROR_CODES.DATABASE_QUERY_ERROR,
+							status: 500,
+							data: {
+								model,
+								availableModels: Object.keys(prisma).filter(
+									(key) => !key.startsWith('$') && !key.startsWith('_')
+								),
+							},
+						}
 					);
 				}
 				const result = await db[getEntityName(model)].count({
@@ -447,18 +487,18 @@ export const prismaAdapter =
 			 */
 			async update(data) {
 				const { model, where, update } = data;
-				if (!db[getEntityName(model)]) {
-					throw new C15TError(
-						`Model ${model} does not exist in the database. If you haven't generated the Prisma client, you need to run 'npx prisma generate'`
-					);
-				}
 				const whereClause = convertWhereClause(model, where);
 				const transformed = transformInput(update, model, 'update');
-				const result = await db[getEntityName(model)].update({
-					where: whereClause,
-					data: transformed,
-				});
-				return transformOutput(result, model);
+				try {
+					const result = await db[getEntityName(model)].update({
+						where: whereClause,
+						data: transformed,
+					});
+					return transformOutput(result, model);
+				} catch {
+					// Prisma throws an error if no records match the where clause
+					return null;
+				}
 			},
 
 			/**
@@ -512,6 +552,35 @@ export const prismaAdapter =
 				});
 				return result ? (result.count as number) : 0;
 			},
+
+			/**
+			 * Executes a function within a database transaction
+			 *
+			 * This method wraps Prisma's transaction functionality to provide a consistent interface
+			 * for executing multiple database operations atomically.
+			 *
+			 * @typeParam ResultType - The type of data returned by the transaction
+			 * @param data - The transaction data containing the callback function
+			 * @returns A promise that resolves with the result of the callback function
+			 * @throws {Error} If the transaction fails to complete
+			 */
+			async transaction<ResultType>(data: {
+				callback: (transactionAdapter: Adapter) => Promise<ResultType>;
+			}): Promise<ResultType> {
+				const { callback } = data;
+
+				return db.$transaction(async (tx) => {
+					// Create a prisma client instance that uses the transaction context
+					const txClient = tx as unknown as PrismaClient;
+
+					// Create a new adapter instance that uses the transaction client
+					const transactionAdapter = prismaAdapter(txClient, config)(options);
+
+					// Execute the callback function with the transaction adapter
+					return await callback(transactionAdapter);
+				});
+			},
+
 			options: config,
 		};
 	};

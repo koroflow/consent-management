@@ -4,6 +4,7 @@ import type { C15TContext } from '~/types';
 import { memoryAdapter } from '~/db/adapters/memory-adapter';
 import { c15tInstance } from '~/core';
 import type { ConsentPolicy } from '~/db/schema';
+import { BASE_ERROR_CODES } from '~/error';
 
 describe('Consent Endpoints', () => {
 	let context: C15TContext;
@@ -150,11 +151,9 @@ describe('Consent Endpoints', () => {
 						}),
 					})
 				).rejects.toMatchObject({
-					status: 'NOT_FOUND',
-					body: {
-						code: 'CONSENT_POLICY_NOT_FOUND',
-						message: 'Consent policy not found',
-					},
+					name: 'C15TError',
+					code: BASE_ERROR_CODES.NOT_FOUND,
+					status: 404
 				});
 			});
 		});
@@ -211,12 +210,9 @@ describe('Consent Endpoints', () => {
 						}),
 					})
 				).rejects.toMatchObject({
-					status: 'BAD_REQUEST',
-					body: {
-						code: 'PROVIDED_USERID_AND_EXTERNALUSERID_DO_NOT_MATCH_THE_SAME_USER',
-						message:
-							'Provided userId and externalUserId do not match the same user',
-					},
+					name: 'C15TError',
+					code: BASE_ERROR_CODES.BAD_REQUEST,
+					status: 400
 				});
 			});
 		});
@@ -248,11 +244,9 @@ describe('Consent Endpoints', () => {
 						}),
 					})
 				).rejects.toMatchObject({
-					status: 'NOT_FOUND',
-					body: {
-						code: 'USER_NOT_FOUND',
-						message: 'User not found',
-					},
+					name: 'C15TError',
+					code: BASE_ERROR_CODES.NOT_FOUND,
+					status: 404
 				});
 			});
 

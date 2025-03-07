@@ -1,5 +1,5 @@
 import { env } from '../utils/env';
-import { C15TError } from '~/error';
+import { C15TError, BASE_ERROR_CODES } from '~/error';
 
 /**
  * Regular expression to match trailing slashes in URLs
@@ -24,7 +24,14 @@ function checkHasPath(url: string): boolean {
 		return parsedUrl.pathname !== '/';
 	} catch {
 		throw new C15TError(
-			`Invalid base URL: ${url}. Please provide a valid base URL.`
+			`Invalid base URL: ${url}. Please provide a valid base URL.`,
+			{
+				code: BASE_ERROR_CODES.BAD_REQUEST,
+				status: 400,
+				data: {
+					url,
+				},
+			}
 		);
 	}
 }

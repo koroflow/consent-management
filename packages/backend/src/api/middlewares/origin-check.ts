@@ -1,4 +1,4 @@
-import { APIError } from 'better-call';
+import { C15TError, BASE_ERROR_CODES } from '~/error';
 import { createAuthMiddleware } from '../call';
 import { wildcardMatch } from '~/utils/wildcard';
 import { getHost, getOrigin, getProtocol } from '~/utils/url';
@@ -32,7 +32,7 @@ const VALID_RELATIVE_URL_REGEX =
  * for hostnames. Relative URLs are allowed for callback URLs but must match a safe
  * URL pattern.
  *
- * @throws {APIError} Throws a FORBIDDEN error if any URL fails validation
+ * @throws {C15TError} Throws a FORBIDDEN error if any URL fails validation
  *
  * @example
  * ```typescript
@@ -110,7 +110,7 @@ export const originCheckMiddleware = createAuthMiddleware(async (ctx) => {
 	 * @internal
 	 * @param url - The URL to validate
 	 * @param label - A label describing what type of URL is being validated
-	 * @throws {APIError} If the URL is not from a trusted origin
+	 * @throws {C15TError} If the URL is not from a trusted origin
 	 */
 	const validateURL = (url: string | undefined, label: string) => {
 		if (!url) {
@@ -129,7 +129,18 @@ export const originCheckMiddleware = createAuthMiddleware(async (ctx) => {
 				`If it's a valid URL, please add ${url} to trustedOrigins in your auth config\n`,
 				`Current list of trustedOrigins: ${trustedOrigins}`
 			);
-			throw new APIError('FORBIDDEN', { message: `Invalid ${label}` });
+			throw new C15TError(
+				'The URL provided is not from a trusted origin. Please ensure the URL is correctly configured in the trusted origins list.',
+				{
+					code: BASE_ERROR_CODES.FORBIDDEN,
+					status: 403,
+					data: {
+						url,
+						label,
+						trustedOrigins,
+					},
+				}
+			);
 		}
 	};
 	if (usesCookies && !ctx.context.options.advanced?.disableCSRFCheck) {
@@ -149,7 +160,7 @@ export const originCheckMiddleware = createAuthMiddleware(async (ctx) => {
  *
  * @param getValue - A function that extracts the URL to validate from the endpoint context
  * @returns A middleware that validates the extracted URL
- * @throws {APIError} Throws a FORBIDDEN error if the URL fails validation
+ * @throws {C15TError} Throws a FORBIDDEN error if the URL fails validation
  *
  * @remarks
  * Unlike the more comprehensive originCheckMiddleware, this factory allows creating
@@ -211,7 +222,7 @@ export const originCheck = (
 		 * @internal
 		 * @param url - The URL to validate
 		 * @param label - A label describing what type of URL is being validated
-		 * @throws {APIError} If the URL is not from a trusted origin
+		 * @throws {C15TError} If the URL is not from a trusted origin
 		 */
 		const validateURL = (url: string | undefined, label: string) => {
 			if (!url) {
@@ -230,7 +241,18 @@ export const originCheck = (
 					`If it's a valid URL, please add ${url} to trustedOrigins in your auth config\n`,
 					`Current list of trustedOrigins: ${trustedOrigins}`
 				);
-				throw new APIError('FORBIDDEN', { message: `Invalid ${label}` });
+				throw new C15TError(
+					'The URL provided is not from a trusted origin. Please ensure the URL is correctly configured in the trusted origins list.',
+					{
+						code: BASE_ERROR_CODES.FORBIDDEN,
+						status: 403,
+						data: {
+							url,
+							label,
+							trustedOrigins,
+						},
+					}
+				);
 			}
 		};
 		callbackURL && validateURL(callbackURL, 'callbackURL');

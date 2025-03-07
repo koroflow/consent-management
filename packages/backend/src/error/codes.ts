@@ -26,6 +26,25 @@
  */
 export const BASE_ERROR_CODES = {
 	/**
+	 * The requested resource could not be found.
+	 * This is a general error for when a requested entity does not exist.
+	 */
+	NOT_FOUND: 'Resource not found',
+
+	/**
+	 * The request is invalid or malformed.
+	 * This is a general error for requests that do not meet the expected format.
+	 */
+	BAD_REQUEST: 'Bad request',
+
+	/**
+	 * The request conflicts with the current state of the server.
+	 * This may occur when trying to create a resource that already exists or
+	 * when attempting to modify a resource in a way that conflicts with its current state.
+	 */
+	CONFLICT: 'Conflict with current state',
+
+	/**
 	 * The requested consent record could not be found.
 	 * This may occur when attempting to retrieve, update, or delete a non-existent consent record.
 	 */
@@ -56,58 +75,16 @@ export const BASE_ERROR_CODES = {
 	FAILED_TO_GET_CONSENT: 'Failed to get consent',
 
 	/**
-	 * An error occurred while attempting to list available consent purposes.
-	 * This may be due to storage issues, permissions, or other internal errors.
-	 */
-	FAILED_TO_LIST_PURPOSES: 'Failed to list purposes',
-
-	/**
 	 * An error occurred while attempting to create a new consent purpose.
 	 * This may be due to validation errors, duplicate purpose IDs, or other internal errors.
 	 */
 	FAILED_TO_CREATE_PURPOSE: 'Failed to create purpose',
 
 	/**
-	 * An error occurred while attempting to update an existing consent purpose.
-	 * This may be due to validation errors or other internal errors.
-	 */
-	FAILED_TO_UPDATE_PURPOSE: 'Failed to update purpose',
-
-	/**
-	 * An error occurred while attempting to delete a consent purpose.
-	 * This may be due to dependencies, permissions, or other constraints.
-	 */
-	FAILED_TO_DELETE_PURPOSE: 'Failed to delete purpose',
-
-	/**
-	 * The provided purpose ID is invalid or does not conform to the expected format.
-	 * This may occur when creating or updating purposes with malformed IDs.
-	 */
-	INVALID_PURPOSE_ID: 'Invalid purpose ID',
-
-	/**
 	 * The requested consent purpose could not be found.
 	 * This may occur when attempting to retrieve, update, or delete a non-existent purpose.
 	 */
 	PURPOSE_NOT_FOUND: 'Purpose not found',
-
-	/**
-	 * An attempt was made to reject a required consent purpose.
-	 * Required purposes cannot be rejected as they are mandatory for system operation.
-	 */
-	REQUIRED_PURPOSE_REJECTION: 'Cannot reject a required purpose',
-
-	/**
-	 * An error occurred while attempting to retrieve the consent history.
-	 * This may be due to storage issues, permissions, or other internal errors.
-	 */
-	FAILED_TO_GET_CONSENT_HISTORY: 'Failed to get consent history',
-
-	/**
-	 * The provided token is invalid, expired, or malformed.
-	 * This may occur when using incorrect or outdated consent tokens.
-	 */
-	INVALID_TOKEN: 'Invalid token',
 
 	/**
 	 * The provided configuration is invalid or contains errors.
@@ -120,12 +97,6 @@ export const BASE_ERROR_CODES = {
 	 * This may occur when API calls are made without all necessary data.
 	 */
 	MISSING_REQUIRED_PARAMETER: 'Missing required parameter',
-
-	/**
-	 * The request is invalid or malformed.
-	 * This is a general error for requests that do not meet the expected format.
-	 */
-	INVALID_REQUEST: 'Invalid request',
 
 	/**
 	 * The request requires authentication that was not provided or is invalid.
@@ -146,12 +117,6 @@ export const BASE_ERROR_CODES = {
 	INTERNAL_SERVER_ERROR: 'Internal server error',
 
 	/**
-	 * Unknown or unclassified error.
-	 * Used when an error occurs that doesn't match any other error code.
-	 */
-	UNKNOWN_ERROR: 'Unknown error',
-
-	/**
 	 * Initialization of the system failed.
 	 * This may occur when the system cannot be initialized due to configuration
 	 * errors, missing dependencies, or other setup issues.
@@ -166,20 +131,6 @@ export const BASE_ERROR_CODES = {
 	PLUGIN_INITIALIZATION_FAILED: 'Plugin initialization failed',
 
 	/**
-	 * Error in request handler.
-	 * This may occur when processing a request fails due to unexpected errors
-	 * in the request handler.
-	 */
-	REQUEST_HANDLER_ERROR: 'Request handler error',
-
-	/**
-	 * Error retrieving API endpoints.
-	 * This may occur when the system cannot retrieve API endpoints due to
-	 * configuration errors or other internal issues.
-	 */
-	API_RETRIEVAL_ERROR: 'API retrieval error',
-
-	/**
 	 * Database connection error.
 	 * This may occur when the system cannot connect to the database due to
 	 * connection issues, authentication failures, or other database-related problems.
@@ -192,6 +143,32 @@ export const BASE_ERROR_CODES = {
 	 * constraint violations, or other database-related issues.
 	 */
 	DATABASE_QUERY_ERROR: 'Database query error',
+
+	/**
+	 * An error occurred while attempting to handle a request.
+	 * This may occur when a request cannot be processed due to invalid input,
+	 * internal errors, or other issues.
+	 */
+	REQUEST_HANDLER_ERROR: 'Request handler error',
+
+	/**
+	 * Error retrieving API endpoints.
+	 * This may occur when the system cannot retrieve API endpoints due to
+	 * configuration errors or other internal issues.
+	 */
+	API_RETRIEVAL_ERROR: 'API retrieval error',
+
+	/**
+	 * The request is invalid or malformed.
+	 * This is a specific error for requests that do not meet the expected format.
+	 */
+	INVALID_REQUEST: 'Invalid request',
+
+	/**
+	 * Unknown or unclassified error.
+	 * Used when an error occurs that doesn't match any other error code.
+	 */
+	UNKNOWN_ERROR: 'Unknown error',
 } as const;
 
 /**

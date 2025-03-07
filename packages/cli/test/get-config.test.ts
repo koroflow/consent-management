@@ -25,7 +25,7 @@ test.extend<TmpDirFixture>({
 	},
 });
 
-let tmpDir = '.';
+let tmpDir = './';
 
 describe('getConfig', async () => {
 	beforeEach(async () => {

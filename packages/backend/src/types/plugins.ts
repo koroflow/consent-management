@@ -7,7 +7,6 @@
  */
 import type { Endpoint } from 'better-call';
 import type { C15TMiddleware } from '~/api/call';
-
 import type {
 	C15TOptions,
 	C15TContext,

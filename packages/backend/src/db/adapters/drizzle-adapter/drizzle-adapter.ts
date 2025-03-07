@@ -12,7 +12,7 @@ import {
 	type SQL,
 } from 'drizzle-orm';
 import { getConsentTables } from '../..';
-import { C15TError } from '~/error';
+import { C15TError, BASE_ERROR_CODES } from '~/error';
 import type { Adapter, C15TOptions, Where } from '~/types';
 
 import { applyDefaultValue } from '../utils';
@@ -81,14 +81,29 @@ const createEntityTransformer = (
 		const schema = config.schema || db._.fullSchema;
 		if (!schema) {
 			throw new C15TError(
-				'Drizzle adapter failed to initialize. Schema not found. Please provide a schema object in the adapter options object.'
+				'The schema could not be found. Please ensure the schema is properly configured in the adapter.',
+				{
+					code: BASE_ERROR_CODES.DATABASE_CONNECTION_ERROR,
+					status: 500,
+					data: {
+						provider: config.provider,
+					},
+				}
 			);
 		}
 		const model = getEntityName(entityName);
 		const schemaModel = schema[model];
 		if (!schemaModel) {
 			throw new C15TError(
-				`[# Drizzle Adapter]: The model "${model}" was not found in the schema object. Please pass the schema directly to the adapter options.`
+				`The model "${model}" does not exist in the schema. Please verify the model name and ensure it is defined in your schema.`,
+				{
+					code: BASE_ERROR_CODES.DATABASE_QUERY_ERROR,
+					status: 404,
+					data: {
+						model,
+						availableModels: Object.keys(schema),
+					},
+				}
 			);
 		}
 		return schemaModel;
@@ -139,13 +154,32 @@ const createEntityTransformer = (
 			const field = getField(model, w.field);
 			if (!schemaModel[field]) {
 				throw new C15TError(
-					`The field "${w.field}" does not exist in the schema for the model "${model}". Please update your schema.`
+					`The field "${field}" does not exist in model "${model}". Please verify the field name and ensure it is defined in your schema.`,
+					{
+						code: BASE_ERROR_CODES.DATABASE_QUERY_ERROR,
+						status: 404,
+						data: {
+							model,
+							field,
+							availableFields: Object.keys(schemaModel),
+						},
+					}
 				);
 			}
 			if (w.operator === 'in') {
 				if (!Array.isArray(w.value)) {
 					throw new C15TError(
-						`The value for the field "${w.field}" must be an array when using the "in" operator.`
+						`The value for the field "${field}" must be an array when using the "in" operator.`,
+						{
+							code: BASE_ERROR_CODES.BAD_REQUEST,
+							status: 400,
+							data: {
+								field,
+								operator: w.operator,
+								expectedType: 'array',
+								actualType: typeof w.value,
+							},
+						}
 					);
 				}
 				return [inArray(schemaModel[field], w.value)];
@@ -174,7 +208,17 @@ const createEntityTransformer = (
 				if (w.operator === 'in') {
 					if (!Array.isArray(w.value)) {
 						throw new C15TError(
-							`The value for the field "${w.field}" must be an array when using the "in" operator.`
+							`The value for the field "${field}" must be an array when using the "in" operator.`,
+							{
+								code: BASE_ERROR_CODES.BAD_REQUEST,
+								status: 400,
+								data: {
+									field,
+									operator: w.operator,
+									expectedType: 'array',
+									actualType: typeof w.value,
+								},
+							}
 						);
 					}
 					return inArray(schemaModel[field], w.value);
@@ -403,7 +447,11 @@ function checkMissingFields(
 ) {
 	if (!schema) {
 		throw new C15TError(
-			'Drizzle adapter failed to initialize. Schema not found. Please provide a schema object in the adapter options object.'
+			'The schema could not be found. Please ensure the schema is properly configured in the adapter.',
+			{
+				code: BASE_ERROR_CODES.DATABASE_CONNECTION_ERROR,
+				status: 500,
+			}
 		);
 	}
 	for (const key in values) {
@@ -574,21 +622,16 @@ export const drizzleAdapter =
 			 * @throws {C15TError} If the model or fields don't exist
 			 */
 			async update(data) {
-				const { model, where, update: values } = data;
+				const { model, where, update } = data;
 				const schemaModel = getSchema(model);
 				const clause = convertWhereClause(where, model);
-				const transformed = transformInput(values, model, 'update');
-				const builder = db
+				const transformed = transformInput(update, model, 'update');
+				const result = await db
 					.update(schemaModel)
 					.set(transformed)
-					.where(...clause);
-				const returned = await withReturning(
-					model,
-					builder,
-					transformed,
-					where
-				);
-				return transformOutput(returned, model);
+					.where(clause)
+					.returning();
+				return result.length ? transformOutput(result[0], model) : null;
 			},
 			/**
 			 * Updates multiple records matching the where conditions
@@ -632,10 +675,36 @@ export const drizzleAdapter =
 			async deleteMany(data) {
 				const { model, where } = data;
 				const schemaModel = getSchema(model);
-				const clause = convertWhereClause(where, model); //con
-				const builder = db.delete(schemaModel).where(...clause);
-				const res = await builder;
-				return res ? res.length : 0;
+				const clause = convertWhereClause(where, model);
+				const result = await db.delete(schemaModel).where(clause);
+				return result ? (result.rowCount as number) : 0;
+			},
+			/**
+			 * Executes a function within a database transaction
+			 *
+			 * This method wraps Drizzle's transaction functionality to provide a consistent interface
+			 * for executing multiple database operations atomically.
+			 *
+			 * @typeParam ResultType - The type of data returned by the transaction
+			 * @param data - The transaction data containing the callback function
+			 * @returns A promise that resolves with the result of the callback function
+			 * @throws {Error} If the transaction fails to complete
+			 */
+			async transaction<ResultType>(data: {
+				callback: (transactionAdapter: Adapter) => Promise<ResultType>;
+			}): Promise<ResultType> {
+				const { callback } = data;
+
+				return await db.transaction(async (tx) => {
+					// Create a new adapter instance that uses the transaction connection
+					const transactionAdapter = drizzleAdapter(
+						tx as unknown as DB,
+						config
+					)(options);
+
+					// Execute the callback function with the transaction adapter
+					return await callback(transactionAdapter);
+				});
 			},
 			options: config,
 		} satisfies Adapter;

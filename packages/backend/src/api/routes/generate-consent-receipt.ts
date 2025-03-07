@@ -1,5 +1,5 @@
 import { createAuthEndpoint } from '../call';
-import { APIError } from 'better-call';
+import { C15TError, BASE_ERROR_CODES } from '~/error';
 import { z } from 'zod';
 import crypto from 'node:crypto';
 import type { C15TContext } from '../../types';
@@ -34,30 +34,45 @@ export const generateConsentReceipt = createAuthEndpoint(
 			const validatedData = generateConsentReceiptSchema.safeParse(ctx.query);
 
 			if (!validatedData.success) {
-				throw new APIError('BAD_REQUEST', {
-					message: 'Invalid request parameters',
-					details: validatedData.error.errors,
-				});
+				throw new C15TError(
+					'The request parameters are invalid. Please ensure all required fields are correctly filled and formatted.',
+					{
+						code: BASE_ERROR_CODES.BAD_REQUEST,
+						status: 400,
+						data: {
+							details: validatedData.error.errors,
+						},
+					}
+				);
 			}
 
 			const params = validatedData.data;
 			const { registry } = ctx.context as C15TContext;
 
 			if (!registry) {
-				throw new APIError('INTERNAL_SERVER_ERROR', {
-					message: 'Registry not available',
-					status: 503,
-				});
+				throw new C15TError(
+					'The registry service is currently unavailable. Please check the service status and try again later.',
+					{
+						code: BASE_ERROR_CODES.INITIALIZATION_FAILED,
+						status: 503,
+					}
+				);
 			}
 
 			// Get the consent record with related information
 			const consentResult = await registry.findConsentById(params.consentId);
 			//@ts-expect-error
 			if (!consentResult || !consentResult.consent) {
-				throw new APIError('NOT_FOUND', {
-					message: 'Consent record not found',
-					details: { consentId: params.consentId },
-				});
+				throw new C15TError(
+					'The specified consent record could not be found. Please verify the consent ID and try again.',
+					{
+						code: BASE_ERROR_CODES.CONSENT_NOT_FOUND,
+						status: 404,
+						data: {
+							consentId: params.consentId,
+						},
+					}
+				);
 			}
 			//@ts-expect-error
 			const record = consentResult.consent;
@@ -65,9 +80,13 @@ export const generateConsentReceipt = createAuthEndpoint(
 			const userRecord = consentResult.user;
 
 			if (!userRecord) {
-				throw new APIError('NOT_FOUND', {
-					message: 'User associated with consent not found',
-					details: { consentId: params.consentId },
+				throw new C15TError('NOT_FOUND', {
+					code: BASE_ERROR_CODES.NOT_FOUND,
+					status: 404,
+					data: {
+						message: 'User associated with consent not found',
+						details: { consentId: params.consentId },
+					},
 				});
 			}
 
@@ -191,22 +210,33 @@ export const generateConsentReceipt = createAuthEndpoint(
 			const context = ctx.context as C15TContext;
 			context.logger?.error?.('Error generating consent receipt:', error);
 
-			if (error instanceof APIError) {
+			if (error instanceof C15TError) {
 				throw error;
 			}
 			if (error instanceof z.ZodError) {
-				throw new APIError('BAD_REQUEST', {
-					message: 'Invalid request parameters',
-					details: error.errors,
-				});
+				throw new C15TError(
+					'The request parameters are invalid. Please ensure all required fields are correctly filled and formatted.',
+					{
+						code: BASE_ERROR_CODES.BAD_REQUEST,
+						status: 400,
+						data: {
+							details: error.errors,
+						},
+					}
+				);
 			}
 
-			throw new APIError('INTERNAL_SERVER_ERROR', {
-				message: 'Failed to generate consent receipt',
-				status: 503,
-				details:
-					error instanceof Error ? { message: error.message } : { error },
-			});
+			throw new C15TError(
+				'Failed to generate consent receipt. Please try again later or contact support if the issue persists.',
+				{
+					code: BASE_ERROR_CODES.INTERNAL_SERVER_ERROR,
+					status: 503,
+					data: {
+						details:
+							error instanceof Error ? { message: error.message } : { error },
+					},
+				}
+			);
 		}
 	}
 );

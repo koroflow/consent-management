@@ -499,7 +499,7 @@ export const memoryAdapter =
 			>(data: {
 				model: Model;
 				where: Where<Model>;
-				update: Partial<TableFields<Model>>;
+				update: EntityInput<Model>;
 			}): Promise<Result | null> {
 				const { model, where, update: values } = data;
 				const table = db[model] || [];
@@ -533,7 +533,7 @@ export const memoryAdapter =
 			>(data: {
 				model: Model;
 				where: Where<Model>;
-				update: Partial<TableFields<Model>>;
+				update: Partial<EntityInput<Model>>;
 			}): Promise<Result[]> {
 				const { model, where, update: values } = data;
 				const table = db[model] || [];
@@ -602,6 +602,47 @@ export const memoryAdapter =
 				});
 
 				return count;
+			},
+
+			/**
+			 * Executes a function within a memory-based transaction
+			 *
+			 * This method provides a simplified transaction mechanism for the in-memory
+			 * database. It creates a deep copy of the current database state, performs
+			 * operations on the copy, and then replaces the original database if successful.
+			 *
+			 * @typeParam ResultType - The type of data returned by the transaction
+			 * @param data - The transaction data containing the callback function
+			 * @returns A promise that resolves with the result of the callback function
+			 * @throws {Error} If the transaction callback throws an error
+			 */
+			async transaction<ResultType>(data: {
+				callback: (transactionAdapter: Adapter) => Promise<ResultType>;
+			}): Promise<ResultType> {
+				const { callback } = data;
+
+				// Create a deep copy of the database for transaction isolation
+				const tempDb: MemoryDB = {};
+				for (const key in db) {
+					if (Object.hasOwn(db, key)) {
+						tempDb[key] = JSON.parse(JSON.stringify(db[key]));
+					}
+				}
+
+				// Create a new adapter instance that uses the temporary database
+				const transactionAdapter = memoryAdapter(tempDb)(options);
+
+				// Execute the callback function with the transaction adapter
+				const result = await callback(transactionAdapter);
+
+				// If successful, commit changes by replacing the original database
+				for (const key in tempDb) {
+					if (Object.hasOwn(tempDb, key)) {
+						db[key] = tempDb[key] as Record<string, unknown>[];
+					}
+				}
+
+				return result;
 			},
 		};
 	};
