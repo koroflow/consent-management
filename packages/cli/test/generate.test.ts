@@ -1,12 +1,12 @@
-import { describe, expect, it } from 'vitest';
 import { drizzleAdapter } from '@c15t/backend/db/adapters/drizzle';
-import { prismaAdapter } from '@c15t/backend/db/adapters/prisma';
 import { kyselyAdapter } from '@c15t/backend/db/adapters/kysely';
-import { generateDrizzleSchema } from '../src/generators/drizzle';
+import { prismaAdapter } from '@c15t/backend/db/adapters/prisma';
 import type { C15TOptions } from '@c15t/backend/types';
-import { generatePrismaSchema } from '../src/generators/prisma';
-import { generateMigrations } from '../src/generators/kysely';
 import Database from 'better-sqlite3';
+import { describe, expect, it } from 'vitest';
+import { generateDrizzleSchema } from '../src/generators/drizzle';
+import { generateMigrations } from '../src/generators/kysely';
+import { generatePrismaSchema } from '../src/generators/prisma';
 
 // Set constant timestamp for tests to ensure consistent snapshots
 const TEST_TIMESTAMP = '2023-01-01T00:00:00.000Z';

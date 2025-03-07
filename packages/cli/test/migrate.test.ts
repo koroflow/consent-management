@@ -1,9 +1,9 @@
+import { c15tInstance } from '@c15t/backend';
+import type { C15TPlugin } from '@c15t/backend/types';
+import Database from 'better-sqlite3';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { migrateAction } from '../src/commands/migrate';
 import * as config from '../src/utils/get-config';
-import { c15tInstance } from '@c15t/backend';
-import Database from 'better-sqlite3';
-import type { C15TPlugin } from '@c15t/backend/types';
 
 describe('migrate base c15t instance', () => {
 	const db = new Database(':memory:');

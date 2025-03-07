@@ -14,7 +14,7 @@
 	"files": ["dist"],
 	"scripts": {
 		"build": "unbuild",
-		"fmt": "pnpm biome format --write .",
+		"fmt": "pnpm biome format --write . && biome check --formatter-enabled=false --linter-enabled=false --organize-imports-enabled=true --write",
 		"lint": "pnpm biome lint ./src",
 		"start": "node ./dist/index.mjs",
 		"stub": "unbuild --stub",
