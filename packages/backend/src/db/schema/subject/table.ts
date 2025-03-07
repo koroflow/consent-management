@@ -16,9 +16,9 @@ import { subjectSchema } from './schema';
  *
  * @example
  * ```typescript
- * const userTableSchema = getSubjectTable(c15tOptions);
+ * const subjectTableSchema = getSubjectTable(c15tOptions);
  * // Use the schema for migrations or data access
- * const migrationPlans = generateMigrations(userTableSchema);
+ * const migrationPlans = generateMigrations(subjectTableSchema);
  * ```
  */
 export function getSubjectTable(
