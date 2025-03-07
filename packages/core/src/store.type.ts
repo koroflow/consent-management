@@ -74,10 +74,10 @@ export interface PrivacyConsentState {
 	/** Event callbacks for consent actions */
 	callbacks: Callbacks;
 
-	/** User's detected country code */
+	/** Subject's detected country code */
 	detectedCountry: string | null;
 
-	/** User's location information */
+	/** Subject's location information */
 	locationInfo: LocationInfo | null;
 
 	/** Applicable jurisdiction information */

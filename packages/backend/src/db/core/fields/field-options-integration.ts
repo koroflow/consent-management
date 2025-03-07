@@ -29,7 +29,7 @@ import type { Field } from './field-types';
  *   }
  * }
  *
- * // Infer the output types for user fields from plugins
+ * // Infer the output types for subject fields from plugins
  * type UserPluginFields = InferFieldsFromPlugins<MyOptions, 'userFields', 'output'>;
  * // Results in { acceptedTerms: boolean }
  * ```
@@ -59,7 +59,7 @@ export type InferFieldsFromPlugins<
  *
  * @example
  * ```typescript
- * // Configuration with additional user fields
+ * // Configuration with additional subject fields
  * interface MyOptions extends C15TOptions {
  *   auth: {
  *     userFields: {
@@ -71,7 +71,7 @@ export type InferFieldsFromPlugins<
  *   }
  * }
  *
- * // Infer the output types for user fields from options
+ * // Infer the output types for subject fields from options
  * type UserAdditionalFields = InferFieldsFromOptions<MyOptions, 'auth', 'userFields', 'output'>;
  * // Results in { profile?: string | null | undefined }
  * ```

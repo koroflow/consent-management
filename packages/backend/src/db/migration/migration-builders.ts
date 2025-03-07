@@ -123,7 +123,7 @@ export function buildTableCreateMigrations(
 			(col) => col.primaryKey().notNull()
 		);
 
-		// Now add all the user-defined fields to the table
+		// Now add all the subject-defined fields to the table
 		for (const [fieldName, field] of Object.entries(table.fields)) {
 			// Get appropriate database-specific type for this field
 			const type = getType(field, dbType) as

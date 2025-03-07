@@ -67,7 +67,7 @@ describe('migrate auth instance with plugins', () => {
 		vi.restoreAllMocks();
 	});
 
-	it('should migrate the database and sign-up a user', async () => {
+	it('should migrate the database and sign-up a subject', async () => {
 		await migrateAction({
 			cwd: process.cwd(),
 			config: 'test/c15t.ts',

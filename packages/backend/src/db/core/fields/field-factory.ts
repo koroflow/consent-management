@@ -361,7 +361,7 @@ export function dateField<
 
 	// Create database-aware transform functions for SQLite and MySQL
 	const inputTransform = async (value: Date) => {
-		// First apply the user's transform if provided
+		// First apply the subject's transform if provided
 		let transformedValue = value;
 		if (originalInputTransform) {
 			transformedValue = (await originalInputTransform(value)) as Date;
@@ -399,7 +399,7 @@ export function dateField<
 			}
 		}
 
-		// Apply the user's transform if provided
+		// Apply the subject's transform if provided
 		if (originalOutputTransform && parsedValue instanceof Date) {
 			return await originalOutputTransform(parsedValue);
 		}
@@ -546,7 +546,7 @@ export function timezoneField<
 
 	// Custom input transform that applies validation if enabled
 	const inputTransform = async (value: string): Promise<string> => {
-		// First apply the user's transform if provided
+		// First apply the subject's transform if provided
 		let transformedValue = value;
 		if (originalInputTransform) {
 			transformedValue = await originalInputTransform(value);
@@ -559,7 +559,7 @@ export function timezoneField<
 	const outputTransform = async (value: unknown): Promise<string> => {
 		let parsedValue = value;
 
-		// Then apply the user's transform if provided
+		// Then apply the subject's transform if provided
 		if (originalOutputTransform && typeof parsedValue === 'string') {
 			parsedValue = await originalOutputTransform(parsedValue);
 		}
@@ -634,7 +634,7 @@ export function jsonField<
 
 	// Create database-aware transform functions
 	const inputTransform = async (value: JsonValue): Promise<Primitive> => {
-		// First apply the user's transform if provided
+		// First apply the subject's transform if provided
 		let transformedValue = value;
 		if (originalInputTransform) {
 			const result = await originalInputTransform(value);
@@ -667,7 +667,7 @@ export function jsonField<
 		// First parse from database format
 		let parsedValue = parseFromDb(value);
 
-		// Then apply the user's transform if provided
+		// Then apply the subject's transform if provided
 		if (
 			originalOutputTransform &&
 			typeof parsedValue === 'object' &&

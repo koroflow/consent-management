@@ -3,112 +3,112 @@ import { getWithHooks } from '~/db/hooks';
 import { BASE_ERROR_CODES, C15TError } from '~/error';
 import type { GenericEndpointContext, RegistryContext } from '~/types';
 import { validateEntityOutput } from '../definition';
-import type { User } from './schema';
+import type { Subject } from './schema';
 /**
- * Creates and returns a set of user-related adapter methods to interact with the database.
+ * Creates and returns a set of subject-related adapter methods to interact with the database.
  *
  * These methods provide a consistent interface for creating, finding, updating, and deleting
- * user records while applying hooks and enforcing data validation rules.
+ * subject records while applying hooks and enforcing data validation rules.
  *
  * @param adapter - The database adapter used for direct database operations
  * @param ctx - The context object containing the database adapter, hooks, and options
- * @returns An object containing type-safe user operations
+ * @returns An object containing type-safe subject operations
  *
  * @example
  * ```typescript
- * const userAdapter = createUserAdapter(
+ * const userAdapter = createSubjectAdapter(
  *   databaseAdapter,
  *   createWithHooks,
  *   updateWithHooks,
  *   c15tOptions
  * );
  *
- * // Create a new user
- * const user = await userAdapter.createUser({
+ * // Create a new subject
+ * const subject = await userAdapter.createSubject({
  *   externalId: 'external-123',
  *   identityProvider: 'auth0'
  * });
  * ```
  */
-export function userRegistry({ adapter, ...ctx }: RegistryContext) {
+export function subjectRegistry({ adapter, ...ctx }: RegistryContext) {
 	const { createWithHooks, updateWithHooks } = getWithHooks(adapter, ctx);
 
 	return {
 		/**
-		 * Creates a new user record in the database.
+		 * Creates a new subject record in the database.
 		 *
 		 * Automatically sets creation and update timestamps and applies any
 		 * configured hooks during the creation process.
 		 *
-		 * @param user - User data to create (without id and timestamps)
+		 * @param subject - Subject data to create (without id and timestamps)
 		 * @param context - Optional endpoint context for hooks
-		 * @returns The created user with all fields populated
+		 * @returns The created subject with all fields populated
 		 *
 		 * @throws May throw an error if hooks prevent creation or if database operations fail
 		 */
-		createUser: async (
-			user: Omit<User, 'id' | 'createdAt' | 'updatedAt'> & Partial<User>,
+		createSubject: async (
+			subject: Omit<Subject, 'id' | 'createdAt' | 'updatedAt'> & Partial<Subject>,
 			context?: GenericEndpointContext
 		) => {
 			const createdUser = await createWithHooks({
 				data: {
 					createdAt: new Date(),
 					updatedAt: new Date(),
-					...user,
+					...subject,
 				},
-				model: 'user',
+				model: 'subject',
 				customFn: undefined,
 				context,
 			});
 			return createdUser
-				? validateEntityOutput('user', createdUser, ctx.options)
+				? validateEntityOutput('subject', createdUser, ctx.options)
 				: null;
 		},
 
 		/**
-		 * Finds an existing user or creates a new one if needed.
-		 * If both userId and externalUserId are provided, validates they match the same user.
-		 * Creates a new anonymous user only if no identifiers are provided.
+		 * Finds an existing subject or creates a new one if needed.
+		 * If both subjectId and externalUserId are provided, validates they match the same subject.
+		 * Creates a new anonymous subject only if no identifiers are provided.
 		 *
-		 * @param params - Parameters for finding or creating the user
-		 * @returns The existing or newly created user
-		 * @throws APIError if user validation fails or creation fails
+		 * @param params - Parameters for finding or creating the subject
+		 * @returns The existing or newly created subject
+		 * @throws APIError if subject validation fails or creation fails
 		 */
-		findOrCreateUser: async function ({
-			userId,
+		findOrcreateSubject: async function ({
+			subjectId,
 			externalUserId,
 			ipAddress = 'unknown',
 			context,
 		}: {
-			userId?: string;
+			subjectId?: string;
 			externalUserId?: string;
 			ipAddress?: string;
 			context?: GenericEndpointContext;
 		}) {
-			// If both userId and externalUserId are provided, validate they match
-			if (userId && externalUserId) {
+			// If both subjectId and externalUserId are provided, validate they match
+			if (subjectId && externalUserId) {
 				const [userById, userByExternalId] = await Promise.all([
-					this.findUserById(userId),
+					this.findUserById(subjectId),
 					this.findUserByExternalId(externalUserId),
 				]);
 
 				if (!userById || !userByExternalId) {
 					ctx.logger?.info(
-						'User validation failed: One or both users not found',
+						'Subject validation failed: One or both subjects not found',
 						{
-							providedUserId: userId,
+							providedUserId: subjectId,
 							providedExternalId: externalUserId,
 							userByIdFound: !!userById,
 							userByExternalIdFound: !!userByExternalId,
 						}
 					);
 					throw new C15TError(
-						'The specified user could not be found. Please verify the user identifiers and try again.',
+						'The specified subject could not be found. Please verify the subject identifiers and try again.',
 						{
 							code: BASE_ERROR_CODES.NOT_FOUND,
 							status: 404,
 							data: {
-								providedUserId: userId,
+								providedUserId: subjectId,
 								providedExternalId: externalUserId,
 							},
 						}
@@ -117,21 +117,21 @@ export function userRegistry({ adapter, ...ctx }: RegistryContext) {
 
 				if (userById.id !== userByExternalId.id) {
 					ctx.logger?.warn(
-						'User validation failed: IDs do not match the same user',
+						'Subject validation failed: IDs do not match the same subject',
 						{
-							providedUserId: userId,
+							providedUserId: subjectId,
 							providedExternalId: externalUserId,
 							userByIdId: userById.id,
 							userByExternalIdId: userByExternalId.id,
 						}
 					);
 					throw new C15TError(
-						'The provided userId and externalUserId do not match the same user. Please ensure both identifiers refer to the same user.',
+						'The provided subjectId and externalUserId do not match the same subject. Please ensure both identifiers refer to the same subject.',
 						{
 							code: BASE_ERROR_CODES.CONFLICT,
 							status: 409,
 							data: {
-								providedUserId: userId,
+								providedUserId: subjectId,
 								providedExternalId: externalUserId,
 								userByIdId: userById.id,
 								userByExternalIdId: userByExternalId.id,
@@ -143,13 +143,13 @@ export function userRegistry({ adapter, ...ctx }: RegistryContext) {
 				return userById;
 			}
 
-			// Try to find user by userId if provided
-			if (userId) {
-				const user = await this.findUserById(userId);
-				if (user) {
-					return user;
+			// Try to find subject by subjectId if provided
+			if (subjectId) {
+				const subject = await this.findUserById(subjectId);
+				if (subject) {
+					return subject;
 				}
-				throw new C15TError('User not found', {
+				throw new C15TError('Subject not found', {
 					code: BASE_ERROR_CODES.NOT_FOUND,
 					status: 404,
 				});
@@ -158,19 +158,19 @@ export function userRegistry({ adapter, ...ctx }: RegistryContext) {
 			// If externalUserId provided, try to find or create with upsert
 			if (externalUserId) {
 				try {
-					const user = await this.findUserByExternalId(externalUserId);
-					if (user) {
-						ctx.logger?.debug('Found existing user by external ID', {
+					const subject = await this.findUserByExternalId(externalUserId);
+					if (subject) {
+						ctx.logger?.debug('Found existing subject by external ID', {
 							externalUserId,
 						});
-						return user;
+						return subject;
 					}
 
-					ctx.logger?.info('Creating new user with external ID', {
+					ctx.logger?.info('Creating new subject with external ID', {
 						externalUserId,
 					});
 					// Attempt to create with unique constraint on externalId
-					return await this.createUser(
+					return await this.createSubject(
 						{
 							externalId: externalUserId,
 							identityProvider: 'external',
@@ -189,17 +189,17 @@ export function userRegistry({ adapter, ...ctx }: RegistryContext) {
 							'Handling duplicate key violation for external ID',
 							{ externalUserId }
 						);
-						const user = await this.findUserByExternalId(externalUserId);
-						if (user) {
-							return user;
+						const subject = await this.findUserByExternalId(externalUserId);
+						if (subject) {
+							return subject;
 						}
 					}
-					ctx.logger?.error('Failed to create or find user with external ID', {
+					ctx.logger?.error('Failed to create or find subject with external ID', {
 						externalUserId,
 						error: error instanceof Error ? error.message : 'Unknown error',
 					});
 					throw new C15TError(
-						'Failed to create or find user with external ID',
+						'Failed to create or find subject with external ID',
 						{
 							code: BASE_ERROR_CODES.INTERNAL_SERVER_ERROR,
 							status: 500,
@@ -211,10 +211,10 @@ export function userRegistry({ adapter, ...ctx }: RegistryContext) {
 				}
 			}
 
-			// For anonymous users, use a transaction to prevent duplicates
+			// For anonymous subjects, use a transaction to prevent duplicates
 			try {
-				ctx.logger?.info('Creating new anonymous user');
-				return await this.createUser(
+				ctx.logger?.info('Creating new anonymous subject');
+				return await this.createSubject(
 					{
 						externalId: null,
 						identityProvider: 'anonymous',
@@ -224,11 +224,11 @@ export function userRegistry({ adapter, ...ctx }: RegistryContext) {
 					context
 				);
 			} catch (error) {
-				ctx.logger?.error('Failed to create anonymous user', {
+				ctx.logger?.error('Failed to create anonymous subject', {
 					ipAddress,
 					error: error instanceof Error ? error.message : 'Unknown error',
 				});
-				throw new C15TError('Failed to create anonymous user', {
+				throw new C15TError('Failed to create anonymous subject', {
 					code: BASE_ERROR_CODES.INTERNAL_SERVER_ERROR,
 					status: 500,
 					data: {
@@ -239,38 +239,38 @@ export function userRegistry({ adapter, ...ctx }: RegistryContext) {
 		},
 
 		/**
-		 * Finds a user by their unique ID.
+		 * Finds a subject by their unique ID.
 		 *
-		 * Returns the user with processed output fields according to the schema configuration.
+		 * Returns the subject with processed output fields according to the schema configuration.
 		 *
-		 * @param userId - The unique identifier of the user
-		 * @returns The user object if found, null otherwise
+		 * @param subjectId - The unique identifier of the subject
+		 * @returns The subject object if found, null otherwise
 		 */
-		findUserById: async (userId: string) => {
-			const user = await adapter.findOne({
-				model: 'user',
+		findUserById: async (subjectId: string) => {
+			const subject = await adapter.findOne({
+				model: 'subject',
 				where: [
 					{
 						field: 'id',
-						value: userId,
+						value: subjectId,
 					},
 				],
 			});
-			return user ? validateEntityOutput('user', user, ctx.options) : null;
+			return subject ? validateEntityOutput('subject', subject, ctx.options) : null;
 		},
 
 		/**
-		 * Finds a user by their external ID.
+		 * Finds a subject by their external ID.
 		 *
 		 * This is useful when integrating with external authentication systems
-		 * where users are identified by a provider-specific ID.
+		 * where subjects are identified by a provider-specific ID.
 		 *
-		 * @param externalId - The external identifier of the user
-		 * @returns The user object if found, null otherwise
+		 * @param externalId - The external identifier of the subject
+		 * @returns The subject object if found, null otherwise
 		 */
 		findUserByExternalId: async (externalId: string) => {
-			const user = await adapter.findOne({
-				model: 'user',
+			const subject = await adapter.findOne({
+				model: 'subject',
 				where: [
 					{
 						field: 'externalId',
@@ -278,26 +278,26 @@ export function userRegistry({ adapter, ...ctx }: RegistryContext) {
 					},
 				],
 			});
-			return user ? validateEntityOutput('user', user, ctx.options) : null;
+			return subject ? validateEntityOutput('subject', subject, ctx.options) : null;
 		},
 
 		/**
-		 * Updates an existing user record by ID.
+		 * Updates an existing subject record by ID.
 		 *
 		 * Applies any configured hooks during the update process and
 		 * processes the output according to schema configuration.
 		 *
-		 * @param userId - The unique identifier of the user to update
-		 * @param data - The fields to update on the user record
+		 * @param subjectId - The unique identifier of the subject to update
+		 * @param data - The fields to update on the subject record
 		 * @param context - Optional endpoint context for hooks
-		 * @returns The updated user if successful, null if user not found or hooks prevented update
+		 * @returns The updated subject if successful, null if subject not found or hooks prevented update
 		 */
 		updateUser: async (
-			userId: string,
-			data: Partial<User> & Record<string, unknown>,
+			subjectId: string,
+			data: Partial<Subject> & Record<string, unknown>,
 			context?: GenericEndpointContext
 		) => {
-			const user = await updateWithHooks({
+			const subject = await updateWithHooks({
 				data: {
 					...data,
 					updatedAt: new Date(),
@@ -305,35 +305,35 @@ export function userRegistry({ adapter, ...ctx }: RegistryContext) {
 				where: [
 					{
 						field: 'id',
-						value: userId,
+						value: subjectId,
 					},
 				],
-				model: 'user',
+				model: 'subject',
 				customFn: undefined,
 				context,
 			});
-			return user ? validateEntityOutput('user', user, ctx.options) : null;
+			return subject ? validateEntityOutput('subject', subject, ctx.options) : null;
 		},
 
 		/**
-		 * Deletes a user and all associated consents from the database.
+		 * Deletes a subject and all associated consents from the database.
 		 *
 		 * This is a cascading operation that first removes all consents associated
-		 * with the user, then removes the user record itself.
+		 * with the subject, then removes the subject record itself.
 		 *
-		 * @param userId - The unique identifier of the user to delete
+		 * @param subjectId - The unique identifier of the subject to delete
 		 * @returns A promise that resolves when the deletion is complete
 		 */
-		deleteUser: async (userId: string) => {
+		deleteUser: async (subjectId: string) => {
 			await adapter.transaction({
 				callback: async (tx: Adapter) => {
-					// Update the user record
+					// Update the subject record
 					await tx.update({
-						model: 'user',
+						model: 'subject',
 						where: [
 							{
 								field: 'id',
-								value: userId,
+								value: subjectId,
 							},
 						],
 						update: {
@@ -347,8 +347,8 @@ export function userRegistry({ adapter, ...ctx }: RegistryContext) {
 						model: 'consent',
 						where: [
 							{
-								field: 'userId',
-								value: userId,
+								field: 'subjectId',
+								value: subjectId,
 							},
 						],
 					});

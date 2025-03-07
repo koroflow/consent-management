@@ -18,11 +18,11 @@ import type { Field } from '../core/fields';
  *
  * @example
  * ```typescript
- * // Get user data from database
- * const userData = { id: '123', email: 'user@example.com', password: 'hash123' };
+ * // Get subject data from database
+ * const userData = { id: '123', email: 'subject@example.com', password: 'hash123' };
  *
  * // Define schema with password field marked as not returnable
- * const userSchema = {
+ * const subjectSchema = {
  *   fields: {
  *     id: { name: 'id', type: 'string', returned: true },
  *     email: { name: 'email', type: 'string', returned: true },
@@ -31,8 +31,8 @@ import type { Field } from '../core/fields';
  * };
  *
  * // Process the data - password will be excluded
- * const processedData = parseEntityOutputData(userData, userSchema);
- * // Result: { id: '123', email: 'user@example.com' }
+ * const processedData = parseEntityOutputData(userData, subjectSchema);
+ * // Result: { id: '123', email: 'subject@example.com' }
  * ```
  *
  * @remarks
@@ -99,7 +99,7 @@ export type FieldConflictResolution = {
  * @example
  * ```typescript
  * // Get fields with conflict resolution
- * const fields = getAllFields(options, 'user', {
+ * const fields = getAllFields(options, 'subject', {
  *   strategy: 'warn',
  *   onWarning: (msg) => console.warn(msg)
  * });
@@ -224,13 +224,13 @@ export type ExtraFieldsConfig = {
  * ```typescript
  * // Input data from client
  * const inputData = {
- *   email: 'user@example.com',
- *   role: 'user',
+ *   email: 'subject@example.com',
+ *   role: 'subject',
  *   extraField: 'value' // Field not in schema
  * };
  *
  * // Schema with field definitions
- * const userSchema = {
+ * const subjectSchema = {
  *   fields: {
  *     id: {
  *       name: 'id',
@@ -248,7 +248,7 @@ export type ExtraFieldsConfig = {
  *     role: {
  *       name: 'role',
  *       type: 'string',
- *       defaultValue: 'user'
+ *       defaultValue: 'subject'
  *     },
  *     createdAt: {
  *       name: 'created_at',
@@ -261,7 +261,7 @@ export type ExtraFieldsConfig = {
  * };
  *
  * // Process the data with extra fields config
- * const validatedData = parseInputData(inputData, userSchema, {
+ * const validatedData = parseInputData(inputData, subjectSchema, {
  *   strategy: 'warn',
  *   onWarning: (msg) => console.warn(msg),
  *   allowedExtraFields: ['metadata']

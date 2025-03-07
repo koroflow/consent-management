@@ -15,9 +15,9 @@ import type { DomainEntityConfig } from './domain/types';
 import type { GeoLocationEntityConfig } from './geo-location/types';
 import type { PurposeJunctionEntityConfig } from './purpose-junction/types';
 import type { PurposeEntityConfig } from './purpose/types';
-import type { RecordEntityConfig } from './record/types';
+import type { RecordEntityConfig } from './consent-record/types';
 // Import entity-specific types from their respective directories
-import type { UserEntityConfig } from './user/types';
+import type { UserEntityConfig } from './subject/types';
 import type { WithdrawalEntityConfig } from './withdrawal/types';
 
 /**
@@ -76,10 +76,10 @@ export interface ActiveEntityConfig extends TimestampedEntityConfig {
  */
 export interface TablesConfig {
 	/**
-	 * User entity configuration
-	 * @default entityName: "user", entityPrefix: "usr"
+	 * Subject entity configuration
+	 * @default entityName: "subject", entityPrefix: "usr"
 	 */
-	user?: UserEntityConfig;
+	subject?: UserEntityConfig;
 
 	/**
 	 * Purpose entity configuration
@@ -142,14 +142,14 @@ export interface TablesConfig {
 	auditLog?: AuditLogEntityConfig;
 }
 
-export type { UserEntityConfig } from './user/types';
+export type { UserEntityConfig } from './subject/types';
 export type { PurposeEntityConfig } from './purpose/types';
 export type { ConsentPolicyEntityConfig } from './consent-policy/types';
 export type { DomainEntityConfig } from './domain/types';
 export type { GeoLocationEntityConfig } from './geo-location/types';
 export type { ConsentEntityConfig } from './consent/types';
 export type { PurposeJunctionEntityConfig } from './purpose-junction/types';
-export type { RecordEntityConfig } from './record/types';
+export type { RecordEntityConfig } from './consent-record/types';
 export type { ConsentGeoLocationEntityConfig } from './consent-geo-location/types';
 export type { WithdrawalEntityConfig } from './withdrawal/types';
 export type { AuditLogEntityConfig } from './audit-log/types';

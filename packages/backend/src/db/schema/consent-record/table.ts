@@ -1,6 +1,6 @@
 import type { Field } from '~/db/core/fields';
 import type { C15TOptions } from '~/types';
-import { recordSchema } from './schema';
+import { consentRecordSchema } from './schema';
 
 /**
  * Generates the database table configuration for the consent record entity.
@@ -15,25 +15,25 @@ import { recordSchema } from './schema';
  *
  * @example
  * ```typescript
- * const recordTableSchema = getRecordTable(c15tOptions);
+ * const recordTableSchema = getConsentRecordTable(c15tOptions);
  * // Use the schema for migrations or data access
  * const migrationPlans = generateMigrations(recordTableSchema);
  * ```
  */
-export function getRecordTable(
+export function getConsentRecordTable(
 	options: C15TOptions,
 	recordFields?: Record<string, Field>
 ) {
 	// Get record config, supporting both the new tables.record and legacy record format
 	const recordConfig = options.tables?.record;
-	const userConfig = options.tables?.user;
+	const userConfig = options.tables?.subject;
 	const consentConfig = options.tables?.consent;
 
 	return {
 		/**
 		 * The name of the consent record table in the database, configurable through options
 		 */
-		entityName: recordConfig?.entityName || 'record',
+		entityName: recordConfig?.entityName || 'consentRecord',
 
 		/**
 		 * The ID prefix for the consent record table
@@ -44,21 +44,21 @@ export function getRecordTable(
 		/**
 		 * The schema for the consent record table
 		 */
-		schema: recordSchema,
+		schema: consentRecordSchema,
 
 		/**
 		 * Field definitions for the consent record table
 		 */
 		fields: {
 			/**
-			 * Reference to the user associated with this consent record
+			 * Reference to the subject associated with this consent record
 			 */
-			userId: {
+			subjectId: {
 				type: 'string',
 				required: true,
-				fieldName: recordConfig?.fields?.userId || 'userId',
+				fieldName: recordConfig?.fields?.subjectId || 'subjectId',
 				references: {
-					model: userConfig?.entityName || 'user',
+					model: userConfig?.entityName || 'subject',
 					field: 'id',
 				},
 			},
@@ -89,7 +89,7 @@ export function getRecordTable(
 
 			/**
 			 * Additional details about the consent action
-			 * May include IP address, user agent, reason for withdrawal, etc.
+			 * May include IP address, subject agent, reason for withdrawal, etc.
 			 */
 			details: {
 				type: 'json',
@@ -117,7 +117,7 @@ export function getRecordTable(
 
 		/**
 		 * Execution order during migrations (lower numbers run first)
-		 * Consent record table needs to be created after the user and consent tables it references
+		 * Consent record table needs to be created after the subject and consent tables it references
 		 */
 		order: 7,
 	};

@@ -106,7 +106,7 @@ export const BASE_ERROR_CODES = {
 
 	/**
 	 * The requester does not have permission to perform the requested operation.
-	 * This may occur when authenticated users attempt operations beyond their permission level.
+	 * This may occur when authenticated subjects attempt operations beyond their permission level.
 	 */
 	FORBIDDEN: 'Forbidden',
 

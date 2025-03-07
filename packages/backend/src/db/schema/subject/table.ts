@@ -1,17 +1,17 @@
 import type { Field } from '~/db/core/fields';
 import { COMMON_TIMEZONES } from '~/db/core/fields';
 import type { C15TOptions } from '~/types';
-import { userSchema } from './schema';
+import { subjectSchema } from './schema';
 
 /**
- * Generates the database table configuration for the user entity.
+ * Generates the database table configuration for the subject entity.
  *
- * This function creates a schema definition that includes all standard user fields
+ * This function creates a schema definition that includes all standard subject fields
  * and any additional fields from plugins or configuration. The resulting schema is used
  * for database migrations, schema validation, and query building.
  *
- * @param options - C15T configuration options that may contain user table customizations
- * @param userFields - Additional fields from plugins to include in the user table
+ * @param options - C15T configuration options that may contain subject table customizations
+ * @param userFields - Additional fields from plugins to include in the subject table
  * @returns A complete table schema definition with fields, model name, and metadata
  *
  * @example
@@ -25,32 +25,32 @@ export function getUserTable(
 	options: C15TOptions,
 	userFields?: Record<string, Field>
 ) {
-	// Get user config, supporting both the new tables.user and legacy user format
-	const userConfig = options.tables?.user;
+	// Get subject config, supporting both the new tables.subject and legacy subject format
+	const userConfig = options.tables?.subject;
 
 	return {
 		/**
-		 * The name of the user table in the database, configurable through options
+		 * The name of the subject table in the database, configurable through options
 		 */
-		entityName: userConfig?.entityName || 'user',
+		entityName: userConfig?.entityName || 'subject',
 
 		/**
-		 * The ID prefix for the user table
-		 * Used to generate unique prefixed IDs for users
+		 * The ID prefix for the subject table
+		 * Used to generate unique prefixed IDs for subjects
 		 */
 		entityPrefix: userConfig?.entityPrefix || 'usr',
 
 		/**
-		 * The Zod schema for the user table
+		 * The Zod schema for the subject table
 		 */
-		schema: userSchema,
+		schema: subjectSchema,
 
 		/**
-		 * Field definitions for the user table
+		 * Field definitions for the subject table
 		 */
 		fields: {
 			/**
-			 * Whether the user has been identified/verified
+			 * Whether the subject has been identified/verified
 			 * Default: false
 			 */
 			isIdentified: {
@@ -61,7 +61,7 @@ export function getUserTable(
 			},
 
 			/**
-			 * External identifier for the user (from auth providers)
+			 * External identifier for the subject (from auth providers)
 			 * Optional field
 			 */
 			externalId: {
@@ -71,7 +71,7 @@ export function getUserTable(
 			},
 
 			/**
-			 * The provider that identified this user (e.g., 'auth0', 'okta')
+			 * The provider that identified this subject (e.g., 'auth0', 'okta')
 			 * Optional field
 			 */
 			identityProvider: {
@@ -81,7 +81,7 @@ export function getUserTable(
 			},
 
 			/**
-			 * Last known IP address of the user
+			 * Last known IP address of the subject
 			 * Optional field, useful for security and audit purposes
 			 */
 			lastIpAddress: {
@@ -91,7 +91,7 @@ export function getUserTable(
 			},
 
 			/**
-			 * When the user was created
+			 * When the subject was created
 			 * Automatically set to current time by default
 			 */
 			createdAt: {
@@ -102,7 +102,7 @@ export function getUserTable(
 			},
 
 			/**
-			 * When the user was last updated
+			 * When the subject was last updated
 			 * Automatically set to current time on update
 			 */
 			updatedAt: {
@@ -113,7 +113,7 @@ export function getUserTable(
 			},
 
 			/**
-			 * User's local timezone, stored as IANA timezone identifier
+			 * Subject's local timezone, stored as IANA timezone identifier
 			 */
 			userTimezone: {
 				type: 'timezone',
@@ -131,7 +131,7 @@ export function getUserTable(
 
 		/**
 		 * Execution order during migrations (lower numbers run first)
-		 * User table needs to be created early as other tables reference it
+		 * Subject table needs to be created early as other tables reference it
 		 */
 		order: 1,
 	};

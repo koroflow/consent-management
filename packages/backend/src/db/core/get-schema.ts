@@ -31,8 +31,8 @@ interface SchemaEntry {
  * ```typescript
  * const schema = getSchema(config);
  *
- * // Access user entity definition
- * const userFields = schema.user.fields;
+ * // Access subject entity definition
+ * const userFields = schema.subject.fields;
  *
  * // Check field reference
  * const emailField = userFields.email;

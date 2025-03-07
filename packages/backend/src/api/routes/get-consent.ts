@@ -6,9 +6,9 @@ import { createAuthEndpoint } from '../call';
 
 // Define schemas for the different identification methods
 const getByUserIdSchema = z.object({
-	userId: z.string(),
+	subjectId: z.string(),
 	domain: z.string().optional(),
-	identifierType: z.literal('userId'),
+	identifierType: z.literal('subjectId'),
 });
 
 const getByExternalIdSchema = z.object({
@@ -36,7 +36,7 @@ export interface GetConsentResponse {
 		hasActiveConsent: boolean;
 		records: Array<{
 			id: string;
-			userId: string;
+			subjectId: string;
 			domain: string;
 			status: string;
 			givenAt: string;
@@ -50,8 +50,8 @@ export interface GetConsentResponse {
 /**
  * Endpoint for retrieving active consent records.
  *
- * This endpoint allows clients to retrieve a user's active consent records by specifying:
- * 1. The user ID (internal UUID) and an optional domain
+ * This endpoint allows clients to retrieve a subject's active consent records by specifying:
+ * 1. The subject ID (internal UUID) and an optional domain
  * 2. The external ID and an optional domain
  * 3. The IP address and a required domain (since IP alone is too broad)
  *
@@ -93,15 +93,15 @@ export const getConsent = createAuthEndpoint(
 				);
 			}
 
-			// Find user based on identifier type
-			let users: EntityOutputFields<'user'>[] = [];
+			// Find subject based on identifier type
+			let subjects: EntityOutputFields<'subject'>[] = [];
 
 			// biome-ignore lint/style/useDefaultSwitchClause: <explanation>
 			switch (params.identifierType) {
-				case 'userId': {
-					const userRecord = await registry.findUserById(params.userId);
+				case 'subjectId': {
+					const userRecord = await registry.findUserById(params.subjectId);
 					if (userRecord) {
-						users = [userRecord];
+						subjects = [userRecord];
 					}
 					break;
 				}
@@ -110,7 +110,7 @@ export const getConsent = createAuthEndpoint(
 						params.externalId
 					);
 					if (externalUser) {
-						users = [externalUser];
+						subjects = [externalUser];
 					}
 					break;
 				}
@@ -130,14 +130,14 @@ export const getConsent = createAuthEndpoint(
 					}
 
 					// This is a simplification - in a real implementation, we would need
-					// a method to look up users by IP address, possibly by scanning recent consent records
+					// a method to look up subjects by IP address, possibly by scanning recent consent records
 					// For now, we'll use an empty array as this would require a custom query
-					users = [];
+					subjects = [];
 					break;
 				}
 			}
 
-			if (users.length === 0) {
+			if (subjects.length === 0) {
 				return {
 					success: true,
 					data: {
@@ -148,19 +148,19 @@ export const getConsent = createAuthEndpoint(
 				};
 			}
 
-			// Get active consent records for these users
+			// Get active consent records for these subjects
 			const consentResults: Array<{
 				id: string;
-				userId: string;
+				subjectId: string;
 				domain: string;
 				status: string;
 				givenAt: string;
 			}> = [];
 
-			for (const user of users) {
-				// Use the adapter to find user consents
+			for (const subject of subjects) {
+				// Use the adapter to find subject consents
 				const userConsents = await registry.findConsents({
-					userId: user.id,
+					subjectId: subject.id,
 					domainId: params.domain,
 				});
 
@@ -169,11 +169,11 @@ export const getConsent = createAuthEndpoint(
 					(consent) => consent.status === 'active'
 				);
 
-				// Include user identification in the results
+				// Include subject identification in the results
 				for (const consent of activeConsents) {
 					consentResults.push({
 						id: consent.id,
-						userId: user.id,
+						subjectId: subject.id,
 						// domain: consent.domainId,
 						// status: consent.status,
 						givenAt: consent.givenAt.toISOString(),

@@ -16,9 +16,9 @@ import type { Endpoint } from 'better-call';
  * @example
  * ```ts
  * interface APIHandlers {
- *   getUser: (id: string) => Promise<User>;
- *   userData: User;
- *   updateUser: (user: User) => Promise<void>;
+ *   getUser: (id: string) => Promise<Subject>;
+ *   userData: Subject;
+ *   updateUser: (subject: Subject) => Promise<void>;
  * }
  *
  * // ActionKeys will be 'getUser' | 'updateUser'

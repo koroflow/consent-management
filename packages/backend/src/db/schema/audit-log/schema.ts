@@ -5,7 +5,7 @@ import { z } from 'zod';
  *
  * This defines the structure and validation rules for audit log entries:
  * - Required fields: entityType, entityId, actionType
- * - Optional fields: userId, ipAddress, changes, metadata
+ * - Optional fields: subjectId, ipAddress, changes, metadata
  * - Default current date/time for creation timestamp
  *
  * @example
@@ -15,7 +15,7 @@ import { z } from 'zod';
  *   entityType: 'consent',
  *   entityId: 'consent-123',
  *   actionType: 'update',
- *   userId: 'admin-456',
+ *   subjectId: 'admin-456',
  *   changes: { status: { from: 'active', to: 'withdrawn' } }
  * };
  *
@@ -28,7 +28,7 @@ export const auditLogSchema = z.object({
 	entityType: z.string(),
 	entityId: z.string(),
 	actionType: z.string(),
-	userId: z.string().optional(),
+	subjectId: z.string().optional(),
 	ipAddress: z.string().optional(),
 	userAgent: z.string().optional(),
 	changes: z.record(z.unknown()).optional(),

@@ -25,9 +25,9 @@
  * });
  *
  * // Use hooks with database operations
- * const user = await createWithHooks({
+ * const subject = await createWithHooks({
  *   data: { name: 'Alice', email: 'alice@example.com' },
- *   model: 'user'
+ *   model: 'subject'
  * });
  * ```
  */

@@ -26,7 +26,7 @@ import type { AuditLog } from './schema';
  *   entityType: 'consent',
  *   entityId: 'consent-123',
  *   actionType: 'update',
- *   userId: 'admin-456',
+ *   subjectId: 'admin-456',
  *   changes: { status: { from: 'active', to: 'withdrawn' } }
  * });
  * ```
@@ -72,7 +72,7 @@ export function auditLogRegistry({ adapter, ...ctx }: RegistryContext) {
 		 * Finds all audit log entries matching specified filters.
 		 * Returns logs with processed output fields according to the schema configuration.
 		 *
-		 * @param entityType - Optional entity type to filter logs (e.g., 'consent', 'user')
+		 * @param entityType - Optional entity type to filter logs (e.g., 'consent', 'subject')
 		 * @param entityId - Optional entity ID to filter logs
 		 * @param actionType - Optional action type to filter logs (e.g., 'create', 'update')
 		 * @param limit - Optional maximum number of logs to return
@@ -149,7 +149,7 @@ export function auditLogRegistry({ adapter, ...ctx }: RegistryContext) {
 		 * Finds all audit log entries for a specific entity.
 		 * Returns logs with processed output fields according to the schema configuration.
 		 *
-		 * @param entityType - The type of entity (e.g., 'consent', 'user')
+		 * @param entityType - The type of entity (e.g., 'consent', 'subject')
 		 * @param entityId - The unique identifier of the entity
 		 * @param limit - Optional maximum number of logs to return
 		 * @returns Array of audit log entries for the specified entity

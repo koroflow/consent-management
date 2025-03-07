@@ -44,7 +44,7 @@ describe('Consent Endpoints', () => {
 			response: {
 				id: string;
 				givenAt: string;
-				userId: string;
+				subjectId: string;
 				domainId: string;
 				type: string;
 				status: string;
@@ -67,7 +67,7 @@ describe('Consent Endpoints', () => {
 			// biome-ignore lint/suspicious/noMisplacedAssertion: its okay
 			expect(response.givenAt).toBeDefined();
 			// biome-ignore lint/suspicious/noMisplacedAssertion: its okay
-			expect(response.userId).toBeDefined();
+			expect(response.subjectId).toBeDefined();
 			// biome-ignore lint/suspicious/noMisplacedAssertion: its okay
 			expect(response.domainId).toBeDefined();
 		};
@@ -82,9 +82,9 @@ describe('Consent Endpoints', () => {
 			expectValidConsentResponse(response, 'cookie_banner');
 		});
 
-		it('should set privacy policy consent successfully with external user', async () => {
-			await context.registry.createUser({
-				externalId: 'test-user',
+		it('should set privacy policy consent successfully with external subject', async () => {
+			await context.registry.createSubject({
+				externalId: 'test-subject',
 				isIdentified: true,
 				identityProvider: 'test',
 			});
@@ -94,12 +94,12 @@ describe('Consent Endpoints', () => {
 				params: undefined,
 				query: undefined,
 				body: createConsentData('privacy_policy', {
-					externalUserId: 'test-user',
+					externalUserId: 'test-subject',
 				}),
 			});
 
 			expectValidConsentResponse(response, 'privacy_policy', {
-				externalUserId: 'test-user',
+				externalUserId: 'test-subject',
 			});
 		});
 
@@ -158,17 +158,17 @@ describe('Consent Endpoints', () => {
 			});
 		});
 
-		describe('User mapping validation', () => {
-			it('should validate that userId and externalUserId map to the same user', async () => {
-				// Create a user with external ID
-				const user = await context.registry.createUser({
-					externalId: 'test-user',
+		describe('Subject mapping validation', () => {
+			it('should validate that subjectId and externalUserId map to the same subject', async () => {
+				// Create a subject with external ID
+				const subject = await context.registry.createSubject({
+					externalId: 'test-subject',
 					isIdentified: true,
 					identityProvider: 'test',
 				});
 
-				if (!user) {
-					throw new Error('Failed to create test user');
+				if (!subject) {
+					throw new Error('Failed to create test subject');
 				}
 
 				// Test with matching IDs
@@ -177,25 +177,25 @@ describe('Consent Endpoints', () => {
 					params: undefined,
 					query: undefined,
 					body: createConsentData('privacy_policy', {
-						userId: user.id,
-						externalUserId: 'test-user',
+						subjectId: subject.id,
+						externalUserId: 'test-subject',
 					}),
 				});
 
 				expectValidConsentResponse(response, 'privacy_policy', {
-					userId: user.id,
-					externalUserId: 'test-user',
+					subjectId: subject.id,
+					externalUserId: 'test-subject',
 				});
 
-				// Create another user with different external ID
-				const otherUser = await context.registry.createUser({
-					externalId: 'other-user',
+				// Create another subject with different external ID
+				const otherUser = await context.registry.createSubject({
+					externalId: 'other-subject',
 					isIdentified: true,
 					identityProvider: 'test',
 				});
 
 				if (!otherUser) {
-					throw new Error('Failed to create other test user');
+					throw new Error('Failed to create other test subject');
 				}
 
 				// Test with mismatched IDs
@@ -205,8 +205,8 @@ describe('Consent Endpoints', () => {
 						params: undefined,
 						query: undefined,
 						body: createConsentData('privacy_policy', {
-							userId: user.id,
-							externalUserId: 'other-user',
+							subjectId: subject.id,
+							externalUserId: 'other-subject',
 						}),
 					})
 				).rejects.toMatchObject({
@@ -218,7 +218,7 @@ describe('Consent Endpoints', () => {
 		});
 
 		describe('Error cases', () => {
-			it('should create anonymous user when external user is not found', async () => {
+			it('should create anonymous subject when external subject is not found', async () => {
 				const response = await setConsent({
 					context,
 					params: undefined,
@@ -233,14 +233,14 @@ describe('Consent Endpoints', () => {
 				});
 			});
 
-			it('should error if user ID is not found', async () => {
+			it('should error if subject ID is not found', async () => {
 				await expect(
 					setConsent({
 						context,
 						params: undefined,
 						query: undefined,
 						body: createConsentData('privacy_policy', {
-							userId: 'non-existent',
+							subjectId: 'non-existent',
 						}),
 					})
 				).rejects.toMatchObject({

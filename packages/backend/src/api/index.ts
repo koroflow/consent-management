@@ -40,7 +40,7 @@ import { toEndpoints } from './to-endpoints';
  *
  * // Use the configured API
  * const response = await api.getConsentStatus({
- *   params: { userId: "123" }
+ *   params: { subjectId: "123" }
  * });
  * ```
  */

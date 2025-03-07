@@ -43,7 +43,7 @@ type InternalContext = InputContext<string, EndpointOptions> &
  * ```typescript
  * const api = toEndpoints({
  *   getUser: createAuthEndpoint(async (ctx) => {
- *     return { id: 1, name: "User" };
+ *     return { id: 1, name: "Subject" };
  *   }),
  *   updateUser: createAuthEndpoint(async (ctx) => {
  *     // Process update logic
@@ -51,7 +51,7 @@ type InternalContext = InputContext<string, EndpointOptions> &
  * }, contextPromise);
  *
  * // Later use the API
- * const user = await api.getUser({ params: { id: "123" } });
+ * const subject = await api.getUser({ params: { id: "123" } });
  * ```
  */
 export function toEndpoints<EndpointMap extends Record<string, C15TEndpoint>>(

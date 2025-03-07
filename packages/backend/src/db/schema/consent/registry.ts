@@ -5,7 +5,7 @@ import { validateEntityOutput } from '../definition';
 import type { Consent } from './schema';
 
 export interface FindConsentsParams {
-	userId?: string;
+	subjectId?: string;
 	domainId?: string;
 	status?: string;
 	purposeIds?: string[];
@@ -40,7 +40,7 @@ export interface RevokeConsentParams {
  *
  * // Create a new consent record
  * const consent = await consentAdapter.createConsent({
- *   userId: 'user-123',
+ *   subjectId: 'subject-123',
  *   domainId: 'domain-456',
  *   purposeIds: ['purpose-789'],
  *   status: 'active'
@@ -97,10 +97,10 @@ export function consentRegistry({ adapter, ...ctx }: RegistryContext) {
 				});
 			}
 
-			if (params.userId) {
+			if (params.subjectId) {
 				whereConditions.push({
-					field: 'userId',
-					value: params.userId,
+					field: 'subjectId',
+					value: params.subjectId,
 				});
 			}
 
@@ -163,19 +163,19 @@ export function consentRegistry({ adapter, ...ctx }: RegistryContext) {
 		},
 
 		/**
-		 * Finds all consents for a specific user.
+		 * Finds all consents for a specific subject.
 		 * Returns consents with processed output fields according to the schema configuration.
 		 *
-		 * @param userId - The user ID to find consents for
-		 * @returns Array of consents associated with the user
+		 * @param subjectId - The subject ID to find consents for
+		 * @returns Array of consents associated with the subject
 		 */
-		findConsentsByUserId: async (userId: string) => {
+		findConsentsByUserId: async (subjectId: string) => {
 			const consents = await adapter.findMany({
 				model: 'consent',
 				where: [
 					{
-						field: 'userId',
-						value: userId,
+						field: 'subjectId',
+						value: subjectId,
 					},
 				],
 				sortBy: {

@@ -8,20 +8,20 @@ import {
 	geoLocationSchema,
 	purposeJunctionSchema,
 	purposeSchema,
-	recordSchema,
-	userSchema,
+	consentRecordSchema,
+	subjectSchema,
 	withdrawalSchema,
 } from './index';
 
 // Export all schemas
 export const schemas = {
-	user: userSchema,
+	subject: subjectSchema,
 	purpose: purposeSchema,
 	consentPolicy: consentPolicySchema,
 	domain: domainSchema,
 	consent: consentSchema,
 	purposeJunction: purposeJunctionSchema,
-	record: recordSchema,
+	record: consentRecordSchema,
 	consentGeoLocation: consentGeoLocationSchema,
 	geoLocation: geoLocationSchema,
 	withdrawal: withdrawalSchema,

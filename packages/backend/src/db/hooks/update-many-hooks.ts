@@ -82,14 +82,14 @@ function processUpdateManyResult<TEntityData extends Record<string, unknown>>(
  *
  * @example
  * ```typescript
- * // Batch update users
+ * // Batch update subjects
  * const updatedUsers = await updateManyWithHooks(
  *   mysqlAdapter,
  *   { hooks: userHooks, options: config },
  *   {
  *     data: { isVerified: true },
  *     where: { emailDomain: 'example.com' },
- *     model: 'user'
+ *     model: 'subject'
  *   }
  * );
  *

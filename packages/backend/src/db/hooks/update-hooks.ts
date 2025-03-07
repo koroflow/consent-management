@@ -26,8 +26,8 @@ import { processHooks } from './utils';
  *   { hooks: userHooks, options: config },
  *   {
  *     data: { status: 'active' },
- *     where: { id: 'user-123' },
- *     model: 'user'
+ *     where: { id: 'subject-123' },
+ *     model: 'subject'
  *   }
  * );
  * ```

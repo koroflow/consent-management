@@ -51,9 +51,9 @@ export type AllConsentNames =
  *
  * - `defaultValue`: Initial consent state
  *   - `true`: Consent is granted by default (typically only for 'necessary' cookies)
- *   - `false`: User must explicitly grant consent
+ *   - `false`: Subject must explicitly grant consent
  *
- * - `description`: User-friendly explanation of the consent category
+ * - `description`: Subject-friendly explanation of the consent category
  *   - Should be clear and concise
  *   - Must accurately describe data usage
  *   - Should help users make informed decisions
@@ -104,7 +104,7 @@ export type ConsentType = {
 	/** Whether consent is granted by default */
 	defaultValue: boolean;
 
-	/** User-friendly description of what this consent enables */
+	/** Subject-friendly description of what this consent enables */
 	description: string;
 
 	/** Whether users can modify this consent setting */
@@ -143,7 +143,7 @@ export type ConsentType = {
  *    - Disabled by default
  *
  * 4. Experience (Type 3):
- *    - User experience improvements
+ *    - Subject experience improvements
  *    - Optional for users
  *    - Disabled by default
  *

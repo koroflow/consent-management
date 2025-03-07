@@ -80,7 +80,7 @@ export function createMockContext(): C15TContext {
 				success: true,
 				data: {
 					id: 'test-consent-id',
-					userId: 'test-user',
+					subjectId: 'test-subject',
 					domainId: 'example.com',
 					status: 'active',
 					givenAt: new Date().toISOString(),
@@ -191,7 +191,7 @@ export function createMockResponse(status: number, body: unknown): Response {
  */
 export function createMockConsent(
 	overrides: Partial<{
-		userId: string;
+		subjectId: string;
 		domain: string;
 		preferences: Record<string, string>;
 		status: string;
@@ -199,7 +199,7 @@ export function createMockConsent(
 	}> = {}
 ) {
 	return {
-		userId: 'test-user',
+		subjectId: 'test-subject',
 		domain: 'example.com',
 		preferences: {
 			marketing: 'granted',

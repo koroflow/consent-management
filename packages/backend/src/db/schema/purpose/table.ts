@@ -66,7 +66,7 @@ export function getPurposeTable(
 			},
 
 			/**
-			 * Detailed description of the purpose, shown to users
+			 * Detailed description of the purpose, shown to subjects
 			 */
 			description: {
 				type: 'string',

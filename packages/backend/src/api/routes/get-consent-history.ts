@@ -6,16 +6,16 @@ import { createAuthEndpoint } from '../call';
 
 // Define the schema for validating request parameters
 const getConsentHistorySchema = z.object({
-	userId: z.string(),
+	subjectId: z.string(),
 	domain: z.string().optional(),
 	limit: z.coerce.number().int().positive().max(1000).default(100),
 	offset: z.coerce.number().int().min(0).default(0),
 });
 
 /**
- * Endpoint for retrieving a user's complete consent history.
+ * Endpoint for retrieving a subject's complete consent history.
  *
- * This endpoint returns comprehensive information about a user's consent records,
+ * This endpoint returns comprehensive information about a subject's consent records,
  * including all consent entries, withdrawals, related evidence records, and audit logs.
  * It supports optional domain filtering and pagination to manage large result sets.
  *
@@ -39,7 +39,7 @@ export const getConsentHistory = createAuthEndpoint(
 				});
 			}
 
-			let userConsents = await registry.findConsents({ userId: params.userId });
+			let userConsents = await registry.findConsents({ subjectId: params.subjectId });
 			if (params.domain) {
 				userConsents = userConsents.filter(
 					(consent) => consent.domainId === params.domain
@@ -93,7 +93,7 @@ export const getConsentHistory = createAuthEndpoint(
 				details: Record<string, unknown>;
 			}> = [];
 			if ('findAuditLogs' in registry) {
-				const logs = await registry.findAuditLogs(params.userId);
+				const logs = await registry.findAuditLogs(params.subjectId);
 				auditLogs = logs.map((log: EntityOutputFields<'auditLog'>) => ({
 					id: log.id,
 					createdAt: log.createdAt.toISOString(),

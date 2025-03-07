@@ -117,7 +117,7 @@ export const validateContextMiddleware = createAuthMiddleware(async (ctx) => {
 	// Optional storage adapter validation
 	if (typedContext.storage) {
 		const storage = typedContext.storage as Adapter;
-		const requiredMethods = ['users', 'records', 'policies'];
+		const requiredMethods = ['subjects', 'records', 'policies'];
 		const missingMethods = requiredMethods.filter(
 			(method) => !(method in storage)
 		);

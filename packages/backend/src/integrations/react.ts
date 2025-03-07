@@ -58,9 +58,9 @@ interface ConsentState {
 	isLoading: boolean;
 
 	/**
-	 * Whether the user has provided consent
-	 * - `true`: User has provided at least one consent
-	 * - `false`: User has explicitly declined all consent
+	 * Whether the subject has provided consent
+	 * - `true`: Subject has provided at least one consent
+	 * - `false`: Subject has explicitly declined all consent
 	 * - `null`: Consent status hasn't been determined yet
 	 */
 	hasConsented: boolean | null;
@@ -150,7 +150,7 @@ interface c15tClientConfig {
 
 	/**
 	 * Default preferences to use for acceptAll action
-	 * These values determine what gets set when a user accepts all consent
+	 * These values determine what gets set when a subject accepts all consent
 	 *
 	 * @example
 	 * ```ts
@@ -207,7 +207,7 @@ interface ConditionalContentResult {
 	isLoading: boolean;
 
 	/**
-	 * Whether the user has given any consent
+	 * Whether the subject has given any consent
 	 */
 	hasConsented: boolean | null;
 
@@ -515,7 +515,7 @@ export function createConsentClient(
 	/**
 	 * Hook to conditionally render content based on consent
 	 *
-	 * This hook checks if the user has consented to specific purposes
+	 * This hook checks if the subject has consented to specific purposes
 	 * and returns a boolean indicating whether the content can be shown.
 	 *
 	 * @example

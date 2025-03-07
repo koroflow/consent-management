@@ -4,7 +4,7 @@ import { z } from 'zod';
  * Zod schema for validating consent withdrawal entities.
  *
  * This defines the structure and validation rules for withdrawal records:
- * - Required fields: consentId, userId
+ * - Required fields: consentId, subjectId
  * - Optional fields: withdrawalReason, withdrawalMethod, ipAddress, metadata
  * - Default current date/time for creation and update timestamps
  *
@@ -13,9 +13,9 @@ import { z } from 'zod';
  * const withdrawalData = {
  *   id: '123e4567-e89b-12d3-a456-426614174000',
  *   consentId: 'consent-123',
- *   userId: 'user-456',
+ *   subjectId: 'subject-456',
  *   withdrawalReason: 'No longer wish to receive marketing emails',
- *   withdrawalMethod: 'user-initiated',
+ *   withdrawalMethod: 'subject-initiated',
  *   ipAddress: '192.168.1.1'
  * };
  *
@@ -26,11 +26,11 @@ import { z } from 'zod';
 export const withdrawalSchema = z.object({
 	id: z.string(),
 	consentId: z.string(),
-	userId: z.string(),
+	subjectId: z.string(),
 	withdrawalReason: z.string().optional(),
 	withdrawalMethod: z
-		.enum(['user-initiated', 'automatic-expiry', 'admin', 'api', 'other'])
-		.default('user-initiated'),
+		.enum(['subject-initiated', 'automatic-expiry', 'admin', 'api', 'other'])
+		.default('subject-initiated'),
 	ipAddress: z.string().optional(),
 	userAgent: z.string().optional(),
 	metadata: z.record(z.unknown()).optional(),

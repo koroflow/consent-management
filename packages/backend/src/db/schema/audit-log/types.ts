@@ -17,7 +17,7 @@ export interface AuditLogEntityConfig extends BaseEntityConfig {
 		id?: string;
 		timestamp: string;
 		action: string;
-		userId?: string;
+		subjectId?: string;
 		resourceType: string;
 		resourceId?: string;
 		actor?: string;

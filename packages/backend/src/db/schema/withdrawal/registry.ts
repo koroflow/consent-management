@@ -25,9 +25,9 @@ import type { Withdrawal } from './schema';
  * // Create a new withdrawal record
  * const withdrawal = await withdrawalAdapter.createWithdrawal({
  *   consentId: 'consent-123',
- *   userId: 'user-456',
+ *   subjectId: 'subject-456',
  *   withdrawalReason: 'No longer wish to receive marketing emails',
- *   withdrawalMethod: 'user-initiated'
+ *   withdrawalMethod: 'subject-initiated'
  * });
  * ```
  */
@@ -71,22 +71,22 @@ export function withdrawalRegistry({ adapter, ...ctx }: RegistryContext) {
 		 * Finds all withdrawal records matching specified filters.
 		 * Returns withdrawals with processed output fields according to the schema configuration.
 		 *
-		 * @param userId - Optional user ID to filter withdrawals
+		 * @param subjectId - Optional subject ID to filter withdrawals
 		 * @param consentId - Optional consent ID to filter withdrawals
 		 * @param limit - Optional maximum number of records to return
 		 * @returns Array of withdrawal records matching the criteria
 		 */
 		findWithdrawals: async (
-			userId?: string,
+			subjectId?: string,
 			consentId?: string,
 			limit?: number
 		) => {
 			const whereConditions: Where<'withdrawal'> = [];
 
-			if (userId) {
+			if (subjectId) {
 				whereConditions.push({
-					field: 'userId',
-					value: userId,
+					field: 'subjectId',
+					value: subjectId,
 				});
 			}
 
@@ -135,20 +135,20 @@ export function withdrawalRegistry({ adapter, ...ctx }: RegistryContext) {
 		},
 
 		/**
-		 * Finds all withdrawal records for a specific user.
+		 * Finds all withdrawal records for a specific subject.
 		 * Returns withdrawals with processed output fields according to the schema configuration.
 		 *
-		 * @param userId - The user ID to find withdrawals for
+		 * @param subjectId - The subject ID to find withdrawals for
 		 * @param limit - Optional maximum number of records to return
-		 * @returns Array of withdrawal records associated with the user
+		 * @returns Array of withdrawal records associated with the subject
 		 */
-		findWithdrawalsByUserId: async (userId: string, limit?: number) => {
+		findWithdrawalsByUserId: async (subjectId: string, limit?: number) => {
 			const withdrawals = await adapter.findMany({
 				model: 'withdrawal',
 				where: [
 					{
-						field: 'userId',
-						value: userId,
+						field: 'subjectId',
+						value: subjectId,
 					},
 				],
 				sortBy: {

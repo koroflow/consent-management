@@ -9,8 +9,8 @@ import {
 	policyRegistry,
 	purposeJunctionRegistry,
 	purposeRegistry,
-	recordRegistry,
-	userRegistry,
+	consentRecordRegistry,
+	subjectRegistry,
 	withdrawalRegistry,
 } from './schema/index';
 
@@ -24,8 +24,8 @@ export const createRegistry = (ctx: RegistryContext) => {
 		...purposeJunctionRegistry(ctx),
 		...purposeRegistry(ctx),
 		...policyRegistry(ctx),
-		...recordRegistry(ctx),
-		...userRegistry(ctx),
+		...consentRecordRegistry(ctx),
+		...subjectRegistry(ctx),
 		...withdrawalRegistry(ctx),
 	};
 };

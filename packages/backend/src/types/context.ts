@@ -173,7 +173,7 @@ export interface BaseC15TContext {
 	ipAddress?: string | null;
 
 	/**
-	 * User agent of the client
+	 * Subject agent of the client
 	 */
 	userAgent?: string | null;
 }

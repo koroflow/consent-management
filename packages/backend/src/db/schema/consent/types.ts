@@ -24,7 +24,7 @@ export interface ConsentEntityConfig extends BaseEntityConfig {
 
 	fields?: Record<string, string> & {
 		id?: string;
-		userId?: string;
+		subjectId?: string;
 		domainId?: string;
 		purposeIds?: string;
 		metadata?: string;

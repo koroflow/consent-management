@@ -223,7 +223,7 @@ export interface C15TPlugin {
 	 * @example
 	 * ```ts
 	 * schema: {
-	 * 	user: {
+	 * 	subject: {
 	 * 		fields: {
 	 * 			email: {
 	 * 				 type: "string",
@@ -427,7 +427,7 @@ export interface AnalyticsPlugin extends C15TPlugin {
 		trackingEvents: string[];
 
 		/**
-		 * Whether to anonymize user data
+		 * Whether to anonymize subject data
 		 */
 		anonymizeData?: boolean;
 	};

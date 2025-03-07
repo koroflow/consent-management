@@ -26,7 +26,7 @@ export function getWithdrawalTable(
 ) {
 	const withdrawalConfig = options.tables?.withdrawal;
 	const consentConfig = options.tables?.consent;
-	const userConfig = options.tables?.user;
+	const userConfig = options.tables?.subject;
 
 	return {
 		/**
@@ -63,14 +63,14 @@ export function getWithdrawalTable(
 			},
 
 			/**
-			 * Reference to the user who withdrew consent
+			 * Reference to the subject who withdrew consent
 			 */
-			userId: {
+			subjectId: {
 				type: 'string',
 				required: true,
-				fieldName: withdrawalConfig?.fields?.userId || 'userId',
+				fieldName: withdrawalConfig?.fields?.subjectId || 'subjectId',
 				references: {
-					model: userConfig?.entityName || 'user',
+					model: userConfig?.entityName || 'subject',
 					field: 'id',
 				},
 			},
@@ -87,11 +87,11 @@ export function getWithdrawalTable(
 
 			/**
 			 * Method by which consent was withdrawn
-			 * Common values: 'user-initiated', 'automatic-expiry', 'admin'
+			 * Common values: 'subject-initiated', 'automatic-expiry', 'admin'
 			 */
 			withdrawalMethod: {
 				type: 'string',
-				defaultValue: () => 'user-initiated',
+				defaultValue: () => 'subject-initiated',
 				required: true,
 				fieldName:
 					withdrawalConfig?.fields?.withdrawalMethod || 'withdrawalMethod',
@@ -107,7 +107,7 @@ export function getWithdrawalTable(
 			},
 
 			/**
-			 * User agent (browser/device) from which the withdrawal was initiated
+			 * Subject agent (browser/device) from which the withdrawal was initiated
 			 */
 			userAgent: {
 				type: 'string',
@@ -162,7 +162,7 @@ export function getWithdrawalTable(
 		indexes: [
 			{
 				name: 'user_id_index',
-				fields: ['userId'],
+				fields: ['subjectId'],
 			},
 			{
 				name: 'created_at_index',
@@ -172,7 +172,7 @@ export function getWithdrawalTable(
 
 		/**
 		 * Execution order during migrations (lower numbers run first)
-		 * Withdrawal table needs to be created after the consent and user tables it references
+		 * Withdrawal table needs to be created after the consent and subject tables it references
 		 */
 		order: 7,
 	};

@@ -23,8 +23,8 @@ import { applyDefaultValue } from '../utils';
  * ```typescript
  * const db: MemoryDB = {
  *   consent: [
- *     { id: '1', userId: 'user123', purposeId: 'marketing', allowed: true },
- *     { id: '2', userId: 'user456', purposeId: 'analytics', allowed: false }
+ *     { id: '1', subjectId: 'user123', purposeId: 'marketing', allowed: true },
+ *     { id: '2', subjectId: 'user456', purposeId: 'analytics', allowed: false }
  *   ],
  *   purpose: [
  *     { id: 'marketing', name: 'Marketing', description: 'For sending promotional materials' }
@@ -48,7 +48,7 @@ export interface MemoryDB {
  * ```typescript
  * // Simple equality condition
  * const whereCondition: WhereCondition<'consent'> = {
- *   field: 'userId',
+ *   field: 'subjectId',
  *   value: 'user123'
  * };
  *
@@ -101,10 +101,10 @@ interface WhereCondition<EntityType extends EntityName> {
 	 *
 	 * @example
 	 * ```typescript
-	 * // Match records where purposeId is 'marketing' OR userId is 'user123'
+	 * // Match records where purposeId is 'marketing' OR subjectId is 'user123'
 	 * const where = [
 	 *   { field: 'purposeId', value: 'marketing' },
-	 *   { field: 'userId', value: 'user123', connector: 'OR' }
+	 *   { field: 'subjectId', value: 'user123', connector: 'OR' }
 	 * ];
 	 * ```
 	 */

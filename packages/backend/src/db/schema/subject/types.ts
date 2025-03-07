@@ -1,13 +1,13 @@
 /**
- * User Entity Type Definitions
+ * Subject Entity Type Definitions
  *
- * This module contains type definitions specific to the user entity.
+ * This module contains type definitions specific to the subject entity.
  */
 import type { TimestampedEntityConfig } from '../types';
 
 /**
- * User entity configuration
- * @default entityName: "user", entityPrefix: "usr"
+ * Subject entity configuration
+ * @default entityName: "subject", entityPrefix: "usr"
  */
 export interface UserEntityConfig extends TimestampedEntityConfig {
 	fields?: Record<string, string> & {

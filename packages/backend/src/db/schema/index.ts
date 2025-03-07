@@ -8,7 +8,7 @@
  * @remarks
  * The Schema Module is organized into three main components:
  *
- * 1. Table Definitions - Individual table schemas (user, consent, purpose, etc.)
+ * 1. Table Definitions - Individual table schemas (subject, consent, purpose, etc.)
  * 2. Schema Utilities - Functions for retrieving and working with the complete schema
  * 3. Data Parsing - Validation and transformation of input/output data
  *
@@ -26,10 +26,10 @@
  * // Get the complete schema
  * const tables = getConsentTables(options);
  *
- * // Validate input data against the user table schema
+ * // Validate input data against the subject table schema
  * const validUserData = parseInputData(
  *   inputData,
- *   { fields: tables.user.fields }
+ *   { fields: tables.subject.fields }
  * );
  * ```
  */
@@ -49,8 +49,8 @@ export * from './consent-policy';
 export * from './domain';
 export * from './purpose';
 export * from './purpose-junction';
-export * from './record';
-export * from './user';
+export * from './consent-record';
+export * from './subject';
 export * from './withdrawal';
 
 // Schema Type Exports

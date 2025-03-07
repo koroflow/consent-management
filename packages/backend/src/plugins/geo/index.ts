@@ -2,7 +2,7 @@
 //  * Geo Plugin for c15t
 //  *
 //  * This plugin provides geolocation detection and jurisdiction-based consent management.
-//  * It identifies users' locations based on their IP addresses and applies appropriate
+//  * It identifies subjects' locations based on their IP addresses and applies appropriate
 //  * jurisdiction-specific consent rules based on their geography.
 //  *
 //  * Features:
@@ -43,9 +43,9 @@
 //  *   plugins: [geoClient()]
 //  * });
 //  *
-//  * // Get the user's jurisdiction
+//  * // Get the subject's jurisdiction
 //  * const { jurisdiction, country } = await client.geo.getJurisdiction();
-//  * console.log(`User is in ${country} under ${jurisdiction} jurisdiction`);
+//  * console.log(`Subject is in ${country} under ${jurisdiction} jurisdiction`);
 //  * ```
 //  */
 
@@ -142,7 +142,7 @@
 
 // 		/**
 // 		 * Consent purposes that must always be accepted in this jurisdiction
-// 		 * These will be automatically set to true regardless of user choice
+// 		 * These will be automatically set to true regardless of subject choice
 // 		 */
 // 		requiredPurposes?: string[];
 
@@ -189,7 +189,7 @@
 //  * Creates a geo plugin instance for c15t
 //  *
 //  * This plugin adds geolocation capabilities to the consent management system,
-//  * allowing for jurisdiction-specific consent rules based on user location.
+//  * allowing for jurisdiction-specific consent rules based on subject location.
 //  *
 //  * @param options - Configuration options for the geo plugin
 //  * @returns A configured geo plugin instance
@@ -322,10 +322,10 @@
 
 // 		endpoints: {
 // 			/**
-// 			 * Endpoint that returns the detected jurisdiction for the current user
+// 			 * Endpoint that returns the detected jurisdiction for the current subject
 // 			 *
 // 			 * This endpoint uses geolocation to determine which jurisdiction's rules
-// 			 * should apply to the current user, based on their country and region.
+// 			 * should apply to the current subject, based on their country and region.
 // 			 *
 // 			 * @example
 // 			 * GET /geo/jurisdiction
@@ -395,7 +395,7 @@
 // 			),
 
 // 			/**
-// 			 * Endpoint that returns geolocation information for the current user
+// 			 * Endpoint that returns geolocation information for the current subject
 // 			 *
 // 			 * This endpoint provides raw geolocation data, including IP address
 // 			 * and detected country/region.
@@ -452,7 +452,7 @@
 // 					/**
 // 					 * Hook handler that applies jurisdiction-specific consent rules
 // 					 *
-// 					 * This enforces required consent purposes based on the user's jurisdiction.
+// 					 * This enforces required consent purposes based on the subject's jurisdiction.
 // 					 * For example, in GDPR regions, essential cookies would be required.
 // 					 *
 // 					 * @param ctx - Request context
@@ -515,7 +515,7 @@
 //  * Creates a client-side geo plugin
 //  *
 //  * This plugin adds geolocation methods to the c15t client instance,
-//  * allowing client-side code to access user location and jurisdiction information.
+//  * allowing client-side code to access subject location and jurisdiction information.
 //  *
 //  * @example
 //  * ```typescript
@@ -537,7 +537,7 @@
 // 		id: 'geo',
 // 		methods: {
 // 			/**
-// 			 * Gets the detected jurisdiction for the current user
+// 			 * Gets the detected jurisdiction for the current subject
 // 			 *
 // 			 * @returns Promise resolving to jurisdiction information
 // 			 */
@@ -548,7 +548,7 @@
 // 			},
 
 // 			/**
-// 			 * Gets geolocation information for the current user
+// 			 * Gets geolocation information for the current subject
 // 			 *
 // 			 * @returns Promise resolving to location data
 // 			 */

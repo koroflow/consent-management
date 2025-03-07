@@ -31,14 +31,14 @@ export type LiteralString = '' | (string & Record<never, never>);
  *
  * @example
  * ```ts
- * interface User {
+ * interface Subject {
  *   id: number;
  *   name: string;
  *   email?: string;
  * }
  *
- * // RequiredKeysOf<User> will be 'id' | 'name'
- * type RequiredUserFields = RequiredKeysOf<User>;
+ * // RequiredKeysOf<Subject> will be 'id' | 'name'
+ * type RequiredUserFields = RequiredKeysOf<Subject>;
  * ```
  */
 export type RequiredKeysOf<BaseType extends object> = Exclude<
@@ -60,7 +60,7 @@ export type RequiredKeysOf<BaseType extends object> = Exclude<
  *
  * @example
  * ```ts
- * interface User {
+ * interface Subject {
  *   id: number;
  *   name: string;
  *   settings: {
@@ -70,7 +70,7 @@ export type RequiredKeysOf<BaseType extends object> = Exclude<
  * }
  *
  * // All properties including nested ones are optional
- * const partialUser: DeepPartial<User> = {
+ * const partialUser: DeepPartial<Subject> = {
  *   name: 'John',
  *   settings: {
  *     theme: 'dark'

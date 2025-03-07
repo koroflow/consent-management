@@ -39,8 +39,8 @@ export type EntityName = keyof C15TDBSchema;
  *
  * @example
  * ```typescript
- * // Define input for creating a user
- * const userInput: EntityInput<'user'> = {
+ * // Define input for creating a subject
+ * const userInput: EntityInput<'subject'> = {
  *   name: 'John Doe',
  *   email: 'john@example.com'
  * };
@@ -59,8 +59,8 @@ export type EntityInput<TEntity extends EntityName> = Partial<
  *
  * @example
  * ```typescript
- * // Type for a user retrieved from the database
- * const user: EntityOutput<'user'> = {
+ * // Type for a subject retrieved from the database
+ * const subject: EntityOutput<'subject'> = {
  *   id: '123',
  *   name: 'John Doe',
  *   email: 'john@example.com',

@@ -21,8 +21,8 @@ import type { EntityTypeMap } from '~/db/core/types';
  * // type safety for database operations
  * const query = db
  *   .selectFrom('consent')  // Type-safe table name
- *   .select(['id', 'userId', 'purposeId']) // Type-safe column names
- *   .where('userId', '=', userId)
+ *   .select(['id', 'subjectId', 'purposeId']) // Type-safe column names
+ *   .where('subjectId', '=', subjectId)
  *   .executeTakeFirst();
  * ```
  */
@@ -80,7 +80,7 @@ export type KyselyDatabaseType = 'postgres' | 'mysql' | 'sqlite' | 'mssql';
  * const pool: PostgresPoolConfig = new Pool({
  *   host: 'localhost',
  *   database: 'consent_db',
- *   user: 'postgres',
+ *   subject: 'postgres',
  *   password: 'password'
  * });
  * ```
@@ -101,7 +101,7 @@ export type PostgresPoolConfig = PostgresPool;
  * // Create a MySQL connection pool
  * const pool: MysqlPoolConfig = mysql.createPool({
  *   host: 'localhost',
- *   user: 'user',
+ *   subject: 'subject',
  *   database: 'consent_db',
  *   password: 'password',
  *   waitForConnections: true,

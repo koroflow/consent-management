@@ -221,7 +221,7 @@ export class c15tClient {
 	// /**
 	//  * Retrieves the current consent preferences.
 	//  *
-	//  * This method fetches the current consent settings for the user,
+	//  * This method fetches the current consent settings for the subject,
 	//  * including which purposes they have consented to and when the
 	//  * consent was last updated.
 	//  *
@@ -230,7 +230,7 @@ export class c15tClient {
 	//  * const { data, error } = await client.getConsent();
 	//  *
 	//  * if (data) {
-	//  *   console.log('User consented to analytics:', data.preferences.analytics);
+	//  *   console.log('Subject consented to analytics:', data.preferences.analytics);
 	//  *   console.log('Consent last updated:', data.updatedAt);
 	//  * }
 	//  * ```
@@ -266,7 +266,7 @@ export class c15tClient {
 	 * }
 	 *
 	 * if (data) {
-	 *   // Display available consent purposes to the user
+	 *   // Display available consent purposes to the subject
 	 *   data.forEach(purpose => {
 	 *     console.log(`${purpose.name}: ${purpose.description}`);
 	 *     console.log(`Required: ${purpose.required}`);
@@ -287,9 +287,9 @@ export class c15tClient {
 	}
 
 	// /**
-	//  * Updates the user's consent preferences.
+	//  * Updates the subject's consent preferences.
 	//  *
-	//  * This method sends the user's updated consent choices to the server,
+	//  * This method sends the subject's updated consent choices to the server,
 	//  * recording which purposes they have agreed to and which they have declined.
 	//  *
 	//  * @example
@@ -329,9 +329,9 @@ export class c15tClient {
 	//  *
 	//  * @example
 	//  * ```typescript
-	//  * // Get consent history for a specific user
+	//  * // Get consent history for a specific subject
 	//  * const { data } = await client.getConsentHistory({
-	//  *   userId: '123',
+	//  *   subjectId: '123',
 	//  *   limit: 10
 	//  * });
 	//  *
@@ -350,7 +350,7 @@ export class c15tClient {
 	// async getConsentHistory(
 	// 	query?: {
 	// 		recordId?: string;
-	// 		userId?: string;
+	// 		subjectId?: string;
 	// 		deviceId?: string;
 	// 		limit?: number;
 	// 		offset?: number;
@@ -429,7 +429,7 @@ export class c15tClient {
  *   baseURL: 'https://api.example.com/consent',
  *   headers: {
  *     'X-API-Key': process.env.API_KEY,
- *     'User-Agent': 'MyConsentApp/1.0'
+ *     'Subject-Agent': 'MyConsentApp/1.0'
  *   },
  *   fetchOptions: {
  *     // Optional custom fetch implementation
@@ -447,7 +447,7 @@ export class c15tClient {
  *     return;
  *   }
  *
- *   // Display purposes to user and collect their choices
+ *   // Display purposes to subject and collect their choices
  *   // ...
  *
  *   // Then update their consent

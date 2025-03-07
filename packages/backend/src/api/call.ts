@@ -52,27 +52,27 @@ export const optionsMiddleware = createMiddleware(async () => {
  * ```typescript
  * // Create a custom authentication middleware
  * const verifyUserMiddleware = createAuthMiddleware(async (context) => {
- *   const { userId } = context.params;
+ *   const { subjectId } = context.params;
  *
- *   // Verify the user exists
- *   const user = await getUserById(userId);
- *   if (!user) {
+ *   // Verify the subject exists
+ *   const subject = await getUserById(subjectId);
+ *   if (!subject) {
  *     throw new APIError({
- *       message: 'User not found',
+ *       message: 'Subject not found',
  *       status: 'NOT_FOUND'
  *     });
  *   }
  *
- *   // Add user to context
+ *   // Add subject to context
  *   return {
  *     context: {
- *       user
+ *       subject
  *     }
  *   };
  * });
  *
  * // Apply the middleware to specific routes in router configuration
- * router.use('/users/**', verifyUserMiddleware);
+ * router.use('/subjects/**', verifyUserMiddleware);
  * ```
  */
 export const createAuthMiddleware = createMiddleware.create({
@@ -111,13 +111,13 @@ export const createAuthMiddleware = createMiddleware.create({
  * ```typescript
  * // Create a consent status endpoint
  * export const getConsentStatus = createAuthEndpoint(async (context) => {
- *   const { userId, domain } = context.params;
+ *   const { subjectId, domain } = context.params;
  *
  *   // Get consent status from storage
- *   const status = await context.context.storage.getConsentStatus(userId, domain);
+ *   const status = await context.context.storage.getConsentStatus(subjectId, domain);
  *
  *   return {
- *     userId,
+ *     subjectId,
  *     domain,
  *     hasConsented: status.consented,
  *     purposes: status.purposes,
@@ -127,17 +127,17 @@ export const createAuthMiddleware = createMiddleware.create({
  *
  * // Create a consent update endpoint with error handling
  * export const updateConsent = createAuthEndpoint(async (context) => {
- *   const { userId, domain, purposes } = context.params;
+ *   const { subjectId, domain, purposes } = context.params;
  *
  *   try {
  *     // Update consent status in storage
- *     await context.context.storage.updateConsentStatus(userId, domain, {
+ *     await context.context.storage.updateConsentStatus(subjectId, domain, {
  *       consented: true,
  *       purposes,
  *       timestamp: new Date().toISOString()
  *     });
  *
- *     return { success: true, userId, domain };
+ *     return { success: true, subjectId, domain };
  *   } catch (error) {
  *     throw new APIError({
  *       message: 'Failed to update consent status',

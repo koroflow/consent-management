@@ -39,12 +39,12 @@ import type { LocationInfo } from './compliance';
  *
  * Banner interaction callbacks:
  * - `onBannerShown`: Consent banner has been displayed
- * - `onBannerClosed`: User has closed the consent banner
+ * - `onBannerClosed`: Subject has closed the consent banner
  *
  * Consent decision callbacks:
- * - `onConsentGiven`: User has granted consent
- * - `onConsentRejected`: User has rejected consent
- * - `onPreferenceExpressed`: User has made their preferences known
+ * - `onConsentGiven`: Subject has granted consent
+ * - `onConsentRejected`: Subject has rejected consent
+ * - `onPreferenceExpressed`: Subject has made their preferences known
  *
  * @example
  * Basic usage with TypeScript:

@@ -21,7 +21,7 @@ import { createLogger } from '~/utils/logger';
  * @example
  * ```typescript
  * const adapter = await getAdapter(config);
- * const users = await adapter.findMany('user', { where: { active: true } });
+ * const subjects = await adapter.findMany('subject', { where: { active: true } });
  * ```
  */
 export async function getAdapter(options: C15TOptions) {

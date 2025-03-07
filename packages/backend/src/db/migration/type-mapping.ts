@@ -107,7 +107,7 @@ const map = {
  * getMySqlStringType({ type: 'string', unique: true });
  *
  * // Returns 'varchar(36)' for reference fields
- * getMySqlStringType({ type: 'string', references: 'users' });
+ * getMySqlStringType({ type: 'string', references: 'subjects' });
  *
  * // Returns 'text' for regular string fields
  * getMySqlStringType({ type: 'string' });

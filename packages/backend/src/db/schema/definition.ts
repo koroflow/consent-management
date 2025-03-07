@@ -10,7 +10,7 @@ import {
 	getPurposeJunctionTable,
 	getPurposeTable,
 	// getGeoLocationTable,
-	getRecordTable,
+	getConsentRecordTable,
 	getUserTable,
 	getWithdrawalTable,
 } from './index';
@@ -60,7 +60,7 @@ export const getConsentTables = (options: C15TOptions) => {
 	}, {} as PluginSchema);
 
 	const {
-		user,
+		subject,
 		purpose,
 		consentPolicy,
 		domain,
@@ -75,13 +75,13 @@ export const getConsentTables = (options: C15TOptions) => {
 	} = pluginSchema || {};
 
 	return {
-		user: getUserTable(options, user?.fields),
+		subject: getUserTable(options, subject?.fields),
 		purpose: getPurposeTable(options, purpose?.fields),
 		consentPolicy: getConsentPolicyTable(options, consentPolicy?.fields),
 		domain: getDomainTable(options, domain?.fields),
 		consent: getConsentTable(options, consent?.fields),
 		purposeJunction: getPurposeJunctionTable(options, purposeJunction?.fields),
-		record: getRecordTable(options, record?.fields),
+		record: getConsentRecordTable(options, record?.fields),
 		consentGeoLocation: getConsentGeoLocationTable(
 			options,
 			consentGeoLocation?.fields
@@ -161,12 +161,12 @@ export type EntityInputFields<TableName extends keyof C15TDBSchema> = Omit<
  * // Validate data retrieved from an external API
  * try {
  *   const validUserOutput = validateEntityOutput(
- *     'user',
+ *     'subject',
  *     fetchedUserData,
  *     options
  *   );
  *
- *   // validUserOutput is now typed as EntityOutputFields<'user'>
+ *   // validUserOutput is now typed as EntityOutputFields<'subject'>
  *   displayUserProfile(validUserOutput);
  * } catch (error) {
  *   console.error('Output validation failed:', error.message);

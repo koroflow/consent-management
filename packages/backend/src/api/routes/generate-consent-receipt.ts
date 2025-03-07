@@ -1,6 +1,6 @@
 import crypto from 'node:crypto';
 import { z } from 'zod';
-import type { inferRecord as RecordType } from '~/db/schema/record/schema';
+import type { ConsentRecord } from '~/db/schema/consent-record/schema';
 import { BASE_ERROR_CODES, C15TError } from '~/error';
 import type { C15TContext } from '../../types';
 import { createAuthEndpoint } from '../call';
@@ -77,11 +77,11 @@ export const generateConsentReceipt = createAuthEndpoint(
 			//@ts-expect-error
 			const record = consentResult.consent;
 			//@ts-expect-error
-			const userRecord = consentResult.user;
+			const userRecord = consentResult.subject;
 
 			if (!userRecord) {
 				throw new C15TError(
-					'The user associated with this consent record could not be found. Please verify the user exists and is correctly linked.',
+					'The subject associated with this consent record could not be found. Please verify the subject exists and is correctly linked.',
 					{
 						code: BASE_ERROR_CODES.NOT_FOUND,
 						status: 404,
@@ -93,7 +93,7 @@ export const generateConsentReceipt = createAuthEndpoint(
 			}
 
 			// Get consent records related to this consent
-			let records: RecordType[] = [];
+			let records: ConsentRecord[] = [];
 
 			try {
 				if (registry.getRecords) {

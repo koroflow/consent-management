@@ -93,7 +93,7 @@ export type ComplianceSettings = {
 };
 
 /**
- * User privacy preference configuration.
+ * Subject privacy preference configuration.
  *
  * @remarks
  * Contains settings that affect how user privacy preferences are handled:
@@ -140,13 +140,13 @@ export type PrivacySettings = {
  *
  * @example
  * ```typescript
- * // User accepted all cookies
+ * // Subject accepted all cookies
  * const fullConsent: HasConsentedProps = {
  *   time: Date.now(),
  *   type: 'all'
  * };
  *
- * // User customized their consent
+ * // Subject customized their consent
  * const customConsent: HasConsentedProps = {
  *   time: Date.now(),
  *   type: 'custom'

@@ -12,7 +12,7 @@ import type { BaseEntityConfig } from '../types';
 export interface RecordEntityConfig extends BaseEntityConfig {
 	fields?: Record<string, string> & {
 		id?: string;
-		userId?: string;
+		subjectId?: string;
 		consentId?: string;
 		actionType?: string;
 		details?: string;

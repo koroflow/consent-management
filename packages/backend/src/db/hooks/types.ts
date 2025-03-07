@@ -48,7 +48,7 @@ export type HookResult<TData> =
  *
  * @example
  * ```typescript
- * const userHook: ModelHook<'user'> = {
+ * const userHook: ModelHook<'subject'> = {
  *   create: {
  *     before: (userData) => ({
  *       kind: 'transform',

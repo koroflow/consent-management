@@ -397,7 +397,7 @@ const createEntityTransformer = (
  * const configWithSchema: DrizzleAdapterConfig = {
  *   provider: 'mysql',
  *   schema: {
- *     users: users, // Drizzle schema objects
+ *     subjects: subjects, // Drizzle schema objects
  *     consents: consents,
  *     purposes: purposes
  *   }
@@ -424,7 +424,7 @@ export interface DrizzleAdapterConfig {
 	/**
 	 * If the table names in the schema are plural
 	 * set this to true. For example, if the schema
-	 * has an object with a key "users" instead of "user"
+	 * has an object with a key "subjects" instead of "subject"
 	 *
 	 * @default false
 	 */
@@ -482,7 +482,7 @@ function checkMissingFields(
  * import { c15tInstance } from '@c15t/backend';
  *
  * // Create a Postgres connection
- * const connection = postgres('postgresql://user:password@localhost:5432/db');
+ * const connection = postgres('postgresql://subject:password@localhost:5432/db');
  * const db = drizzle(connection, { schema });
  *
  * // Create the C15T instance with Drizzle adapter
@@ -509,7 +509,7 @@ function checkMissingFields(
  *
  * const connection = await mysql.createConnection({
  *   host: 'localhost',
- *   user: 'root',
+ *   subject: 'root',
  *   database: 'c15t'
  * });
  *

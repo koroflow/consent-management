@@ -89,7 +89,7 @@ function getDatabaseType(
  * const pool = new Pool({
  *   host: 'localhost',
  *   database: 'consent_db',
- *   user: 'postgres',
+ *   subject: 'postgres',
  *   password: 'password'
  * });
  *
@@ -115,7 +115,7 @@ function getDatabaseType(
  * const pool = new Pool({
  *   host: 'localhost',
  *   database: 'consent_db',
- *   user: 'postgres',
+ *   subject: 'postgres',
  *   password: 'password'
  * });
  *

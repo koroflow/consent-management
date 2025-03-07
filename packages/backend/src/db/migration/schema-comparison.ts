@@ -158,10 +158,10 @@ function handleNewTable(
  * @example
  * ```typescript
  * // This might produce logs like:
- * // "Field userId in table users has a different type in the database. Expected string but got varchar."
+ * // "Field subjectId in table subjects has a different type in the database. Expected string but got varchar."
  * handleExistingTable(
- *   'users',
- *   { fields: { userId: { type: 'string', required: true } }, order: 1 },
+ *   'subjects',
+ *   { fields: { subjectId: { type: 'string', required: true } }, order: 1 },
  *   dbTable,
  *   columnsToAdd,
  *   'postgres',

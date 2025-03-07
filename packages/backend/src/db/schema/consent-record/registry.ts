@@ -2,7 +2,7 @@ import type { Where } from '~/db/adapters/types';
 import { getWithHooks } from '~/db/hooks';
 import type { GenericEndpointContext, RegistryContext } from '~/types';
 import { validateEntityOutput } from '../definition';
-import type { inferRecord as Record } from './schema';
+import type { ConsentRecord } from './schema';
 
 /**
  * Creates and returns a set of consent record-related adapter methods to interact with the database.
@@ -22,15 +22,15 @@ import type { inferRecord as Record } from './schema';
  * );
  *
  * // Create a new consent record
- * const record = await recordAdapter.createRecord({
- *   userId: 'user-123',
+ * const record = await recordAdapter.createConsentRecord({
+ *   subjectId: 'subject-123',
  *   consentId: 'consent-456',
  *   actionType: 'given',
  *   details: { ip: '192.168.1.1', userAgent: 'Mozilla/5.0...' }
  * });
  * ```
  */
-export function recordRegistry({ adapter, ...ctx }: RegistryContext) {
+export function consentRecordRegistry({ adapter, ...ctx }: RegistryContext) {
 	const { createWithHooks } = getWithHooks(adapter, ctx);
 	return {
 		/**
@@ -43,8 +43,8 @@ export function recordRegistry({ adapter, ...ctx }: RegistryContext) {
 		 * @returns The created consent record with all fields populated
 		 * @throws May throw an error if hooks prevent creation or if database operations fail
 		 */
-		createRecord: async (
-			record: Omit<Record, 'id' | 'createdAt' | 'updatedAt'> & Partial<Record>,
+		createConsentRecord: async (
+			record: Omit<ConsentRecord, 'id' | 'createdAt' | 'updatedAt'> & Partial<ConsentRecord>,
 			context?: GenericEndpointContext
 		) => {
 			const createdRecord = await createWithHooks({
@@ -64,31 +64,31 @@ export function recordRegistry({ adapter, ...ctx }: RegistryContext) {
 				);
 			}
 
-			return createdRecord as Record;
+			return createdRecord as ConsentRecord;
 		},
 
 		/**
 		 * Finds all consent records matching specified filters.
 		 * Returns records with processed output fields according to the schema configuration.
 		 *
-		 * @param userId - Optional user ID to filter records
+		 * @param subjectId - Optional subject ID to filter records
 		 * @param consentId - Optional consent ID to filter records
 		 * @param actionType - Optional action type to filter records
 		 * @param limit - Optional maximum number of records to return
 		 * @returns Array of consent records matching the criteria
 		 */
-		findRecords: async (
-			userId?: string,
+		findConsentRecords: async (
+			subjectId?: string,
 			consentId?: string,
 			actionType?: string,
 			limit?: number
 		) => {
 			const whereConditions: Where<'record'> = [];
 
-			if (userId) {
+			if (subjectId) {
 				whereConditions.push({
-					field: 'userId',
-					value: userId,
+					field: 'subjectId',
+					value: subjectId,
 				});
 			}
 
@@ -128,7 +128,7 @@ export function recordRegistry({ adapter, ...ctx }: RegistryContext) {
 		 * @param recordId - The unique identifier of the consent record
 		 * @returns The consent record object if found, null otherwise
 		 */
-		findRecordById: async (recordId: string) => {
+		findConsentRecordById: async (recordId: string) => {
 			const record = await adapter.findOne({
 				model: 'record',
 				where: [
@@ -144,20 +144,20 @@ export function recordRegistry({ adapter, ...ctx }: RegistryContext) {
 		},
 
 		/**
-		 * Finds all consent records for a specific user.
+		 * Finds all consent records for a specific subject.
 		 * Returns records with processed output fields according to the schema configuration.
 		 *
-		 * @param userId - The user ID to find consent records for
+		 * @param subjectId - The subject ID to find consent records for
 		 * @param limit - Optional maximum number of records to return
-		 * @returns Array of consent records associated with the user
+		 * @returns Array of consent records associated with the subject
 		 */
-		findRecordsByUserId: async (userId: string, limit?: number) => {
+		findConsentRecordsBySubjectId: async (subjectId: string, limit?: number) => {
 			const records = await adapter.findMany({
 				model: 'record',
 				where: [
 					{
-						field: 'userId',
-						value: userId,
+						field: 'subjectId',
+						value: subjectId,
 					},
 				],
 				sortBy: {
@@ -179,7 +179,7 @@ export function recordRegistry({ adapter, ...ctx }: RegistryContext) {
 		 * @param limit - Optional maximum number of records to return
 		 * @returns Array of consent records associated with the consent
 		 */
-		findRecordsByConsentId: async (consentId: string, limit?: number) => {
+		findConsentRecordsByConsentId: async (consentId: string, limit?: number) => {
 			const records = await adapter.findMany({
 				model: 'record',
 				where: [

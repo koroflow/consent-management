@@ -27,9 +27,9 @@ import { updateManyWithHooks } from './update-many-hooks';
  *   hooks: c15tOptions.databaseHooks || []
  * });
  *
- * const user = await createWithHooks({
+ * const subject = await createWithHooks({
  *   data: { name: 'Alice' },
- *   model: 'user'
+ *   model: 'subject'
  * });
  * ```
  */
