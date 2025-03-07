@@ -94,12 +94,12 @@ describe('Consent Endpoints', () => {
 				params: undefined,
 				query: undefined,
 				body: createConsentData('privacy_policy', {
-					externalUserId: 'test-subject',
+					externalSubjectId: 'test-subject',
 				}),
 			});
 
 			expectValidConsentResponse(response, 'privacy_policy', {
-				externalUserId: 'test-subject',
+				externalSubjectId: 'test-subject',
 			});
 		});
 
@@ -159,7 +159,7 @@ describe('Consent Endpoints', () => {
 		});
 
 		describe('Subject mapping validation', () => {
-			it('should validate that subjectId and externalUserId map to the same subject', async () => {
+			it('should validate that subjectId and externalSubjectId map to the same subject', async () => {
 				// Create a subject with external ID
 				const subject = await context.registry.createSubject({
 					externalId: 'test-subject',
@@ -178,23 +178,23 @@ describe('Consent Endpoints', () => {
 					query: undefined,
 					body: createConsentData('privacy_policy', {
 						subjectId: subject.id,
-						externalUserId: 'test-subject',
+						externalSubjectId: 'test-subject',
 					}),
 				});
 
 				expectValidConsentResponse(response, 'privacy_policy', {
 					subjectId: subject.id,
-					externalUserId: 'test-subject',
+					externalSubjectId: 'test-subject',
 				});
 
 				// Create another subject with different external ID
-				const otherUser = await context.registry.createSubject({
+				const otherSubject = await context.registry.createSubject({
 					externalId: 'other-subject',
 					isIdentified: true,
 					identityProvider: 'test',
 				});
 
-				if (!otherUser) {
+				if (!otherSubject) {
 					throw new Error('Failed to create other test subject');
 				}
 
@@ -206,7 +206,7 @@ describe('Consent Endpoints', () => {
 						query: undefined,
 						body: createConsentData('privacy_policy', {
 							subjectId: subject.id,
-							externalUserId: 'other-subject',
+							externalSubjectId: 'other-subject',
 						}),
 					})
 				).rejects.toMatchObject({
@@ -224,12 +224,12 @@ describe('Consent Endpoints', () => {
 					params: undefined,
 					query: undefined,
 					body: createConsentData('privacy_policy', {
-						externalUserId: 'non-existent',
+						externalSubjectId: 'non-existent',
 					}),
 				});
 
 				expectValidConsentResponse(response, 'privacy_policy', {
-					externalUserId: 'non-existent',
+					externalSubjectId: 'non-existent',
 				});
 			});
 

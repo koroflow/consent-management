@@ -13,7 +13,7 @@ import { z } from 'zod';
  * @example
  * ```typescript
  * const purposeData = {
- *   id: '123e4567-e89b-12d3-a456-426614174000',
+ *   id: 'pur_e8zyhgozr3im7xj59it',
  *   code: 'marketing',
  *   name: 'Marketing Communications',
  *   description: 'Allow us to send you marketing materials',
@@ -25,7 +25,7 @@ import { z } from 'zod';
  *
  * // Example with missing fields (defaults will be applied)
  * const minimalPurposeData = {
- *   id: '123e4567-e89b-12d3-a456-426614174000',
+ *   id: 'pur_e8zyhgozr3im7xj59it',
  *   code: 'marketing',
  *   name: 'Marketing Communications',
  *   description: 'Allow us to send you marketing materials',

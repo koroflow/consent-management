@@ -80,7 +80,7 @@ export type KyselyDatabaseType = 'postgres' | 'mysql' | 'sqlite' | 'mssql';
  * const pool: PostgresPoolConfig = new Pool({
  *   host: 'localhost',
  *   database: 'consent_db',
- *   subject: 'postgres',
+ *   user: 'postgres',
  *   password: 'password'
  * });
  * ```
@@ -101,7 +101,7 @@ export type PostgresPoolConfig = PostgresPool;
  * // Create a MySQL connection pool
  * const pool: MysqlPoolConfig = mysql.createPool({
  *   host: 'localhost',
- *   subject: 'subject',
+ *   user: 'user',
  *   database: 'consent_db',
  *   password: 'password',
  *   waitForConnections: true,

@@ -11,11 +11,11 @@ import { z } from 'zod';
  * @example
  * ```typescript
  * const auditLogData = {
- *   id: '123e4567-e89b-12d3-a456-426614174000',
+ *   id: 'log_w5qufx2a66m7xkn3ty',
  *   entityType: 'consent',
- *   entityId: 'consent-123',
+ *   entityId: 'cns_hadt8w7nngm7xmx2bn',
  *   actionType: 'update',
- *   subjectId: 'admin-456',
+ *   subjectId: 'sub_x1pftyoufsm7xgo1kv',
  *   changes: { status: { from: 'active', to: 'withdrawn' } }
  * };
  *

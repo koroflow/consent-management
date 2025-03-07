@@ -19,20 +19,18 @@ import type { Field } from '../core/fields';
  * @example
  * ```typescript
  * // Get subject data from database
- * const userData = { id: '123', email: 'subject@example.com', password: 'hash123' };
+ * const subjectData = { id: 'sub_x1pftyoufsm7xgo1kv', };
  *
  * // Define schema with password field marked as not returnable
  * const subjectSchema = {
  *   fields: {
  *     id: { name: 'id', type: 'string', returned: true },
- *     email: { name: 'email', type: 'string', returned: true },
- *     password: { name: 'password', type: 'string', returned: false }
  *   }
  * };
  *
  * // Process the data - password will be excluded
  * const processedData = parseEntityOutputData(userData, subjectSchema);
- * // Result: { id: '123', email: 'subject@example.com' }
+ * // Result: { id: 'sub_x1pftyoufsm7xgo1kv',}
  * ```
  *
  * @remarks

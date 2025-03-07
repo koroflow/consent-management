@@ -12,7 +12,7 @@ import { z } from 'zod';
  * @example
  * ```typescript
  * const domainData = {
- *   id: '123e4567-e89b-12d3-a456-426614174000',
+ *   id: 'dom_x1pftyoufsm7xgo1kv',
  *   name: 'example.com',
  *   description: 'Company website',
  *   allowedOrigins: ['https://app.example.com', 'https://admin.example.com']

@@ -99,27 +99,27 @@ export const verifyConsent = createAuthEndpoint(
 			}
 
 			// Find subject based on provided identifiers
-			let userRecord: EntityOutputFields<'subject'> | null = null;
+			let subjectRecord: EntityOutputFields<'subject'> | null = null;
 			let identifierUsed: string | null = null;
 
 			// Try to find subject by subjectId (most precise)
 			if (params.subjectId) {
-				userRecord = await registry.findUserById(params.subjectId);
-				if (userRecord) {
+				subjectRecord = await registry.findUserById(params.subjectId);
+				if (subjectRecord) {
 					identifierUsed = 'subjectId';
 				}
 			}
 
 			// If not found and externalId provided, try that
-			if (!userRecord && params.externalId) {
-				userRecord = await registry.findUserByExternalId(params.externalId);
-				if (userRecord) {
+			if (!subjectRecord && params.externalId) {
+				subjectRecord = await registry.findUserByExternalId(params.externalId);
+				if (subjectRecord) {
 					identifierUsed = 'externalId';
 				}
 			}
 
 			// If no subject found, return negative verification
-			if (!userRecord) {
+			if (!subjectRecord) {
 				return {
 					success: true,
 					data: {
@@ -137,7 +137,7 @@ export const verifyConsent = createAuthEndpoint(
 
 			// Find active consents for this subject
 			const userConsents = await registry.findConsents({
-				subjectId: userRecord.id,
+				subjectId: subjectRecord.id,
 			});
 
 			// Filter for active consents that match the domain

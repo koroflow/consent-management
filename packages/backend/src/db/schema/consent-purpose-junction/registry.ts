@@ -5,13 +5,13 @@ import { getWithHooks } from '~/db/hooks';
 import { validateEntityOutput } from '../definition';
 
 /**
- * Creates and returns a set of consent-consentPurpose junction adapter methods to interact with the database.
+ * Creates and returns a set of consent-purpose junction adapter methods to interact with the database.
  * These methods provide a consistent interface for creating, finding, and managing
  * relationships between consents and purposes while applying hooks and enforcing data validation rules.
  *
  * @param adapter - The database adapter used for direct database operations
  * @param ctx - The context object containing the database adapter, hooks, and options
- * @returns An object containing type-safe consent-consentPurpose junction operations
+ * @returns An object containing type-safe consent-purpose junction operations
  *
  * @example
  * ```typescript
@@ -24,8 +24,8 @@ import { validateEntityOutput } from '../definition';
  *
  * // Create a new junction record
  * const junction = await junctionAdapter.createConsentPurposeJunction({
- *   consentId: 'consent-123',
- *   purposeId: 'consentPurpose-456',
+ *   consentId: 'cns_hadt8w7nngm7xmx2bn',
+ *   purposeId: 'pol_tioiyf19tbkm7xn5vpx',
  *   status: 'active'
  * });
  * ```
@@ -37,7 +37,7 @@ export function consentPurposeJunctionRegistry({
 	const { createWithHooks, updateWithHooks } = getWithHooks(adapter, ctx);
 	return {
 		/**
-		 * Creates a new consent-consentPurpose junction record in the database.
+		 * Creates a new consent-purpose junction record in the database.
 		 * Automatically sets creation timestamp and applies any
 		 * configured hooks during the creation process.
 		 *
@@ -65,7 +65,7 @@ export function consentPurposeJunctionRegistry({
 
 			if (!createdJunction) {
 				throw new Error(
-					'Failed to create consent-consentPurpose junction - operation returned null'
+					'Failed to create consent-purpose junction - operation returned null'
 				);
 			}
 
@@ -182,7 +182,7 @@ export function consentPurposeJunctionRegistry({
 				return true;
 			} catch (error) {
 				ctx.logger.error(
-					'Error deleting consent-consentPurpose junctions:',
+					'Error deleting consent-purpose junctions:',
 					error
 				);
 				return false;

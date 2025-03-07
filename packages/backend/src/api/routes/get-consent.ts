@@ -99,9 +99,9 @@ export const getConsent = createAuthEndpoint(
 			// biome-ignore lint/style/useDefaultSwitchClause: <explanation>
 			switch (params.identifierType) {
 				case 'subjectId': {
-					const userRecord = await registry.findUserById(params.subjectId);
-					if (userRecord) {
-						subjects = [userRecord];
+					const subjectRecord = await registry.findUserById(params.subjectId);
+					if (subjectRecord) {
+						subjects = [subjectRecord];
 					}
 					break;
 				}

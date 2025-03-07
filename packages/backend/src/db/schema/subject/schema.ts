@@ -11,14 +11,14 @@ import { z } from 'zod';
  *
  * @example
  * ```typescript
- * const userData = {
- *   id: '123e4567-e89b-12d3-a456-426614174000',
+ * const subjectData = {
+ *   id: 'sub_x1pftyoufsm7xgo1kv',
  *   externalId: 'ext-123',
  *   isIdentified: true
  * };
  *
  * // Validate and parse the subject data
- * const validUser = subjectSchema.parse(userData);
+ * const validSubject = subjectSchema.parse(subjectData);
  * ```
  */
 export const subjectSchema = z.object({

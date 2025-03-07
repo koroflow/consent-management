@@ -482,7 +482,7 @@ function checkMissingFields(
  * import { c15tInstance } from '@c15t/backend';
  *
  * // Create a Postgres connection
- * const connection = postgres('postgresql://subject:password@localhost:5432/db');
+ * const connection = postgres('postgresql://user:password@localhost:5432/db');
  * const db = drizzle(connection, { schema });
  *
  * // Create the C15T instance with Drizzle adapter
@@ -509,7 +509,7 @@ function checkMissingFields(
  *
  * const connection = await mysql.createConnection({
  *   host: 'localhost',
- *   subject: 'root',
+ *   user: 'root',
  *   database: 'c15t'
  * });
  *

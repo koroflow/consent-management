@@ -331,7 +331,7 @@ export class c15tClient {
 	//  * ```typescript
 	//  * // Get consent history for a specific subject
 	//  * const { data } = await client.getConsentHistory({
-	//  *   subjectId: '123',
+	//  *   subjectId: 'sub_x1pftyoufsm7xgo1kv',
 	//  *   limit: 10
 	//  * });
 	//  *

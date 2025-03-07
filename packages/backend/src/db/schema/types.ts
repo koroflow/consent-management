@@ -77,7 +77,7 @@ export interface ActiveEntityConfig extends TimestampedEntityConfig {
 export interface TablesConfig {
 	/**
 	 * Subject entity configuration
-	 * @default entityName: "subject", entityPrefix: "usr"
+	 * @default entityName: "subject", entityPrefix: "sub"
 	 */
 	subject?: UserEntityConfig;
 

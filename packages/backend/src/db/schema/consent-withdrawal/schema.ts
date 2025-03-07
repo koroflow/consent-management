@@ -11,9 +11,9 @@ import { z } from 'zod';
  * @example
  * ```typescript
  * const withdrawalData = {
- *   id: '123e4567-e89b-12d3-a456-426614174000',
- *   consentId: 'consent-123',
- *   subjectId: 'subject-456',
+ *   id: 'wdr_w5qufx2a66m7xkn3ty',
+ *   consentId: 'cns_hadt8w7nngm7xmx2bn',
+ *   subjectId: 'sub_x1pftyoufsm7xgo1kv',
  *   withdrawalReason: 'No longer wish to receive marketing emails',
  *   withdrawalMethod: 'subject-initiated',
  *   ipAddress: '192.168.1.1'

@@ -20,7 +20,7 @@ export type ConsentType = z.infer<typeof ConsentType>;
 // Base schema for all consent types
 const baseConsentSchema = z.object({
 	subjectId: z.string().optional(),
-	externalUserId: z.string().optional(),
+	externalSubjectId: z.string().optional(),
 	domain: z.string(),
 	type: ConsentType,
 	metadata: z.record(z.unknown()).optional(),
@@ -113,13 +113,13 @@ export const setConsent = createAuthEndpoint(
 	async (ctx) => {
 		try {
 			const body = setConsentSchema.parse(ctx.body);
-			const { type, subjectId, externalUserId, domain, metadata } = body;
+			const { type, subjectId, externalSubjectId, domain, metadata } = body;
 			const { registry, adapter } = ctx.context as C15TContext;
 
 			// Find or create subject
 			const subject = await registry.findOrcreateSubject({
 				subjectId,
-				externalUserId,
+				externalSubjectId,
 				ipAddress: ctx.context.ipAddress || 'unknown',
 			});
 
@@ -284,7 +284,7 @@ export const setConsent = createAuthEndpoint(
 			return {
 				id: result.consent.id,
 				subjectId: subject.id,
-				externalUserId: subject.externalId ?? undefined,
+				externalSubjectId: subject.externalId ?? undefined,
 				domainId: domainRecord.id,
 				domain: domainRecord.name,
 				type,

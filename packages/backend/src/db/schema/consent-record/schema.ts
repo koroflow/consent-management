@@ -11,9 +11,9 @@ import { z } from 'zod';
  * @example
  * ```typescript
  * const recordData = {
- *   id: '123e4567-e89b-12d3-a456-426614174000',
- *   subjectId: 'subject-123',
- *   consentId: 'consent-456',
+ *   id: 'rec_w5qufx2a66m7xkn3ty',
+ *   subjectId: 'sub_x1pftyoufsm7xgo1kv',
+ *   consentId: 'cns_hadt8w7nngm7xmx2bn',
  *   actionType: 'given',
  *   details: { ip: '192.168.1.1', userAgent: 'Mozilla/5.0...' }
  * };

@@ -77,9 +77,9 @@ export const generateConsentReceipt = createAuthEndpoint(
 			//@ts-expect-error
 			const record = consentResult.consent;
 			//@ts-expect-error
-			const userRecord = consentResult.subject;
+			const subjectRecord = consentResult.subject;
 
-			if (!userRecord) {
+			if (!subjectRecord) {
 				throw new C15TError(
 					'The subject associated with this consent record could not be found. Please verify the subject exists and is correctly linked.',
 					{
@@ -171,7 +171,7 @@ export const generateConsentReceipt = createAuthEndpoint(
 				consentReceiptID: receiptId,
 				publicKey: process.env.CONSENT_RECEIPT_PUBLIC_KEY || 'not-configured',
 				subject: {
-					id: userRecord.id,
+					id: subjectRecord.id,
 					idType: 'UUID',
 				},
 				dataController: {

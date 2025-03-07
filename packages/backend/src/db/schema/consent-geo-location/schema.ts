@@ -11,8 +11,8 @@ import { z } from 'zod';
  * @example
  * ```typescript
  * const geoLocationData = {
- *   id: '123e4567-e89b-12d3-a456-426614174000',
- *   consentId: '234e5678-e89b-12d3-a456-426614174000',
+ *   id: 'cgl_w5qufx2a66m7xkn3ty',
+ *   consentId: 'cns_hadt8w7nngm7xmx2bn',
  *   ip: '192.168.1.1',
  *   country: 'US',
  *   city: 'New York',

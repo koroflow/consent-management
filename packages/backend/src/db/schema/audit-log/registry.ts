@@ -24,9 +24,9 @@ import type { AuditLog } from './schema';
  * // Create a new audit log entry
  * const log = await auditLogAdapter.createAuditLog({
  *   entityType: 'consent',
- *   entityId: 'consent-123',
+ *   entityId: 'cns_hadt8w7nngm7xmx2bn',
  *   actionType: 'update',
- *   subjectId: 'admin-456',
+ *   subjectId: 'sub_x1pftyoufsm7xgo1kv',
  *   changes: { status: { from: 'active', to: 'withdrawn' } }
  * });
  * ```

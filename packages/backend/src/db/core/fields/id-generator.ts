@@ -26,7 +26,7 @@ const b58 = baseX('123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz');
  *
  * @example
  * ```typescript
- * const subjectId = generateId("usr"); // "usr_3hK4G..."
+ * const subjectId = generateId("sub"); // "syb_3hK4G..."
  * const consentId = generateId("cns"); // "cns_5RtX9..."
  * ```
  */

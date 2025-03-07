@@ -3,7 +3,7 @@ import type { C15TOptions } from '~/types';
 import { consentPurposeJunctionSchema } from './schema';
 
 /**
- * Generates the database table configuration for the consent-consentPurpose junction entity.
+ * Generates the database table configuration for the consent-purpose junction entity.
  *
  * This function creates a schema definition that implements a many-to-many relationship
  * between consents and purposes. The resulting schema is used for database migrations,
@@ -46,7 +46,7 @@ export function getPurposeJunctionTable(
 		schema: consentPurposeJunctionSchema,
 
 		/**
-		 * Field definitions for the consent-consentPurpose junction table
+		 * Field definitions for the consent-purpose junction table
 		 */
 		fields: {
 			/**
@@ -76,7 +76,7 @@ export function getPurposeJunctionTable(
 			},
 
 			/**
-			 * Status of this specific consent-consentPurpose relationship
+			 * Status of this specific consent-purpose relationship
 			 * Default: 'active'
 			 */
 			status: {
@@ -87,7 +87,7 @@ export function getPurposeJunctionTable(
 			},
 
 			/**
-			 * Additional metadata about this specific consent-consentPurpose relationship
+			 * Additional metadata about this specific consent-purpose relationship
 			 */
 			metadata: {
 				type: 'json',

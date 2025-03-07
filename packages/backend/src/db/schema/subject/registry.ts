@@ -68,7 +68,7 @@ export function subjectRegistry({ adapter, ...ctx }: RegistryContext) {
 
 		/**
 		 * Finds an existing subject or creates a new one if needed.
-		 * If both subjectId and externalUserId are provided, validates they match the same subject.
+		 * If both subjectId and externalSubjectId are provided, validates they match the same subject.
 		 * Creates a new anonymous subject only if no identifiers are provided.
 		 *
 		 * @param params - Parameters for finding or creating the subject
@@ -77,20 +77,20 @@ export function subjectRegistry({ adapter, ...ctx }: RegistryContext) {
 		 */
 		findOrcreateSubject: async function ({
 			subjectId,
-			externalUserId,
+			externalSubjectId,
 			ipAddress = 'unknown',
 			context,
 		}: {
 			subjectId?: string;
-			externalUserId?: string;
+			externalSubjectId?: string;
 			ipAddress?: string;
 			context?: GenericEndpointContext;
 		}) {
-			// If both subjectId and externalUserId are provided, validate they match
-			if (subjectId && externalUserId) {
+			// If both subjectId and externalSubjectId are provided, validate they match
+			if (subjectId && externalSubjectId) {
 				const [userById, userByExternalId] = await Promise.all([
 					this.findUserById(subjectId),
-					this.findUserByExternalId(externalUserId),
+					this.findUserByExternalId(externalSubjectId),
 				]);
 
 				if (!userById || !userByExternalId) {
@@ -98,7 +98,7 @@ export function subjectRegistry({ adapter, ...ctx }: RegistryContext) {
 						'Subject validation failed: One or both subjects not found',
 						{
 							providedUserId: subjectId,
-							providedExternalId: externalUserId,
+							providedExternalId: externalSubjectId,
 							userByIdFound: !!userById,
 							userByExternalIdFound: !!userByExternalId,
 						}
@@ -110,7 +110,7 @@ export function subjectRegistry({ adapter, ...ctx }: RegistryContext) {
 							status: 404,
 							data: {
 								providedUserId: subjectId,
-								providedExternalId: externalUserId,
+								providedExternalId: externalSubjectId,
 							},
 						}
 					);
@@ -121,19 +121,19 @@ export function subjectRegistry({ adapter, ...ctx }: RegistryContext) {
 						'Subject validation failed: IDs do not match the same subject',
 						{
 							providedUserId: subjectId,
-							providedExternalId: externalUserId,
+							providedExternalId: externalSubjectId,
 							userByIdId: userById.id,
 							userByExternalIdId: userByExternalId.id,
 						}
 					);
 					throw new C15TError(
-						'The provided subjectId and externalUserId do not match the same subject. Please ensure both identifiers refer to the same subject.',
+						'The provided subjectId and externalSubjectId do not match the same subject. Please ensure both identifiers refer to the same subject.',
 						{
 							code: BASE_ERROR_CODES.CONFLICT,
 							status: 409,
 							data: {
 								providedUserId: subjectId,
-								providedExternalId: externalUserId,
+								providedExternalId: externalSubjectId,
 								userByIdId: userById.id,
 								userByExternalIdId: userByExternalId.id,
 							},
@@ -156,24 +156,24 @@ export function subjectRegistry({ adapter, ...ctx }: RegistryContext) {
 				});
 			}
 
-			// If externalUserId provided, try to find or create with upsert
-			if (externalUserId) {
+			// If externalSubjectId provided, try to find or create with upsert
+			if (externalSubjectId) {
 				try {
-					const subject = await this.findUserByExternalId(externalUserId);
+					const subject = await this.findUserByExternalId(externalSubjectId);
 					if (subject) {
 						ctx.logger?.debug('Found existing subject by external ID', {
-							externalUserId,
+							externalSubjectId,
 						});
 						return subject;
 					}
 
 					ctx.logger?.info('Creating new subject with external ID', {
-						externalUserId,
+						externalSubjectId,
 					});
 					// Attempt to create with unique constraint on externalId
 					return await this.createSubject(
 						{
-							externalId: externalUserId,
+							externalId: externalSubjectId,
 							identityProvider: 'external',
 							lastIpAddress: ipAddress,
 							isIdentified: true,
@@ -188,9 +188,9 @@ export function subjectRegistry({ adapter, ...ctx }: RegistryContext) {
 					) {
 						ctx.logger?.info(
 							'Handling duplicate key violation for external ID',
-							{ externalUserId }
+							{ externalSubjectId }
 						);
-						const subject = await this.findUserByExternalId(externalUserId);
+						const subject = await this.findUserByExternalId(externalSubjectId);
 						if (subject) {
 							return subject;
 						}
@@ -198,7 +198,7 @@ export function subjectRegistry({ adapter, ...ctx }: RegistryContext) {
 					ctx.logger?.error(
 						'Failed to create or find subject with external ID',
 						{
-							externalUserId,
+							externalSubjectId,
 							error: error instanceof Error ? error.message : 'Unknown error',
 						}
 					);

@@ -11,7 +11,7 @@ import { z } from 'zod';
  * @example
  * ```typescript
  * const locationData = {
- *   id: '123e4567-e89b-12d3-a456-426614174000',
+ *   id: 'geo_x1pftyoufsm7xgo1kv',
  *   countryCode: 'US',
  *   countryName: 'United States',
  *   regionCode: 'CA',

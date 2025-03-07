@@ -40,9 +40,9 @@ export interface RevokeConsentParams {
  *
  * // Create a new consent record
  * const consent = await consentAdapter.createConsent({
- *   subjectId: 'subject-123',
- *   domainId: 'domain-456',
- *   purposeIds: ['consentPurpose-789'],
+ *   subjectId: 'sub_x1pftyoufsm7xgo1kv',
+ *   domainId: 'dom_x1pftyoufsm7xgo1kv',
+ *   purposeIds: ['pur_e8zyhgozr3im7xj59it'],
  *   status: 'active'
  * });
  * ```

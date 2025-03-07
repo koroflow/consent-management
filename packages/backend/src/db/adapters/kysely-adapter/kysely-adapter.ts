@@ -586,7 +586,7 @@ const createEntityTransformer = (
  * const pool = new Pool({
  *   host: 'localhost',
  *   database: 'consent_db',
- *   subject: 'postgres',
+ *   user: 'postgres',
  *   password: 'password'
  * });
  *

@@ -119,7 +119,7 @@ export interface c15tClientOptions {
  * // Basic GET request options
  * const getOptions: FetchOptions<UserConsent> = {
  *   method: 'GET',
- *   query: { subjectId: '123' }
+ *   query: { subjectId: 'sub_x1pftyoufsm7xgo1kv' }
  * };
  *
  * // POST request with error handling
@@ -169,8 +169,8 @@ export interface FetchOptions<ResponseType = unknown> {
 	 * ```typescript
 	 * const options = {
 	 *   query: {
-	 *     subjectId: '123',
-	 *     purposes: ['analytics', 'marketing'], // Results in ?purposes=analytics&purposes=marketing
+	 *     subjectId: 'sub_x1pftyoufsm7xgo1kv',
+	 *     purposes: ['pur_uvrr67my07m7xj2bta', 'pur_vv76m0rtb2dm7xj59gt'], // Results in ?purposes=analytics&purposes=marketing
 	 *     includeHistory: true
 	 *   }
 	 * };

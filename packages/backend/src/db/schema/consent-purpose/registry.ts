@@ -24,7 +24,7 @@ import type { ConsentPurpose } from './schema';
  *
  * // Create a new consent consentPurpose
  * const consentPurpose = await purposeAdapter.createConsentPurpose({
- *   code: 'marketing',
+ *   code: 'pur_e8zyhgozr3im7xj59it',
  *   name: 'Marketing Communications',
  *   description: 'Allow us to send you marketing materials',
  *   isEssential: false

@@ -121,7 +121,7 @@ export async function processHooks<
  *   updatedUsers,
  *   'subject',
  *   registeredHooks,
- *   { batchId: 'batch-123' }
+ *   { batchId: 'sub_x1pftyoufsm7xgo1kv' }
  * );
  * ```
  */

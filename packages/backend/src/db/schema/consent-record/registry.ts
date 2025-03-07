@@ -23,8 +23,8 @@ import type { ConsentRecord } from './schema';
  *
  * // Create a new consent record
  * const record = await recordAdapter.createConsentRecord({
- *   subjectId: 'subject-123',
- *   consentId: 'consent-456',
+ *   subjectId: 'sub_x1pftyoufsm7xgo1kv',
+ *   consentId: 'cns_hadt8w7nngm7xmx2bn',
  *   actionType: 'given',
  *   details: { ip: '192.168.1.1', userAgent: 'Mozilla/5.0...' }
  * });

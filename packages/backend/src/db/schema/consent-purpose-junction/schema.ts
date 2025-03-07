@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 /**
- * Zod schema for validating consent-consentPurpose junction entities.
+ * Zod schema for validating consent-purpose junction entities.
  *
  * This defines the structure and validation rules for junction records:
  * - Required fields: consentId, purposeId
@@ -12,9 +12,9 @@ import { z } from 'zod';
  * @example
  * ```typescript
  * const junctionData = {
- *   id: '123e4567-e89b-12d3-a456-426614174000',
- *   consentId: 'consent-123',
- *   purposeId: 'consentPurpose-456',
+ *   id: 'pjx_w5qufx2a66m7xkn3ty',
+ *   consentId: 'cns_hadt8w7nngm7xmx2bn',
+ *   purposeId: 'pur_e8zyhgozr3im7xj59it',
  *   status: 'active'
  * };
  *
@@ -42,7 +42,7 @@ export const consentPurposeJunctionSchema = z.object({
 /**
  * Type definition for PurposeJunction
  *
- * This type represents the structure of a consent-consentPurpose junction record
+ * This type represents the structure of a consent-purpose junction record
  * as defined by the consentPurposeJunctionSchema. It includes all fields
  * that are part of the junction entity.
  */

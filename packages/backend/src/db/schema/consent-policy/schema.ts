@@ -12,7 +12,7 @@ import { z } from 'zod';
  * @example
  * ```typescript
  * const policyData = {
- *   id: '123e4567-e89b-12d3-a456-426614174000',
+ *   id: 'pol_w5qufx2a66m7xkn3ty',
  *   version: '1.0.0',
  *   name: 'Privacy Policy 2023',
  *   effectiveDate: new Date(),

@@ -16,7 +16,7 @@ const getConsentHistorySchema = z.object({
  * Endpoint for retrieving a subject's complete consent history.
  *
  * This endpoint returns comprehensive information about a subject's consent records,
- * including all consent entries, consentWithdrawals, related evidence records, and audit logs.
+ * including all consent entries, withdrawals, related evidence records, and audit logs.
  * It supports optional domain filtering and pagination to manage large result sets.
  *
  * @endpoint GET /consent/history
@@ -56,7 +56,7 @@ export const getConsentHistory = createAuthEndpoint(
 			const end = start + params.limit;
 			const paginatedConsents = userConsents.slice(start, end);
 
-			// Process each consent to include consentWithdrawals and records
+			// Process each consent to include withdrawals and records
 			const processedConsents = await Promise.all(
 				paginatedConsents.map(async (consent) => {
 					const consentWithdrawals = await registry.getWithdrawals(consent.id);

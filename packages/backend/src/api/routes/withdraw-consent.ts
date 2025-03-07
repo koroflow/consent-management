@@ -133,14 +133,14 @@ export const withdrawConsent = createAuthEndpoint(
 				params.identifierType === 'externalId'
 			) {
 				// Find subject
-				let userRecord: EntityOutputFields<'subject'> | null = null;
+				let subjectRecord: EntityOutputFields<'subject'> | null = null;
 				if (params.identifierType === 'subjectId') {
-					userRecord = await registry.findUserById(params.subjectId);
+					subjectRecord = await registry.findUserById(params.subjectId);
 				} else {
-					userRecord = await registry.findUserByExternalId(params.externalId);
+					subjectRecord = await registry.findUserByExternalId(params.externalId);
 				}
 
-				if (!userRecord) {
+				if (!subjectRecord) {
 					throw new C15TError(
 						'The specified subject could not be found. Please verify the subject ID or external ID and try again.',
 						{
@@ -156,7 +156,7 @@ export const withdrawConsent = createAuthEndpoint(
 
 				// Find all active consents for this subject and domain
 				const userConsents = await registry.findConsents({
-					subjectId: userRecord.id,
+					subjectId: subjectRecord.id,
 				});
 
 				// Filter for active consents with matching domain

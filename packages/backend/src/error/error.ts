@@ -17,7 +17,7 @@ import {
  * throw new C15TError('Failed to update subject preferences', {
  *   code: BASE_ERROR_CODES.FAILED_TO_UPDATE_CONSENT,
  *   status: 400,
- *   data: { subjectId: 'user123', preferences: { analytics: true } }
+ *   data: { subjectId: 'sub_x1pftyoufsm7xgo1kv', preferences: { analytics: true } }
  * });
  *
  * // Create an error from an HTTP response

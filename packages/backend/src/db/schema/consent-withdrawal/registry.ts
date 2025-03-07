@@ -24,8 +24,8 @@ import type { Withdrawal } from './schema';
  *
  * // Create a new consentWithdrawal record
  * const consentWithdrawal = await withdrawalAdapter.createConsentWithdrawal({
- *   consentId: 'consent-123',
- *   subjectId: 'subject-456',
+ *   consentId: 'cns_hadt8w7nngm7xmx2bn',
+ *   subjectId: 'sub_x1pftyoufsm7xgo1kv',
  *   withdrawalReason: 'No longer wish to receive marketing emails',
  *   withdrawalMethod: 'subject-initiated'
  * });

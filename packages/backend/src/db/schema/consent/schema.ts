@@ -12,10 +12,10 @@ import { z } from 'zod';
  * @example
  * ```typescript
  * const consentData = {
- *   id: '123e4567-e89b-12d3-a456-426614174000',
- *   subjectId: 'subject-123',
- *   domainId: 'domain-456',
- *   purposeIds: ['consentPurpose-789'],
+ *   id: 'cns_w5qufx2a66m7xkn3ty',
+ *   subjectId: 'sub_x1pftyoufsm7xgo1kv',
+ *   domainId: 'dom_x1pftyoufsm7xgo1kv',
+ *   purposeIds: ['pur_e8zyhgozr3im7xj59it'],
  *   status: 'active',
  *   givenAt: new Date(),
  *   isActive: true,

@@ -22,7 +22,7 @@ import type { ConsentGeoLocation } from './schema';
  *
  * // Create a new geo-location record
  * const geoLocation = await geoLocationAdapter.createConsentGeoLocation({
- *   consentId: '123e4567-e89b-12d3-a456-426614174000',
+ *   consentId: 'cns_hadt8w7nngm7xmx2bn',
  *   ip: '192.168.1.1',
  *   country: 'US',
  *   city: 'New York',
