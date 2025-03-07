@@ -3,7 +3,9 @@ import { c15tInstance } from '@c15t/backend';
 import { LibsqlDialect } from '@libsql/kysely-libsql';
 
 if (!process.env.TURSO_DATABASE_URL || !process.env.TURSO_AUTH_TOKEN) {
-  throw new Error('TURSO_DATABASE_URL and TURSO_AUTH_TOKEN environment variables are required');
+	throw new Error(
+		'TURSO_DATABASE_URL and TURSO_AUTH_TOKEN environment variables are required'
+	);
 }
 
 const libsql = new LibsqlDialect({
