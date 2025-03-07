@@ -301,7 +301,7 @@ export function subjectRegistry({ adapter, ...ctx }: RegistryContext) {
 		 * @param context - Optional endpoint context for hooks
 		 * @returns The updated subject if successful, null if subject not found or hooks prevented update
 		 */
-		updateUser: async (
+		updateSubject: async (
 			subjectId: string,
 			data: Partial<Subject> & Record<string, unknown>,
 			context?: GenericEndpointContext

@@ -55,7 +55,7 @@ export const optionsMiddleware = createMiddleware(async () => {
  *   const { subjectId } = context.params;
  *
  *   // Verify the subject exists
- *   const subject = await getUserById(subjectId);
+ *   const subject = await getSubjectById(subjectId);
  *   if (!subject) {
  *     throw new APIError({
  *       message: 'Subject not found',
