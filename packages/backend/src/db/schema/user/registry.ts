@@ -89,9 +89,10 @@ export function userRegistry({ adapter, ...ctx }: RegistryContext) {
 		}: FindOrCreateUserParams) {
 			// If both userId and externalUserId are provided, validate they match
 			if (userId && externalUserId) {
-				const userById = await this.findUserById(userId);
-				const userByExternalId =
-					await this.findUserByExternalId(externalUserId);
+				const [userById, userByExternalId] = await Promise.all([
+					this.findUserById(userId),
+					this.findUserByExternalId(externalUserId),
+				]);
 
 				if (!userById || !userByExternalId) {
 					throw new APIError('NOT_FOUND', {
@@ -102,8 +103,7 @@ export function userRegistry({ adapter, ...ctx }: RegistryContext) {
 
 				if (userById.id !== userByExternalId.id) {
 					throw new APIError('BAD_REQUEST', {
-						message:
-							'Provided userId and externalUserId do not match the same user',
+						message: 'Provided userId and externalUserId do not match the same user',
 						status: 400,
 					});
 				}
@@ -123,38 +123,59 @@ export function userRegistry({ adapter, ...ctx }: RegistryContext) {
 				});
 			}
 
-			// If no user found and externalUserId provided, try that
+			// If externalUserId provided, try to find or create with upsert
 			if (externalUserId) {
-				const user = await this.findUserByExternalId(externalUserId);
-				if (user) {
-					return user;
+				try {
+					const user = await this.findUserByExternalId(externalUserId);
+					if (user) {
+						return user;
+					}
+					
+					// Attempt to create with unique constraint on externalId
+					return await this.createUser(
+						{
+							externalId: externalUserId,
+							identityProvider: 'external',
+							lastIpAddress: ipAddress,
+							isIdentified: true,
+						},
+						context
+					);
+				} catch (error) {
+					// If creation failed due to duplicate, try to find again
+					if (error instanceof Error && error.message.includes('unique constraint')) {
+						const user = await this.findUserByExternalId(externalUserId);
+						if (user) {
+							return user;
+						}
+					}
+					throw new APIError('INTERNAL_SERVER_ERROR', {
+						message: 'Failed to create or find user with external ID',
+						status: 503,
+						details: error instanceof Error ? error.message : 'Unknown error',
+					});
 				}
-				throw new APIError('NOT_FOUND', {
-					message: 'User not found with provided external ID',
-					status: 404,
-				});
 			}
 
-			// If no identifiers provided, create a new anonymous user
-			ctx.logger?.info('Creating new anonymous user');
-			const user = await this.createUser(
-				{
-					externalId: externalUserId || null,
-					identityProvider: 'anonymous',
-					lastIpAddress: ipAddress,
-					isIdentified: false,
-				},
-				context
-			);
-
-			if (!user) {
+			// For anonymous users, use a transaction to prevent duplicates
+			try {
+				ctx.logger?.info('Creating new anonymous user');
+				return await this.createUser(
+					{
+						externalId: null,
+						identityProvider: 'anonymous',
+						lastIpAddress: ipAddress,
+						isIdentified: false,
+					},
+					context
+				);
+			} catch (error) {
 				throw new APIError('INTERNAL_SERVER_ERROR', {
-					message: 'Failed to create user',
+					message: 'Failed to create anonymous user',
 					status: 503,
+					details: error instanceof Error ? error.message : 'Unknown error',
 				});
 			}
-
-			return user;
 		},
 
 		/**

@@ -159,23 +159,80 @@ describe('Consent Endpoints', () => {
 			});
 		});
 
-		describe('Error cases', () => {
-			it('should error if external user is not found', async () => {
+		describe('User mapping validation', () => {
+			it('should validate that userId and externalUserId map to the same user', async () => {
+				// Create a user with external ID
+				const user = await context.registry.createUser({
+					externalId: 'test-user',
+					isIdentified: true,
+					identityProvider: 'test',
+				});
+
+				if (!user) {
+					throw new Error('Failed to create test user');
+				}
+
+				// Test with matching IDs
+				const response = await setConsent({
+					context,
+					params: undefined,
+					query: undefined,
+					body: createConsentData('privacy_policy', {
+						userId: user.id,
+						externalUserId: 'test-user',
+					}),
+				});
+
+				expectValidConsentResponse(response, 'privacy_policy', {
+					userId: user.id,
+					externalUserId: 'test-user',
+				});
+
+				// Create another user with different external ID
+				const otherUser = await context.registry.createUser({
+					externalId: 'other-user',
+					isIdentified: true,
+					identityProvider: 'test',
+				});
+
+				if (!otherUser) {
+					throw new Error('Failed to create other test user');
+				}
+
+				// Test with mismatched IDs
 				await expect(
 					setConsent({
 						context,
 						params: undefined,
 						query: undefined,
 						body: createConsentData('privacy_policy', {
-							externalUserId: 'non-existent',
+							userId: user.id,
+							externalUserId: 'other-user',
 						}),
 					})
 				).rejects.toMatchObject({
-					status: 'NOT_FOUND',
+					status: 'BAD_REQUEST',
 					body: {
-						code: 'USER_NOT_FOUND_WITH_PROVIDED_EXTERNAL_ID',
-						message: 'User not found with provided external ID',
+						code: 'PROVIDED_USERID_AND_EXTERNALUSERID_DO_NOT_MATCH_THE_SAME_USER',
+						message: 'Provided userId and externalUserId do not match the same user',
 					},
+				});
+			});
+		});
+
+		describe('Error cases', () => {
+			it('should create anonymous user when external user is not found', async () => {
+				const response = await setConsent({
+					context,
+					params: undefined,
+					query: undefined,
+					body: createConsentData('privacy_policy', {
+						externalUserId: 'non-existent',
+					}),
+				});
+
+				expectValidConsentResponse(response, 'privacy_policy', {
+					externalUserId: 'non-existent',
 				});
 			});
 

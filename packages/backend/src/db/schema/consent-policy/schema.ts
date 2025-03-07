@@ -7,7 +7,7 @@ import { z } from 'zod';
  * - Required fields: version, name, effectiveDate, content, contentHash
  * - Optional fields: expirationDate
  * - Default value of true for isActive
- * - Default current date/time for creation timestamp
+ * - Default current date/time for creation and update timestamps
  *
  * @example
  * ```typescript

@@ -6,7 +6,8 @@ import { z } from 'zod';
  * This defines the structure and validation rules for junction records:
  * - Required fields: consentId, purposeId
  * - Default value of 'active' for status
- * - Default current date/time for creation timestamp
+ * - Default current date/time for creation and update timestamps
+ * - Default current date/time for update timestamp
  *
  * @example
  * ```typescript

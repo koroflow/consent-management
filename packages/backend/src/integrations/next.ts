@@ -28,19 +28,13 @@ import { BASE_ERROR_CODES } from '~/error/codes';
 export function toNextJsHandler(instance: C15TInstance) {
 	const handler = async (initialRequest: Request) => {
 		try {
-			let request = initialRequest;
+			const request = initialRequest;
 
 			// For POST requests, validate JSON body
 			if (request.method === 'POST') {
 				try {
 					const clonedRequest = request.clone();
-					const body = await clonedRequest.json();
-
-					request = new Request(request.url, {
-						method: request.method,
-						headers: request.headers,
-						body: JSON.stringify(body),
-					});
+          await clonedRequest.json();
 				} catch (error) {
 					return new Response(
 						JSON.stringify({

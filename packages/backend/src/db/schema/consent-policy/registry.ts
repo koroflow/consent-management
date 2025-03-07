@@ -3,6 +3,7 @@ import type { ConsentPolicy } from './schema';
 import { getWithHooks } from '~/db/hooks';
 import { validateEntityOutput } from '../definition';
 import type { Where } from '~/db/adapters/types';
+import { createHash } from 'crypto';
 
 export interface FindPolicyParams {
 	domainId?: string;
@@ -233,8 +234,12 @@ export function policyRegistry({ adapter, ...ctx }: RegistryContext) {
 				includeInactive: false,
 			});
 
+			// Normalize name for comparison
+			const normalizedSearchName = name.toLowerCase().trim();
+			
+			// Find latest policy with exact name match
 			const latestPolicy = policies
-				.filter((p) => p.name.toLowerCase().includes(name.toLowerCase()))
+				.filter((p) => p.name.toLowerCase() === normalizedSearchName)
 				.sort(
 					(a, b) => b.effectiveDate.getTime() - a.effectiveDate.getTime()
 				)[0];
@@ -243,12 +248,18 @@ export function policyRegistry({ adapter, ...ctx }: RegistryContext) {
 				return latestPolicy;
 			}
 
+			// Generate policy content and hash
+			const defaultContent = `Default ${name} content`;
+			const contentHash = createHash('sha256')
+				.update(defaultContent)
+				.digest('hex');
+
 			return registry.createConsentPolicy({
 				version: '1.0.0',
-				name: `${name.replace(/\b\w/g, (l) => l.toUpperCase())} ${now.getFullYear()}`,
+				name: normalizedSearchName,
 				effectiveDate: now,
-				content: `Default ${name} content`,
-				contentHash: 'default-hash',
+				content: defaultContent,
+				contentHash,
 				isActive: true,
 				updatedAt: now,
 				expirationDate: null,

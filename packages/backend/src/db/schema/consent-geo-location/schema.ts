@@ -6,7 +6,7 @@ import { z } from 'zod';
  * This defines the structure and validation rules for geo-location records:
  * - Required fields: consentId, ip (IP address)
  * - Optional fields: country, region, city, latitude, longitude, timezone
- * - Default current date/time for creation timestamp
+ * - Default current date/time for creation and update timestamps
  *
  * @example
  * ```typescript
