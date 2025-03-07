@@ -97,7 +97,7 @@ export function subjectRegistry({ adapter, ...ctx }: RegistryContext) {
 					ctx.logger?.info(
 						'Subject validation failed: One or both subjects not found',
 						{
-							providedUserId: subjectId,
+							providedSubjectId: subjectId,
 							providedExternalId: externalSubjectId,
 							subjectByIdFound: !!subjectById,
 							subjectByExternalIdFound: !!subjectByExternalId,
@@ -109,7 +109,7 @@ export function subjectRegistry({ adapter, ...ctx }: RegistryContext) {
 							code: BASE_ERROR_CODES.NOT_FOUND,
 							status: 404,
 							data: {
-								providedUserId: subjectId,
+								providedSubjectId: subjectId,
 								providedExternalId: externalSubjectId,
 							},
 						}
@@ -120,7 +120,7 @@ export function subjectRegistry({ adapter, ...ctx }: RegistryContext) {
 					ctx.logger?.warn(
 						'Subject validation failed: IDs do not match the same subject',
 						{
-							providedUserId: subjectId,
+							providedSubjectId: subjectId,
 							providedExternalId: externalSubjectId,
 							subjectByIdId: subjectById.id,
 							subjectByExternalIdId: subjectByExternalId.id,
@@ -132,7 +132,7 @@ export function subjectRegistry({ adapter, ...ctx }: RegistryContext) {
 							code: BASE_ERROR_CODES.CONFLICT,
 							status: 409,
 							data: {
-								providedUserId: subjectId,
+								providedSubjectId: subjectId,
 								providedExternalId: externalSubjectId,
 								subjectByIdId: subjectById.id,
 								subjectByExternalIdId: subjectByExternalId.id,
