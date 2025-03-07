@@ -153,7 +153,7 @@ describe('Consent Endpoints', () => {
 				).rejects.toMatchObject({
 					name: 'C15TError',
 					code: BASE_ERROR_CODES.NOT_FOUND,
-					status: 404
+					status: 404,
 				});
 			});
 		});
@@ -212,7 +212,7 @@ describe('Consent Endpoints', () => {
 				).rejects.toMatchObject({
 					name: 'C15TError',
 					code: BASE_ERROR_CODES.BAD_REQUEST,
-					status: 400
+					status: 400,
 				});
 			});
 		});
@@ -246,7 +246,7 @@ describe('Consent Endpoints', () => {
 				).rejects.toMatchObject({
 					name: 'C15TError',
 					code: BASE_ERROR_CODES.NOT_FOUND,
-					status: 404
+					status: 404,
 				});
 			});
 
