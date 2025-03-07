@@ -181,10 +181,7 @@ export function consentPurposeJunctionRegistry({
 				});
 				return true;
 			} catch (error) {
-				ctx.logger.error(
-					'Error deleting consent-purpose junctions:',
-					error
-				);
+				ctx.logger.error('Error deleting consent-purpose junctions:', error);
 				return false;
 			}
 		},

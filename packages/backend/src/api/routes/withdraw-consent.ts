@@ -137,7 +137,9 @@ export const withdrawConsent = createAuthEndpoint(
 				if (params.identifierType === 'subjectId') {
 					subjectRecord = await registry.findSubjectById(params.subjectId);
 				} else {
-					subjectRecord = await registry.findSubjectByExternalId(params.externalId);
+					subjectRecord = await registry.findSubjectByExternalId(
+						params.externalId
+					);
 				}
 
 				if (!subjectRecord) {
