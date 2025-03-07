@@ -280,9 +280,8 @@ export const getConsentPolicy = createAuthEndpoint(
 					response.data.subjectConsentStatus = {
 						hasConsent: !!subjectConsent,
 						currentPreferences: subjectConsent
-							? 
-               // @ts-expect-error 
-               subjectConsent.preferences
+							? // @ts-expect-error
+								subjectConsent.preferences
 							: null,
 						consentedAt: subjectConsent
 							? subjectConsent.givenAt.toISOString() || null
