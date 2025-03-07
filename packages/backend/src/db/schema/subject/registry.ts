@@ -327,13 +327,14 @@ export function subjectRegistry({ adapter, ...ctx }: RegistryContext) {
 		},
 
 		/**
-		 * Deletes a subject and all associated consents from the database.
+		 * Soft deletes a subject and all associated consents from the database.
 		 *
-		 * This is a cascading operation that first removes all consents associated
-		 * with the subject, then removes the subject record itself.
+		 * This is a cascading operation that marks the subject as deleted by setting
+		 * its status to 'deleted' and removes all associated consent records.
+		 * The subject record itself remains in the database but is inactive.
 		 *
-		 * @param subjectId - The unique identifier of the subject to delete
-		 * @returns A promise that resolves when the deletion is complete
+		 * @param subjectId - The unique identifier of the subject to soft delete
+		 * @returns A promise that resolves when the soft deletion is complete
 		 */
 		deleteSubject: async (subjectId: string) => {
 			await adapter.transaction({
