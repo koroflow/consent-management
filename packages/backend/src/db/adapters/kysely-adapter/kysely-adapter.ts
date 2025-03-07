@@ -1,4 +1,5 @@
 import type {
+	Expression,
 	ExpressionBuilder,
 	ExpressionOrFactory,
 	InsertQueryBuilder,
@@ -83,6 +84,7 @@ export interface WhereCondition<EntityType extends EntityName> {
 		| 'contains'
 		| 'starts_with'
 		| 'ends_with'
+		| 'ilike'
 		| '=';
 
 	/**
@@ -112,6 +114,13 @@ export interface KyselyAdapterConfig {
 	 */
 	type?: KyselyDatabaseType;
 }
+
+/**
+ * Type alias for expression results in Kysely queries
+ *
+ * @internal
+ */
+type ExpressionResult<DB> = Expression<DB>;
 
 // Note: Throughout this adapter, we use "as any" type assertions in several places
 // to bridge the gap between our runtime-generated field references and Kysely's
@@ -426,7 +435,6 @@ const createEntityTransformer = (
 
 				const expr: ExpressionFn = (eb) => {
 					// For type safety, cast field to a reference expression
-					// The double-casting pattern works better than direct any casts
 					const dbField = fieldString as unknown as KyselyFieldRef;
 
 					if (operator.toLowerCase() === 'in') {
@@ -443,6 +451,19 @@ const createEntityTransformer = (
 
 					if (operator === 'ends_with') {
 						return eb(dbField, 'like', `%${value}`);
+					}
+
+					if (operator === 'ilike') {
+						// Use SQL LOWER function for case-insensitive comparison
+						const lowerField = eb.fn<string>('lower', [dbField]);
+						const lowerValue = eb.fn<string>('lower', [
+							eb.val(value?.toString()),
+						]);
+						return eb(
+							lowerField,
+							'like',
+							lowerValue
+						) as ExpressionResult<Database>;
 					}
 
 					if (operator === 'eq') {
@@ -1098,7 +1119,8 @@ export const kyselyAdapter =
 			 * Executes a function within a database transaction
 			 *
 			 * This method wraps Kysely's transaction functionality to provide a consistent interface
-			 * for executing multiple database operations atomically.
+			 * for executing multiple database operations atomically. Falls back to direct execution
+			 * if transactions are disabled or not supported by the database.
 			 *
 			 * @typeParam ResultType - The type of data returned by the transaction
 			 * @param data - The transaction data containing the callback function
@@ -1110,13 +1132,36 @@ export const kyselyAdapter =
 			}): Promise<ResultType> {
 				const { callback } = data;
 
-				return db.transaction().execute(async (trx) => {
-					// Create a new adapter instance that uses the transaction connection
-					const transactionAdapter = kyselyAdapter(trx, config)(opts);
+				// Check if transactions are explicitly disabled
+				if (opts.advanced?.disableTransactions) {
+					const regularAdapter = kyselyAdapter(db, config)(opts);
+					return await callback(regularAdapter);
+				}
 
-					// Execute the callback function with the transaction adapter
-					return await callback(transactionAdapter);
-				});
+				try {
+					return await db.transaction().execute(async (trx) => {
+						const transactionAdapter = kyselyAdapter(trx, config)(opts);
+						return await callback(transactionAdapter);
+					});
+				} catch (error) {
+					// Check if the error indicates transactions are not supported
+					if (
+						error instanceof Error &&
+						(error.message.includes('transactions are not supported') ||
+							error.message.toLowerCase().includes('no transaction support'))
+					) {
+						// Log warning about disableTransactions option
+						// biome-ignore lint/suspicious/noConsole: this is a warning
+						console.warn(
+							'Warning: Database transaction failed. If your database does not support transactions, ' +
+								'you can disable this warning by setting opts.advanced.disableTransactions to true.'
+						);
+						// Fallback: execute without transaction
+						const regularAdapter = kyselyAdapter(db, config)(opts);
+						return await callback(regularAdapter);
+					}
+					throw error;
+				}
 			},
 			options: config,
 		};

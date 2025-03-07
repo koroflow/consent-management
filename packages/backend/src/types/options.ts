@@ -138,6 +138,16 @@ export interface C15TOptions<P extends C15TPlugin[] = C15TPlugin[]> {
 		 * Custom ID generation for consent records and other entities
 		 */
 		generateId?: (options: { model: EntityName; size?: number }) => string;
+
+		/**
+		 * Disable database transactions
+		 *
+		 * When true, operations will execute directly without transaction support.
+		 * Useful for databases that don't support transactions or when you want to bypass transaction overhead.
+		 *
+		 * @default false
+		 */
+		disableTransactions?: boolean;
 	};
 	/**
 	 * API error handling
