@@ -1,17 +1,17 @@
+import { relations } from 'drizzle-orm';
 import {
-	pgTable,
-	serial,
-	uuid,
-	varchar,
-	text,
-	json,
-	timestamp,
 	boolean,
 	index,
-	pgEnum,
 	inet,
+	json,
+	pgEnum,
+	pgTable,
+	serial,
+	text,
+	timestamp,
+	uuid,
+	varchar,
 } from 'drizzle-orm/pg-core';
-import { relations } from 'drizzle-orm';
 
 // Define PostgreSQL enum for record types
 export const recordTypeEnum = pgEnum('consent_record_type', [

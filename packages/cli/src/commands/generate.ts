@@ -1,15 +1,15 @@
-import { Command } from 'commander';
-import { getConfig } from '../utils/get-config';
-import { z } from 'zod';
 import { existsSync } from 'node:fs';
+import fs from 'node:fs/promises';
 import path from 'node:path';
 import { logger } from '@c15t/backend';
-import yoctoSpinner from 'yocto-spinner';
-import prompts from 'prompts';
-import fs from 'node:fs/promises';
-import chalk from 'chalk';
 import { getAdapter } from '@c15t/backend/db';
+import chalk from 'chalk';
+import { Command } from 'commander';
+import prompts from 'prompts';
+import yoctoSpinner from 'yocto-spinner';
+import { z } from 'zod';
 import { getGenerator } from '../generators';
+import { getConfig } from '../utils/get-config';
 
 export async function generateAction(opts: unknown) {
 	const options = z

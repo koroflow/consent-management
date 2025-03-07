@@ -1,8 +1,9 @@
-import type { GenericEndpointContext, RegistryContext } from '~/types';
-import type { User } from './schema';
+import type { Adapter } from '~/db/adapters/types';
 import { getWithHooks } from '~/db/hooks';
+import { BASE_ERROR_CODES, C15TError } from '~/error';
+import type { GenericEndpointContext, RegistryContext } from '~/types';
 import { validateEntityOutput } from '../definition';
-
+import type { User } from './schema';
 /**
  * Creates and returns a set of user-related adapter methods to interact with the database.
  *
@@ -62,6 +63,179 @@ export function userRegistry({ adapter, ...ctx }: RegistryContext) {
 			return createdUser
 				? validateEntityOutput('user', createdUser, ctx.options)
 				: null;
+		},
+
+		/**
+		 * Finds an existing user or creates a new one if needed.
+		 * If both userId and externalUserId are provided, validates they match the same user.
+		 * Creates a new anonymous user only if no identifiers are provided.
+		 *
+		 * @param params - Parameters for finding or creating the user
+		 * @returns The existing or newly created user
+		 * @throws APIError if user validation fails or creation fails
+		 */
+		findOrCreateUser: async function ({
+			userId,
+			externalUserId,
+			ipAddress = 'unknown',
+			context,
+		}: {
+			userId?: string;
+			externalUserId?: string;
+			ipAddress?: string;
+			context?: GenericEndpointContext;
+		}) {
+			// If both userId and externalUserId are provided, validate they match
+			if (userId && externalUserId) {
+				const [userById, userByExternalId] = await Promise.all([
+					this.findUserById(userId),
+					this.findUserByExternalId(externalUserId),
+				]);
+
+				if (!userById || !userByExternalId) {
+					ctx.logger?.info(
+						'User validation failed: One or both users not found',
+						{
+							providedUserId: userId,
+							providedExternalId: externalUserId,
+							userByIdFound: !!userById,
+							userByExternalIdFound: !!userByExternalId,
+						}
+					);
+					throw new C15TError(
+						'The specified user could not be found. Please verify the user identifiers and try again.',
+						{
+							code: BASE_ERROR_CODES.NOT_FOUND,
+							status: 404,
+							data: {
+								providedUserId: userId,
+								providedExternalId: externalUserId,
+							},
+						}
+					);
+				}
+
+				if (userById.id !== userByExternalId.id) {
+					ctx.logger?.warn(
+						'User validation failed: IDs do not match the same user',
+						{
+							providedUserId: userId,
+							providedExternalId: externalUserId,
+							userByIdId: userById.id,
+							userByExternalIdId: userByExternalId.id,
+						}
+					);
+					throw new C15TError(
+						'The provided userId and externalUserId do not match the same user. Please ensure both identifiers refer to the same user.',
+						{
+							code: BASE_ERROR_CODES.CONFLICT,
+							status: 409,
+							data: {
+								providedUserId: userId,
+								providedExternalId: externalUserId,
+								userByIdId: userById.id,
+								userByExternalIdId: userByExternalId.id,
+							},
+						}
+					);
+				}
+
+				return userById;
+			}
+
+			// Try to find user by userId if provided
+			if (userId) {
+				const user = await this.findUserById(userId);
+				if (user) {
+					return user;
+				}
+				throw new C15TError('User not found', {
+					code: BASE_ERROR_CODES.NOT_FOUND,
+					status: 404,
+				});
+			}
+
+			// If externalUserId provided, try to find or create with upsert
+			if (externalUserId) {
+				try {
+					const user = await this.findUserByExternalId(externalUserId);
+					if (user) {
+						ctx.logger?.debug('Found existing user by external ID', {
+							externalUserId,
+						});
+						return user;
+					}
+
+					ctx.logger?.info('Creating new user with external ID', {
+						externalUserId,
+					});
+					// Attempt to create with unique constraint on externalId
+					return await this.createUser(
+						{
+							externalId: externalUserId,
+							identityProvider: 'external',
+							lastIpAddress: ipAddress,
+							isIdentified: true,
+						},
+						context
+					);
+				} catch (error) {
+					// If creation failed due to duplicate, try to find again
+					if (
+						error instanceof Error &&
+						error.message.includes('unique constraint')
+					) {
+						ctx.logger?.info(
+							'Handling duplicate key violation for external ID',
+							{ externalUserId }
+						);
+						const user = await this.findUserByExternalId(externalUserId);
+						if (user) {
+							return user;
+						}
+					}
+					ctx.logger?.error('Failed to create or find user with external ID', {
+						externalUserId,
+						error: error instanceof Error ? error.message : 'Unknown error',
+					});
+					throw new C15TError(
+						'Failed to create or find user with external ID',
+						{
+							code: BASE_ERROR_CODES.INTERNAL_SERVER_ERROR,
+							status: 500,
+							data: {
+								error: error instanceof Error ? error.message : 'Unknown error',
+							},
+						}
+					);
+				}
+			}
+
+			// For anonymous users, use a transaction to prevent duplicates
+			try {
+				ctx.logger?.info('Creating new anonymous user');
+				return await this.createUser(
+					{
+						externalId: null,
+						identityProvider: 'anonymous',
+						lastIpAddress: ipAddress,
+						isIdentified: false,
+					},
+					context
+				);
+			} catch (error) {
+				ctx.logger?.error('Failed to create anonymous user', {
+					ipAddress,
+					error: error instanceof Error ? error.message : 'Unknown error',
+				});
+				throw new C15TError('Failed to create anonymous user', {
+					code: BASE_ERROR_CODES.INTERNAL_SERVER_ERROR,
+					status: 500,
+					data: {
+						error: error instanceof Error ? error.message : 'Unknown error',
+					},
+				});
+			}
 		},
 
 		/**
@@ -151,26 +325,34 @@ export function userRegistry({ adapter, ...ctx }: RegistryContext) {
 		 * @returns A promise that resolves when the deletion is complete
 		 */
 		deleteUser: async (userId: string) => {
-			// Delete all consents associated with the user
-			await adapter.deleteMany({
-				model: 'consent',
-				where: [
-					{
-						field: 'userId',
-						value: userId,
-					},
-				],
-			});
+			await adapter.transaction({
+				callback: async (tx: Adapter) => {
+					// Update the user record
+					await tx.update({
+						model: 'user',
+						where: [
+							{
+								field: 'id',
+								value: userId,
+							},
+						],
+						update: {
+							status: 'deleted',
+							updatedAt: new Date(),
+						},
+					});
 
-			// Delete the user
-			await adapter.delete({
-				model: 'user',
-				where: [
-					{
-						field: 'id',
-						value: userId,
-					},
-				],
+					// Delete all related records
+					await tx.deleteMany({
+						model: 'consent',
+						where: [
+							{
+								field: 'userId',
+								value: userId,
+							},
+						],
+					});
+				},
 			});
 		},
 	};

@@ -71,7 +71,7 @@ model Consent {
   user                User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
   domainId            String
   domain              Domain               @relation(fields: [domainId], references: [id], onDelete: Cascade)
-  purposeIds          Json
+  purposeIds          Json?
   purpose             Purpose              @relation(fields: [purposeIds], references: [id], onDelete: Cascade)
   metadata            Json?
   policyId            String?

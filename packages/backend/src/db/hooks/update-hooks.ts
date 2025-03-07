@@ -1,7 +1,7 @@
+import type { Adapter } from '../adapters/types';
+import type { EntityName } from '../core/types';
 import type { HookContext, UpdateWithHooksProps } from './types';
 import { processHooks } from './utils';
-import type { EntityName } from '../core/types';
-import type { Adapter } from '../adapters/types';
 
 /**
  * Updates a record with hooks applied before and after the update operation.

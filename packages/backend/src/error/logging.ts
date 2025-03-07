@@ -1,5 +1,5 @@
-import type { C15TError } from './error';
 import type { Result, ResultAsync } from 'neverthrow';
+import type { C15TError } from './error';
 
 /**
  * Logs any errors in a Result without changing the Result

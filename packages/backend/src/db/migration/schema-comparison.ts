@@ -1,3 +1,5 @@
+import type { TableMetadata } from 'kysely';
+import type { Field } from '~/db/core/fields';
 /**
  * Schema comparison functionality for database migrations
  *
@@ -18,14 +20,12 @@
  * @module migration/schema-comparison
  */
 import type { C15TOptions } from '~/types';
-import type { Field } from '~/db/core/fields';
 import { createLogger } from '../../utils/logger';
-import { getSchema } from '../core/get-schema';
-import type { TableToCreate, ColumnsToAdd } from './types';
-import { matchType } from './type-mapping';
 import type { KyselyDatabaseType } from '../adapters/kysely-adapter/types';
-import type { TableMetadata } from 'kysely';
+import { getSchema } from '../core/get-schema';
 import type { TableSchemaDefinition } from './get-schema/types';
+import { matchType } from './type-mapping';
+import type { ColumnsToAdd, TableToCreate } from './types';
 
 /**
  * Analyzes schema differences between the expected schema and actual database

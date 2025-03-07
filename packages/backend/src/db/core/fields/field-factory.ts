@@ -1,12 +1,12 @@
+import superjson from 'superjson';
+import type { InferValueType } from './field-inference';
 import type {
-	FieldType,
 	Field,
 	FieldConfig,
-	Primitive,
+	FieldType,
 	JsonValue,
+	Primitive,
 } from './field-types';
-import type { InferValueType } from './field-inference';
-import superjson from 'superjson';
 import {
 	getDatabaseType,
 	parseFromDb,

@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import type {
-	FieldType,
 	Field,
+	FieldType,
 	InferValueType,
 	JsonValue,
 } from './field-types';

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { c15tInstance } from './core';
 import { memoryAdapter } from './db/adapters/memory-adapter';
 import type { C15TPlugin } from './types';
@@ -12,6 +12,7 @@ describe('c15tInstance', () => {
 		const instance = c15tInstance({
 			baseURL: 'http://localhost:3000',
 			database: memoryAdapter({}),
+			secret: 'test-secret',
 		});
 
 		expect(instance.options.baseURL).toBe('http://localhost:3000');
@@ -26,6 +27,7 @@ describe('c15tInstance', () => {
 		const instance = c15tInstance({
 			baseURL: 'http://localhost:8080',
 			database: memoryAdapter({}),
+			// secret: 'test-secret',
 		});
 
 		const request = new Request('http://localhost:8080/api/c15t/status', {
@@ -42,10 +44,11 @@ describe('c15tInstance', () => {
 		}
 	});
 
-	it('should return correct status response structure', async () => {
+	it('should return correct health response structure', async () => {
 		const instance = c15tInstance({
 			baseURL: 'http://localhost:8080',
 			database: memoryAdapter({}),
+			secret: 'test-secret',
 		});
 
 		const request = new Request('http://localhost:8080/api/c15t/status', {
@@ -61,22 +64,18 @@ describe('c15tInstance', () => {
 		if (response.isOk()) {
 			const responseData = await response.value.json();
 
-			// Check response structure
 			expect(responseData).toHaveProperty('status', 'ok');
 			expect(responseData).toHaveProperty('version');
 			expect(responseData).toHaveProperty('timestamp');
 			expect(responseData).toHaveProperty('storage');
 
-			// Check storage object structure
 			expect(responseData.storage).toHaveProperty('type', 'memory');
 			expect(responseData.storage).toHaveProperty('available', true);
 
-			// Check timestamp format
 			expect(new Date(responseData.timestamp).toISOString()).toBe(
 				responseData.timestamp
 			);
 
-			// Check version format (semver)
 			// biome-ignore lint/performance/useTopLevelRegex: <explanation>
 			expect(responseData.version).toMatch(/^\d+\.\d+\.\d+$/);
 		}
@@ -87,6 +86,7 @@ describe('c15tInstance', () => {
 			baseURL: 'http://localhost:3000',
 			basePath: '/custom-path',
 			database: memoryAdapter({}),
+			secret: 'test-secret',
 		});
 
 		const request = new Request('http://localhost:3000/custom-path/status');
@@ -114,6 +114,7 @@ describe('c15tInstance', () => {
 			baseURL: 'http://localhost:3000',
 			database: memoryAdapter({}),
 			plugins: [testPlugin],
+			secret: 'test-secret',
 		});
 
 		const context = await instance.$context;
@@ -127,6 +128,7 @@ describe('c15tInstance', () => {
 		const instance = c15tInstance({
 			baseURL: 'http://localhost:3000',
 			database: memoryAdapter({}),
+			secret: 'test-secret',
 		});
 
 		const api = await instance.getApi();
@@ -141,6 +143,7 @@ describe('c15tInstance', () => {
 		const instance = c15tInstance({
 			baseURL: 'http://localhost:3000',
 			database: memoryAdapter({}),
+			secret: 'test-secret',
 		});
 
 		const request = new Request(
@@ -159,6 +162,7 @@ describe('c15tInstance', () => {
 			baseURL: 'http://localhost:3000',
 			database: memoryAdapter({}),
 			trustedOrigins: ['http://trusted.test'],
+			secret: 'test-secret',
 		});
 
 		const context = await instance.$context;
@@ -174,9 +178,10 @@ describe('c15tInstance', () => {
 			baseURL: 'http://localhost:3000',
 			database: memoryAdapter({}),
 			trustedOrigins: (request) => [request.headers.get('origin') || ''],
+			secret: 'test-secret',
 		});
 
-		const request = new Request('http://localhost:3000/api/c15t/health', {
+		const request = new Request('http://localhost:3000/api/c15t/status', {
 			headers: { origin: 'http://dynamic.test' },
 		});
 
@@ -204,6 +209,7 @@ describe('c15tInstance', () => {
 			baseURL: 'http://localhost:3000',
 			database: memoryAdapter({}),
 			plugins: [errorPlugin],
+			secret: 'test-secret',
 		});
 
 		const context = await instance.$context;
@@ -217,6 +223,7 @@ describe('c15tInstance', () => {
 		const instance = c15tInstance({
 			baseURL: 'http://localhost:3000/',
 			database: memoryAdapter({}),
+			secret: 'test-secret',
 		});
 
 		const request = new Request('http://localhost:3000/api/c15t/status', {
@@ -239,12 +246,28 @@ describe('c15tInstance', () => {
 			name: 'Response Plugin',
 			type: 'test',
 			onResponse: async (response, ctx) => {
-				const data = await response.clone().json();
+				const contentType = response.headers.get('content-type');
+				let data = {};
+
+				if (contentType?.includes('application/json')) {
+					try {
+						data = await response.clone().json();
+					} catch (error) {
+						// biome-ignore lint/suspicious/noConsoleLog: its okay as we are testing
+						// biome-ignore lint/suspicious/noConsole: its okay as we are testing
+						console.log('Failed to parse JSON response:', error);
+					}
+				}
+
 				return {
 					response: new Response(JSON.stringify({ ...data, modified: true }), {
 						status: response.status,
-						headers: response.headers,
+						headers: new Headers({
+							'Content-Type': 'application/json',
+							...Object.fromEntries(response.headers.entries()),
+						}),
 					}),
+					context: ctx,
 				};
 			},
 		};
@@ -253,6 +276,7 @@ describe('c15tInstance', () => {
 			baseURL: 'http://localhost:3000',
 			database: memoryAdapter({}),
 			plugins: [responsePlugin],
+			secret: 'test-secret',
 		});
 
 		const request = new Request('http://localhost:3000/api/c15t/status', {
@@ -262,11 +286,18 @@ describe('c15tInstance', () => {
 				Origin: 'http://localhost:3000',
 			},
 		});
+
 		const response = await instance.handler(request);
+
 		expect(response.isOk()).toBe(true);
+
 		if (response.isOk()) {
-			const data = await response.value.clone().json();
+			const data = await response.value.json();
 			expect(data.modified).toBe(true);
+		} else {
+			// biome-ignore lint/suspicious/noConsole: its okay as we are testing
+			console.error('Response error:', response.error);
+			expect.fail(`Response was not OK: ${JSON.stringify(response.error)}`);
 		}
 	});
 });

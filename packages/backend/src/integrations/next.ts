@@ -1,6 +1,6 @@
 import type { C15TInstance } from '~/core';
-import type { C15TContext } from '~/types';
 import { BASE_ERROR_CODES } from '~/error/codes';
+import type { C15TContext } from '~/types';
 
 /**
  * Convert a c15t handler to a Next.js API route handler.
@@ -26,8 +26,33 @@ import { BASE_ERROR_CODES } from '~/error/codes';
  * @returns Next.js API route handler functions for GET and POST
  */
 export function toNextJsHandler(instance: C15TInstance) {
-	const handler = async (request: Request) => {
+	const handler = async (initialRequest: Request) => {
 		try {
+			const request = initialRequest;
+
+			// For POST requests, validate JSON body
+			if (request.method === 'POST') {
+				try {
+					const clonedRequest = request.clone();
+					await clonedRequest.json();
+				} catch (error) {
+					return new Response(
+						JSON.stringify({
+							error: true,
+							code: BASE_ERROR_CODES.REQUEST_HANDLER_ERROR,
+							message: 'Invalid JSON in request body',
+							details: error instanceof Error ? error.message : 'Unknown error',
+						}),
+						{
+							status: 400,
+							headers: {
+								'Content-Type': 'application/json',
+							},
+						}
+					);
+				}
+			}
+
 			// Ensure the baseURL is set correctly for the c15t instance
 			if (instance.$context) {
 				const contextPromise = instance.$context;

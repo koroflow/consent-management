@@ -1,6 +1,6 @@
+import type { Where } from '~/db/adapters/types';
 import type { C15TOptions, GenericEndpointContext } from '~/types';
 import type { EntityName, EntityTypeMap } from '../core/types';
-import type { Where } from '~/db/adapters/types';
 
 /**
  * Defines execution phases when hooks can run in the database operation lifecycle.

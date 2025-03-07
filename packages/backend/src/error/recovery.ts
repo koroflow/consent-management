@@ -1,6 +1,6 @@
+import { type Result, err, ok } from 'neverthrow';
+import type { ErrorCategory, ErrorMessage } from './codes';
 import type { C15TError } from './error';
-import { type Result, ok, err } from 'neverthrow';
-import type { ErrorMessage, ErrorCategory } from './codes';
 
 /**
  * Recovers from specific error codes by transforming to a default value

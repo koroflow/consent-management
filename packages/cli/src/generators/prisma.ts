@@ -1,11 +1,11 @@
+import { existsSync } from 'node:fs';
+import fs from 'node:fs/promises';
+import path from 'node:path';
 import { getConsentTables } from '@c15t/backend/db';
 import { produceSchema } from '@mrleebo/prisma-ast';
-import { existsSync } from 'node:fs';
-import path from 'node:path';
-import fs from 'node:fs/promises';
 
-import type { SchemaGenerator } from './types';
 import { capitalizeFirstLetter } from '../utils/capitalize-first-letter';
+import type { SchemaGenerator } from './types';
 
 export const generatePrismaSchema: SchemaGenerator = async ({
 	adapter,

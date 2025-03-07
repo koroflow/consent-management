@@ -1,3 +1,4 @@
+import type { Field, FieldType } from '~/db/core/fields';
 /**
  * Database type mapping functionality
  *
@@ -10,7 +11,6 @@
  * @module migration/type-mapping
  */
 import type { KyselyDatabaseType } from '../adapters/kysely-adapter/types';
-import type { Field, FieldType } from '~/db/core/fields';
 
 /**
  * Type mappings for PostgreSQL

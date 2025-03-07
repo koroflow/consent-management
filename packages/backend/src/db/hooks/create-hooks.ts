@@ -1,7 +1,7 @@
+import type { Adapter } from '../adapters/types';
+import type { EntityName } from '../core/types';
 import type { CreateWithHooksProps, HookContext } from './types';
 import { processHooks } from './utils';
-import type { EntityName } from '../core/types';
-import type { Adapter } from '../adapters/types';
 
 /**
  * Creates a record with hooks applied before and after creation.

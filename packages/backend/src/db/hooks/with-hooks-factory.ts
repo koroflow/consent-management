@@ -1,10 +1,10 @@
 import type { Adapter } from '~/db/adapters/types';
+import { createWithHook } from './create-hooks';
 import type {
 	CreateWithHooksProps,
 	HookContext,
 	UpdateWithHooksProps,
 } from './types';
-import { createWithHook } from './create-hooks';
 import { updateWithHooks } from './update-hooks';
 import { updateManyWithHooks } from './update-many-hooks';
 

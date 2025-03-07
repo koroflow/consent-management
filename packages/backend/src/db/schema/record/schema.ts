@@ -6,7 +6,7 @@ import { z } from 'zod';
  * This defines the structure and validation rules for consent records:
  * - Required fields: userId, actionType (given, withdrawn, updated, etc.)
  * - Optional fields: consentId, details
- * - Default current date/time for creation timestamp
+ * - Default current date/time for creation and update timestamps
  *
  * @example
  * ```typescript
@@ -29,6 +29,7 @@ export const recordSchema = z.object({
 	actionType: z.string(),
 	details: z.record(z.unknown()).optional(),
 	createdAt: z.date().default(() => new Date()),
+	updatedAt: z.date().default(() => new Date()),
 });
 
 /**

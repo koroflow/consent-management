@@ -7,6 +7,7 @@ import { z } from 'zod';
  * - Required fields: userId, domainId, purposeIds
  * - Default value of 'active' for status
  * - Default current date/time for creation timestamp
+ * - Includes audit trail of all changes
  *
  * @example
  * ```typescript
@@ -14,27 +15,28 @@ import { z } from 'zod';
  *   id: '123e4567-e89b-12d3-a456-426614174000',
  *   userId: 'user-123',
  *   domainId: 'domain-456',
- *   purposeIds: ['purpose-789'], // Array of strings
+ *   purposeIds: ['purpose-789'],
  *   status: 'active',
  *   givenAt: new Date(),
- *   isActive: true
+ *   isActive: true,
+ *   history: [
+ *     {
+ *       actionType: 'given',
+ *       timestamp: new Date(),
+ *       details: { ip: '192.168.1.1' }
+ *     }
+ *   ]
  * };
- *
- * // Validate and parse the consent data
- * const validConsent = consentSchema.parse(consentData);
- *
- * // Or with defaults applied:
- * const minimalConsentData = {
- *   id: '123e4567-e89b-12d3-a456-426614174000',
- *   userId: 'user-123',
- *   domainId: 'domain-456',
- *   purposeIds: ['purpose-789']
- * };
- *
- * // status will default to 'active', isActive to true, etc.
- * const consentWithDefaults = consentSchema.parse(minimalConsentData);
  * ```
  */
+export const consentHistorySchema = z.object({
+	actionType: z.enum(['given', 'withdrawn', 'updated', 'expired']),
+	timestamp: z.date(),
+	details: z.record(z.unknown()).optional(),
+	previousState: z.record(z.unknown()).optional(),
+	newState: z.record(z.unknown()).optional(),
+});
+
 export const consentSchema = z.object({
 	id: z.string(),
 	userId: z.string(),
@@ -49,8 +51,7 @@ export const consentSchema = z.object({
 	givenAt: z.date().default(() => new Date()),
 	validUntil: z.date().optional(),
 	isActive: z.boolean().default(true),
-	createdAt: z.date().default(() => new Date()),
-	updatedAt: z.date().optional(),
+	history: z.array(consentHistorySchema).default([]),
 });
 
 /**
@@ -58,6 +59,7 @@ export const consentSchema = z.object({
  *
  * This type represents the structure of a consent record
  * as defined by the consentSchema. It includes all fields
- * that are part of the consent entity.
+ * that are part of the consent entity and its history.
  */
 export type Consent = z.infer<typeof consentSchema>;
+export type ConsentHistory = z.infer<typeof consentHistorySchema>;

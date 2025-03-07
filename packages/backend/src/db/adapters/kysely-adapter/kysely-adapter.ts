@@ -1,12 +1,4 @@
 import type {
-	BinaryOperatorExpression,
-	OperandValueExpressionOrList,
-} from 'node_modules/kysely/dist/esm/parser/binary-operation-parser';
-import { getConsentTables } from '../..';
-import type { C15TOptions } from '../../../types';
-import { applyDefaultValue } from '../utils';
-import type { Database, KyselyDatabaseType } from './types';
-import type {
 	ExpressionBuilder,
 	ExpressionOrFactory,
 	InsertQueryBuilder,
@@ -17,16 +9,24 @@ import type {
 	UpdateQueryBuilder,
 } from 'kysely';
 import type {
-	EntityName,
-	EntityTypeMap,
-	EntityInput,
-	EntityOutput,
-} from '~/db/core/types';
-import type { TableReference } from 'node_modules/kysely/dist/esm/parser/table-parser';
-import { generateId, type Field, type Primitive } from '~/db/core/fields';
+	BinaryOperatorExpression,
+	OperandValueExpressionOrList,
+} from 'node_modules/kysely/dist/esm/parser/binary-operation-parser';
 import type { InsertExpression } from 'node_modules/kysely/dist/esm/parser/insert-values-parser';
-import type { Adapter, TableFields, Where } from '../types';
+import type { TableReference } from 'node_modules/kysely/dist/esm/parser/table-parser';
 import superjson from 'superjson';
+import { type Field, type Primitive, generateId } from '~/db/core/fields';
+import type {
+	EntityInput,
+	EntityName,
+	EntityOutput,
+	EntityTypeMap,
+} from '~/db/core/types';
+import { getConsentTables } from '../..';
+import type { C15TOptions } from '../../../types';
+import type { Adapter, TableFields, Where } from '../types';
+import { applyDefaultValue } from '../utils';
+import type { Database, KyselyDatabaseType } from './types';
 
 /**
  * Type alias for Kysely field references
@@ -827,7 +827,7 @@ export const kyselyAdapter =
 			>(data: {
 				model: Model;
 				where: Where<Model>;
-				update: Partial<TableFields<Model>>;
+				update: EntityInput<Model>;
 			}): Promise<Result | null> {
 				const { model, where, update: values } = data;
 				// Convert Where from Adapter type to internal WhereCondition type
@@ -890,7 +890,7 @@ export const kyselyAdapter =
 			>(data: {
 				model: Model;
 				where: Where<Model>;
-				update: Partial<TableFields<Model>>;
+				update: Partial<EntityInput<Model>>;
 			}): Promise<Result[]> {
 				const { model, where, update: values } = data;
 				// Convert Where from Adapter type to internal WhereCondition type
@@ -1093,6 +1093,30 @@ export const kyselyAdapter =
 				const result = await query.execute();
 				const count = result.length;
 				return count;
+			},
+			/**
+			 * Executes a function within a database transaction
+			 *
+			 * This method wraps Kysely's transaction functionality to provide a consistent interface
+			 * for executing multiple database operations atomically.
+			 *
+			 * @typeParam ResultType - The type of data returned by the transaction
+			 * @param data - The transaction data containing the callback function
+			 * @returns A promise that resolves with the result of the callback function
+			 * @throws {Error} If the transaction fails to complete
+			 */
+			async transaction<ResultType>(data: {
+				callback: (transactionAdapter: Adapter) => Promise<ResultType>;
+			}): Promise<ResultType> {
+				const { callback } = data;
+
+				return db.transaction().execute(async (trx) => {
+					// Create a new adapter instance that uses the transaction connection
+					const transactionAdapter = kyselyAdapter(trx, config)(opts);
+
+					// Execute the callback function with the transaction adapter
+					return await callback(transactionAdapter);
+				});
 			},
 			options: config,
 		};

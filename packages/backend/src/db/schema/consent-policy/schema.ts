@@ -7,7 +7,7 @@ import { z } from 'zod';
  * - Required fields: version, name, effectiveDate, content, contentHash
  * - Optional fields: expirationDate
  * - Default value of true for isActive
- * - Default current date/time for creation timestamp
+ * - Default current date/time for creation and update timestamps
  *
  * @example
  * ```typescript
@@ -29,11 +29,12 @@ export const consentPolicySchema = z.object({
 	version: z.string(),
 	name: z.string(),
 	effectiveDate: z.date(),
-	expirationDate: z.date().optional(),
+	expirationDate: z.date().nullable().optional(),
 	content: z.string(),
 	contentHash: z.string(),
 	isActive: z.boolean().default(true),
 	createdAt: z.date().default(() => new Date()),
+	updatedAt: z.date().default(() => new Date()),
 });
 
 /**

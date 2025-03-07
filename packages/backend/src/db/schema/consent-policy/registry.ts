@@ -1,13 +1,27 @@
-import type { GenericEndpointContext, RegistryContext } from '~/types';
-import type { ConsentPolicy } from './schema';
-import { getWithHooks } from '~/db/hooks';
-import { validateEntityOutput } from '../definition';
+import { createHash } from 'node:crypto';
 import type { Where } from '~/db/adapters/types';
+import { getWithHooks } from '~/db/hooks';
+import type { GenericEndpointContext, RegistryContext } from '~/types';
+import { validateEntityOutput } from '../definition';
+import type { ConsentPolicy } from './schema';
 
 export interface FindPolicyParams {
 	domainId?: string;
 	version?: string;
 	includeInactive?: boolean;
+}
+
+/**
+ * Generates placeholder content for a policy with its hash.
+ *
+ * @param name - Policy name
+ * @param date - Generation date
+ * @returns Object containing content and contentHash
+ */
+function generatePolicyPlaceholder(name: string, date: Date) {
+	const content = `[PLACEHOLDER] This is an automatically generated version of the ${name} policy.\n\nThis placeholder content should be replaced with actual policy terms before being presented to users.\n\nGenerated on: ${date.toISOString()}`;
+	const contentHash = createHash('sha256').update(content).digest('hex');
+	return { content, contentHash };
 }
 
 /**
@@ -219,6 +233,79 @@ export function policyRegistry({ adapter, ...ctx }: RegistryContext) {
 			return policy
 				? validateEntityOutput('consentPolicy', policy, ctx.options)
 				: null;
+		},
+
+		/**
+		 * Finds the latest active policy or creates a new one if none exists.
+		 * Uses a database transaction to prevent race conditions in multi-threaded environments.
+		 *
+		 * If multiple active policies with the same name exist, returns the most recent one
+		 * based on effectiveDate. When creating a new policy, it assigns version '1.0.0'
+		 * and generates placeholder content with a SHA-256 hash.
+		 *
+		 * @param name - The name of the policy to find/create
+		 * @returns The policy object
+		 * @throws {Error} If the transaction fails to complete
+		 */
+		findOrCreatePolicy: async (name: string) => {
+			// Normalize name for comparison
+			const normalizedSearchName = name.toLowerCase().trim();
+
+			// Use a transaction to prevent race conditions
+			return adapter.transaction({
+				callback: async (txAdapter) => {
+					const now = new Date();
+					const txRegistry = policyRegistry({
+						adapter: txAdapter,
+						...ctx,
+					});
+
+					// Find latest policy with exact name match directly from database
+					const matchingPolicies = await txAdapter.findMany({
+						model: 'consentPolicy',
+						where: [
+							{ field: 'isActive', value: true },
+							{
+								field: 'name',
+								value: normalizedSearchName,
+								operator: 'caseInsensitiveEquals',
+							},
+						],
+						sortBy: {
+							field: 'effectiveDate',
+							direction: 'desc',
+						},
+						limit: 1,
+					});
+
+					const latestPolicy = matchingPolicies[0]
+						? validateEntityOutput(
+								'consentPolicy',
+								matchingPolicies[0],
+								ctx.options
+							)
+						: null;
+
+					if (latestPolicy) {
+						return latestPolicy;
+					}
+
+					// Generate policy content and hash
+					const { content: defaultContent, contentHash } =
+						generatePolicyPlaceholder(name, now);
+
+					return txRegistry.createConsentPolicy({
+						version: '1.0.0',
+						name: normalizedSearchName,
+						effectiveDate: now,
+						content: defaultContent,
+						contentHash,
+						isActive: true,
+						updatedAt: now,
+						expirationDate: null,
+					});
+				},
+			});
 		},
 	};
 

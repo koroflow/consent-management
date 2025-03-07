@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import { test } from 'vitest';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { test } from 'vitest';
 import { getConfig } from '../src/utils/get-config';
 
 interface TmpDirFixture {
@@ -25,7 +25,7 @@ test.extend<TmpDirFixture>({
 	},
 });
 
-let tmpDir = '.';
+let tmpDir = './';
 
 describe('getConfig', async () => {
 	beforeEach(async () => {

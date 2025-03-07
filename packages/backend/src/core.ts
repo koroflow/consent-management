@@ -1,14 +1,14 @@
 import { router } from './api/index';
-import type {
-	FilterActions,
-	C15TContext,
-	C15TPlugin,
-	C15TOptions,
-} from './types';
-import { init } from './init';
-import { getBaseURL } from './utils';
-import { failAsync, okAsync, safeResultAsync, BASE_ERROR_CODES } from './error';
+import { BASE_ERROR_CODES, failAsync, okAsync, safeResultAsync } from './error';
 import type { C15TResult, C15TResultAsync } from './error/results';
+import { init } from './init';
+import type {
+	C15TContext,
+	C15TOptions,
+	C15TPlugin,
+	FilterActions,
+} from './types';
+import { getBaseURL } from './utils';
 
 /**
  * Interface representing a configured c15t consent management instance.

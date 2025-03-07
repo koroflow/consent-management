@@ -1,6 +1,6 @@
 import { type Result, ResultAsync, err, ok as neverOk } from 'neverthrow';
+import { BASE_ERROR_CODES, type ErrorMessage } from './codes';
 import { C15TError } from './error';
-import { type ErrorMessage, BASE_ERROR_CODES } from './codes';
 
 /**
  * Type for C15T results that can contain any error

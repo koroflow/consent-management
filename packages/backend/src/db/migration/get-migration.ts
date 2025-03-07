@@ -1,12 +1,12 @@
-import { createLogger } from '../../utils/logger';
 import type { C15TOptions } from '~/types';
+import { createLogger } from '../../utils/logger';
 import { createKyselyAdapter } from '../adapters/kysely-adapter/dialect';
-import { analyzeSchemaChanges } from './schema-comparison';
 import {
 	buildColumnAddMigrations,
 	buildTableCreateMigrations,
 } from './migration-builders';
 import { createMigrationExecutors } from './migration-execution';
+import { analyzeSchemaChanges } from './schema-comparison';
 import type { MigrationResult } from './types';
 
 /**

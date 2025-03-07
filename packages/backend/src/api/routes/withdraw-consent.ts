@@ -1,8 +1,8 @@
-import { createAuthEndpoint } from '../call';
-import { APIError } from 'better-call';
 import { z } from 'zod';
-import type { C15TContext } from '../../types';
 import type { EntityOutputFields } from '~/db/schema/definition';
+import { BASE_ERROR_CODES, C15TError } from '~/error';
+import type { C15TContext } from '../../types';
+import { createAuthEndpoint } from '../call';
 
 // Define the schemas for validating request body
 // We'll have three different schemas for the three identification methods
@@ -72,20 +72,27 @@ export const withdrawConsent = createAuthEndpoint(
 			const validatedData = withdrawConsentSchema.safeParse(ctx.body);
 
 			if (!validatedData.success) {
-				throw new APIError('BAD_REQUEST', {
-					message: 'Invalid request data',
-					details: validatedData.error.errors,
-				});
+				throw new C15TError(
+					'The request data is invalid. Please ensure all required fields are correctly filled and formatted.',
+					{
+						code: BASE_ERROR_CODES.BAD_REQUEST,
+						status: 400,
+						data: { details: validatedData.error.errors },
+					}
+				);
 			}
 
 			const params = validatedData.data;
 			const { registry } = ctx.context as C15TContext;
 
 			if (!registry) {
-				throw new APIError('INTERNAL_SERVER_ERROR', {
-					message: 'Registry not available',
-					status: 503,
-				});
+				throw new C15TError(
+					'The registry service is currently unavailable. Please check the service status and try again later.',
+					{
+						code: BASE_ERROR_CODES.INITIALIZATION_FAILED,
+						status: 503,
+					}
+				);
 			}
 
 			// Find the consent records to withdraw based on the identifier type
@@ -96,21 +103,28 @@ export const withdrawConsent = createAuthEndpoint(
 				const record = await registry.findConsentById(params.consentId);
 
 				if (!record) {
-					throw new APIError('NOT_FOUND', {
-						message: 'Consent record not found',
-						details: {
-							consentId: params.consentId,
-						},
-					});
+					throw new C15TError(
+						'The specified consent record could not be found. Please verify the consent ID and try again.',
+						{
+							code: BASE_ERROR_CODES.CONSENT_NOT_FOUND,
+							status: 404,
+							data: { consentId: params.consentId },
+						}
+					);
 				}
 
 				if (record.status !== 'active') {
-					throw new APIError('CONFLICT', {
-						message: 'Consent has already been withdrawn',
-						details: {
-							consentId: params.consentId,
-						},
-					});
+					throw new C15TError(
+						'The consent has already been withdrawn. No further action is required.',
+						{
+							code: BASE_ERROR_CODES.CONFLICT,
+							status: 409,
+							data: {
+								consentId: params.consentId,
+								currentStatus: record.status,
+							},
+						}
+					);
 				}
 
 				recordsToWithdraw = [record];
@@ -127,15 +141,17 @@ export const withdrawConsent = createAuthEndpoint(
 				}
 
 				if (!userRecord) {
-					throw new APIError('NOT_FOUND', {
-						message: 'User not found',
-						details: {
-							[params.identifierType]:
+					throw new C15TError(
+						'The specified user could not be found. Please verify the user ID or external ID and try again.',
+						{
+							code: BASE_ERROR_CODES.NOT_FOUND,
+							status: 404,
+							data:
 								params.identifierType === 'userId'
-									? params.userId
-									: params.externalId,
-						},
-					});
+									? { userId: params.userId }
+									: { externalId: params.externalId },
+						}
+					);
 				}
 
 				// Find all active consents for this user and domain
@@ -150,16 +166,19 @@ export const withdrawConsent = createAuthEndpoint(
 				);
 
 				if (recordsToWithdraw.length === 0) {
-					throw new APIError('NOT_FOUND', {
-						message: 'No active consent records found for this user and domain',
-						details: {
-							[params.identifierType]:
-								params.identifierType === 'userId'
-									? params.userId
-									: params.externalId,
-							domain: params.domain,
-						},
-					});
+					throw new C15TError(
+						'No active consent records were found for this user and domain. Please ensure the user and domain are correct.',
+						{
+							code: BASE_ERROR_CODES.CONSENT_NOT_FOUND,
+							status: 404,
+							data: {
+								domain: params.domain,
+								...(params.identifierType === 'userId'
+									? { userId: params.userId }
+									: { externalId: params.externalId }),
+							},
+						}
+					);
 				}
 			}
 
@@ -200,6 +219,8 @@ export const withdrawConsent = createAuthEndpoint(
 						identifierType: params.identifierType,
 						withdrawnAt: currentTime.toISOString(),
 					},
+					createdAt: currentTime,
+					updatedAt: currentTime,
 				});
 
 				// Log the action in the audit log
@@ -241,22 +262,30 @@ export const withdrawConsent = createAuthEndpoint(
 			const context = ctx.context as C15TContext;
 			context.logger?.error?.('Error withdrawing consent:', error);
 
-			if (error instanceof APIError) {
+			if (error instanceof C15TError) {
 				throw error;
 			}
 			if (error instanceof z.ZodError) {
-				throw new APIError('BAD_REQUEST', {
-					message: 'Invalid request data',
-					details: error.errors,
-				});
+				throw new C15TError(
+					'The request data is invalid. Please ensure all required fields are correctly filled and formatted.',
+					{
+						code: BASE_ERROR_CODES.BAD_REQUEST,
+						status: 400,
+						data: { details: error.errors },
+					}
+				);
 			}
 
-			throw new APIError('INTERNAL_SERVER_ERROR', {
-				message: 'Failed to withdraw consent',
-				status: 503,
-				details:
-					error instanceof Error ? { message: error.message } : { error },
-			});
+			throw new C15TError(
+				'Failed to withdraw consent. Please try again later or contact support if the issue persists.',
+				{
+					code: BASE_ERROR_CODES.INTERNAL_SERVER_ERROR,
+					status: 503,
+					data: {
+						error: error instanceof Error ? error.message : String(error),
+					},
+				}
+			);
 		}
 	}
 );

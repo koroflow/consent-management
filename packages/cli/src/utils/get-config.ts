@@ -1,14 +1,14 @@
-import { loadConfig } from 'c12';
-import { logger } from '@c15t/backend';
+import fs from 'node:fs';
 import path from 'node:path';
 // @ts-ignore
-import babelPresetTypescript from '@babel/preset-typescript';
-// @ts-ignore
 import babelPresetReact from '@babel/preset-react';
-import fs from 'node:fs';
+// @ts-ignore
+import babelPresetTypescript from '@babel/preset-typescript';
+import { logger } from '@c15t/backend';
 import { C15TError } from '@c15t/backend/error';
-import { addSvelteKitEnvModules } from './add-svelte-kit-env-modules';
 import type { C15TOptions } from '@c15t/backend/types';
+import { loadConfig } from 'c12';
+import { addSvelteKitEnvModules } from './add-svelte-kit-env-modules';
 
 /**
  * List of possible config file names and locations to search

@@ -5,16 +5,15 @@ import {
 	type UnionToIntersection,
 	createRouter,
 } from 'better-call';
-import type { C15TOptions, C15TPlugin, C15TContext } from '~/types';
+import type { C15TContext, C15TOptions, C15TPlugin } from '~/types';
 import { getIp } from '~/utils/ip';
 
+import { logger } from '~/utils/logger';
 import { originCheckMiddleware } from './middlewares/origin-check';
 import { validateContextMiddleware } from './middlewares/validate-context';
 import { baseEndpoints } from './routes';
 import { ok } from './routes/ok';
-import { error } from './routes/error';
 import { toEndpoints } from './to-endpoints';
-import { logger } from '~/utils/logger';
 
 /**
  * Retrieves and configures endpoints from plugins and core functionality
@@ -105,7 +104,7 @@ export function getEndpoints<
 		...baseEndpoints,
 		...pluginEndpoints,
 		ok,
-		error,
+		// error,
 	};
 	const api = toEndpoints(endpoints, ctx);
 	return {
@@ -190,7 +189,7 @@ export const router = <
 	const routerInstance = createRouter(api, {
 		routerContext: ctx,
 		openapi: {
-			disabled: true,
+			disabled: false,
 		},
 		basePath,
 		routerMiddleware: [
@@ -207,6 +206,7 @@ export const router = <
 		async onRequest(req) {
 			// Add IP address to context
 			(ctx as C15TContext).ipAddress = getIp(req, options);
+			(ctx as C15TContext).userAgent = req.headers.get('user-agent');
 
 			for (const plugin of ctx.options.plugins || []) {
 				if (plugin.onRequest) {

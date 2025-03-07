@@ -1,8 +1,8 @@
-import type { GenericEndpointContext, RegistryContext } from '~/types';
-import type { inferRecord as Record } from './schema';
-import { getWithHooks } from '~/db/hooks';
-import { validateEntityOutput } from '../definition';
 import type { Where } from '~/db/adapters/types';
+import { getWithHooks } from '~/db/hooks';
+import type { GenericEndpointContext, RegistryContext } from '~/types';
+import { validateEntityOutput } from '../definition';
+import type { inferRecord as Record } from './schema';
 
 /**
  * Creates and returns a set of consent record-related adapter methods to interact with the database.
@@ -44,12 +44,13 @@ export function recordRegistry({ adapter, ...ctx }: RegistryContext) {
 		 * @throws May throw an error if hooks prevent creation or if database operations fail
 		 */
 		createRecord: async (
-			record: Omit<Record, 'id' | 'createdAt'> & Partial<Record>,
+			record: Omit<Record, 'id' | 'createdAt' | 'updatedAt'> & Partial<Record>,
 			context?: GenericEndpointContext
 		) => {
 			const createdRecord = await createWithHooks({
 				data: {
-					createdAt: new Date(),
+					createdAt: record.createdAt || new Date(),
+					updatedAt: record.updatedAt || new Date(),
 					...record,
 				},
 				model: 'record',

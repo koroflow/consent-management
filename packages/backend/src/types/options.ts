@@ -1,3 +1,4 @@
+import type { C15TMiddleware } from '~/api/call';
 /**
  * c15t Consent Management System Configuration Types
  *
@@ -7,11 +8,10 @@
  */
 import type { Logger } from '../utils/logger';
 import type { C15TContext, C15TPlugin } from './index';
-import type { C15TMiddleware } from '~/api/call';
 
-import type { DatabaseHook } from '~/db/hooks/types';
 import type { DatabaseConfiguration } from '~/db/adapters/kysely-adapter/types';
 import type { EntityName } from '~/db/core/types';
+import type { DatabaseHook } from '~/db/hooks/types';
 
 // Import table configuration types from the schema module
 import type { TablesConfig } from '~/db/schema/types';

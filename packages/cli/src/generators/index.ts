@@ -1,8 +1,8 @@
 import { logger } from '@c15t/backend';
-import { generateDrizzleSchema } from './drizzle';
-import { generatePrismaSchema } from './prisma';
-import { generateMigrations } from './kysely';
 import type { Adapter, C15TOptions } from '@c15t/backend/types';
+import { generateDrizzleSchema } from './drizzle';
+import { generateMigrations } from './kysely';
+import { generatePrismaSchema } from './prisma';
 
 export const adapters = {
 	prisma: generatePrismaSchema,

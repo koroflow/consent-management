@@ -1,7 +1,7 @@
-import type { SchemaDefinition } from './types';
-import { processFields } from './process-fields';
-import type { C15TDBSchema } from '../../schema/definition';
 import type { Field } from '~/db/core/fields';
+import type { C15TDBSchema } from '../../schema/definition';
+import { processFields } from './process-fields';
+import type { SchemaDefinition } from './types';
 
 /**
  * Processes table definitions into a structured schema

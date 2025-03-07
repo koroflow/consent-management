@@ -1,7 +1,7 @@
 import type { C15TOptions } from '~/types';
-import type { KyselyAdapterConfig } from './kysely-adapter';
-import type { EntityName } from '../core/types';
+import type { EntityInput, EntityName } from '../core/types';
 import type { C15TDBSchema } from '../schema/definition';
+import type { KyselyAdapterConfig } from './kysely-adapter';
 
 /**
  * Type representing the fields of a database table for a specific entity
@@ -34,7 +34,8 @@ export type ComparisonOperator =
 	| 'in' // In array
 	| 'contains' // Contains substring
 	| 'starts_with' // Starts with
-	| 'ends_with'; // Ends with
+	| 'ends_with' // Ends with
+	| 'caseInsensitiveEquals'; // Case insensitive equality
 
 /**
  * Type representing the logical connectors for combining query conditions
@@ -128,7 +129,7 @@ export interface Adapter {
 	update: <Model extends EntityName, Result extends TableFields<Model>>(data: {
 		model: Model;
 		where: Where<Model>;
-		update: Partial<TableFields<Model>>;
+		update: EntityInput<Model>;
 	}) => Promise<Result | null>;
 
 	/** Updates multiple records matching the where conditions */
@@ -138,7 +139,7 @@ export interface Adapter {
 	>(data: {
 		model: Model;
 		where: Where<Model>;
-		update: Partial<TableFields<Model>>;
+		update: Partial<EntityInput<Model>>;
 	}) => Promise<Result[]>;
 
 	/** Deletes a single record matching the where conditions */
@@ -152,6 +153,38 @@ export interface Adapter {
 		model: Model;
 		where: Where<Model>;
 	}) => Promise<number>;
+
+	/**
+	 * Executes a function within a database transaction
+	 *
+	 * This method allows multiple database operations to be executed in a single atomic transaction.
+	 * If any operation within the transaction fails, all operations are rolled back.
+	 *
+	 * @typeParam ResultType - The type of data returned by the transaction
+	 * @param data - The transaction data containing the callback function
+	 * @returns A promise that resolves with the result of the callback function
+	 * @throws {Error} If the transaction fails to complete
+	 *
+	 * @example
+	 * ```typescript
+	 * const result = await adapter.transaction({
+	 *   callback: async (tx) => {
+	 *     const user = await tx.create({
+	 *       model: 'user',
+	 *       data: { name: 'John Doe' }
+	 *     });
+	 *     await tx.create({
+	 *       model: 'profile',
+	 *       data: { userId: user.id, bio: 'Test bio' }
+	 *     });
+	 *     return user;
+	 *   }
+	 * });
+	 * ```
+	 */
+	transaction: <ResultType>(data: {
+		callback: (transactionAdapter: Adapter) => Promise<ResultType>;
+	}) => Promise<ResultType>;
 
 	/** Optional method to create database schema */
 	createSchema?: (

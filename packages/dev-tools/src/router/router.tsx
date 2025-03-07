@@ -5,10 +5,10 @@ import { motion } from 'motion/react';
 import { useCallback, useState } from 'react';
 
 import type { PrivacyConsentState } from 'c15t';
+import { Badge } from '~/components/ui/badge';
 import { ExpandableTabs } from '../components/ui/expandable-tabs';
 import { ScrollArea } from '../components/ui/scroll-area';
 import { getStore } from '../dev-tool';
-import { Badge } from '~/components/ui/badge';
 
 type TabSection = 'Consents' | 'Compliance' | 'Scripts' | 'Conditional';
 

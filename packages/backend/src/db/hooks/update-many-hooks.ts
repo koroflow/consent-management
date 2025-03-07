@@ -1,11 +1,11 @@
 import type { Adapter } from '~/db/adapters/types';
+import type { EntityName } from '~/db/core/types';
 import type {
 	CustomOperationFunction,
 	HookContext,
 	UpdateWithHooksProps,
 } from './types';
-import { processHooks, processAfterHooksForMany } from './utils';
-import type { EntityName } from '~/db/core/types';
+import { processAfterHooksForMany, processHooks } from './utils';
 
 /**
  * Executes a custom function if provided for batch updates.

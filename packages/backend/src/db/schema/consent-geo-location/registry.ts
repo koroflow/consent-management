@@ -1,7 +1,7 @@
-import type { GenericEndpointContext, RegistryContext } from '~/types';
-import type { ConsentGeoLocation } from './schema';
 import { getWithHooks } from '~/db/hooks';
+import type { GenericEndpointContext, RegistryContext } from '~/types';
 import { validateEntityOutput } from '../definition';
+import type { ConsentGeoLocation } from './schema';
 
 /**
  * Creates and returns a set of consent geo-location-related adapter methods to interact with the database.

@@ -6,7 +6,7 @@ import { z } from 'zod';
  * This defines the structure and validation rules for geo-location records:
  * - Required fields: consentId, ip (IP address)
  * - Optional fields: country, region, city, latitude, longitude, timezone
- * - Default current date/time for creation timestamp
+ * - Default current date/time for creation and update timestamps
  *
  * @example
  * ```typescript
@@ -38,6 +38,7 @@ export const consentGeoLocationSchema = z.object({
 		.regex(/^[A-Za-z_]+\/[A-Za-z_]+$/)
 		.optional(), // Basic IANA timezone format check
 	createdAt: z.date().default(() => new Date()),
+	updatedAt: z.date().default(() => new Date()),
 });
 
 /**
