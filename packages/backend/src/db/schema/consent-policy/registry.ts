@@ -224,45 +224,61 @@ export function policyRegistry({ adapter, ...ctx }: RegistryContext) {
 
 		/**
 		 * Finds the latest active policy or creates a new one if none exists.
+		 * Uses a database transaction to prevent race conditions in multi-threaded environments.
+		 *
+		 * If multiple active policies with the same name exist, returns the most recent one
+		 * based on effectiveDate. When creating a new policy, it assigns version '1.0.0'
+		 * and generates placeholder content with a SHA-256 hash.
 		 *
 		 * @param name - The name of the policy to find/create
 		 * @returns The policy object
+		 * @throws {Error} If the transaction fails to complete
 		 */
 		findOrCreatePolicy: async (name: string) => {
-			const now = new Date();
-			const policies = await registry.findPolicies({
-				includeInactive: false,
-			});
-
 			// Normalize name for comparison
 			const normalizedSearchName = name.toLowerCase().trim();
 
-			// Find latest policy with exact name match
-			const latestPolicy = policies
-				.filter((p) => p.name.toLowerCase() === normalizedSearchName)
-				.sort(
-					(a, b) => b.effectiveDate.getTime() - a.effectiveDate.getTime()
-				)[0];
+			// Use a transaction to prevent race conditions
+			return adapter.transaction({
+				callback: async (txAdapter) => {
+					const now = new Date();
+					const txRegistry = policyRegistry({
+						adapter: txAdapter,
+						...ctx,
+					});
 
-			if (latestPolicy) {
-				return latestPolicy;
-			}
+					const policies = await txRegistry.findPolicies({
+						includeInactive: false,
+					});
 
-			// Generate policy content and hash
-			const defaultContent = `Default ${name} content`;
-			const contentHash = createHash('sha256')
-				.update(defaultContent)
-				.digest('hex');
+					// Find latest policy with exact name match
+					const latestPolicy = policies
+						.filter((p) => p.name.toLowerCase() === normalizedSearchName)
+						.sort(
+							(a, b) => b.effectiveDate.getTime() - a.effectiveDate.getTime()
+						)[0];
 
-			return registry.createConsentPolicy({
-				version: '1.0.0',
-				name: normalizedSearchName,
-				effectiveDate: now,
-				content: defaultContent,
-				contentHash,
-				isActive: true,
-				updatedAt: now,
-				expirationDate: null,
+					if (latestPolicy) {
+						return latestPolicy;
+					}
+
+					// Generate policy content and hash
+					const defaultContent = `[PLACEHOLDER] This is an automatically generated version of the ${name} policy.\n\nThis placeholder content should be replaced with actual policy terms before being presented to users.\n\nGenerated on: ${now.toISOString()}`;
+					const contentHash = createHash('sha256')
+						.update(defaultContent)
+						.digest('hex');
+
+					return txRegistry.createConsentPolicy({
+						version: '1.0.0',
+						name: name.trim(),
+						effectiveDate: now,
+						content: defaultContent,
+						contentHash,
+						isActive: true,
+						updatedAt: now,
+						expirationDate: null,
+					});
+				},
 			});
 		},
 	};
