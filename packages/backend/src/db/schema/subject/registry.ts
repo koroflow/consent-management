@@ -24,7 +24,7 @@ import type { Subject } from './schema';
  * );
  *
  * // Create a new subject
- * const subject = await userAdapter.createSubject({
+ * const subject = await subjectAdapter.createSubject({
  *   externalId: 'external-123',
  *   identityProvider: 'auth0'
  * });
