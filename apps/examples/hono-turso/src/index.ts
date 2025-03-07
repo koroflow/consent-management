@@ -13,12 +13,28 @@ app.on(['POST', 'GET'], '/api/c15t/*', async (c) => {
 			TURSO_DATABASE_URL: string;
 			TURSO_AUTH_TOKEN: string;
 		}>(c);
+
+		if (!TURSO_DATABASE_URL || !TURSO_AUTH_TOKEN) {
+			return new Response(
+				JSON.stringify({
+					error: true,
+					message: 'Missing required environment variables for database connection',
+				}),
+				{
+					status: 500,
+					headers: {
+						'Content-Type': 'application/json',
+					},
+				}
+			);
+		}
+
 		const c15t = c15tInstance({
 			// secret: process.env.C15T_SECRET,
 			// baseURL: process.env.C15T_BASE_URL,
 			database: new LibsqlDialect({
-				url: TURSO_DATABASE_URL || '',
-				authToken: TURSO_AUTH_TOKEN || '',
+				url: TURSO_DATABASE_URL,
+				authToken: TURSO_AUTH_TOKEN,
 			}),
 			basePath: '/api/c15t',
 		});
