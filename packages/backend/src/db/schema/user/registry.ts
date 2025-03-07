@@ -103,7 +103,8 @@ export function userRegistry({ adapter, ...ctx }: RegistryContext) {
 
 				if (userById.id !== userByExternalId.id) {
 					throw new APIError('BAD_REQUEST', {
-						message: 'Provided userId and externalUserId do not match the same user',
+						message:
+							'Provided userId and externalUserId do not match the same user',
 						status: 400,
 					});
 				}
@@ -130,7 +131,7 @@ export function userRegistry({ adapter, ...ctx }: RegistryContext) {
 					if (user) {
 						return user;
 					}
-					
+
 					// Attempt to create with unique constraint on externalId
 					return await this.createUser(
 						{
@@ -143,7 +144,10 @@ export function userRegistry({ adapter, ...ctx }: RegistryContext) {
 					);
 				} catch (error) {
 					// If creation failed due to duplicate, try to find again
-					if (error instanceof Error && error.message.includes('unique constraint')) {
+					if (
+						error instanceof Error &&
+						error.message.includes('unique constraint')
+					) {
 						const user = await this.findUserByExternalId(externalUserId);
 						if (user) {
 							return user;

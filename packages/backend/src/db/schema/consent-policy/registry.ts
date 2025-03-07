@@ -236,7 +236,7 @@ export function policyRegistry({ adapter, ...ctx }: RegistryContext) {
 
 			// Normalize name for comparison
 			const normalizedSearchName = name.toLowerCase().trim();
-			
+
 			// Find latest policy with exact name match
 			const latestPolicy = policies
 				.filter((p) => p.name.toLowerCase() === normalizedSearchName)
