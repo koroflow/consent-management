@@ -230,7 +230,7 @@ export const generateConsentReceipt = createAuthEndpoint(
 				'Failed to generate consent receipt. Please try again later or contact support if the issue persists.',
 				{
 					code: BASE_ERROR_CODES.INTERNAL_SERVER_ERROR,
-					status: 503,
+					status: 500,
 					data: {
 						details:
 							error instanceof Error ? { message: error.message } : { error },
