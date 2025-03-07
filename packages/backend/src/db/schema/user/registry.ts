@@ -95,6 +95,15 @@ export function userRegistry({ adapter, ...ctx }: RegistryContext) {
 				]);
 
 				if (!userById || !userByExternalId) {
+					ctx.logger?.info(
+						'User validation failed: One or both users not found',
+						{
+							providedUserId: userId,
+							providedExternalId: externalUserId,
+							userByIdFound: !!userById,
+							userByExternalIdFound: !!userByExternalId,
+						}
+					);
 					throw new APIError('NOT_FOUND', {
 						message: 'One or both users not found',
 						status: 404,
@@ -102,6 +111,15 @@ export function userRegistry({ adapter, ...ctx }: RegistryContext) {
 				}
 
 				if (userById.id !== userByExternalId.id) {
+					ctx.logger?.warn(
+						'User validation failed: IDs do not match the same user',
+						{
+							providedUserId: userId,
+							providedExternalId: externalUserId,
+							userByIdId: userById.id,
+							userByExternalIdId: userByExternalId.id,
+						}
+					);
 					throw new APIError('BAD_REQUEST', {
 						message:
 							'Provided userId and externalUserId do not match the same user',
@@ -129,9 +147,15 @@ export function userRegistry({ adapter, ...ctx }: RegistryContext) {
 				try {
 					const user = await this.findUserByExternalId(externalUserId);
 					if (user) {
+						ctx.logger?.debug('Found existing user by external ID', {
+							externalUserId,
+						});
 						return user;
 					}
 
+					ctx.logger?.info('Creating new user with external ID', {
+						externalUserId,
+					});
 					// Attempt to create with unique constraint on externalId
 					return await this.createUser(
 						{
@@ -148,14 +172,22 @@ export function userRegistry({ adapter, ...ctx }: RegistryContext) {
 						error instanceof Error &&
 						error.message.includes('unique constraint')
 					) {
+						ctx.logger?.info(
+							'Handling duplicate key violation for external ID',
+							{ externalUserId }
+						);
 						const user = await this.findUserByExternalId(externalUserId);
 						if (user) {
 							return user;
 						}
 					}
+					ctx.logger?.error('Failed to create or find user with external ID', {
+						externalUserId,
+						error: error instanceof Error ? error.message : 'Unknown error',
+					});
 					throw new APIError('INTERNAL_SERVER_ERROR', {
 						message: 'Failed to create or find user with external ID',
-						status: 503,
+						status: 500,
 						details: error instanceof Error ? error.message : 'Unknown error',
 					});
 				}
@@ -174,9 +206,13 @@ export function userRegistry({ adapter, ...ctx }: RegistryContext) {
 					context
 				);
 			} catch (error) {
+				ctx.logger?.error('Failed to create anonymous user', {
+					ipAddress,
+					error: error instanceof Error ? error.message : 'Unknown error',
+				});
 				throw new APIError('INTERNAL_SERVER_ERROR', {
 					message: 'Failed to create anonymous user',
-					status: 503,
+					status: 500,
 					details: error instanceof Error ? error.message : 'Unknown error',
 				});
 			}
