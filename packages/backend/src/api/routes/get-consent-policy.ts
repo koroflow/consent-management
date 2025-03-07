@@ -32,7 +32,7 @@ export interface GetPolicyResponse {
 			availablePreferences?: Record<string, unknown>;
 			createdAt: string;
 		};
-		userConsentStatus?: {
+		subjectConsentStatus?: {
 			hasConsent: boolean;
 			currentPreferences: Record<string, string | null> | null;
 			consentedAt: string | null;
@@ -96,7 +96,7 @@ export interface GetPolicyResponse {
  *       },
  *       "createdAt": "2023-04-01T12:34:56.789Z"
  *     },
- *     "userConsentStatus": {
+ *     "subjectConsentStatus": {
  *       "hasConsent": true,
  *       "currentPreferences": {
  *         "marketing": null,
@@ -113,7 +113,7 @@ export interface GetPolicyResponse {
  * @returns {boolean} success - Whether the request was successful
  * @returns {Object} data - The policy data
  * @returns {Object} data.policy - The consent policy information
- * @returns {Object} [data.userConsentStatus] - Subject's consent status if subject identifiers were provided
+ * @returns {Object} [data.subjectConsentStatus] - Subject's consent status if subject identifiers were provided
  *
  * @throws {C15TError} BAD_REQUEST - When request parameters are invalid
  * @throws {C15TError} NOT_FOUND - When the domain or policy version doesn't exist
@@ -276,7 +276,7 @@ export const getConsentPolicy = createAuthEndpoint(
 					const userConsent = userConsents.length > 0 ? userConsents[0] : null;
 
 					// Add subject consent info to response
-					response.data.userConsentStatus = {
+					response.data.subjectConsentStatus = {
 						hasConsent: !!userConsent,
 						//@ts-expect-error
 						currentPreferences: userConsent ? userConsent.preferences : null,
