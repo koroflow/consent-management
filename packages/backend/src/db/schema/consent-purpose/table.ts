@@ -3,14 +3,14 @@ import type { C15TOptions } from '~/types';
 import { purposeSchema } from './schema';
 
 /**
- * Generates the database table configuration for the consent purpose entity.
+ * Generates the database table configuration for the consent consentPurpose entity.
  *
- * This function creates a schema definition that includes all standard consent purpose fields
+ * This function creates a schema definition that includes all standard consent consentPurpose fields
  * and any additional fields from plugins or configuration. The resulting schema is used
  * for database migrations, schema validation, and query building.
  *
- * @param options - C15T configuration options that may contain purpose table customizations
- * @param purposeFields - Additional fields from plugins to include in the purpose table
+ * @param options - C15T configuration options that may contain consentPurpose table customizations
+ * @param purposeFields - Additional fields from plugins to include in the consentPurpose table
  * @returns A complete table schema definition with fields, model name, and metadata
  *
  * @example
@@ -24,31 +24,31 @@ export function getPurposeTable(
 	options: C15TOptions,
 	purposeFields?: Record<string, Field>
 ) {
-	const purposeConfig = options.tables?.purpose;
+	const purposeConfig = options.tables?.consentPurpose;
 
 	return {
 		/**
-		 * The name of the purpose table in the database, configurable through options
+		 * The name of the consentPurpose table in the database, configurable through options
 		 */
-		entityName: purposeConfig?.entityName || 'purpose',
+		entityName: purposeConfig?.entityName || 'consentPurpose',
 
 		/**
-		 * The ID prefix for the purpose table
+		 * The ID prefix for the consentPurpose table
 		 * Used to generate unique prefixed IDs for purposes
 		 */
 		entityPrefix: purposeConfig?.entityPrefix || 'pur',
 
 		/**
-		 * The schema for the purpose table
+		 * The schema for the consentPurpose table
 		 */
 		schema: purposeSchema,
 
 		/**
-		 * Field definitions for the consent purpose table
+		 * Field definitions for the consent consentPurpose table
 		 */
 		fields: {
 			/**
-			 * Unique code for the purpose, used for programmatic identification
+			 * Unique code for the consentPurpose, used for programmatic identification
 			 */
 			code: {
 				type: 'string',
@@ -57,7 +57,7 @@ export function getPurposeTable(
 			},
 
 			/**
-			 * Human-readable name of the purpose
+			 * Human-readable name of the consentPurpose
 			 */
 			name: {
 				type: 'string',
@@ -66,7 +66,7 @@ export function getPurposeTable(
 			},
 
 			/**
-			 * Detailed description of the purpose, shown to subjects
+			 * Detailed description of the consentPurpose, shown to subjects
 			 */
 			description: {
 				type: 'string',
@@ -75,7 +75,7 @@ export function getPurposeTable(
 			},
 
 			/**
-			 * Whether this is an essential purpose that doesn't require explicit consent
+			 * Whether this is an essential consentPurpose that doesn't require explicit consent
 			 * Default: false
 			 */
 			isEssential: {
@@ -86,7 +86,7 @@ export function getPurposeTable(
 			},
 
 			/**
-			 * Category of data this purpose processes (e.g., 'personal', 'profile')
+			 * Category of data this consentPurpose processes (e.g., 'personal', 'profile')
 			 * Optional field
 			 */
 			dataCategory: {
@@ -106,7 +106,7 @@ export function getPurposeTable(
 			},
 
 			/**
-			 * Whether this purpose is currently active
+			 * Whether this consentPurpose is currently active
 			 * Default: true
 			 */
 			isActive: {
@@ -117,7 +117,7 @@ export function getPurposeTable(
 			},
 
 			/**
-			 * When the purpose record was created
+			 * When the consentPurpose record was created
 			 * Automatically set to current time by default
 			 */
 			createdAt: {
@@ -128,7 +128,7 @@ export function getPurposeTable(
 			},
 
 			/**
-			 * When the purpose record was last updated
+			 * When the consentPurpose record was last updated
 			 * Automatically updated on each modification
 			 */
 			updatedAt: {
@@ -147,8 +147,8 @@ export function getPurposeTable(
 
 		/**
 		 * Execution order during migrations (lower numbers run first)
-		 * Purpose table needs to be created relatively early as other tables reference it
+		 * ConsentPurpose table needs to be created relatively early as other tables reference it
 		 */
-		order: 2,
+		order: 1,
 	};
 }

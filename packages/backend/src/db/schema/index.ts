@@ -8,7 +8,7 @@
  * @remarks
  * The Schema Module is organized into three main components:
  *
- * 1. Table Definitions - Individual table schemas (subject, consent, purpose, etc.)
+ * 1. Table Definitions - Individual table schemas (subject, consent, consentPurpose, etc.)
  * 2. Schema Utilities - Functions for retrieving and working with the complete schema
  * 3. Data Parsing - Validation and transformation of input/output data
  *
@@ -42,16 +42,16 @@
  * Each table definition includes field specifications, relationships, and metadata.
  */
 export * from './audit-log';
-export * from './consent';
 export * from './consent-geo-location';
-export * from './geo-location';
 export * from './consent-policy';
-export * from './domain';
-export * from './purpose';
-export * from './purpose-junction';
+export * from './consent-purpose-junction';
+export * from './consent-purpose';
 export * from './consent-record';
+export * from './consent-withdrawal';
+export * from './consent';
+export * from './domain';
+export * from './geo-location';
 export * from './subject';
-export * from './withdrawal';
 
 // Schema Type Exports
 /**

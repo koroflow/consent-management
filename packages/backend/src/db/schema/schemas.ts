@@ -6,26 +6,26 @@ import {
 	consentSchema,
 	domainSchema,
 	geoLocationSchema,
-	purposeJunctionSchema,
+	consentPurposeJunctionSchema,
 	purposeSchema,
 	consentRecordSchema,
 	subjectSchema,
-	withdrawalSchema,
+	consentWithdrawalSchema,
 } from './index';
 
 // Export all schemas
 export const schemas = {
-	subject: subjectSchema,
-	purpose: purposeSchema,
-	consentPolicy: consentPolicySchema,
-	domain: domainSchema,
-	consent: consentSchema,
-	purposeJunction: purposeJunctionSchema,
-	record: consentRecordSchema,
-	consentGeoLocation: consentGeoLocationSchema,
-	geoLocation: geoLocationSchema,
-	withdrawal: withdrawalSchema,
 	auditLog: auditLogSchema,
+	consent: consentSchema,
+	consentGeoLocation: consentGeoLocationSchema,
+	consentPolicy: consentPolicySchema,
+	consentPurpose: purposeSchema,
+	consentPurposeJunction: consentPurposeJunctionSchema,
+	consentRecord: consentRecordSchema,
+	consentWithdrawal: consentWithdrawalSchema,
+	domain: domainSchema,
+	geoLocation: geoLocationSchema,
+	subject: subjectSchema,
 } as const;
 
 // Type for all table names

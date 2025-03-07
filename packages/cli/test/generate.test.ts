@@ -74,7 +74,7 @@ describe('generate', async () => {
 		const drizzleTestCases = [
 			{ provider: 'pg', snapshotPath: './__snapshots__/drizzle/pg.txt' },
 			{ provider: 'mysql', snapshotPath: './__snapshots__/drizzle/mysql.txt' },
-			{ provider: 'sqlite', snapshotPath: './__snapshots__/c15t-schema.txt' },
+			{ provider: 'sqlite', snapshotPath: './__snapshots__/drizzle/sqlite.txt' },
 		];
 
 		it.each(drizzleTestCases)(
@@ -105,6 +105,11 @@ describe('generate', async () => {
 			{
 				provider: 'sqlite',
 				snapshotPath: './__snapshots__/kysely/sqlite.sql',
+				getDatabase: () => new Database(':memory:'),
+			},
+      {
+				provider: 'd1',
+				snapshotPath: './__snapshots__/kysely/d1.sql',
 				getDatabase: () => new Database(':memory:'),
 			},
 			{

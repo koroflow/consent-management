@@ -136,6 +136,6 @@ export function getConsentPolicyTable(
 		 * Execution order during migrations (lower numbers run first)
 		 * Policy table needs to be created before tables that reference it (like consent)
 		 */
-		order: 3,
+		order: 2,
 	};
 }

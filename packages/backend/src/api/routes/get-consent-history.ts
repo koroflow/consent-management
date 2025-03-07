@@ -16,7 +16,7 @@ const getConsentHistorySchema = z.object({
  * Endpoint for retrieving a subject's complete consent history.
  *
  * This endpoint returns comprehensive information about a subject's consent records,
- * including all consent entries, withdrawals, related evidence records, and audit logs.
+ * including all consent entries, consentWithdrawals, related evidence records, and audit logs.
  * It supports optional domain filtering and pagination to manage large result sets.
  *
  * @endpoint GET /consent/history
@@ -54,10 +54,10 @@ export const getConsentHistory = createAuthEndpoint(
 			const end = start + params.limit;
 			const paginatedConsents = userConsents.slice(start, end);
 
-			// Process each consent to include withdrawals and records
+			// Process each consent to include consentWithdrawals and records
 			const processedConsents = await Promise.all(
 				paginatedConsents.map(async (consent) => {
-					const withdrawals = await registry.getWithdrawals(consent.id);
+					const consentWithdrawals = await registry.getWithdrawals(consent.id);
 					const records = await registry.getRecords(consent.id);
 
 					return {
@@ -65,17 +65,17 @@ export const getConsentHistory = createAuthEndpoint(
 						domainId: consent.domainId,
 						status: consent.status as string,
 						givenAt: consent.givenAt.toISOString(),
-						withdrawals: withdrawals.map((withdrawal) => ({
-							id: withdrawal.id,
-							createdAt: withdrawal.createdAt.toISOString(),
-							reason: withdrawal.withdrawalReason,
-							method: withdrawal.withdrawalMethod,
+						consentWithdrawals: consentWithdrawals.map((consentWithdrawal) => ({
+							id: consentWithdrawal.id,
+							createdAt: consentWithdrawal.createdAt.toISOString(),
+							reason: consentWithdrawal.withdrawalReason,
+							method: consentWithdrawal.withdrawalMethod,
 							actor:
-								(withdrawal.metadata as Record<string, unknown>)?.actor ||
+								(consentWithdrawal.metadata as Record<string, unknown>)?.actor ||
 								'system',
-							metadata: withdrawal.metadata,
+							metadata: consentWithdrawal.metadata,
 						})),
-						records: records.map((record: EntityOutputFields<'record'>) => ({
+						consentRecords: records.map((record: EntityOutputFields<'consentRecord'>) => ({
 							id: record.id,
 							createdAt: record.createdAt.toISOString(),
 							type: record.actionType,

@@ -1,9 +1,9 @@
 import { z } from 'zod';
 
 /**
- * Zod schema for validating consent purpose entities.
+ * Zod schema for validating consent consentPurpose entities.
  *
- * This defines the structure and validation rules for consent purpose records:
+ * This defines the structure and validation rules for consent consentPurpose records:
  * - Required fields: code, name, description
  * - Default value of false for isEssential
  * - Default value of true for isActive
@@ -20,7 +20,7 @@ import { z } from 'zod';
  *   isEssential: false
  * };
  *
- * // Validate and parse the purpose data
+ * // Validate and parse the consentPurpose data
  * const validPurpose = purposeSchema.parse(purposeData);
  *
  * // Example with missing fields (defaults will be applied)
@@ -49,10 +49,10 @@ export const purposeSchema = z.object({
 });
 
 /**
- * Type definition for Purpose
+ * Type definition for ConsentPurpose
  *
- * This type represents the structure of a consent purpose record
+ * This type represents the structure of a consent consentPurpose record
  * as defined by the purposeSchema. It includes all fields
- * that are part of the consent purpose entity.
+ * that are part of the consent consentPurpose entity.
  */
-export type Purpose = z.infer<typeof purposeSchema>;
+export type ConsentPurpose = z.infer<typeof purposeSchema>;

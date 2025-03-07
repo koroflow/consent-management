@@ -1,10 +1,10 @@
 import type { ActiveEntityConfig } from '../types';
 
 /**
- * Purpose entity configuration
- * @default entityName: "purpose", entityPrefix: "pur"
+ * ConsentPurpose entity configuration
+ * @default entityName: "consentPurpose", entityPrefix: "pur"
  */
-export interface PurposeEntityConfig extends ActiveEntityConfig {
+export interface ConsentPurposeEntityConfig extends ActiveEntityConfig {
 	fields?: Record<string, string> & {
 		id?: string;
 		name?: string;

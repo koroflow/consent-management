@@ -242,30 +242,30 @@ export const getConsentPolicy = createAuthEndpoint(
 
 			// If subject identifiers were provided, try to find the subject's consent status
 			if (params.subjectId || params.externalId || params.ipAddress) {
-				let userRecord: EntityOutputFields<'subject'> | null = null;
+				let subjectRecord: EntityOutputFields<'subject'> | null = null;
 				let identifierUsed: string | null = null;
 
 				// Try to find subject by subjectId
 				if (params.subjectId) {
-					userRecord = await registry.findUserById(params.subjectId);
-					if (userRecord) {
+					subjectRecord = await registry.findUserById(params.subjectId);
+					if (subjectRecord) {
 						identifierUsed = 'subjectId';
 					}
 				}
 
 				// If not found and externalId provided, try that
-				if (!userRecord && params.externalId) {
-					userRecord = await registry.findUserByExternalId(params.externalId);
-					if (userRecord) {
+				if (!subjectRecord && params.externalId) {
+					subjectRecord = await registry.findUserByExternalId(params.externalId);
+					if (subjectRecord) {
 						identifierUsed = 'externalId';
 					}
 				}
 
 				// If we found a subject, get their consent status
-				if (userRecord) {
+				if (subjectRecord) {
 					// Get subject's active consents for this domain
 					const userConsents = await registry.findConsents({
-						subjectId: userRecord.id,
+						subjectId: subjectRecord.id,
 						domainId: domain.id,
 						status: 'active',
 					});

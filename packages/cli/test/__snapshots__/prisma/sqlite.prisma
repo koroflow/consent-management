@@ -8,34 +8,34 @@ datasource db {
   url      = "file:./dev.db"
 }
 
-model User {
-  id               String       @id
-  isIdentified     Boolean
-  externalId       String?
-  identityProvider String?
-  lastIpAddress    String?
-  createdAt        DateTime
-  updatedAt        DateTime
-  userTimezone     String
-  consents         Consent[]
-  records          Record[]
-  withdrawals      Withdrawal[]
-  auditlogs        AuditLog[]
+model Subject {
+  id                 String              @id
+  isIdentified       Boolean
+  externalId         String?
+  identityProvider   String?
+  lastIpAddress      String?
+  createdAt          DateTime
+  updatedAt          DateTime
+  userTimezone       String
+  consents           Consent[]
+  consentrecords     ConsentRecord[]
+  consentwithdrawals ConsentWithdrawal[]
+  auditlogs          AuditLog[]
 }
 
-model Purpose {
-  id               String            @id
-  code             String
-  name             String
-  description      String
-  isEssential      Boolean
-  dataCategory     String?
-  legalBasis       String?
-  isActive         Boolean
-  createdAt        DateTime
-  updatedAt        DateTime
-  consents         Consent[]
-  purposejunctions PurposeJunction[]
+model ConsentPurpose {
+  id                      String                   @id
+  code                    String
+  name                    String
+  description             String
+  isEssential             Boolean
+  dataCategory            String?
+  legalBasis              String?
+  isActive                Boolean
+  createdAt               DateTime
+  updatedAt               DateTime
+  consents                Consent[]
+  consentpurposejunctions ConsentPurposeJunction[]
 }
 
 model ConsentPolicy {
@@ -66,45 +66,45 @@ model Domain {
 }
 
 model Consent {
-  id                  String               @id
-  userId              String
-  user                User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
-  domainId            String
-  domain              Domain               @relation(fields: [domainId], references: [id], onDelete: Cascade)
-  purposeIds          String?
-  purpose             Purpose              @relation(fields: [purposeIds], references: [id], onDelete: Cascade)
-  metadata            String?
-  policyId            String?
-  consentpolicy       ConsentPolicy        @relation(fields: [policyId], references: [id], onDelete: Cascade)
-  ipAddress           String?
-  userAgent           String?
-  status              String
-  withdrawalReason    String?
-  givenAt             DateTime
-  validUntil          DateTime?
-  isActive            Boolean
-  purposejunctions    PurposeJunction[]
-  records             Record[]
-  consentgeolocations ConsentGeoLocation[]
-  withdrawals         Withdrawal[]
+  id                      String                   @id
+  subjectId               String
+  subject                 Subject                  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  domainId                String
+  domain                  Domain                   @relation(fields: [domainId], references: [id], onDelete: Cascade)
+  purposeIds              String?
+  consentpurpose          ConsentPurpose           @relation(fields: [purposeIds], references: [id], onDelete: Cascade)
+  metadata                String?
+  policyId                String?
+  consentpolicy           ConsentPolicy            @relation(fields: [policyId], references: [id], onDelete: Cascade)
+  ipAddress               String?
+  userAgent               String?
+  status                  String
+  withdrawalReason        String?
+  givenAt                 DateTime
+  validUntil              DateTime?
+  isActive                Boolean
+  consentpurposejunctions ConsentPurposeJunction[]
+  consentrecords          ConsentRecord[]
+  consentgeolocations     ConsentGeoLocation[]
+  consentwithdrawals      ConsentWithdrawal[]
 }
 
-model PurposeJunction {
-  id        String    @id
-  consentId String
-  consent   Consent   @relation(fields: [consentId], references: [id], onDelete: Cascade)
-  purposeId String
-  purpose   Purpose   @relation(fields: [purposeId], references: [id], onDelete: Cascade)
-  status    String
-  metadata  String?
-  createdAt DateTime
-  updatedAt DateTime?
+model ConsentPurposeJunction {
+  id             String         @id
+  consentId      String
+  consent        Consent        @relation(fields: [consentId], references: [id], onDelete: Cascade)
+  purposeId      String
+  consentpurpose ConsentPurpose @relation(fields: [purposeId], references: [id], onDelete: Cascade)
+  status         String
+  metadata       String?
+  createdAt      DateTime
+  updatedAt      DateTime?
 }
 
-model Record {
+model ConsentRecord {
   id         String   @id
-  userId     String
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subjectId  String
+  subject    Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
   consentId  String?
   consent    Consent  @relation(fields: [consentId], references: [id], onDelete: Cascade)
   actionType String
@@ -126,12 +126,12 @@ model ConsentGeoLocation {
   createdAt DateTime
 }
 
-model Withdrawal {
+model ConsentWithdrawal {
   id               String   @id
   consentId        String
   consent          Consent  @relation(fields: [consentId], references: [id], onDelete: Cascade)
-  userId           String
-  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subjectId        String
+  subject          Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
   withdrawalReason String?
   withdrawalMethod String
   ipAddress        String?
@@ -145,8 +145,8 @@ model AuditLog {
   entityType    String
   entityId      String
   actionType    String
-  userId        String?
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subjectId     String?
+  subject       Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
   ipAddress     String?
   userAgent     String?
   changes       String?

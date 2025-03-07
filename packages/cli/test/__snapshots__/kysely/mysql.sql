@@ -6,9 +6,8 @@
 -- To roll back this migration, use the ROLLBACK section below
 
 START TRANSACTION;
-
 -- MIGRATION
-CREATE TABLE IF NOT EXISTS "user" (
+CREATE TABLE IF NOT EXISTS "subject" (
   "id" VARCHAR(255) NOT NULL PRIMARY KEY,
   "isIdentified" TINYINT(1) NOT NULL,
   "externalId" text,
@@ -19,7 +18,7 @@ CREATE TABLE IF NOT EXISTS "user" (
   "userTimezone" text
 );
 
-CREATE TABLE IF NOT EXISTS "purpose" (
+CREATE TABLE IF NOT EXISTS "consentPurpose" (
   "id" VARCHAR(255) NOT NULL PRIMARY KEY,
   "code" VARCHAR(255) NOT NULL,
   "name" VARCHAR(255) NOT NULL,
@@ -67,9 +66,9 @@ CREATE TABLE IF NOT EXISTS "consentPolicy" (
 
 CREATE TABLE IF NOT EXISTS "consent" (
   "id" VARCHAR(255) NOT NULL PRIMARY KEY,
-  "userId" text NOT NULL REFERENCES "user" ("id"),
+  "subjectId" text NOT NULL REFERENCES "subject" ("id"),
   "domainId" text NOT NULL REFERENCES "domain" ("id"),
-  "purposeIds" text REFERENCES "purpose" ("id"),
+  "purposeIds" text REFERENCES "consentPurpose" ("id"),
   "metadata" JSON,
   "policyId" text REFERENCES "consentPolicy" ("id"),
   "ipAddress" text,
@@ -81,14 +80,23 @@ CREATE TABLE IF NOT EXISTS "consent" (
   "isActive" TINYINT(1) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS "purposeJunction" (
+CREATE TABLE IF NOT EXISTS "consentPurposeJunction" (
   "id" VARCHAR(255) NOT NULL PRIMARY KEY,
   "consentId" text NOT NULL REFERENCES "consent" ("id"),
-  "purposeId" text NOT NULL REFERENCES "purpose" ("id"),
+  "purposeId" text NOT NULL REFERENCES "consentPurpose" ("id"),
   "status" text NOT NULL,
   "metadata" JSON,
   "createdAt" DATETIME NOT NULL,
   "updatedAt" DATETIME
+);
+
+CREATE TABLE IF NOT EXISTS "consentRecord" (
+  "id" VARCHAR(255) NOT NULL PRIMARY KEY,
+  "subjectId" text NOT NULL REFERENCES "subject" ("id"),
+  "consentId" text REFERENCES "consent" ("id"),
+  "actionType" text NOT NULL,
+  "details" text,
+  "createdAt" DATETIME NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS "consentGeoLocation" (
@@ -104,19 +112,10 @@ CREATE TABLE IF NOT EXISTS "consentGeoLocation" (
   "createdAt" DATETIME NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS "record" (
-  "id" VARCHAR(255) NOT NULL PRIMARY KEY,
-  "userId" text NOT NULL REFERENCES "user" ("id"),
-  "consentId" text REFERENCES "consent" ("id"),
-  "actionType" text NOT NULL,
-  "details" text,
-  "createdAt" DATETIME NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS "withdrawal" (
+CREATE TABLE IF NOT EXISTS "consentWithdrawal" (
   "id" VARCHAR(255) NOT NULL PRIMARY KEY,
   "consentId" text NOT NULL REFERENCES "consent" ("id"),
-  "userId" text NOT NULL REFERENCES "user" ("id"),
+  "subjectId" text NOT NULL REFERENCES "subject" ("id"),
   "withdrawalReason" text,
   "withdrawalMethod" text NOT NULL,
   "ipAddress" text,
@@ -130,7 +129,7 @@ CREATE TABLE IF NOT EXISTS "auditLog" (
   "entityType" text NOT NULL,
   "entityId" text NOT NULL,
   "actionType" text NOT NULL,
-  "userId" text REFERENCES "user" ("id"),
+  "subjectId" text REFERENCES "subject" ("id"),
   "ipAddress" text,
   "userAgent" text,
   "changes" text,
@@ -138,7 +137,6 @@ CREATE TABLE IF NOT EXISTS "auditLog" (
   "createdAt" DATETIME NOT NULL,
   "eventTimezone" text NOT NULL
 );
-
 COMMIT;
 
 -- ROLLBACK
@@ -148,13 +146,13 @@ START TRANSACTION;
 
 DROP TABLE IF EXISTS "auditLog";
 
-DROP TABLE IF EXISTS "withdrawal";
-
-DROP TABLE IF EXISTS "record";
+DROP TABLE IF EXISTS "consentWithdrawal";
 
 DROP TABLE IF EXISTS "consentGeoLocation";
 
-DROP TABLE IF EXISTS "purposeJunction";
+DROP TABLE IF EXISTS "consentRecord";
+
+DROP TABLE IF EXISTS "consentPurposeJunction";
 
 DROP TABLE IF EXISTS "consent";
 
@@ -164,9 +162,9 @@ DROP TABLE IF EXISTS "geoLocation";
 
 DROP TABLE IF EXISTS "domain";
 
-DROP TABLE IF EXISTS "purpose";
+DROP TABLE IF EXISTS "consentPurpose";
 
-DROP TABLE IF EXISTS "user";
+DROP TABLE IF EXISTS "subject";
 
 COMMIT;
 */

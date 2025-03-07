@@ -11,8 +11,8 @@ import {
 	getPurposeTable,
 	// getGeoLocationTable,
 	getConsentRecordTable,
-	getUserTable,
-	getWithdrawalTable,
+	getSubjectTable,
+	getConsentWithdrawalTable,
 } from './index';
 import type { InferTableShape } from './schemas';
 
@@ -61,32 +61,32 @@ export const getConsentTables = (options: C15TOptions) => {
 
 	const {
 		subject,
-		purpose,
+		consentPurpose,
 		consentPolicy,
 		domain,
 		geoLocation,
 		consent,
-		purposeJunction,
+		consentPurposeJunction,
 		record,
 		consentGeoLocation,
-		withdrawal,
+		consentWithdrawal,
 		auditLog,
 		...pluginTables
 	} = pluginSchema || {};
 
 	return {
-		subject: getUserTable(options, subject?.fields),
-		purpose: getPurposeTable(options, purpose?.fields),
+		subject: getSubjectTable(options, subject?.fields),
+		consentPurpose: getPurposeTable(options, consentPurpose?.fields),
 		consentPolicy: getConsentPolicyTable(options, consentPolicy?.fields),
 		domain: getDomainTable(options, domain?.fields),
 		consent: getConsentTable(options, consent?.fields),
-		purposeJunction: getPurposeJunctionTable(options, purposeJunction?.fields),
-		record: getConsentRecordTable(options, record?.fields),
+		consentPurposeJunction: getPurposeJunctionTable(options, consentPurposeJunction?.fields),
+		consentRecord: getConsentRecordTable(options, record?.fields),
 		consentGeoLocation: getConsentGeoLocationTable(
 			options,
 			consentGeoLocation?.fields
 		),
-		withdrawal: getWithdrawalTable(options, withdrawal?.fields),
+		consentWithdrawal: getConsentWithdrawalTable(options, consentWithdrawal?.fields),
 		auditLog: getAuditLogTable(options, auditLog?.fields),
 		geoLocation: getGeoLocationTable(options, geoLocation?.fields),
 		...pluginTables,

@@ -16,29 +16,29 @@ import { subjectSchema } from './schema';
  *
  * @example
  * ```typescript
- * const userTableSchema = getUserTable(c15tOptions);
+ * const userTableSchema = getSubjectTable(c15tOptions);
  * // Use the schema for migrations or data access
  * const migrationPlans = generateMigrations(userTableSchema);
  * ```
  */
-export function getUserTable(
+export function getSubjectTable(
 	options: C15TOptions,
 	userFields?: Record<string, Field>
 ) {
 	// Get subject config, supporting both the new tables.subject and legacy subject format
-	const userConfig = options.tables?.subject;
+	const subjectConfig = options.tables?.subject;
 
 	return {
 		/**
 		 * The name of the subject table in the database, configurable through options
 		 */
-		entityName: userConfig?.entityName || 'subject',
+		entityName: subjectConfig?.entityName || 'subject',
 
 		/**
 		 * The ID prefix for the subject table
 		 * Used to generate unique prefixed IDs for subjects
 		 */
-		entityPrefix: userConfig?.entityPrefix || 'usr',
+		entityPrefix: subjectConfig?.entityPrefix || 'sub',
 
 		/**
 		 * The Zod schema for the subject table
@@ -57,7 +57,7 @@ export function getUserTable(
 				type: 'boolean',
 				defaultValue: () => false,
 				required: true,
-				fieldName: userConfig?.fields?.isIdentified || 'isIdentified',
+				fieldName: subjectConfig?.fields?.isIdentified || 'isIdentified',
 			},
 
 			/**
@@ -67,7 +67,7 @@ export function getUserTable(
 			externalId: {
 				type: 'string',
 				required: false,
-				fieldName: userConfig?.fields?.externalId || 'externalId',
+				fieldName: subjectConfig?.fields?.externalId || 'externalId',
 			},
 
 			/**
@@ -77,7 +77,7 @@ export function getUserTable(
 			identityProvider: {
 				type: 'string',
 				required: false,
-				fieldName: userConfig?.fields?.identityProvider || 'identityProvider',
+				fieldName: subjectConfig?.fields?.identityProvider || 'identityProvider',
 			},
 
 			/**
@@ -87,7 +87,7 @@ export function getUserTable(
 			lastIpAddress: {
 				type: 'string',
 				required: false,
-				fieldName: userConfig?.fields?.lastIpAddress || 'lastIpAddress',
+				fieldName: subjectConfig?.fields?.lastIpAddress || 'lastIpAddress',
 			},
 
 			/**
@@ -98,7 +98,7 @@ export function getUserTable(
 				type: 'date',
 				defaultValue: () => new Date(),
 				required: true,
-				fieldName: userConfig?.fields?.createdAt || 'createdAt',
+				fieldName: subjectConfig?.fields?.createdAt || 'createdAt',
 			},
 
 			/**
@@ -109,7 +109,7 @@ export function getUserTable(
 				type: 'date',
 				defaultValue: () => new Date(),
 				required: true,
-				fieldName: userConfig?.fields?.updatedAt || 'updatedAt',
+				fieldName: subjectConfig?.fields?.updatedAt || 'updatedAt',
 			},
 
 			/**
@@ -119,14 +119,14 @@ export function getUserTable(
 				type: 'timezone',
 				required: false,
 				defaultValue: COMMON_TIMEZONES.UTC,
-				fieldName: userConfig?.fields?.userTimezone || 'userTimezone',
+				fieldName: subjectConfig?.fields?.userTimezone || 'userTimezone',
 			},
 
 			// Include additional fields from plugins
 			...(userFields || {}),
 
 			// Include additional fields from configuration
-			...(userConfig?.additionalFields || {}),
+			...(subjectConfig?.additionalFields || {}),
 		},
 
 		/**

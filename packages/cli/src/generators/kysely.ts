@@ -161,8 +161,10 @@ function formatSQL(
 		.join('\n\n');
 
 	// Database-specific transaction syntax
-	const transactionStart = dbType === 'mysql' ? 'START TRANSACTION;' : 'BEGIN;';
-	const transactionEnd = 'COMMIT;';
+	// Only use transactions for non-D1 databases
+	const useTransactions = dbType !== 'd1';
+	const transactionStart = useTransactions ? (dbType === 'mysql' ? 'START TRANSACTION;' : 'BEGIN;') : '';
+	const transactionEnd = useTransactions ? 'COMMIT;' : '';
 
 	// Generate timestamp for the migration, or use the provided one
 	const timestamp = options?.timestamp || new Date().toISOString();
@@ -176,10 +178,8 @@ function formatSQL(
 -- To roll back this migration, use the ROLLBACK section below
 
 ${transactionStart}
-
 -- MIGRATION
 ${formattedStatements}
-
 ${transactionEnd}
 
 -- ROLLBACK

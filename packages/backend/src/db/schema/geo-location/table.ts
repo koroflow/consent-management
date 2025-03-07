@@ -143,6 +143,6 @@ export function getGeoLocationTable(
 		 * Execution order during migrations (lower numbers run first)
 		 * Geo-location is a base entity that doesn't depend on other tables
 		 */
-		order: 2,
+		order: 1,
 	};
 }

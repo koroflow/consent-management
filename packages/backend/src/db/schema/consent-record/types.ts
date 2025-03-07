@@ -9,7 +9,7 @@ import type { BaseEntityConfig } from '../types';
  * Record entity configuration
  * @default entityName: "record", entityPrefix: "rec"
  */
-export interface RecordEntityConfig extends BaseEntityConfig {
+export interface ConsentRecordEntityConfig extends BaseEntityConfig {
 	fields?: Record<string, string> & {
 		id?: string;
 		subjectId?: string;

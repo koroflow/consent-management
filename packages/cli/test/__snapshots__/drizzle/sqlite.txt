@@ -1,16 +1,17 @@
 import { sqliteTable, text, integer,  } from "drizzle-orm/sqlite-core";
 
-export const user = sqliteTable("user", {
+export const subject = sqliteTable("subject", {
   id: text("id").primaryKey(),
   isIdentified: integer('is_identified', { mode: 'boolean' }).notNull(),
   externalId: text('external_id'),
   identityProvider: text('identity_provider'),
   lastIpAddress: text('last_ip_address'),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
-  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull()
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull(),
+  userTimezone: text('user_timezone')
 });
 
-export const purpose = sqliteTable("purpose", {
+export const consentPurpose = sqliteTable("consent_purpose", {
   id: text("id").primaryKey(),
   code: text('code').notNull(),
   name: text('name').notNull(),
@@ -48,33 +49,33 @@ export const domain = sqliteTable("domain", {
 
 export const consent = sqliteTable("consent", {
   id: text("id").primaryKey(),
-  userId: text('user_id').notNull().references(()=> user.id, { onDelete: 'cascade' }),
+  subjectId: text('subject_id').notNull().references(()=> subject.id, { onDelete: 'cascade' }),
   domainId: text('domain_id').notNull().references(()=> domain.id, { onDelete: 'cascade' }),
-  purposeIds: text('purpose_ids').notNull(),
+  purposeIds: text('purpose_ids').references(()=> consentPurpose.id, { onDelete: 'cascade' }),
+  metadata: text('metadata'),
   policyId: text('policy_id').references(()=> consentPolicy.id, { onDelete: 'cascade' }),
-  status: text('status').notNull(),
-  withdrawalReason: text('withdrawal_reason'),
   ipAddress: text('ip_address'),
   userAgent: text('user_agent'),
-  metadata: text('metadata'),
-  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
-  updatedAt: integer('updated_at', { mode: 'timestamp' }),
-  expiresAt: integer('expires_at', { mode: 'timestamp' })
+  status: text('status').notNull(),
+  withdrawalReason: text('withdrawal_reason'),
+  givenAt: integer('given_at', { mode: 'timestamp' }).notNull(),
+  validUntil: integer('valid_until', { mode: 'timestamp' }),
+  isActive: integer('is_active', { mode: 'boolean' }).notNull()
 });
 
-export const purposeJunction = sqliteTable("purpose_junction", {
+export const consentPurposeJunction = sqliteTable("consent_purpose_junction", {
   id: text("id").primaryKey(),
   consentId: text('consent_id').notNull().references(()=> consent.id, { onDelete: 'cascade' }),
-  purposeId: text('purpose_id').notNull().references(()=> purpose.id, { onDelete: 'cascade' }),
+  purposeId: text('purpose_id').notNull().references(()=> consentPurpose.id, { onDelete: 'cascade' }),
   status: text('status').notNull(),
   metadata: text('metadata'),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
   updatedAt: integer('updated_at', { mode: 'timestamp' })
 });
 
-export const record = sqliteTable("record", {
+export const consentRecord = sqliteTable("consent_record", {
   id: text("id").primaryKey(),
-  userId: text('user_id').notNull().references(()=> user.id, { onDelete: 'cascade' }),
+  subjectId: text('subject_id').notNull().references(()=> subject.id, { onDelete: 'cascade' }),
   consentId: text('consent_id').references(()=> consent.id, { onDelete: 'cascade' }),
   actionType: text('action_type').notNull(),
   details: text('details'),
@@ -94,10 +95,10 @@ export const consentGeoLocation = sqliteTable("consent_geo_location", {
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull()
 });
 
-export const withdrawal = sqliteTable("withdrawal", {
+export const consentWithdrawal = sqliteTable("consent_withdrawal", {
   id: text("id").primaryKey(),
   consentId: text('consent_id').notNull().references(()=> consent.id, { onDelete: 'cascade' }),
-  userId: text('user_id').notNull().references(()=> user.id, { onDelete: 'cascade' }),
+  subjectId: text('subject_id').notNull().references(()=> subject.id, { onDelete: 'cascade' }),
   withdrawalReason: text('withdrawal_reason'),
   withdrawalMethod: text('withdrawal_method').notNull(),
   ipAddress: text('ip_address'),
@@ -111,12 +112,13 @@ export const auditLog = sqliteTable("audit_log", {
   entityType: text('entity_type').notNull(),
   entityId: text('entity_id').notNull(),
   actionType: text('action_type').notNull(),
-  userId: text('user_id').references(()=> user.id, { onDelete: 'cascade' }),
+  subjectId: text('subject_id').references(()=> subject.id, { onDelete: 'cascade' }),
   ipAddress: text('ip_address'),
   userAgent: text('user_agent'),
   changes: text('changes'),
   metadata: text('metadata'),
-  createdAt: integer('created_at', { mode: 'timestamp' }).notNull()
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
+  eventTimezone: text('event_timezone').notNull()
 });
 
 export const geoLocation = sqliteTable("geo_location", {

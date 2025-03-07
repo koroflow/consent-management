@@ -1,4 +1,4 @@
-import type { Purpose } from '~/db/schema/purpose';
+import type { ConsentPurpose } from '~/db/schema/consent-purpose';
 import type { FetchOptions, ResponseContext, c15tClientOptions } from './types';
 
 /**
@@ -267,9 +267,9 @@ export class c15tClient {
 	 *
 	 * if (data) {
 	 *   // Display available consent purposes to the subject
-	 *   data.forEach(purpose => {
-	 *     console.log(`${purpose.name}: ${purpose.description}`);
-	 *     console.log(`Required: ${purpose.required}`);
+	 *   data.forEach(consentPurpose => {
+	 *     console.log(`${consentPurpose.name}: ${consentPurpose.description}`);
+	 *     console.log(`Required: ${consentPurpose.required}`);
 	 *   });
 	 * }
 	 * ```
@@ -278,9 +278,9 @@ export class c15tClient {
 	 * @returns Response context containing the list of consent purposes if successful
 	 */
 	async listPurposes(
-		options?: FetchOptions<Purpose[]>
-	): Promise<ResponseContext<Purpose[]>> {
-		return this.fetcher<Purpose[]>('/list-purposes', {
+		options?: FetchOptions<ConsentPurpose[]>
+	): Promise<ResponseContext<ConsentPurpose[]>> {
+		return this.fetcher<ConsentPurpose[]>('/list-purposes', {
 			method: 'GET',
 			...options,
 		});
@@ -306,7 +306,7 @@ export class c15tClient {
 	//  * }
 	//  * ```
 	//  *
-	//  * @param preferences - Record mapping purpose IDs to boolean consent values
+	//  * @param preferences - Record mapping consentPurpose IDs to boolean consent values
 	//  * @param options - Optional fetch configuration options
 	//  * @returns Response context containing the updated consent preferences if successful
 	//  */

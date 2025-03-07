@@ -7,11 +7,11 @@ import {
 	domainRegistry,
 	geoLocationRegistry,
 	policyRegistry,
-	purposeJunctionRegistry,
-	purposeRegistry,
+	consentPurposeJunctionRegistry,
+	consentPurposeRegistry,
 	consentRecordRegistry,
 	subjectRegistry,
-	withdrawalRegistry,
+	consentWithdrawalRegistry,
 } from './schema/index';
 
 export const createRegistry = (ctx: RegistryContext) => {
@@ -21,11 +21,11 @@ export const createRegistry = (ctx: RegistryContext) => {
 		...domainRegistry(ctx),
 		...geoLocationRegistry(ctx),
 		...consentGeoLocationRegistry(ctx),
-		...purposeJunctionRegistry(ctx),
-		...purposeRegistry(ctx),
+		...consentPurposeJunctionRegistry(ctx),
+		...consentPurposeRegistry(ctx),
 		...policyRegistry(ctx),
 		...consentRecordRegistry(ctx),
 		...subjectRegistry(ctx),
-		...withdrawalRegistry(ctx),
+		...consentWithdrawalRegistry(ctx),
 	};
 };

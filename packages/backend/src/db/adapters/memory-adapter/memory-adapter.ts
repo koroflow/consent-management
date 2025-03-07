@@ -26,7 +26,7 @@ import { applyDefaultValue } from '../utils';
  *     { id: '1', subjectId: 'user123', purposeId: 'marketing', allowed: true },
  *     { id: '2', subjectId: 'user456', purposeId: 'analytics', allowed: false }
  *   ],
- *   purpose: [
+ *   consentPurpose: [
  *     { id: 'marketing', name: 'Marketing', description: 'For sending promotional materials' }
  *   ]
  * };

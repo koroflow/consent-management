@@ -1,9 +1,9 @@
 import type { Field } from '~/db/core/fields';
 import type { C15TOptions } from '~/types';
-import { purposeJunctionSchema } from './schema';
+import { consentPurposeJunctionSchema } from './schema';
 
 /**
- * Generates the database table configuration for the consent-purpose junction entity.
+ * Generates the database table configuration for the consent-consentPurpose junction entity.
  *
  * This function creates a schema definition that implements a many-to-many relationship
  * between consents and purposes. The resulting schema is used for database migrations,
@@ -24,29 +24,29 @@ export function getPurposeJunctionTable(
 	options: C15TOptions,
 	junctionFields?: Record<string, Field>
 ) {
-	const purposeJunctionConfig = options.tables?.purposeJunction;
+	const purposeJunctionConfig = options.tables?.consentPurposeJunction;
 	const consentConfig = options.tables?.consent;
-	const purposeConfig = options.tables?.purpose;
+	const purposeConfig = options.tables?.consentPurpose;
 
 	return {
 		/**
 		 * The name of the junction table in the database, configurable through options
 		 */
-		entityName: purposeJunctionConfig?.entityName || 'purposeJunction',
+		entityName: purposeJunctionConfig?.entityName || 'consentPurposeJunction',
 
 		/**
-		 * The ID prefix for the purpose junction table
-		 * Used to generate unique prefixed IDs for purpose junctions
+		 * The ID prefix for the consentPurpose junction table
+		 * Used to generate unique prefixed IDs for consentPurpose junctions
 		 */
 		entityPrefix: purposeJunctionConfig?.entityPrefix || 'pjx',
 
 		/**
-		 * The schema for the purpose junction table
+		 * The schema for the consentPurpose junction table
 		 */
-		schema: purposeJunctionSchema,
+		schema: consentPurposeJunctionSchema,
 
 		/**
-		 * Field definitions for the consent-purpose junction table
+		 * Field definitions for the consent-consentPurpose junction table
 		 */
 		fields: {
 			/**
@@ -63,20 +63,20 @@ export function getPurposeJunctionTable(
 			},
 
 			/**
-			 * Reference to the purpose record this junction is associated with
+			 * Reference to the consentPurpose record this junction is associated with
 			 */
 			purposeId: {
 				type: 'string',
 				required: true,
 				fieldName: purposeJunctionConfig?.fields?.purposeId || 'purposeId',
 				references: {
-					model: purposeConfig?.entityName || 'purpose',
+					model: purposeConfig?.entityName || 'consentPurpose',
 					field: 'id',
 				},
 			},
 
 			/**
-			 * Status of this specific consent-purpose relationship
+			 * Status of this specific consent-consentPurpose relationship
 			 * Default: 'active'
 			 */
 			status: {
@@ -87,7 +87,7 @@ export function getPurposeJunctionTable(
 			},
 
 			/**
-			 * Additional metadata about this specific consent-purpose relationship
+			 * Additional metadata about this specific consent-consentPurpose relationship
 			 */
 			metadata: {
 				type: 'json',
@@ -124,7 +124,7 @@ export function getPurposeJunctionTable(
 		},
 
 		/**
-		 * Add unique constraint to ensure a purpose can only be associated with a consent once
+		 * Add unique constraint to ensure a consentPurpose can only be associated with a consent once
 		 */
 		uniqueConstraints: [
 			{
@@ -135,8 +135,8 @@ export function getPurposeJunctionTable(
 
 		/**
 		 * Execution order during migrations (lower numbers run first)
-		 * Junction table needs to be created after the consent and purpose tables it references
+		 * Junction table needs to be created after the consent and consentPurpose tables it references
 		 */
-		order: 6,
+		order: 4,
 	};
 }

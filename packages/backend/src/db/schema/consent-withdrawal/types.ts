@@ -2,9 +2,9 @@ import type { BaseEntityConfig } from '../types';
 
 /**
  * Withdrawal entity configuration
- * @default entityName: "withdrawal", entityPrefix: "wdr"
+ * @default entityName: "consentWithdrawal", entityPrefix: "wdr"
  */
-export interface WithdrawalEntityConfig extends BaseEntityConfig {
+export interface ConsentWithdrawalEntityConfig extends BaseEntityConfig {
 	fields?: Record<string, string> & {
 		id?: string;
 		consentId?: string;
@@ -17,9 +17,9 @@ export interface WithdrawalEntityConfig extends BaseEntityConfig {
 	};
 
 	/**
-	 * Prevent multiple withdrawals for the same consent
+	 * Prevent multiple consentWithdrawals for the same consent
 	 *
-	 * If true, a subject can only have one withdrawal record per consent,
+	 * If true, a subject can only have one consentWithdrawal record per consent,
 	 * preventing multiple revocation records for the same consent.
 	 * This helps maintain data integrity and clearer consent history.
 	 *

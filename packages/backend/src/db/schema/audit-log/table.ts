@@ -25,7 +25,7 @@ export function getAuditLogTable(
 	auditLogFields?: Record<string, Field>
 ) {
 	const auditLogConfig = options.tables?.auditLog;
-	const userConfig = options.tables?.subject;
+	const subjectConfig = options.tables?.subject;
 
 	return {
 		/**
@@ -49,7 +49,7 @@ export function getAuditLogTable(
 		 */
 		fields: {
 			/**
-			 * Type of entity this audit log entry is about (e.g., 'consent', 'subject', 'purpose')
+			 * Type of entity this audit log entry is about (e.g., 'consent', 'subject', 'consentPurpose')
 			 */
 			entityType: {
 				type: 'string',
@@ -84,7 +84,7 @@ export function getAuditLogTable(
 				required: false,
 				fieldName: auditLogConfig?.fields?.subjectId || 'subjectId',
 				references: {
-					model: userConfig?.entityName || 'subject',
+					model: subjectConfig?.entityName || 'subject',
 					field: 'id',
 				},
 			},
@@ -180,6 +180,6 @@ export function getAuditLogTable(
 		 * Execution order during migrations (lower numbers run first)
 		 * Audit log table needs to be created after the subject table it references
 		 */
-		order: 8,
+		order: 5,
 	};
 }

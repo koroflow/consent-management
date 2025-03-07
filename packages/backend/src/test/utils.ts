@@ -29,7 +29,7 @@ export function createMockContext(): C15TContext {
 							domainId: 'example.com',
 							status: 'active',
 							givenAt: new Date().toISOString(),
-							withdrawals: [],
+							consentWithdrawals: [],
 							records: [],
 						},
 					],
@@ -37,10 +37,10 @@ export function createMockContext(): C15TContext {
 					pagination: { total: 1, offset: 0, limit: 100 },
 				},
 			}),
-			findWithdrawals: vi.fn().mockResolvedValue({
+			findConsentWithdrawals: vi.fn().mockResolvedValue({
 				success: true,
 				data: {
-					withdrawals: [],
+					consentWithdrawals: [],
 					auditLogs: [],
 					pagination: { total: 0, offset: 0, limit: 100 },
 				},
@@ -71,7 +71,7 @@ export function createMockContext(): C15TContext {
 				},
 			}),
 			createConsent: vi.fn(),
-			createWithdrawal: vi.fn(),
+			createConsentWithdrawal: vi.fn(),
 			createDomain: vi.fn(),
 			updateConsent: vi.fn(),
 			updateWithdrawal: vi.fn(),

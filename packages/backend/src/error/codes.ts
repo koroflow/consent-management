@@ -75,16 +75,16 @@ export const BASE_ERROR_CODES = {
 	FAILED_TO_GET_CONSENT: 'Failed to get consent',
 
 	/**
-	 * An error occurred while attempting to create a new consent purpose.
-	 * This may be due to validation errors, duplicate purpose IDs, or other internal errors.
+	 * An error occurred while attempting to create a new consent consentPurpose.
+	 * This may be due to validation errors, duplicate consentPurpose IDs, or other internal errors.
 	 */
-	FAILED_TO_CREATE_PURPOSE: 'Failed to create purpose',
+	FAILED_TO_CREATE_PURPOSE: 'Failed to create consentPurpose',
 
 	/**
-	 * The requested consent purpose could not be found.
-	 * This may occur when attempting to retrieve, update, or delete a non-existent purpose.
+	 * The requested consent consentPurpose could not be found.
+	 * This may occur when attempting to retrieve, update, or delete a non-existent consentPurpose.
 	 */
-	PURPOSE_NOT_FOUND: 'Purpose not found',
+	PURPOSE_NOT_FOUND: 'Consent Purpose not found',
 
 	/**
 	 * The provided configuration is invalid or contains errors.

@@ -53,7 +53,7 @@ export function consentRecordRegistry({ adapter, ...ctx }: RegistryContext) {
 					updatedAt: record.updatedAt || new Date(),
 					...record,
 				},
-				model: 'record',
+				model: 'consentRecord',
 				customFn: undefined,
 				context,
 			});
@@ -83,7 +83,7 @@ export function consentRecordRegistry({ adapter, ...ctx }: RegistryContext) {
 			actionType?: string,
 			limit?: number
 		) => {
-			const whereConditions: Where<'record'> = [];
+			const whereConditions: Where<'consentRecord'> = [];
 
 			if (subjectId) {
 				whereConditions.push({
@@ -107,7 +107,7 @@ export function consentRecordRegistry({ adapter, ...ctx }: RegistryContext) {
 			}
 
 			const records = await adapter.findMany({
-				model: 'record',
+				model: 'consentRecord',
 				where: whereConditions,
 				sortBy: {
 					field: 'createdAt',
@@ -117,7 +117,7 @@ export function consentRecordRegistry({ adapter, ...ctx }: RegistryContext) {
 			});
 
 			return records.map((record) =>
-				validateEntityOutput('record', record, ctx.options)
+				validateEntityOutput('consentRecord', record, ctx.options)
 			);
 		},
 
@@ -130,7 +130,7 @@ export function consentRecordRegistry({ adapter, ...ctx }: RegistryContext) {
 		 */
 		findConsentRecordById: async (recordId: string) => {
 			const record = await adapter.findOne({
-				model: 'record',
+				model: 'consentRecord',
 				where: [
 					{
 						field: 'id',
@@ -139,7 +139,7 @@ export function consentRecordRegistry({ adapter, ...ctx }: RegistryContext) {
 				],
 			});
 			return record
-				? validateEntityOutput('record', record, ctx.options)
+				? validateEntityOutput('consentRecord', record, ctx.options)
 				: null;
 		},
 
@@ -153,7 +153,7 @@ export function consentRecordRegistry({ adapter, ...ctx }: RegistryContext) {
 		 */
 		findConsentRecordsBySubjectId: async (subjectId: string, limit?: number) => {
 			const records = await adapter.findMany({
-				model: 'record',
+				model: 'consentRecord',
 				where: [
 					{
 						field: 'subjectId',
@@ -167,7 +167,7 @@ export function consentRecordRegistry({ adapter, ...ctx }: RegistryContext) {
 				limit,
 			});
 			return records.map((record) =>
-				validateEntityOutput('record', record, ctx.options)
+				validateEntityOutput('consentRecord', record, ctx.options)
 			);
 		},
 
@@ -181,7 +181,7 @@ export function consentRecordRegistry({ adapter, ...ctx }: RegistryContext) {
 		 */
 		findConsentRecordsByConsentId: async (consentId: string, limit?: number) => {
 			const records = await adapter.findMany({
-				model: 'record',
+				model: 'consentRecord',
 				where: [
 					{
 						field: 'consentId',
@@ -195,7 +195,7 @@ export function consentRecordRegistry({ adapter, ...ctx }: RegistryContext) {
 				limit,
 			});
 			return records.map((record) =>
-				validateEntityOutput('record', record, ctx.options)
+				validateEntityOutput('consentRecord', record, ctx.options)
 			);
 		},
 	};

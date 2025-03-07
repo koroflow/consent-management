@@ -1,6 +1,6 @@
 import { mysqlTable, varchar, text, int, timestamp, boolean, json } from "drizzle-orm/mysql-core";
 
-export const user = mysqlTable("user", {
+export const subject = mysqlTable("subject", {
   id: varchar("id", { length: 36 }).primaryKey(),
   isIdentified: boolean('is_identified').notNull(),
   externalId: text('external_id'),
@@ -11,7 +11,7 @@ export const user = mysqlTable("user", {
   userTimezone: text('user_timezone')
 });
 
-export const purpose = mysqlTable("purpose", {
+export const consentPurpose = mysqlTable("consent_purpose", {
   id: varchar("id", { length: 36 }).primaryKey(),
   code: text('code').notNull(),
   name: text('name').notNull(),
@@ -49,9 +49,9 @@ export const domain = mysqlTable("domain", {
 
 export const consent = mysqlTable("consent", {
   id: varchar("id", { length: 36 }).primaryKey(),
-  userId: varchar('user_id', { length: 36 }).notNull().references(()=> user.id, { onDelete: 'cascade' }),
+  subjectId: varchar('subject_id', { length: 36 }).notNull().references(()=> subject.id, { onDelete: 'cascade' }),
   domainId: varchar('domain_id', { length: 36 }).notNull().references(()=> domain.id, { onDelete: 'cascade' }),
-  purposeIds: json('purpose_ids').references(()=> purpose.id, { onDelete: 'cascade' }),
+  purposeIds: json('purpose_ids').references(()=> consentPurpose.id, { onDelete: 'cascade' }),
   metadata: json('metadata'),
   policyId: varchar('policy_id', { length: 36 }).references(()=> consentPolicy.id, { onDelete: 'cascade' }),
   ipAddress: text('ip_address'),
@@ -63,19 +63,19 @@ export const consent = mysqlTable("consent", {
   isActive: boolean('is_active').notNull()
 });
 
-export const purposeJunction = mysqlTable("purpose_junction", {
+export const consentPurposeJunction = mysqlTable("consent_purpose_junction", {
   id: varchar("id", { length: 36 }).primaryKey(),
   consentId: varchar('consent_id', { length: 36 }).notNull().references(()=> consent.id, { onDelete: 'cascade' }),
-  purposeId: varchar('purpose_id', { length: 36 }).notNull().references(()=> purpose.id, { onDelete: 'cascade' }),
+  purposeId: varchar('purpose_id', { length: 36 }).notNull().references(()=> consentPurpose.id, { onDelete: 'cascade' }),
   status: text('status').notNull(),
   metadata: json('metadata'),
   createdAt: timestamp('created_at').notNull(),
   updatedAt: timestamp('updated_at')
 });
 
-export const record = mysqlTable("record", {
+export const consentRecord = mysqlTable("consent_record", {
   id: varchar("id", { length: 36 }).primaryKey(),
-  userId: varchar('user_id', { length: 36 }).notNull().references(()=> user.id, { onDelete: 'cascade' }),
+  subjectId: varchar('subject_id', { length: 36 }).notNull().references(()=> subject.id, { onDelete: 'cascade' }),
   consentId: varchar('consent_id', { length: 36 }).references(()=> consent.id, { onDelete: 'cascade' }),
   actionType: text('action_type').notNull(),
   details: json('details'),
@@ -95,10 +95,10 @@ export const consentGeoLocation = mysqlTable("consent_geo_location", {
   createdAt: timestamp('created_at').notNull()
 });
 
-export const withdrawal = mysqlTable("withdrawal", {
+export const consentWithdrawal = mysqlTable("consent_withdrawal", {
   id: varchar("id", { length: 36 }).primaryKey(),
   consentId: varchar('consent_id', { length: 36 }).notNull().references(()=> consent.id, { onDelete: 'cascade' }),
-  userId: varchar('user_id', { length: 36 }).notNull().references(()=> user.id, { onDelete: 'cascade' }),
+  subjectId: varchar('subject_id', { length: 36 }).notNull().references(()=> subject.id, { onDelete: 'cascade' }),
   withdrawalReason: text('withdrawal_reason'),
   withdrawalMethod: text('withdrawal_method').notNull(),
   ipAddress: text('ip_address'),
@@ -112,7 +112,7 @@ export const auditLog = mysqlTable("audit_log", {
   entityType: text('entity_type').notNull(),
   entityId: text('entity_id').notNull(),
   actionType: text('action_type').notNull(),
-  userId: varchar('user_id', { length: 36 }).references(()=> user.id, { onDelete: 'cascade' }),
+  subjectId: varchar('subject_id', { length: 36 }).references(()=> subject.id, { onDelete: 'cascade' }),
   ipAddress: text('ip_address'),
   userAgent: text('user_agent'),
   changes: json('changes'),

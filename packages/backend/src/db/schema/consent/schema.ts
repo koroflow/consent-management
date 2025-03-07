@@ -15,7 +15,7 @@ import { z } from 'zod';
  *   id: '123e4567-e89b-12d3-a456-426614174000',
  *   subjectId: 'subject-123',
  *   domainId: 'domain-456',
- *   purposeIds: ['purpose-789'],
+ *   purposeIds: ['consentPurpose-789'],
  *   status: 'active',
  *   givenAt: new Date(),
  *   isActive: true,

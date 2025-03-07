@@ -132,6 +132,6 @@ export function getDomainTable(
 		 * Execution order during migrations (lower numbers run first)
 		 * Domain table needs to be created before tables that reference it
 		 */
-		order: 2,
+		order: 1,
 	};
 }

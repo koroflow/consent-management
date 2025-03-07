@@ -208,7 +208,7 @@ export const withdrawConsent = createAuthEndpoint(
 					metadata: params.metadata || {},
 				});
 
-				// Add consent record for the withdrawal
+				// Add consent record for the consentWithdrawal
 				await registry.createConsentRecord({
 					subjectId: record.subjectId,
 					consentId: record.id,
@@ -242,13 +242,13 @@ export const withdrawConsent = createAuthEndpoint(
 				});
 
 				withdrawalResults.push({
-					id: withdrawalResult?.id || `withdrawal-${record.id}`,
+					id: withdrawalResult?.id || `consentWithdrawal-${record.id}`,
 					consentId: record.id,
 					revokedAt: currentTime.toISOString(),
 				});
 			}
 
-			// Return success response with withdrawal details
+			// Return success response with consentWithdrawal details
 			return {
 				success: true,
 				data: {

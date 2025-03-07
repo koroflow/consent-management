@@ -130,7 +130,7 @@ export const generateConsentReceipt = createAuthEndpoint(
 						service: serviceName,
 						purposes: [
 							{
-								purpose: key,
+								consentPurpose: key,
 								purposeDescription: `${value ? 'Enabled' : 'Disabled'} ${key} tracking and functionality`,
 								consentType: 'EXPLICIT',
 								purposeCategory: [serviceName],

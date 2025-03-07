@@ -67,7 +67,7 @@ interface ConsentState {
 
 	/**
 	 * Map of consent purposes to their consent status
-	 * Key is the purpose ID, value is a boolean indicating consent
+	 * Key is the consentPurpose ID, value is a boolean indicating consent
 	 */
 	preferences: Record<string, boolean> | null;
 
@@ -92,7 +92,7 @@ interface ConsentActions {
 	/**
 	 * Set specific consent preferences
 	 *
-	 * @param preferences - Map of purpose IDs to consent values
+	 * @param preferences - Map of consentPurpose IDs to consent values
 	 * @returns Promise that resolves when consent is updated
 	 */
 	setConsent: (preferences: Record<string, boolean>) => Promise<void>;
@@ -354,7 +354,7 @@ export function createConsentClient(
 		/**
 		 * Update consent preferences for specific purposes
 		 *
-		 * @param preferences - Map of purpose IDs to consent values
+		 * @param preferences - Map of consentPurpose IDs to consent values
 		 * @returns Promise that resolves when consent is updated
 		 */
 		setConsent: async (preferences: Record<string, boolean>) => {
@@ -530,7 +530,7 @@ export function createConsentClient(
 	 * }
 	 * ```
 	 *
-	 * @param requiredConsent - Required consent purpose(s) to show content
+	 * @param requiredConsent - Required consent consentPurpose(s) to show content
 	 * @returns Object with loading state, consent status, and whether content can be shown
 	 */
 	const useConditionalContent = (

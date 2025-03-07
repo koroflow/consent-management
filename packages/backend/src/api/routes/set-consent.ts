@@ -198,12 +198,12 @@ export const setConsent = createAuthEndpoint(
 						.filter(([_, isConsented]) => isConsented)
 						.map(async ([purposeCode]) => {
 							let existingPurpose =
-								await registry.findPurposeByCode(purposeCode);
+								await registry.findConsentPurposeByCode(purposeCode);
 							if (!existingPurpose) {
-								existingPurpose = await registry.createPurpose({
+								existingPurpose = await registry.createConsentPurpose({
 									code: purposeCode,
 									name: purposeCode,
-									description: `Auto-created purpose for ${purposeCode}`,
+									description: `Auto-created consentPurpose for ${purposeCode}`,
 									isActive: true,
 									isEssential: false,
 									dataCategory: 'functional',
@@ -237,7 +237,7 @@ export const setConsent = createAuthEndpoint(
 
 					// Create record entry
 					const record = (await tx.create({
-						model: 'record',
+						model: 'consentRecord',
 						data: {
 							subjectId: subject.id,
 							consentId: consentRecord.id,

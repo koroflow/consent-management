@@ -26,7 +26,7 @@ export function getConsentRecordTable(
 ) {
 	// Get record config, supporting both the new tables.record and legacy record format
 	const recordConfig = options.tables?.record;
-	const userConfig = options.tables?.subject;
+	const subjectConfig = options.tables?.subject;
 	const consentConfig = options.tables?.consent;
 
 	return {
@@ -58,7 +58,7 @@ export function getConsentRecordTable(
 				required: true,
 				fieldName: recordConfig?.fields?.subjectId || 'subjectId',
 				references: {
-					model: userConfig?.entityName || 'subject',
+					model: subjectConfig?.entityName || 'subject',
 					field: 'id',
 				},
 			},
@@ -89,7 +89,7 @@ export function getConsentRecordTable(
 
 			/**
 			 * Additional details about the consent action
-			 * May include IP address, subject agent, reason for withdrawal, etc.
+			 * May include IP address, subject agent, reason for consentWithdrawal, etc.
 			 */
 			details: {
 				type: 'json',
@@ -119,6 +119,6 @@ export function getConsentRecordTable(
 		 * Execution order during migrations (lower numbers run first)
 		 * Consent record table needs to be created after the subject and consent tables it references
 		 */
-		order: 7,
+		order: 4,
 	};
 }
