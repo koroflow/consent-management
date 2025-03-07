@@ -1,4 +1,5 @@
 import type {
+	Expression,
 	ExpressionBuilder,
 	ExpressionOrFactory,
 	InsertQueryBuilder,
@@ -83,6 +84,7 @@ export interface WhereCondition<EntityType extends EntityName> {
 		| 'contains'
 		| 'starts_with'
 		| 'ends_with'
+		| 'ilike'
 		| '=';
 
 	/**
@@ -112,6 +114,13 @@ export interface KyselyAdapterConfig {
 	 */
 	type?: KyselyDatabaseType;
 }
+
+/**
+ * Type alias for expression results in Kysely queries
+ *
+ * @internal
+ */
+type ExpressionResult<DB> = Expression<DB>;
 
 // Note: Throughout this adapter, we use "as any" type assertions in several places
 // to bridge the gap between our runtime-generated field references and Kysely's
@@ -426,7 +435,6 @@ const createEntityTransformer = (
 
 				const expr: ExpressionFn = (eb) => {
 					// For type safety, cast field to a reference expression
-					// The double-casting pattern works better than direct any casts
 					const dbField = fieldString as unknown as KyselyFieldRef;
 
 					if (operator.toLowerCase() === 'in') {
@@ -443,6 +451,19 @@ const createEntityTransformer = (
 
 					if (operator === 'ends_with') {
 						return eb(dbField, 'like', `%${value}`);
+					}
+
+					if (operator === 'ilike') {
+						// Use SQL LOWER function for case-insensitive comparison
+						const lowerField = eb.fn<string>('lower', [dbField]);
+						const lowerValue = eb.fn<string>('lower', [
+							eb.val(value?.toString()),
+						]);
+						return eb(
+							lowerField,
+							'like',
+							lowerValue
+						) as ExpressionResult<Database>;
 					}
 
 					if (operator === 'eq') {

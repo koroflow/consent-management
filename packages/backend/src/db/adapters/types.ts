@@ -35,7 +35,7 @@ export type ComparisonOperator =
 	| 'contains' // Contains substring
 	| 'starts_with' // Starts with
 	| 'ends_with' // Ends with
-	| 'caseInsensitiveEquals'; // Case insensitive equality
+	| 'ilike'; // Case insensitive equality
 
 /**
  * Type representing the logical connectors for combining query conditions

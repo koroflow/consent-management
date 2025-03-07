@@ -268,7 +268,7 @@ export function policyRegistry({ adapter, ...ctx }: RegistryContext) {
 							{
 								field: 'name',
 								value: normalizedSearchName,
-								operator: 'caseInsensitiveEquals',
+								operator: 'ilike',
 							},
 						],
 						sortBy: {

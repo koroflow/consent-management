@@ -254,7 +254,7 @@ export const setConsent = createAuthEndpoint(
 							userId: user.id,
 							entityType: 'consent',
 							entityId: consentRecord.id,
-							action: 'create',
+							actionType: 'consent_given',
 							details: {
 								consentId: consentRecord.id,
 								type,
