@@ -188,7 +188,7 @@ export const withdrawConsent = createAuthEndpoint(
 			const requestHeaders = ctx.request?.headers as
 				| Record<string, string>
 				| undefined;
-			const deviceInfo = requestHeaders?.['subject-agent'] || '';
+			const deviceInfo = requestHeaders?.['user-agent'] || '';
 			// @ts-expect-error
 			const ipAddress = ctx.request?.ip || '';
 

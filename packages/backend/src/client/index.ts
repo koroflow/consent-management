@@ -429,7 +429,7 @@ export class c15tClient {
  *   baseURL: 'https://api.example.com/consent',
  *   headers: {
  *     'X-API-Key': process.env.API_KEY,
- *     'Subject-Agent': 'MyConsentApp/1.0'
+ *     'user-agent': 'MyConsentApp/1.0'
  *   },
  *   fetchOptions: {
  *     // Optional custom fetch implementation

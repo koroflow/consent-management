@@ -72,14 +72,14 @@ export type InferFieldsFromPlugins<
  * }
  *
  * // Infer the output types for subject fields from options
- * type UserAdditionalFields = InferFieldsFromOptions<MyOptions, 'auth', 'subjectFields', 'output'>;
+ * type SubjectAdditionalFields = InferFieldsFromOptions<MyOptions, 'subject', 'subjectFields', 'output'>;
  * // Results in { profile?: string | null | undefined }
  * ```
  *
  * @remarks
  * TSchemaKey can be one of:
  * - Single string key like 'subjectFields' to access TOptions[T]['subjectFields']
- * - Array of strings for a nested path like ['auth', 'subjectFields']
+ * - Array of strings for a nested path like ['subject', 'subjectFields']
  *
  * This type helper extracts custom fields defined directly in the options object,
  * rather than those defined in plugins.

@@ -17,8 +17,7 @@ import type { ConsentWithdrawalEntityConfig } from './consent-withdrawal/types';
 import type { ConsentEntityConfig } from './consent/types';
 import type { DomainEntityConfig } from './domain/types';
 import type { GeoLocationEntityConfig } from './geo-location/types';
-// Import entity-specific types from their respective directories
-import type { UserEntityConfig } from './subject/types';
+import type { SubjectEntityConfig } from './subject/types';
 
 /**
  * Base entity configuration shared by all entities
@@ -79,7 +78,7 @@ export interface TablesConfig {
 	 * Subject entity configuration
 	 * @default entityName: "subject", entityPrefix: "sub"
 	 */
-	subject?: UserEntityConfig;
+	subject?: SubjectEntityConfig;
 
 	/**
 	 * Domain configuration
@@ -152,4 +151,4 @@ export type { ConsentRecordEntityConfig } from './consent-record/types';
 export type { ConsentWithdrawalEntityConfig } from './consent-withdrawal/types';
 export type { DomainEntityConfig } from './domain/types';
 export type { GeoLocationEntityConfig } from './geo-location/types';
-export type { UserEntityConfig } from './subject/types';
+export type { SubjectEntityConfig } from './subject/types';

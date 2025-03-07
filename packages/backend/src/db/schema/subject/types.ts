@@ -9,7 +9,7 @@ import type { TimestampedEntityConfig } from '../types';
  * Subject entity configuration
  * @default entityName: "subject", entityPrefix: "sub"
  */
-export interface UserEntityConfig extends TimestampedEntityConfig {
+export interface SubjectEntityConfig extends TimestampedEntityConfig {
 	fields?: Record<string, string> & {
 		id?: string;
 		isIdentified?: string;

@@ -202,10 +202,10 @@ export function consentWithdrawalRegistry({
 						value: consentId,
 					},
 				],
-				// sortBy: {
-				// 	field: 'createdAt',
-				// 	direction: 'desc',
-				// },
+				sortBy: {
+					field: 'createdAt',
+					direction: 'desc',
+				},
 			});
 			return consentWithdrawal
 				? validateEntityOutput(

@@ -108,6 +108,7 @@ export interface Adapter {
 		model: Model;
 		where: Where<Model>;
 		select?: Array<keyof Result>;
+		sortBy?: SortOptions<Model>;
 	}) => Promise<Result | null>;
 
 	/** Finds multiple records matching the where conditions */

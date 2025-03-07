@@ -252,7 +252,7 @@ export function consentRegistry({ adapter, ...ctx }: RegistryContext) {
 		 * Also records the withdrawal reason if provided.
 		 *
 		 * @param consentId - The unique identifier of the consent to update
-		 * @param withdrawalReason - Optional reason for withdrawal
+		 * @param withdrawalReason - Optional reason for consentWithdrawal
 		 * @param context - Optional endpoint context for hooks
 		 * @returns The updated consent with withdrawn status
 		 */

@@ -16,7 +16,7 @@ import type { Subject } from './schema';
  *
  * @example
  * ```typescript
- * const userAdapter = createSubjectAdapter(
+ * const subjectAdapter = createSubjectAdapter(
  *   databaseAdapter,
  *   createWithHooks,
  *   updateWithHooks,
@@ -51,7 +51,7 @@ export function subjectRegistry({ adapter, ...ctx }: RegistryContext) {
 				Partial<Subject>,
 			context?: GenericEndpointContext
 		) => {
-			const createdUser = await createWithHooks({
+			const createdSubject = await createWithHooks({
 				data: {
 					createdAt: new Date(),
 					updatedAt: new Date(),
@@ -61,8 +61,8 @@ export function subjectRegistry({ adapter, ...ctx }: RegistryContext) {
 				customFn: undefined,
 				context,
 			});
-			return createdUser
-				? validateEntityOutput('subject', createdUser, ctx.options)
+			return createdSubject
+				? validateEntityOutput('subject', createdSubject, ctx.options)
 				: null;
 		},
 
@@ -75,7 +75,7 @@ export function subjectRegistry({ adapter, ...ctx }: RegistryContext) {
 		 * @returns The existing or newly created subject
 		 * @throws APIError if subject validation fails or creation fails
 		 */
-		findOrcreateSubject: async function ({
+		findOrCreateSubject: async function ({
 			subjectId,
 			externalSubjectId,
 			ipAddress = 'unknown',
@@ -88,19 +88,19 @@ export function subjectRegistry({ adapter, ...ctx }: RegistryContext) {
 		}) {
 			// If both subjectId and externalSubjectId are provided, validate they match
 			if (subjectId && externalSubjectId) {
-				const [userById, userByExternalId] = await Promise.all([
+				const [subjectById, subjectByExternalId] = await Promise.all([
 					this.findSubjectById(subjectId),
 					this.findSubjectByExternalId(externalSubjectId),
 				]);
 
-				if (!userById || !userByExternalId) {
+				if (!subjectById || !subjectByExternalId) {
 					ctx.logger?.info(
 						'Subject validation failed: One or both subjects not found',
 						{
 							providedUserId: subjectId,
 							providedExternalId: externalSubjectId,
-							userByIdFound: !!userById,
-							userByExternalIdFound: !!userByExternalId,
+							subjectByIdFound: !!subjectById,
+							subjectByExternalIdFound: !!subjectByExternalId,
 						}
 					);
 					throw new C15TError(
@@ -116,14 +116,14 @@ export function subjectRegistry({ adapter, ...ctx }: RegistryContext) {
 					);
 				}
 
-				if (userById.id !== userByExternalId.id) {
+				if (subjectById.id !== subjectByExternalId.id) {
 					ctx.logger?.warn(
 						'Subject validation failed: IDs do not match the same subject',
 						{
 							providedUserId: subjectId,
 							providedExternalId: externalSubjectId,
-							userByIdId: userById.id,
-							userByExternalIdId: userByExternalId.id,
+							subjectByIdId: subjectById.id,
+							subjectByExternalIdId: subjectByExternalId.id,
 						}
 					);
 					throw new C15TError(
@@ -134,14 +134,14 @@ export function subjectRegistry({ adapter, ...ctx }: RegistryContext) {
 							data: {
 								providedUserId: subjectId,
 								providedExternalId: externalSubjectId,
-								userByIdId: userById.id,
-								userByExternalIdId: userByExternalId.id,
+								subjectByIdId: subjectById.id,
+								subjectByExternalIdId: subjectByExternalId.id,
 							},
 						}
 					);
 				}
 
-				return userById;
+				return subjectById;
 			}
 
 			// Try to find subject by subjectId if provided

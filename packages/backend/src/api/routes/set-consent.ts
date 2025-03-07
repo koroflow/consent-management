@@ -117,7 +117,7 @@ export const setConsent = createAuthEndpoint(
 			const { registry, adapter } = ctx.context as C15TContext;
 
 			// Find or create subject
-			const subject = await registry.findOrcreateSubject({
+			const subject = await registry.findOrCreateSubject({
 				subjectId,
 				externalSubjectId,
 				ipAddress: ctx.context.ipAddress || 'unknown',
