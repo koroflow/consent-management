@@ -82,7 +82,7 @@ export function getConsentTable(
 			 * Represents the many-to-many relationship between consent and purposes
 			 */
 			purposeIds: {
-				type: 'json',
+				type: 'string',
 				required: false,
 				fieldName: consentConfig?.fields?.purposeIds || 'purposeIds',
 				references: {

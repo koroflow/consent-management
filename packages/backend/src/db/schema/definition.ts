@@ -191,6 +191,216 @@ export function validateEntityOutput<TableName extends keyof C15TDBSchema>(
 		throw new Error(`Table ${tableName} not found`);
 	}
 
-	// Validate and return data using Zod schema
-	return table.schema.parse(data) as EntityOutputFields<TableName>;
+	console.log(
+		`🔎 DEBUG VALIDATE: Validating ${tableName} entity with direct date inspection`
+	);
+
+	// Check for and fix date fields that are strings but should be Date objects
+	if (data && typeof data === 'object') {
+		if ('createdAt' in data) {
+			const createdAt = data.createdAt;
+			console.log(
+				'🔎 DEBUG VALIDATE: Inspecting createdAt value:',
+				createdAt,
+				'type:',
+				typeof createdAt
+			);
+			console.log(
+				'🔎 DEBUG VALIDATE: createdAt is Date?',
+				createdAt instanceof Date
+			);
+
+			// If it's a string that looks like a date, convert it
+			if (
+				typeof createdAt === 'string' &&
+				/^\d{4}-\d{2}-\d{2}/.test(createdAt)
+			) {
+				console.log('🔎 DEBUG VALIDATE: Converting string createdAt to Date');
+				data.createdAt = new Date(createdAt);
+				console.log(
+					'🔎 DEBUG VALIDATE: After conversion:',
+					data.createdAt,
+					'type:',
+					typeof data.createdAt
+				);
+				console.log(
+					'🔎 DEBUG VALIDATE: Is now Date?',
+					data.createdAt instanceof Date
+				);
+			}
+		}
+
+		if ('updatedAt' in data) {
+			const updatedAt = data.updatedAt;
+			console.log(
+				'🔎 DEBUG VALIDATE: Inspecting updatedAt value:',
+				updatedAt,
+				'type:',
+				typeof updatedAt
+			);
+			console.log(
+				'🔎 DEBUG VALIDATE: updatedAt is Date?',
+				updatedAt instanceof Date
+			);
+
+			// If it's a string that looks like a date, convert it
+			if (
+				typeof updatedAt === 'string' &&
+				/^\d{4}-\d{2}-\d{2}/.test(updatedAt)
+			) {
+				console.log('🔎 DEBUG VALIDATE: Converting string updatedAt to Date');
+				data.updatedAt = new Date(updatedAt);
+				console.log(
+					'🔎 DEBUG VALIDATE: After conversion:',
+					data.updatedAt,
+					'type:',
+					typeof data.updatedAt
+				);
+				console.log(
+					'🔎 DEBUG VALIDATE: Is now Date?',
+					data.updatedAt instanceof Date
+				);
+			}
+		}
+	}
+
+	// Log date fields for debugging
+	if ('createdAt' in data) {
+		console.log(
+			`🔍 DEBUG validateEntityOutput: createdAt in data: ${data.createdAt} (${typeof data.createdAt})`
+		);
+		console.log(
+			`🔍 DEBUG validateEntityOutput: createdAt is Date? ${data.createdAt instanceof Date}`
+		);
+
+		// Get the expected Zod schema for createdAt if available
+		try {
+			const schema = table.schema.shape;
+			// Use optional chaining and type checks to avoid errors
+			if (schema && typeof schema === 'object' && 'createdAt' in schema) {
+				const createdAtSchema = schema.createdAt;
+				if (
+					createdAtSchema &&
+					typeof createdAtSchema === 'object' &&
+					'_def' in createdAtSchema
+				) {
+					// Now safely access the typeName
+					const typeDef = createdAtSchema._def;
+					if (typeDef && typeof typeDef === 'object' && 'typeName' in typeDef) {
+						console.log(
+							`🔍 DEBUG validateEntityOutput: createdAt schema type: ${typeDef.typeName}`
+						);
+					}
+				}
+			}
+		} catch (err) {
+			console.log(
+				`🔍 DEBUG validateEntityOutput: Error accessing schema for createdAt: ${err}`
+			);
+		}
+	}
+	if ('updatedAt' in data) {
+		console.log(
+			`🔍 DEBUG validateEntityOutput: updatedAt in data: ${data.updatedAt} (${typeof data.updatedAt})`
+		);
+		console.log(
+			`🔍 DEBUG validateEntityOutput: updatedAt is Date? ${data.updatedAt instanceof Date}`
+		);
+
+		// Get the expected Zod schema for updatedAt if available
+		try {
+			const schema = table.schema.shape;
+			// Use optional chaining and type checks to avoid errors
+			if (schema && typeof schema === 'object' && 'updatedAt' in schema) {
+				const updatedAtSchema = schema.updatedAt;
+				if (
+					updatedAtSchema &&
+					typeof updatedAtSchema === 'object' &&
+					'_def' in updatedAtSchema
+				) {
+					// Now safely access the typeName
+					const typeDef = updatedAtSchema._def;
+					if (typeDef && typeof typeDef === 'object' && 'typeName' in typeDef) {
+						console.log(
+							`🔍 DEBUG validateEntityOutput: updatedAt schema type: ${typeDef.typeName}`
+						);
+					}
+				}
+			}
+		} catch (err) {
+			console.log(
+				`🔍 DEBUG validateEntityOutput: Error accessing schema for updatedAt: ${err}`
+			);
+		}
+	}
+
+	try {
+		// Validate and return data using Zod schema
+		const result = table.schema.parse(data) as EntityOutputFields<TableName>;
+		console.log(
+			`🔍 DEBUG validateEntityOutput: Validation succeeded for ${tableName}`
+		);
+		return result;
+	} catch (error) {
+		console.error(
+			`🔍 DEBUG validateEntityOutput: Validation failed for ${tableName}:`,
+			error
+		);
+		// Log the error details if it's a Zod error
+		if (error && typeof error === 'object' && 'errors' in error) {
+			console.error('Zod validation errors details:');
+
+			// Safely type the errors array with proper checks
+			const errorObj = error as { errors?: unknown[] };
+			const errors = Array.isArray(errorObj.errors) ? errorObj.errors : [];
+
+			for (const err of errors) {
+				if (err && typeof err === 'object') {
+					// Safely access properties with optional chaining
+					interface ZodErrorItem {
+						path?: string[];
+						expected?: string;
+						received?: string;
+						message?: string;
+						code?: string;
+					}
+
+					// More specific typing for the error object
+					const errorItem = err as Partial<ZodErrorItem>;
+					const path = Array.isArray(errorItem.path)
+						? errorItem.path.join('.')
+						: 'unknown path';
+					const expected = errorItem.expected || 'unknown';
+					const received = errorItem.received || 'unknown';
+					const message = errorItem.message || 'No error message';
+
+					console.error(
+						`- Path: ${path}, Expected: ${expected}, Received: ${received}`
+					);
+					console.error(`  Message: ${message}`);
+
+					// Extra debugging for date fields
+					if (path.includes('createdAt') || path.includes('updatedAt')) {
+						const fieldName = path.split('.').pop() || '';
+						if (fieldName && fieldName in data) {
+							const fieldValue = data[fieldName];
+							console.error(
+								`  Value: ${fieldValue}, Type: ${typeof fieldValue}`
+							);
+							if (typeof fieldValue === 'string') {
+								try {
+									console.error(
+										`  Trying to parse as Date: ${new Date(fieldValue)}`
+									);
+								} catch (parseErr) {
+									console.error(`  Failed to parse as Date: ${parseErr}`);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		throw error;
+	}
 }
