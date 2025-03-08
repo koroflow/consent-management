@@ -1,10 +1,12 @@
 import { expect, test } from 'vitest';
 
 import type { C15TOptions } from '~/types';
+import { generateId } from '../core/fields';
 import type { Adapter } from './types';
 
 interface AdapterTestOptions {
 	name: string;
+  expectedAdapterId: string;
 	getAdapter: (
 		customOptions?: Omit<C15TOptions, 'storage'>
 	) => Promise<Adapter>;
@@ -19,15 +21,17 @@ export function runAdapterTests(opts: AdapterTestOptions) {
 	test(`${opts.name}: initialize adapter`, async () => {
 		adapter = await opts.getAdapter();
 		expect(adapter).toBeDefined();
-		expect(adapter.id).toBe('kysely');
+		expect(adapter.id).toBe(opts.expectedAdapterId);
 	});
 
 	// Individual test cases
 	test(`${opts.name}: create subject`, async () => {
+		const testId = generateId('sub');
+
 		const res = await adapter.create({
 			model: 'subject',
 			data: {
-				id: 'subject-id-1',
+				id: testId,
 				isIdentified: false,
 				createdAt: new Date(),
 				updatedAt: new Date(),
@@ -36,42 +40,34 @@ export function runAdapterTests(opts: AdapterTestOptions) {
 
 		expect(res).toBeDefined();
 		//@ts-expect-error - id is not a field on the subject model
-		expect(res.id).toBe('subject-id-1');
+		expect(res.id).toBe(testId);
 	});
 
 	test(`${opts.name}: find subject`, async () => {
+		// Create a subject first
+		const testId = generateId('sub');
+		await adapter.create({
+			model: 'subject',
+			data: {
+				id: testId,
+				isIdentified: false,
+				createdAt: new Date(),
+				updatedAt: new Date(),
+			},
+		});
+
 		const res = await adapter.findOne({
 			model: 'subject',
 			where: [
 				{
 					field: 'id',
-					value: 'subject-id-1',
+					value: testId,
 				},
 			],
 		});
 
 		expect(res).toBeDefined();
 		//@ts-expect-error - id is not a field on the subject model
-		expect(res.id).toBe('subject-id-1');
+		expect(res?.id).toBe(testId);
 	});
-
-	// And so on for other tests...
-
-	// Skip the generateId test conditionally
-	// (opts.skipGenerateIdTest ? test.skip : test)(`${opts.name}: generate ID`, async () => {
-	// 	// Test implementation...
-	// });
-
-	// // Skip the transaction test conditionally
-	// (opts.skipTransactionTest ? test.skip : test)(`${opts.name}: transaction`, async () => {
-	// 	const recordId = null;
-
-	// 	await adapter.transaction({
-	// 		callback: async (txAdapter) => {
-	// 			// Transaction test implementation...
-	// 		},
-	// 	});
-
-	// 	// Verification...
-	// });
 }

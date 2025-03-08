@@ -192,6 +192,7 @@ describe('Kysely Adapter Tests', () => {
 		// Run the adapter tests for SQLite
 		runAdapterTests({
 			name: 'SQLite',
+			expectedAdapterId: 'kysely',
 			getAdapter: async () => sqliteAdapter,
 			skipGenerateIdTest: sqliteConfig.skipGenerateIdTest,
 			skipTransactionTest: sqliteConfig.disableTransactions,
