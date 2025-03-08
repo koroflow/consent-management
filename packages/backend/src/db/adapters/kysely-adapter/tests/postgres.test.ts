@@ -181,7 +181,7 @@ describe('Kysely Adapter Tests', () => {
 
 		afterAll(async () => {
 			// Temporarily disable cleanup to inspect tables
-			// await postgresConfig.cleanup?.();
+			await postgresConfig.cleanup?.();
 			await pgPool.end();
 			logger.info('Pool closed, but tables preserved for inspection');
 		}, hookTimeout);
@@ -219,6 +219,7 @@ describe('Kysely Adapter Tests', () => {
 		// Run the adapter tests for Postgres
 		runAdapterTests({
 			name: 'Postgres',
+			expectedAdapterId: 'kysely',
 			getAdapter: async () => postgresAdapter,
 			skipGenerateIdTest: postgresConfig.skipGenerateIdTest,
 			skipTransactionTest: postgresConfig.disableTransactions,
