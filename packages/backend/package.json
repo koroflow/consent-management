@@ -134,10 +134,14 @@
 	},
 	"devDependencies": {
 		"@c15t/typescript-config": "workspace:*",
+		"@libsql/kysely-libsql": "^0.4.1",
 		"@types/better-sqlite3": "^7.6.12",
 		"@types/node": "^22.13.9",
 		"@types/pg": "^8.11.11",
+		"@vitest/ui": "^3.0.8",
 		"knip": "^5.45.0",
+		"tarn": "^3.0.2",
+		"tedious": "^18.6.1",
 		"typescript": "^5.8.2"
 	}
 }

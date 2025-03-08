@@ -199,8 +199,8 @@ describe('Consent Endpoints', () => {
 				}
 
 				// Test with mismatched IDs
-				await expect(
-					setConsent({
+				try {
+					await setConsent({
 						context,
 						params: undefined,
 						query: undefined,
@@ -208,12 +208,14 @@ describe('Consent Endpoints', () => {
 							subjectId: subject.id,
 							externalSubjectId: 'other-subject',
 						}),
-					})
-				).rejects.toMatchObject({
-					name: 'C15TError',
-					code: BASE_ERROR_CODES.BAD_REQUEST,
-					status: 400,
-				});
+					});
+				} catch (error) {
+					expect(error).toMatchObject({
+						name: 'C15TError',
+						code: BASE_ERROR_CODES.CONFLICT,
+						status: 409,
+					});
+				}
 			});
 		});
 

@@ -399,6 +399,80 @@ export function dateField<
 			}
 		}
 
+		// Enhanced MySQL date string handling
+		if (dbType === 'mysql' && typeof value === 'string') {
+			// Add explicit handling for MySQL date formats
+			const isMySQLDateFormat =
+				/^\d{4}-\d{2}-\d{2}$/.test(value) || // YYYY-MM-DD
+				/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/.test(value); // YYYY-MM-DD HH:MM:SS
+
+			if (isMySQLDateFormat) {
+				// For MySQL date-only format, add time component
+				if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+					value = `${value}T00:00:00Z`;
+				}
+
+				// Convert MySQL space-separated datetime to ISO format
+				if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/.test(value)) {
+					value = `${value.replace(' ', 'T')}Z`;
+				}
+
+				try {
+					const dateObj = new Date(value);
+					if (!Number.isNaN(dateObj.getTime())) {
+						parsedValue = dateObj;
+					}
+				} catch {
+					// Ignore parsing errors
+				}
+			}
+		}
+
+		// General fallback for any string that might be a valid date
+		// This handles cases not explicitly caught by the database-specific handlers
+		if (typeof parsedValue === 'string' && !(parsedValue instanceof Date)) {
+			try {
+				// Check if the string is ISO 8601 format or looks like a date
+				const isLikelyDate =
+					/^\d{4}[-/]\d{1,2}[-/]\d{1,2}/.test(parsedValue) || // Starts with YYYY-MM-DD or YYYY/MM/DD
+					/^\d{1,2}[-/]\d{1,2}[-/]\d{4}/.test(parsedValue) || // Starts with MM-DD-YYYY or MM/DD/YYYY
+					(parsedValue.includes('T') && parsedValue.includes(':')); // Contains T and : (likely ISO format)
+
+				if (isLikelyDate) {
+					const dateObj = new Date(parsedValue);
+					if (!Number.isNaN(dateObj.getTime())) {
+						parsedValue = dateObj;
+					}
+				}
+			} catch {
+				// If conversion fails, keep the original value
+			}
+		}
+
+		// Handle values that might be Date objects but were stringified
+		if (
+			typeof parsedValue === 'object' &&
+			parsedValue !== null &&
+			!Array.isArray(parsedValue) &&
+			!(parsedValue instanceof Date) &&
+			'toString' in parsedValue
+		) {
+			try {
+				const dateStr = parsedValue.toString();
+				if (
+					dateStr.includes('GMT') ||
+					(typeof dateStr === 'string' && !Number.isNaN(Date.parse(dateStr)))
+				) {
+					const dateObj = new Date(dateStr);
+					if (!Number.isNaN(dateObj.getTime())) {
+						parsedValue = dateObj;
+					}
+				}
+			} catch {
+				// If conversion fails, keep the original value
+			}
+		}
+
 		// Apply the subject's transform if provided
 		if (originalOutputTransform && parsedValue instanceof Date) {
 			return await originalOutputTransform(parsedValue);
